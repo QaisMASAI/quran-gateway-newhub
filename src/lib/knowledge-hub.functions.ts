@@ -246,11 +246,35 @@ export const getKnowledgeHub = createServerFn({ method: "POST" })
           : { data: [] as Array<{ source_id: string; surah: number; ayah: number; text: string }> };
 
         const firstAyah = link.ayah_start;
-        const ar = (rangeRows ?? []).find((r) => r.ayah === firstAyah && r.source_id === arabicSourceId)?.text ?? "";
-        const tr =
+        let ar = (rangeRows ?? []).find((r) => r.ayah === firstAyah && r.source_id === arabicSourceId)?.text ?? "";
+        let tr =
           (rangeRows ?? []).find((r) => r.ayah === firstAyah && r.source_id === localeSourceId)?.text ??
           (rangeRows ?? []).find((r) => r.ayah === firstAyah && r.source_id === arabicSourceId)?.text ??
           "";
+
+        if (!ar || !tr) {
+          try {
+            const trId = data.language === "he" ? 233 : data.language === "en" ? 20 : 0;
+            const remote = await fetch(
+              `https://api.quran.com/api/v4/verses/by_key/${link.surah}:${firstAyah}?words=false${
+                trId ? `&translations=${trId}` : ""
+              }`,
+            );
+            if (remote.ok) {
+              const remoteJson = (await remote.json()) as {
+                verse?: { text_uthmani?: string; translations?: Array<{ text?: string }> };
+              };
+              ar = ar || remoteJson.verse?.text_uthmani || "";
+              tr =
+                tr ||
+                (data.language === "ar"
+                  ? remoteJson.verse?.text_uthmani || ""
+                  : (remoteJson.verse?.translations?.[0]?.text ?? "").replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim());
+            }
+          } catch {
+            // keep DB values if remote fallback fails
+          }
+        }
 
         return {
           link,
