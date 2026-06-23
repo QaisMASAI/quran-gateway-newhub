@@ -40,11 +40,13 @@ export interface TopicLessonRow {
 }
 
 export const TAFSIR_SOURCE_SLUG_BY_KEY: Record<string, string> = {
-  "ibn-kathir": "ibn_kathir",
-  tabari: "al_tabari",
+  muyassar: "al_muyassar",
   qurtubi: "al_qurtubi",
   saadi: "al_saadi",
-  muyassar: "al_muyassar",
+  jalalayn: "al_jalalayn",
+  baghawi: "al_baghawi",
+  waseet: "al_waseet",
+  tanweer: "al_tanweer",
 };
 
 export function sourceName(s: TafsirSourceRow | null | undefined, locale: Locale): string {
