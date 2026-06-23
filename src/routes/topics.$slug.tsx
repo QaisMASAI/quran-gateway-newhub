@@ -1,6 +1,7 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
+import i18n from "@/lib/i18n";
 import { Header } from "@/components/Header";
 import { getTopic, type AyahRef } from "@/lib/topics";
 import { useTopicT } from "@/lib/content-i18n";
@@ -17,9 +18,12 @@ export const Route = createFileRoute("/topics/$slug")({
     return { topic };
   },
   head: ({ params, loaderData }) => {
+    const locale = normalizeLocale(i18n.resolvedLanguage) ?? "he";
     const topic = loaderData?.topic;
-    const title = topic ? `${topic.title} — נושא בקוראן` : "נושא בקוראן";
-    const description = topic?.description ?? "נושאים מתוך הקוראן הקדוש.";
+    const localizedTitle = topic ? i18n.t(`content:topics.${topic.slug}.title`, { lng: locale, defaultValue: topic.title }) : "";
+    const localizedDescription = topic ? i18n.t(`content:topics.${topic.slug}.description`, { lng: locale, defaultValue: topic.description ?? "" }) : "";
+    const title = topic ? `${localizedTitle} — ${i18n.t("pages:topics.title", { lng: locale })}` : i18n.t("pages:topics.title", { lng: locale });
+    const description = localizedDescription || i18n.t("pages:topics.intro", { lng: locale });
     const url = `/topics/${params.slug}`;
     return {
       meta: [

@@ -1,6 +1,7 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
+import i18n from "@/lib/i18n";
 import { Header } from "@/components/Header";
 import { getProphet, type AyahRef } from "@/lib/prophets";
 import { useProphetT } from "@/lib/content-i18n";
@@ -17,11 +18,13 @@ export const Route = createFileRoute("/prophets/$slug")({
     return { prophet };
   },
   head: ({ params, loaderData }) => {
+    const locale = normalizeLocale(i18n.resolvedLanguage) ?? "he";
     const p = loaderData?.prophet;
-    const title = p ? `${p.nameHe} (${p.nameAr}) — נביא בקוראן` : "נביא בקוראן";
+    const localizedName = p ? i18n.t(`content:prophets.${p.slug}.name`, { lng: locale, defaultValue: p.nameHe }) : "";
+    const title = p ? `${localizedName} (${p.nameAr}) — ${i18n.t("pages:prophets.title", { lng: locale })}` : i18n.t("pages:prophets.title", { lng: locale });
     const description = p
-      ? `פסוקים בקוראן הקדוש בהם נזכר ${p.nameHe}${p.nameHeAlt ? ` (${p.nameHeAlt})` : ""}.`
-      : "נביאי הקוראן הקדוש.";
+      ? i18n.t("pages:detail.prophetIntro", { lng: locale, name: localizedName })
+      : i18n.t("pages:prophets.intro", { lng: locale });
     const url = `/prophets/${params.slug}`;
     return {
       meta: [
