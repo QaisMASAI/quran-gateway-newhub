@@ -23,7 +23,7 @@ type UpsertChunk = {
   source_name: string;
   translator_name: string | null;
   chunk_text: string;
-  embedding: number[] | null;
+  embedding: string | null;
   embedding_model: string;
 };
 
@@ -39,6 +39,10 @@ async function buildChunkEmbeddings(texts: string[], apiKey: string) {
     input: texts,
   });
   return vectors;
+}
+
+function toVectorLiteral(vec: number[]) {
+  return `[${vec.join(",")}]`;
 }
 
 export const rebuildGroundedChunks = createServerFn({ method: "POST" })
@@ -216,7 +220,7 @@ export const rebuildGroundedChunks = createServerFn({ method: "POST" })
     const texts = chunks.map((c) => c.chunk_text || c.source_name);
     const vectors = await buildChunkEmbeddings(texts, apiKey);
     for (let i = 0; i < chunks.length; i += 1) {
-      chunks[i].embedding = vectors[i] ?? null;
+      chunks[i].embedding = vectors[i] ? toVectorLiteral(vectors[i]) : null;
     }
 
     const { error: upsertError } = await supabaseAdmin
