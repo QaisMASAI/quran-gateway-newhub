@@ -323,7 +323,7 @@ function FeatureCard({
   body,
   icon,
 }: {
-  to: string;
+  to: "/topics" | "/learn/journeys" | "/learn" | "/research";
   title: string;
   body: string;
   icon: React.ReactNode;
