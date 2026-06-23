@@ -2,8 +2,8 @@
 // using HTML5 Canvas. Multiple formats for social networks.
 
 export type VerseImageFormat =
-  | "square"    // 1:1 — Instagram feed, generic
-  | "story"     // 9:16 — Instagram/WhatsApp/Facebook stories
+  | "square" // 1:1 — Instagram feed, generic
+  | "story" // 9:16 — Instagram/WhatsApp/Facebook stories
   | "landscape" // 1.91:1 — Facebook/Twitter/LinkedIn/OG share
   | "portrait"; // 4:5 — Instagram portrait
 
@@ -90,10 +90,7 @@ function fitFont(
   return { size: minSize, lines: wrap(ctx, text, maxWidth) };
 }
 
-function roundRect(
-  ctx: CanvasRenderingContext2D,
-  x: number, y: number, w: number, h: number, r: number,
-) {
+function roundRect(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, r: number) {
   ctx.beginPath();
   ctx.moveTo(x + r, y);
   ctx.arcTo(x + w, y, x + w, y + h, r);
@@ -259,30 +256,22 @@ export async function renderVerseImage(input: VerseImageInput): Promise<Blob> {
   const brandSize = Math.round(Math.min(W, H) * (landscape ? 0.035 : 0.022));
   ctx.font = `700 ${brandSize}px "Heebo", system-ui, sans-serif`;
   const brandY = cardY + cardH - Math.round(H * (landscape ? 0.1 : 0.06));
-  ctx.fillText("Quran Connect · קוראן בעברית", W / 2, brandY);
+  ctx.fillText("Noor Al-Quran · نور القرآن", W / 2, brandY);
   if (input.url) {
     const urlSize = Math.round(brandSize * 0.78);
     ctx.font = `400 ${urlSize}px "Heebo", system-ui, sans-serif`;
     ctx.fillStyle = "rgba(60,40,10,0.55)";
-    ctx.fillText(
-      input.url.replace(/^https?:\/\//, ""),
-      W / 2,
-      brandY + brandSize * 1.4,
-    );
+    ctx.fillText(input.url.replace(/^https?:\/\//, ""), W / 2, brandY + brandSize * 1.4);
   }
 
   return await new Promise<Blob>((resolve, reject) => {
-    canvas.toBlob(
-      (b) => (b ? resolve(b) : reject(new Error("toBlob failed"))),
-      "image/png",
-      0.95,
-    );
+    canvas.toBlob((b) => (b ? resolve(b) : reject(new Error("toBlob failed"))), "image/png", 0.95);
   });
 }
 
 export const FORMAT_LABELS: Record<VerseImageFormat, string> = {
-  square: "Square · Instagram / General",
-  story: "Story · 9:16",
-  landscape: "Landscape · Facebook / X",
-  portrait: "Portrait · Instagram 4:5",
+  square: "מרובע · אינסטגרם / כללי",
+  story: "סטורי · 9:16",
+  landscape: "אופקי · פייסבוק / טוויטר",
+  portrait: "פורטרט · אינסטגרם 4:5",
 };
