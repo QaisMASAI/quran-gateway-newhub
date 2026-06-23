@@ -22,31 +22,33 @@ import {
   Compass,
   ArrowUpRight,
 } from "lucide-react";
-import { normalizeLocale } from "@/lib/i18n";
+import i18n, { normalizeLocale } from "@/lib/i18n";
 
 export const Route = createFileRoute("/")({
-  head: () => ({
-    meta: [
-      { title: "Noor Al Quran | Discover the Quran" },
-      {
-        name: "description",
-        content:
-          "Discover the Quran through clear explanations, guided learning paths, topics, prophets, historical context, and AI-powered exploration.",
-      },
-      { property: "og:title", content: "Noor Al Quran | Discover the Quran" },
-      {
-        property: "og:description",
-        content: "Explore, learn, and understand the Quran through an accessible multilingual learning experience.",
-      },
-      { property: "og:url", content: "/" },
-      { name: "twitter:title", content: "Noor Al Quran | Discover the Quran" },
-      {
-        name: "twitter:description",
-        content: "Explore, learn, and understand the Quran through an accessible multilingual learning experience.",
-      },
-    ],
-    links: [{ rel: "canonical", href: "/" }],
-  }),
+  head: () => {
+    const locale = normalizeLocale(i18n.resolvedLanguage) ?? "he";
+    return {
+      meta: [
+        { title: i18n.t("pages:home.metaTitle", { lng: locale }) },
+        {
+          name: "description",
+          content: i18n.t("pages:home.metaDescription", { lng: locale }),
+        },
+        { property: "og:title", content: i18n.t("pages:home.ogTitle", { lng: locale }) },
+        {
+          property: "og:description",
+          content: i18n.t("pages:home.ogDescription", { lng: locale }),
+        },
+        { property: "og:url", content: "/" },
+        { name: "twitter:title", content: i18n.t("pages:home.ogTitle", { lng: locale }) },
+        {
+          name: "twitter:description",
+          content: i18n.t("pages:home.ogDescription", { lng: locale }),
+        },
+      ],
+      links: [{ rel: "canonical", href: "/" }],
+    };
+  },
   component: Home,
 });
 

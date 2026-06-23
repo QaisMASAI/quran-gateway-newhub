@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
+import i18n from "@/lib/i18n";
 import { Header } from "@/components/Header";
 import { Loader2, Compass, Network } from "lucide-react";
 import { listAllEntities, groupByKind, type EntityKind } from "@/lib/knowledge";
@@ -8,16 +9,22 @@ import { EntityCard } from "@/components/discovery/EntityCard";
 import { normalizeLocale, type Locale } from "@/lib/i18n";
 
 export const Route = createFileRoute("/learn/")({
-  head: () => ({
-    meta: [
-      { title: "Noor Al Quran| Quran Discovery Journey" },
-      {
-        name: "description",
-        content:
-          "Explore the Quran through topics, prophets and stories — a guided journey of knowledge discovery in Hebrew, Arabic and English.",
-      },
-    ],
-  }),
+  head: () => {
+    const locale = normalizeLocale(i18n.resolvedLanguage) ?? "he";
+    return {
+      meta: [
+        { title: i18n.t("pages:learn.metaTitle", { lng: locale }) },
+        {
+          name: "description",
+          content: i18n.t("pages:learn.metaDescription", { lng: locale }),
+        },
+        { property: "og:title", content: i18n.t("pages:learn.metaTitle", { lng: locale }) },
+        { property: "og:description", content: i18n.t("pages:learn.metaDescription", { lng: locale }) },
+        { property: "og:url", content: "/learn" },
+      ],
+      links: [{ rel: "canonical", href: "/learn" }],
+    };
+  },
   component: LearnIndex,
 });
 
