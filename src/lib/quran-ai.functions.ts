@@ -4,6 +4,15 @@ import { z } from "zod";
 import { createLovableAiGatewayProvider } from "./ai-gateway.server";
 import { embedTexts } from "./embeddings.server";
 
+async function withTimeout<T>(promise: Promise<T>, timeoutMs: number): Promise<T> {
+  return await Promise.race([
+    promise,
+    new Promise<never>((_, reject) =>
+      setTimeout(() => reject(new Error("generation_timeout")), timeoutMs),
+    ),
+  ]);
+}
+
 // ============================================================
 // Prompt-injection hardening
 // ============================================================
@@ -266,13 +275,16 @@ export const explainAyah = createServerFn({ method: "POST" })
     const userPrompt = userPromptFor(lang, data.mode, safeSurahName, data.surah, data.ayah, sourceMeta, safeSource);
 
     try {
-      const { text } = await generateText({
-        model: gateway("google/gemini-2.5-flash"),
-        system: data.mode === "tafsir" ? systems.tafsir : systems.sabab,
-        prompt: userPrompt,
-        temperature: 0,
-        maxOutputTokens: 600,
-      });
+      const { text } = await withTimeout(
+        generateText({
+          model: gateway("google/gemini-2.5-flash"),
+          system: data.mode === "tafsir" ? systems.tafsir : systems.sabab,
+          prompt: userPrompt,
+          temperature: 0,
+          maxOutputTokens: 600,
+        }),
+        20_000,
+      );
       return {
         text,
         source: {
@@ -535,13 +547,16 @@ Strict rules:
     } as const;
 
     try {
-      const { text } = await generateText({
-        model: gateway("google/gemini-2.5-flash"),
-        system: systemByLang[lang],
-        prompt: userPromptByLang[lang],
-        temperature: 0,
-        maxOutputTokens: 500,
-      });
+      const { text } = await withTimeout(
+        generateText({
+          model: gateway("google/gemini-2.5-flash"),
+          system: systemByLang[lang],
+          prompt: userPromptByLang[lang],
+          temperature: 0,
+          maxOutputTokens: 500,
+        }),
+        20_000,
+      );
 
       const allowed = new Set(ranked.map((v) => `${v.surah}:${v.ayah}`));
       const cited = new Set<string>();
@@ -623,13 +638,16 @@ Rules:
 - If the question is empty or meaningless, return empty arrays.`;
 
     try {
-      const { text } = await generateText({
-        model: gateway("google/gemini-2.5-flash"),
-        system,
-        prompt: sanitizeUntrusted(data.question, 500),
-        temperature: 0,
-        maxOutputTokens: 300,
-      });
+      const { text } = await withTimeout(
+        generateText({
+          model: gateway("google/gemini-2.5-flash"),
+          system,
+          prompt: sanitizeUntrusted(data.question, 500),
+          temperature: 0,
+          maxOutputTokens: 300,
+        }),
+        12_000,
+      );
 
       const cleaned = text
         .trim()
