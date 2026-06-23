@@ -3,7 +3,7 @@ import { Link } from "@tanstack/react-router";
 import { Play, Pause, Sparkles, BookText, Star, Loader2, NotebookPen, User, Tag, HeartHandshake } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import { useTranslation } from "react-i18next";
-import { ayahAudioUrl, cleanText, normalizeHebrew, RECITERS, reciterName, getStoredReciter, setStoredReciter, type ReciterKey } from "@/lib/quran-api";
+import { ayahAudioUrl, cleanText, normalizeHebrew, RECITERS, reciterName, getStoredReciter, type ReciterKey } from "@/lib/quran-api";
 import { useFavorites } from "@/lib/favorites";
 import { useQuery } from "@tanstack/react-query";
 import { TAFSIR_SOURCES_META, tafsirSourceName } from "@/lib/tafsir-sources";
@@ -65,11 +65,10 @@ export function AyahCard({ surah, surahName, ayah, arabic, hebrew, highlight }: 
   const [playing, setPlaying] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const [reciter, setReciter] = useState<ReciterKey>(() => getStoredReciter());
-  const [showReciter, setShowReciter] = useState(false);
 
   const [panel, setPanel] = useState<null | "tafsir" | "sabab">(null);
   const [showNote, setShowNote] = useState(false);
-  const [tafsirSource, setTafsirSource] = useState<typeof TAFSIR_SOURCES_META[number]["key"]>("muyassar");
+  const [tafsirSource] = useState<typeof TAFSIR_SOURCES_META[number]["key"]>("jalalayn");
   const selectedTafsirSlug = TAFSIR_SOURCE_SLUG_BY_KEY[tafsirSource] ?? "al_muyassar";
   const tafsirQ = useQuery({
     queryKey: ["tafsir-verse", surah, ayah, locale, selectedTafsirSlug],
@@ -117,22 +116,12 @@ export function AyahCard({ surah, surahName, ayah, arabic, hebrew, highlight }: 
     }
   };
 
-  const pickReciter = (k: ReciterKey) => {
-    setStoredReciter(k);
-    setReciter(k);
-    setShowReciter(false);
-  };
-
   const openPanel = (mode: "tafsir" | "sabab") => {
     if (panel === mode) {
       setPanel(null);
       return;
     }
     setPanel(mode);
-  };
-
-  const selectTafsirSource = (src: typeof TAFSIR_SOURCES_META[number]["key"]) => {
-    setTafsirSource(src);
   };
 
   const heHighlight = useMemo(() => highlightHebrew(hebrew, highlight), [hebrew, highlight]);
@@ -196,29 +185,10 @@ export function AyahCard({ surah, surahName, ayah, arabic, hebrew, highlight }: 
           <span>{playing ? t("ui.ayah.pause") : t("ui.ayah.play")}</span>
         </ActionBtn>
 
-        <div className="relative">
-          <ActionBtn onClick={() => setShowReciter((v) => !v)} active={showReciter}>
-            <span className="text-[10px] opacity-70">{t("ui.ayah.reciter")}</span>
-            <span>{(() => { const r = RECITERS.find((x) => x.key === reciter); return r ? reciterName(r, locale) : ""; })()}</span>
-          </ActionBtn>
-          {showReciter && (
-            <div className="absolute end-0 z-20 mt-1 w-56 rounded-xl border border-border bg-background shadow-lg">
-              {RECITERS.map((r) => (
-                <button
-                  type="button"
-                  key={r.key}
-                  onClick={() => pickReciter(r.key)}
-                  className={`flex w-full items-center justify-between gap-2 px-3 py-2 text-start text-[12.5px] hover:bg-secondary/60 ${
-                    r.key === reciter ? "text-primary font-semibold" : "text-foreground/85"
-                  }`}
-                >
-                  <span dir="rtl" lang="ar" className="font-arabic text-[11px] text-muted-foreground">{r.name_ar}</span>
-                  <span>{reciterName(r, locale)}</span>
-                </button>
-              ))}
-            </div>
-          )}
-        </div>
+        <ActionBtn onClick={() => {}} active>
+          <span className="text-[10px] opacity-70">{t("ui.ayah.reciter")}</span>
+          <span>{(() => { const r = RECITERS.find((x) => x.key === reciter); return r ? reciterName(r, locale) : ""; })()}</span>
+        </ActionBtn>
 
 
         <ActionBtn onClick={() => openPanel("tafsir")} active={panel === "tafsir"}>
@@ -311,24 +281,12 @@ export function AyahCard({ surah, surahName, ayah, arabic, hebrew, highlight }: 
 
             {panel === "tafsir" && (
               <div className="mb-3 flex flex-wrap gap-1.5 border-b border-border/60 pb-2.5">
-                {TAFSIR_SOURCES_META.map((s) => {
-                  const active = tafsirSource === s.key;
-                  return (
-                    <button
-                      type="button"
-                      key={s.key}
-                      onClick={() => selectTafsirSource(s.key)}
-                      title={s.name_ar}
-                      className={`rounded-full border px-3 py-1 text-[11.5px] font-medium transition-colors ${
-                        active
-                          ? "border-primary/40 bg-primary/10 text-primary"
-                          : "border-border bg-background text-muted-foreground hover:border-primary/30 hover:text-primary"
-                      }`}
-                    >
-                      {tafsirSourceName(s, locale)}
-                    </button>
-                  );
-                })}
+                <span className="rounded-full border border-primary/40 bg-primary/10 px-3 py-1 text-[11.5px] font-medium text-primary">
+                  {tafsirSourceName(
+                    TAFSIR_SOURCES_META.find((s) => s.key === "jalalayn") ?? TAFSIR_SOURCES_META[0],
+                    locale,
+                  )}
+                </span>
               </div>
             )}
 
