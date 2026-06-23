@@ -15,7 +15,7 @@ import enPages from "@/locales/en/pages.json";
 export type Locale = "he" | "ar" | "en";
 
 export const SUPPORTED_LOCALES: Locale[] = ["he", "ar", "en"];
-export const DEFAULT_LOCALE: Locale = "en";
+export const DEFAULT_LOCALE: Locale = "he";
 
 export const LOCALE_DIR: Record<Locale, "rtl" | "ltr"> = {
   he: "rtl",

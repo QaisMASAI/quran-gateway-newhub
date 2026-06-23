@@ -49,17 +49,17 @@ const SearchRoute = SearchRouteImport.update({
   id: '/search',
   path: '/search',
   getParentRoute: () => rootRouteImport,
-} as any)
+} as any).lazy(() => import('./routes/search.lazy').then((d) => d.Route))
 const ResearchRoute = ResearchRouteImport.update({
   id: '/research',
   path: '/research',
   getParentRoute: () => rootRouteImport,
-} as any)
+} as any).lazy(() => import('./routes/research.lazy').then((d) => d.Route))
 const ProfileRoute = ProfileRouteImport.update({
   id: '/profile',
   path: '/profile',
   getParentRoute: () => rootRouteImport,
-} as any)
+} as any).lazy(() => import('./routes/profile.lazy').then((d) => d.Route))
 const OnboardingRoute = OnboardingRouteImport.update({
   id: '/onboarding',
   path: '/onboarding',
@@ -74,12 +74,12 @@ const AuthRoute = AuthRouteImport.update({
   id: '/auth',
   path: '/auth',
   getParentRoute: () => rootRouteImport,
-} as any)
+} as any).lazy(() => import('./routes/auth.lazy').then((d) => d.Route))
 const AskRoute = AskRouteImport.update({
   id: '/ask',
   path: '/ask',
   getParentRoute: () => rootRouteImport,
-} as any)
+} as any).lazy(() => import('./routes/ask.lazy').then((d) => d.Route))
 const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
   id: '/_authenticated',
   getParentRoute: () => rootRouteImport,
@@ -138,7 +138,7 @@ const LearnGraphRoute = LearnGraphRouteImport.update({
   id: '/learn/graph',
   path: '/learn/graph',
   getParentRoute: () => rootRouteImport,
-} as any)
+} as any).lazy(() => import('./routes/learn.graph.lazy').then((d) => d.Route))
 const ExploreTimelineRoute = ExploreTimelineRouteImport.update({
   id: '/explore/timeline',
   path: '/explore/timeline',

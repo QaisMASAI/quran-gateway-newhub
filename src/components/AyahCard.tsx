@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, useMemo } from "react";
+import { useState, useRef, useEffect, useMemo, type ReactNode } from "react";
 import { Link } from "@tanstack/react-router";
 import { Play, Pause, Sparkles, BookText, Star, Loader2, NotebookPen, User, Tag, HeartHandshake } from "lucide-react";
 import ReactMarkdown from "react-markdown";
@@ -22,7 +22,7 @@ interface Props {
   highlight?: string;
 }
 
-function highlightHebrew(text: string, term?: string): { __html: string } | null {
+function highlightHebrew(text: string, term?: string): ReactNode | null {
   if (!term) return null;
   const cleaned = cleanText(text);
   const normTerm = normalizeHebrew(term);
@@ -31,10 +31,24 @@ function highlightHebrew(text: string, term?: string): { __html: string } | null
   const escapedChars = [...term.trim()].map((ch) => ch.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"));
   const pattern = escapedChars.join("[\\u0591-\\u05C7\\s]*");
   try {
-    const re = new RegExp(`(${pattern})`, "gi");
-    const escaped = cleaned
-      .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-    return { __html: escaped.replace(re, '<mark class="search-hit">$1</mark>') };
+    const re = new RegExp(pattern, "gi");
+    const matches = [...cleaned.matchAll(re)];
+    if (!matches.length) return null;
+    let lastIndex = 0;
+    const nodes: ReactNode[] = [];
+    for (const match of matches) {
+      const value = match[0] ?? "";
+      const index = match.index ?? 0;
+      if (index > lastIndex) nodes.push(cleaned.slice(lastIndex, index));
+      nodes.push(
+        <mark key={`${index}-${value}`} className="search-hit">
+          {value}
+        </mark>,
+      );
+      lastIndex = index + value.length;
+    }
+    if (lastIndex < cleaned.length) nodes.push(cleaned.slice(lastIndex));
+    return nodes;
   } catch {
     return null;
   }
@@ -185,7 +199,7 @@ export function AyahCard({ surah, surahName, ayah, arabic, hebrew, highlight }: 
             : "text-[15px] leading-relaxed text-foreground/85 text-start";
           const translationDir = isHe ? "rtl" : "ltr";
           return heHighlight ? (
-            <p className={translationClass} dir={translationDir} dangerouslySetInnerHTML={heHighlight} />
+            <p className={translationClass} dir={translationDir}>{heHighlight}</p>
           ) : (
             <p className={translationClass} dir={translationDir}>{cleanText(hebrew)}</p>
           );
@@ -208,6 +222,7 @@ export function AyahCard({ surah, surahName, ayah, arabic, hebrew, highlight }: 
             <div className="absolute end-0 z-20 mt-1 w-56 rounded-xl border border-border bg-background shadow-lg">
               {RECITERS.map((r) => (
                 <button
+                  type="button"
                   key={r.key}
                   onClick={() => pickReciter(r.key)}
                   className={`flex w-full items-center justify-between gap-2 px-3 py-2 text-start text-[12.5px] hover:bg-secondary/60 ${
@@ -320,6 +335,7 @@ export function AyahCard({ surah, surahName, ayah, arabic, hebrew, highlight }: 
                   const hasError = cache[k]?.error;
                   return (
                     <button
+                      type="button"
                       key={s.key}
                       onClick={() => selectTafsirSource(s.key)}
                       title={s.name_ar}
@@ -397,7 +413,7 @@ function ActionBtn({
       : "border-primary/30 bg-primary/10 text-primary"
     : "border-border bg-background text-muted-foreground hover:border-primary/30 hover:text-primary";
   return (
-    <button onClick={onClick} className={`${base} ${styles}`}>
+    <button type="button" onClick={onClick} className={`${base} ${styles}`}>
       {children}
     </button>
   );
