@@ -2,6 +2,7 @@
 // Data is structural only: names + verse references (surah:ayah).
 // We deliberately do NOT include narratives — those must be read from the
 // Quran itself or from authenticated Tafsir, never invented by the platform.
+import seed from "@/lib/seeds/knowledge-seed.json";
 
 export type AyahRef = {
   surah: number;
@@ -288,6 +289,41 @@ export const PROPHETS: Prophet[] = [
   },
 ];
 
-export function getProphet(slug: string): Prophet | undefined {
-  return PROPHETS.find((p) => p.slug === slug);
+type SeedProphet = {
+  kind: string;
+  slug: string;
+  title: { he?: string; ar?: string; en?: string };
+};
+
+const seedProphetLinks = new Map(
+  ((seed.verses as Array<{ slug: string; links: [number, number, number][] }> | undefined) ?? []).map((v) => [
+    v.slug,
+    v.links,
+  ]),
+);
+
+const seedProphets: Prophet[] = (((seed.entities as SeedProphet[] | undefined) ?? [])
+  .filter((e) => e.kind === "prophet")
+  .map((e) => ({
+    slug: e.slug,
+    nameHe: e.title.he ?? e.title.en ?? e.slug,
+    nameAr: e.title.ar ?? e.title.en ?? e.slug,
+    refs: (seedProphetLinks.get(e.slug) ?? []).map(([surah, ayah, to]) => ({
+      surah,
+      ayah,
+      to,
+    })),
+  }))
+  .filter((p) => p.refs.length > 0));
+
+const mergedProphets = [...PROPHETS];
+const seenProphetSlugs = new Set(PROPHETS.map((p) => p.slug));
+for (const p of seedProphets) {
+  if (!seenProphetSlugs.has(p.slug)) mergedProphets.push(p);
 }
+
+export function getProphet(slug: string): Prophet | undefined {
+  return mergedProphets.find((p) => p.slug === slug);
+}
+
+export const ALL_PROPHETS: Prophet[] = mergedProphets;
