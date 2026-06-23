@@ -1,4 +1,8 @@
-// Client-side helpers for the Quran.com public API and Yasser Al-Dossari audio.
+// Client-side helpers for Quran data stored in the local database and recitation audio.
+
+import { supabase } from "@/integrations/supabase/client";
+import { SURAH_NAMES_AR, SURAH_NAMES_EN, SURAH_NAMES_HE } from "@/lib/surah-names-he";
+import { fetchSurahBilingual } from "@/lib/translations-db";
 
 export interface Chapter {
   id: number;
@@ -17,42 +21,84 @@ export interface Verse {
   translations: { id: number; text: string; resource_name?: string }[];
 }
 
-const API = "https://api.quran.com/api/v4";
-// Translation resource ids on Quran.com
-const HEBREW_TRANSLATION_ID = 233;
-const ENGLISH_TRANSLATION_ID = 20; // Saheeh International
-const ARABIC_MUYASSAR_ID = 16; // Tafsir Muyassar (Arabic gloss)
+const VERSE_COUNTS: Record<number, number> = {
+  1: 7, 2: 286, 3: 200, 4: 176, 5: 120, 6: 165, 7: 206, 8: 75, 9: 129, 10: 109,
+  11: 123, 12: 111, 13: 43, 14: 52, 15: 99, 16: 128, 17: 111, 18: 110, 19: 98, 20: 135,
+  21: 112, 22: 78, 23: 118, 24: 64, 25: 77, 26: 227, 27: 93, 28: 88, 29: 69, 30: 60,
+  31: 34, 32: 30, 33: 73, 34: 54, 35: 45, 36: 83, 37: 182, 38: 88, 39: 75, 40: 85,
+  41: 54, 42: 53, 43: 89, 44: 59, 45: 37, 46: 35, 47: 38, 48: 29, 49: 18, 50: 45,
+  51: 60, 52: 49, 53: 62, 54: 55, 55: 78, 56: 96, 57: 29, 58: 22, 59: 24, 60: 13,
+  61: 14, 62: 11, 63: 11, 64: 18, 65: 12, 66: 12, 67: 30, 68: 52, 69: 52, 70: 44,
+  71: 28, 72: 28, 73: 20, 74: 56, 75: 40, 76: 31, 77: 50, 78: 40, 79: 46, 80: 42,
+  81: 29, 82: 19, 83: 36, 84: 25, 85: 22, 86: 17, 87: 19, 88: 26, 89: 30, 90: 20,
+  91: 15, 92: 21, 93: 11, 94: 8, 95: 8, 96: 19, 97: 5, 98: 8, 99: 8, 100: 11,
+  101: 11, 102: 8, 103: 3, 104: 9, 105: 5, 106: 4, 107: 7, 108: 3, 109: 6, 110: 3,
+  111: 5, 112: 4, 113: 5, 114: 6,
+};
+
+const TRANSLATION_SOURCE_CODE: Record<ApiLang, string> = {
+  he: "ben-shemesh",
+  ar: "arabic-original",
+  en: "saheeh-international",
+};
+
+const sourceIdCache = new Map<string, string>();
+
+async function resolveSourceId(code: string): Promise<string | null> {
+  const cached = sourceIdCache.get(code);
+  if (cached) return cached;
+  const { data } = await supabase
+    .from("translation_sources")
+    .select("id")
+    .eq("code", code)
+    .maybeSingle();
+  if (!data?.id) return null;
+  sourceIdCache.set(code, data.id);
+  return data.id;
+}
 
 export type ApiLang = "he" | "ar" | "en";
 
 function translationIdFor(lang: ApiLang): number {
-  if (lang === "en") return ENGLISH_TRANSLATION_ID;
-  if (lang === "ar") return ARABIC_MUYASSAR_ID;
-  return HEBREW_TRANSLATION_ID;
+  if (lang === "en") return 20;
+  if (lang === "ar") return 16;
+  return 233;
 }
 
 export async function fetchChapters(lang: ApiLang = "he"): Promise<Chapter[]> {
-  const res = await fetch(`${API}/chapters?language=${lang}`);
-  if (!res.ok) throw new Error("Failed to load chapters");
-  const json = await res.json();
-  return json.chapters as Chapter[];
+  return Array.from({ length: 114 }, (_, idx) => {
+    const id = idx + 1;
+    return {
+      id,
+      name_arabic: SURAH_NAMES_AR[id] ?? `سورة ${id}`,
+      name_simple: SURAH_NAMES_EN[id] ?? `Surah ${id}`,
+      translated_name: { name: lang === "he" ? SURAH_NAMES_HE[id] ?? SURAH_NAMES_EN[id] : lang === "ar" ? SURAH_NAMES_AR[id] ?? SURAH_NAMES_EN[id] : SURAH_NAMES_EN[id] ?? `Surah ${id}` },
+      verses_count: VERSE_COUNTS[id] ?? 0,
+      revelation_place: "makkah",
+    };
+  });
 }
 
 export async function fetchChapter(id: number, lang: ApiLang = "he"): Promise<Chapter> {
-  const res = await fetch(`${API}/chapters/${id}?language=${lang}`);
-  if (!res.ok) throw new Error("Failed to load chapter");
-  const json = await res.json();
-  return json.chapter as Chapter;
+  const all = await fetchChapters(lang);
+  const chapter = all.find((c) => c.id === id);
+  if (!chapter) throw new Error("Failed to load chapter");
+  return chapter;
 }
 
 export async function fetchVerses(chapterId: number, lang: ApiLang = "he"): Promise<Verse[]> {
-  const tid = translationIdFor(lang);
-  const res = await fetch(
-    `${API}/verses/by_chapter/${chapterId}?translations=${tid}&fields=text_uthmani&per_page=300&language=${lang}`,
-  );
-  if (!res.ok) throw new Error("Failed to load verses");
-  const json = await res.json();
-  return json.verses as Verse[];
+  const rows = await fetchSurahBilingual(chapterId, lang);
+  return rows.map((row) => ({
+    id: Number(`${row.surah}${String(row.ayah).padStart(3, "0")}`),
+    verse_key: `${row.surah}:${row.ayah}`,
+    verse_number: row.ayah,
+    text_uthmani: row.arabic,
+    translations: [{
+      id: translationIdFor(lang),
+      text: row.translation,
+      resource_name: lang === "he" ? "Ben Shemesh" : lang === "en" ? "Sahih International" : "Arabic Original",
+    }],
+  }));
 }
 
 // Yasser Al-Dossari full-surah recitation via mp3quran.net
@@ -188,43 +234,12 @@ export function normalizeArabic(input: string): string {
 
 // --- loaders (full Quran in two requests) ---
 
-interface UthmaniVerse {
-  id: number;
-  verse_key: string;
-  text_uthmani: string;
-}
-interface TranslationItem {
-  resource_id: number;
-  text: string;
-}
-
-async function fetchAllArabic(): Promise<UthmaniVerse[]> {
-  const res = await fetch(`${API}/quran/verses/uthmani`);
-  if (!res.ok) throw new Error("Failed to load Arabic Quran");
-  const json = await res.json();
-  return json.verses as UthmaniVerse[];
-}
-
-async function fetchAllHebrew(): Promise<TranslationItem[]> {
-  const res = await fetch(`${API}/quran/translations/${HEBREW_TRANSLATION_ID}`);
-  if (!res.ok) throw new Error("Failed to load Hebrew translations");
-  const json = await res.json();
-  return json.translations as TranslationItem[];
-}
-
-async function fetchAllEnglish(): Promise<TranslationItem[]> {
-  const res = await fetch(`${API}/quran/translations/${ENGLISH_TRANSLATION_ID}`);
-  if (!res.ok) throw new Error("Failed to load English translations");
-  const json = await res.json();
-  return json.translations as TranslationItem[];
-}
-
 export async function buildQuranIndex(): Promise<QuranIndex> {
-  const [arabic, hebrew, english, chaptersRaw] = await Promise.all([
-    fetchAllArabic(),
-    fetchAllHebrew(),
-    fetchAllEnglish(),
+  const [chaptersRaw, arSourceId, heSourceId, enSourceId] = await Promise.all([
     fetchChapters(),
+    resolveSourceId(TRANSLATION_SOURCE_CODE.ar),
+    resolveSourceId(TRANSLATION_SOURCE_CODE.he),
+    resolveSourceId(TRANSLATION_SOURCE_CODE.en),
   ]);
 
   const chapters: SurahMeta[] = chaptersRaw.map((c) => ({
@@ -235,15 +250,46 @@ export async function buildQuranIndex(): Promise<QuranIndex> {
     verses_count: c.verses_count,
   }));
 
-  const verses: IndexedVerse[] = arabic.map((v, i) => {
-    const [s, a] = v.verse_key.split(":").map(Number);
-    const heRaw = cleanText(hebrew[i]?.text ?? "");
-    const enRaw = cleanText(english[i]?.text ?? "");
-    const arRaw = v.text_uthmani;
+  const sourceIds = [arSourceId, heSourceId, enSourceId].filter(Boolean) as string[];
+  if (sourceIds.length === 0) {
+    return { verses: [], chapters, bySurah: new Map<number, IndexedVerse[]>() };
+  }
+
+  const { data: rows, error } = await supabase
+    .from("ayah_translations")
+    .select("source_id,surah,ayah,text")
+    .in("source_id", sourceIds)
+    .order("surah", { ascending: true })
+    .order("ayah", { ascending: true });
+
+  if (error || !rows) throw new Error("Failed to load verses");
+
+  const verseMap = new Map<string, { surah: number; ayah: number; arabic: string; hebrew: string; english: string }>();
+  for (const row of rows) {
+    const key = `${row.surah}:${row.ayah}`;
+    const current = verseMap.get(key) ?? {
+      surah: row.surah,
+      ayah: row.ayah,
+      arabic: "",
+      hebrew: "",
+      english: "",
+    };
+    if (row.source_id === arSourceId) current.arabic = row.text;
+    if (row.source_id === heSourceId) current.hebrew = cleanText(row.text);
+    if (row.source_id === enSourceId) current.english = cleanText(row.text);
+    verseMap.set(key, current);
+  }
+
+  const verses: IndexedVerse[] = Array.from(verseMap.values()).map((v) => {
+    const s = v.surah;
+    const a = v.ayah;
+    const heRaw = v.hebrew;
+    const enRaw = v.english;
+    const arRaw = v.arabic;
     return {
       surah: s,
       ayah: a,
-      verse_key: v.verse_key,
+      verse_key: `${s}:${a}`,
       arabic: arRaw,
       hebrew: heRaw,
       english: enRaw,
