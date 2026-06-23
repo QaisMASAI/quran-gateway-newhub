@@ -264,11 +264,13 @@ export const getKnowledgeHub = createServerFn({ method: "POST" })
           Number(t.ayah_end) >= Number(link.ayah_start),
       );
 
+      const jalalaynOnly = overlapTafsir.filter((t) => t.source?.name_ar === "تفسير الجلالين");
+
       const preferredTafsir =
         localeOrder
-          .map((lang) => overlapTafsir.find((t) => t.lang === lang))
+          .map((lang) => (jalalaynOnly.length > 0 ? jalalaynOnly : overlapTafsir).find((t) => t.lang === lang))
           .find(Boolean) ??
-        overlapTafsir[0];
+        (jalalaynOnly[0] ?? overlapTafsir[0]);
 
       const overlapAsbab = allAsbabRows.filter(
         (a) =>
@@ -294,7 +296,7 @@ export const getKnowledgeHub = createServerFn({ method: "POST" })
         note: pickLocale(link.note_i18n as I18nText, data.language),
         tafsirPreview: excerpt(preferredTafsir?.body, 320),
         asbabPreview: excerpt(preferredAsbab?.body, 220),
-        tafsirSources: overlapTafsir.slice(0, 3).map((item) => ({
+        tafsirSources: (jalalaynOnly.length > 0 ? jalalaynOnly : overlapTafsir).slice(0, 3).map((item) => ({
           id: String(item.id),
           source: item.source?.name_en ?? item.source?.name_he ?? "Tafsir",
           sourceArabic: item.source?.name_ar ?? "",
