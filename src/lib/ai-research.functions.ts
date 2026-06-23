@@ -11,6 +11,16 @@ const ResearchSchema = z.object({
   question: z.string().min(2).max(500),
   language: z.enum(["he", "en", "ar"]).optional().default("he"),
   k: z.number().int().min(1).max(15).optional().default(8),
+  history: z
+    .array(
+      z.object({
+        role: z.enum(["user", "assistant"]),
+        content: z.string().min(1).max(1200),
+      }),
+    )
+    .max(12)
+    .optional()
+    .default([]),
 });
 
 export interface VerseCitation {
@@ -47,6 +57,36 @@ function sanitize(s: string, max = 600) {
     .replace(/\b(ignore|disregard)\s+(previous|prior)\s+(instructions?)\b/gi, "[filtered]")
     .slice(0, max);
 }
+
+function normalizeForSearch(input: string, language: "he" | "en" | "ar") {
+  let out = input.toLowerCase();
+  if (language === "he") {
+    out = out
+      .replace(/[\u0591-\u05C7]/g, "")
+      .replace(/[\u05BE\u05C0\u05C3\u05F3\u05F4"'.,!?;:()\[\]{}\-_/\\]/g, " ");
+  }
+  if (language === "ar") {
+    out = out
+      .replace(/[\u064B-\u065F\u0670]/g, "")
+      .replace(/[\u0622\u0623\u0625]/g, "ا")
+      .replace(/ى/g, "ي")
+      .replace(/ة/g, "ه")
+      .replace(/["'.,!?;:()\[\]{}\-_/\\]/g, " ");
+  }
+  return out.replace(/\s+/g, " ").trim();
+}
+
+function lexicalOverlapScore(query: string, text: string, language: "he" | "en" | "ar") {
+  const normalizedQuery = normalizeForSearch(query, language);
+  const normalizedText = normalizeForSearch(text, language);
+  if (!normalizedQuery || !normalizedText) return 0;
+  const terms = [...new Set(normalizedQuery.split(" ").filter((t) => t.length >= 2))];
+  if (!terms.length) return 0;
+  const hits = terms.reduce((acc, term) => (normalizedText.includes(term) ? acc + 1 : acc), 0);
+  return hits / terms.length;
+}
+
+const NO_SOURCE_MESSAGE = "No authenticated Islamic source was found in the database for this question.";
 
 const SYSTEM_BY_LANG: Record<string, string> = {
   he: `אתה עוזר מחקר על הקוראן. ענה אך ורק על בסיס הפסוקים והתפסירים המסופקים. אם המידע לא קיים — אמור זאת בכנות. צטט פסוקים בפורמט [סורה:איה]. כתוב בעברית בצורה נגישה לקוראים בני 9-70, מוסלמים ולא-מוסלמים כאחד. אסור להמציא פסוקים או מקורות.`,
@@ -85,14 +125,37 @@ export const askQuranResearch = createServerFn({ method: "POST" })
     // 2) Strictly grounded retrieval from local database only.
     const { data: chunkRows } = await supabaseAdmin.rpc("match_grounded_chunks", {
       query_embedding: embedding as unknown as string,
-      match_count: Math.max(8, data.k * 2),
+      match_count: Math.max(20, data.k * 4),
       min_similarity: 0.12,
-      language_filter: data.language,
+      language_filter: undefined,
       surah_filter: undefined,
     });
 
-    const chunkVerses = (chunkRows ?? []).filter((r) => r.content_type === "quran_ayah");
-    const chunkTafsir = (chunkRows ?? []).filter((r) => r.content_type !== "quran_ayah");
+    type ChunkRow = {
+      content_type: string;
+      language: "he" | "en" | "ar";
+      source_name: string | null;
+      translator_name: string | null;
+      surah: number | null;
+      ayah_start: number | null;
+      chunk_text: string | null;
+      similarity: number | null;
+    };
+
+    const reranked = ((chunkRows ?? []) as ChunkRow[])
+      .map((row) => {
+        const semantic = row.similarity ?? 0;
+        const lexical = lexicalOverlapScore(data.question, row.chunk_text ?? "", data.language);
+        const languageBoost = row.language === data.language ? 0.06 : row.language === "ar" ? 0.03 : 0;
+        return {
+          ...row,
+          rankScore: semantic * 0.75 + lexical * 0.25 + languageBoost,
+        };
+      })
+      .sort((a, b) => b.rankScore - a.rankScore);
+
+    const chunkVerses = reranked.filter((r) => r.content_type === "quran_ayah");
+    const chunkTafsir = reranked.filter((r) => r.content_type !== "quran_ayah");
 
     const verses: VerseCitation[] = [];
     if (chunkVerses.length > 0) {
@@ -162,7 +225,16 @@ export const askQuranResearch = createServerFn({ method: "POST" })
       }
     }
 
+    if (verses.length === 0 && tafsir.length === 0) {
+      return { ...base, answer: NO_SOURCE_MESSAGE };
+    }
+
     // 4) Build grounded prompt
+    const historyBlock = (data.history ?? [])
+      .slice(-8)
+      .map((m) => `${m.role === "user" ? "User" : "Assistant"}: ${sanitize(m.content, 320)}`)
+      .join("\n");
+
     const versesBlock = verses
       .map(
         (v, i) =>
@@ -173,14 +245,16 @@ export const askQuranResearch = createServerFn({ method: "POST" })
       .map((t) => `(${t.source} on ${t.surah}:${t.ayah}) ${sanitize(t.text, 400)}`)
       .join("\n\n");
 
-    const userMsg = `${SYSTEM_BY_LANG[data.language]}\n\n=== Question ===\n${sanitize(data.question)}\n\n=== Retrieved Evidence (LOCAL DATABASE ONLY) ===\nVerses:\n${versesBlock || "(none)"}\n\nTafsir:\n${tafsirBlock || "(none)"}\n\nRules:\n- Use only the evidence above.\n- If evidence is insufficient, output exactly: No authenticated Islamic source was found in the database for this question.\n- Cite verses as [surah:ayah].\n\nProduce a concise, well-cited answer.`;
+    const userMsg = `${SYSTEM_BY_LANG[data.language]}\n\n=== Conversation Memory ===\n${historyBlock || "(none)"}\n\n=== Current Question ===\n${sanitize(data.question)}\n\n=== Retrieved Evidence (LOCAL DATABASE ONLY) ===\nVerses:\n${versesBlock || "(none)"}\n\nTafsir:\n${tafsirBlock || "(none)"}\n\nRules:\n- Use only the evidence above.\n- If evidence is insufficient, output exactly: ${NO_SOURCE_MESSAGE}\n- Cite verses as [surah:ayah].\n- Keep answer concise, structured, and faithful to sources.\n\nProduce a concise, well-cited answer.`;
 
     const gateway = createLovableAiGatewayProvider(apiKey);
     let answer = "";
     try {
       const { text } = await generateText({
-        model: gateway("google/gemini-3-flash-preview"),
+        model: gateway("google/gemini-2.5-flash"),
         prompt: userMsg,
+        temperature: 0,
+        maxOutputTokens: 700,
       });
       answer = text;
     } catch (err) {
@@ -209,5 +283,11 @@ export const askQuranResearch = createServerFn({ method: "POST" })
       // non-fatal
     }
 
-    return { answer, verses, tafsir, confidence, language: data.language };
+    return {
+      answer: answer?.trim() || NO_SOURCE_MESSAGE,
+      verses,
+      tafsir,
+      confidence,
+      language: data.language,
+    };
   });
