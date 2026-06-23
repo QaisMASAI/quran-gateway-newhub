@@ -143,7 +143,7 @@ function MapPage() {
         </div>
 
         {isLoading && (
-          <div className="mt-4 text-sm text-muted-foreground">{t("common.loading")}</div>
+          <div className="mt-4 text-sm text-muted-foreground">{t("dailyVerse.loading")}</div>
         )}
 
         <div className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
