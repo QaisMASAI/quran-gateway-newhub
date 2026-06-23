@@ -25,10 +25,12 @@ export const Route = createFileRoute("/surah/$id")({
         { name: "description", content: description },
         { property: "og:title", content: title },
         { property: "og:description", content: description },
+        { property: "og:url", content: `/surah/${params.id}` },
         { property: "og:type", content: "article" },
         { name: "twitter:title", content: title },
         { name: "twitter:description", content: description },
       ],
+      links: [{ rel: "canonical", href: `/surah/${params.id}` }],
     };
   },
   component: SurahPage,
