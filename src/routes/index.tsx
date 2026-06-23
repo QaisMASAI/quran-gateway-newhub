@@ -8,7 +8,20 @@ import { Header } from "@/components/Header";
 import { Logo } from "@/components/Logo";
 import { DailyVerse } from "@/components/DailyVerse";
 import { ContinueReading } from "@/components/ContinueReading";
-import { BookOpen, Sparkles, Volume2, Star, Search as SearchIcon, ChevronRight, ChevronLeft, Loader2, MapPin } from "lucide-react";
+import { TrustBadge } from "@/components/TrustBadge";
+import {
+  BookOpen,
+  Sparkles,
+  Volume2,
+  Star,
+  Search as SearchIcon,
+  ChevronRight,
+  ChevronLeft,
+  Loader2,
+  MapPin,
+  Compass,
+  ArrowUpRight,
+} from "lucide-react";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -64,11 +77,15 @@ function Home() {
       {/* ============== HERO ============== */}
       <section className="relative overflow-hidden">
         <div
-          className="arabesque-bg relative px-6 pt-16 pb-28 text-center text-white shadow-2xl"
+          className="arabesque-bg relative px-6 pt-16 pb-28 text-center text-primary-foreground shadow-2xl"
           style={{ background: "var(--gradient-hero)" }}
         >
-          <div className={`pointer-events-none absolute -top-24 ${isRtl ? '-left-16' : '-right-16'} h-72 w-72 rounded-full bg-[oklch(0.72_0.13_85/0.18)] blur-3xl`} />
-          <div className={`pointer-events-none absolute -bottom-24 ${isRtl ? '-right-10' : '-left-10'} h-72 w-72 rounded-full bg-white/10 blur-3xl`} />
+          <div
+            className={`pointer-events-none absolute -top-24 ${isRtl ? "-left-16" : "-right-16"} h-72 w-72 rounded-full bg-gold/20 blur-3xl`}
+          />
+          <div
+            className={`pointer-events-none absolute -bottom-24 ${isRtl ? "-right-10" : "-left-10"} h-72 w-72 rounded-full bg-primary-foreground/10 blur-3xl`}
+          />
           <span className="arabesque-corner" style={{ top: 0, [isRtl ? 'left' : 'right']: 0 }} aria-hidden />
           <span className="arabesque-corner" style={{ bottom: 0, [isRtl ? 'right' : 'left']: 0, transform: "rotate(180deg)" }} aria-hidden />
 
@@ -89,33 +106,38 @@ function Home() {
               {t("home.badge")}
             </span>
 
-            <h1 className="font-display text-4xl font-bold leading-tight text-white sm:text-6xl md:text-7xl">
+            <h1 className="font-display text-4xl font-bold leading-tight text-primary-foreground sm:text-6xl md:text-7xl">
               {t("home.h1")}
               <span className="mt-3 block font-arabic text-3xl text-gold sm:text-5xl" dir="rtl">
                 ٱلْقُرْآنُ ٱلْكَرِيمُ
               </span>
             </h1>
 
-            <p className="mx-auto max-w-2xl text-base leading-relaxed text-white/75 sm:text-lg">{t("home.subtitle")}</p>
+            <p className="mx-auto max-w-2xl text-base leading-relaxed text-primary-foreground/80 sm:text-lg">
+              {t("home.subtitle")}
+            </p>
+            <div className="flex justify-center">
+              <TrustBadge size="md" className="border-primary-foreground/20 bg-primary-foreground/10 text-primary-foreground" />
+            </div>
 
             <div className="flex flex-wrap justify-center gap-3 pt-3">
               <a
                 href="#main"
-                className="inline-flex items-center gap-2 rounded-full border-b-4 border-black/10 bg-white px-7 py-3.5 text-sm font-bold text-primary shadow-lg transition-all hover:-translate-y-1 active:translate-y-0"
+                className="inline-flex items-center gap-2 rounded-full border border-primary-foreground/30 bg-primary-foreground px-7 py-3.5 text-sm font-bold text-primary shadow-lg transition-all hover:-translate-y-1 active:translate-y-0"
               >
                 <BookOpen className="h-4 w-4" />
                 {t("home.ctaStart")}
               </a>
               <Link
                 to="/ask"
-                className="inline-flex items-center gap-2 rounded-full border-b-4 border-[oklch(0.55_0.12_75)] bg-gold px-7 py-3.5 text-sm font-bold text-primary shadow-lg transition-all hover:-translate-y-1 active:translate-y-0"
+                className="inline-flex items-center gap-2 rounded-full border border-gold/40 bg-gold px-7 py-3.5 text-sm font-bold text-primary shadow-lg transition-all hover:-translate-y-1 active:translate-y-0"
               >
                 <Sparkles className="h-4 w-4" />
                 {t("home.ctaAsk")}
               </Link>
               <Link
                 to="/search"
-                className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-7 py-3.5 text-sm font-bold text-white backdrop-blur-md transition-colors hover:bg-white/20"
+                className="inline-flex items-center gap-2 rounded-full border border-primary-foreground/30 bg-primary-foreground/10 px-7 py-3.5 text-sm font-bold text-primary-foreground backdrop-blur-md transition-colors hover:bg-primary-foreground/20"
               >
                 <SearchIcon className="h-4 w-4" />
                 {t("home.ctaSearch")}
@@ -139,8 +161,66 @@ function Home() {
         <DailyVerse />
       </div>
 
+      <section className="mx-auto mt-12 max-w-6xl px-4 sm:px-6">
+        <div className="surface-card p-5 sm:p-7">
+          <div className={`flex items-start justify-between gap-4 ${isRtl ? "flex-row-reverse" : ""}`}>
+            <div>
+              <h2 className="font-display text-2xl font-bold text-foreground sm:text-3xl">Immersive AI Quran Search</h2>
+              <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
+                Ask emotional, conceptual, or thematic questions — every answer is grounded only in authenticated local Quran and Tafsir sources.
+              </p>
+            </div>
+            <Sparkles className="h-6 w-6 shrink-0 text-gold" />
+          </div>
+          <div className={`mt-5 grid gap-3 sm:grid-cols-3 ${isRtl ? "sm:[&>*]:text-right" : ""}`}>
+            {[
+              { q: "Why do people suffer?", to: "/ask" },
+              { q: "What does the Quran say about anxiety?", to: "/research" },
+              { q: "Explain patience in Islam.", to: "/ask" },
+            ].map((item) => (
+              <Link
+                key={item.q}
+                to={item.to}
+                className="rounded-xl border border-border bg-secondary/40 px-4 py-3 text-sm text-foreground/90 transition-colors hover:border-primary/40 hover:bg-secondary"
+              >
+                “{item.q}”
+              </Link>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="mx-auto mt-8 max-w-6xl px-4 sm:px-6">
+        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+          <FeatureCard
+            to="/topics"
+            title="Topic Exploration"
+            body="Discover mercy, patience, justice, forgiveness, and more through connected Quran passages."
+            icon={<Compass className="h-5 w-5" />}
+          />
+          <FeatureCard
+            to="/learn/journeys"
+            title="Guided Quran Journeys"
+            body="Follow curated pathways designed for spiritual reflection and structured learning."
+            icon={<BookOpen className="h-5 w-5" />}
+          />
+          <FeatureCard
+            to="/learn"
+            title="Featured Themes"
+            body="Explore prophets, stories, events, and themes as interconnected knowledge maps."
+            icon={<Star className="h-5 w-5" />}
+          />
+          <FeatureCard
+            to="/research"
+            title="Premium Tafsir Experience"
+            body="Compare grounded tafsir citations with elegant source cards and confidence context."
+            icon={<Sparkles className="h-5 w-5" />}
+          />
+        </div>
+      </section>
+
       <main id="main" className="mx-auto max-w-6xl px-4 py-16 sm:px-6 scroll-mt-20">
-        <div className={`mb-10 flex flex-col gap-5 md:flex-row md:items-end md:justify-between ${isRtl ? 'md:flex-row-reverse' : ''}`}>
+        <div className={`mb-10 flex flex-col gap-5 md:flex-row md:items-end md:justify-between ${isRtl ? "md:flex-row-reverse" : ""}`}>
           <div className="space-y-1.5">
             <h2 className="font-display text-3xl font-bold text-primary sm:text-4xl">{t("home.chaptersTitle")}</h2>
             <p className="text-sm text-muted-foreground">{t("home.chaptersSubtitle")}</p>
@@ -234,6 +314,34 @@ function Home() {
         <p className="relative mt-1 opacity-70">{t("home.footerReciter")}</p>
       </footer>
     </div>
+  );
+}
+
+function FeatureCard({
+  to,
+  title,
+  body,
+  icon,
+}: {
+  to: string;
+  title: string;
+  body: string;
+  icon: React.ReactNode;
+}) {
+  return (
+    <Link
+      to={to}
+      className="surface-card group block p-4 transition-all hover:border-primary/35 hover:shadow-soft"
+    >
+      <div className="mb-3 inline-flex h-10 w-10 items-center justify-center rounded-xl bg-primary-soft text-primary">
+        {icon}
+      </div>
+      <h3 className="text-sm font-semibold text-foreground">{title}</h3>
+      <p className="mt-1.5 text-xs leading-relaxed text-muted-foreground">{body}</p>
+      <div className="mt-3 inline-flex items-center gap-1 text-xs font-semibold text-primary">
+        Explore <ArrowUpRight className="h-3.5 w-3.5 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
+      </div>
+    </Link>
   );
 }
 
