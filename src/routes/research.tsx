@@ -178,6 +178,13 @@ function ResearchPage() {
                       <p className="text-sm text-muted-foreground mt-2" dir="rtl">
                         {v.hebrew}
                       </p>
+                      {(v.translation_source || v.translator) && (
+                        <p className="mt-2 text-xs text-muted-foreground">
+                          {v.translation_source ? `Translation: ${v.translation_source}` : ""}
+                          {v.translation_source && v.translator ? " · " : ""}
+                          {v.translator ? `Translator: ${v.translator}` : ""}
+                        </p>
+                      )}
                     </Link>
                   ))}
                 </div>
@@ -194,6 +201,7 @@ function ResearchPage() {
                     <div key={i} className="rounded-xl border border-border bg-card p-4">
                       <div className="text-xs font-medium text-primary mb-1">
                         {tf.source} · {tf.surah}:{tf.ayah}
+                        {tf.translator ? ` · ${tf.translator}` : ""}
                       </div>
                       <p className="text-sm text-foreground/90">{tf.text}</p>
                     </div>
