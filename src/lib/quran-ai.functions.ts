@@ -45,17 +45,11 @@ function sanitizeUntrusted(input: string, maxLen = 4000): string {
 // ============================================================
 
 const APPROVED_SOURCES = {
-  "ibn-kathir": {
-    slug: "ibn_kathir",
-    name_he: "תפסיר אבן כתיר",
-    name_ar: "تفسير ابن كثير",
-    name_en: "Tafsir Ibn Kathir",
-  },
-  tabari: {
-    slug: "al_tabari",
-    name_he: "תפסיר אל-טברי",
-    name_ar: "تفسير الطبري",
-    name_en: "Tafsir Al-Tabari",
+  muyassar: {
+    slug: "al_muyassar",
+    name_he: "תפסיר אל-מויסר",
+    name_ar: "التفسير الميسر",
+    name_en: "Tafsir Al-Muyassar",
   },
   qurtubi: {
     slug: "al_qurtubi",
@@ -69,11 +63,29 @@ const APPROVED_SOURCES = {
     name_ar: "تفسير السعدي",
     name_en: "Tafsir Al-Sa'di",
   },
-  muyassar: {
-    slug: "al_muyassar",
-    name_he: "תפסיר אל-מויסר",
-    name_ar: "التفسير الميسر",
-    name_en: "Tafsir Al-Muyassar",
+  jalalayn: {
+    slug: "al_jalalayn",
+    name_he: "תפסיר אל-ג׳לאלין",
+    name_ar: "تفسير الجلالين",
+    name_en: "Tafsir Al-Jalalayn",
+  },
+  baghawi: {
+    slug: "al_baghawi",
+    name_he: "תפסיר אל-בע׳אווי",
+    name_ar: "تفسير البغوي",
+    name_en: "Tafsir Al-Baghawi",
+  },
+  waseet: {
+    slug: "al_waseet",
+    name_he: "א-תפסיר אל-ווסיט",
+    name_ar: "التفسير الوسيط",
+    name_en: "Tafsir Al-Waseet",
+  },
+  tanweer: {
+    slug: "al_tanweer",
+    name_he: "א-תחריר וא-תנוויר",
+    name_ar: "التحرير والتنوير",
+    name_en: "Tafsir Al-Tanweer",
   },
 } as const;
 
@@ -87,7 +99,7 @@ const InputSchema = z.object({
   arabic: z.string().min(1).max(2000),
   surahName: z.string().min(1).max(120),
   mode: z.enum(["tafsir", "sabab"]),
-  source: z.enum(["ibn-kathir", "tabari", "qurtubi", "saadi", "muyassar"]).optional(),
+  source: z.enum(["muyassar", "qurtubi", "saadi", "jalalayn", "baghawi", "waseet", "tanweer"]).optional(),
   lang: z.enum(["he", "ar", "en"]).optional(),
 });
 
