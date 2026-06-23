@@ -186,6 +186,7 @@ function SurahPage() {
                 </div>
 
                 <button
+                  type="button"
                   onClick={togglePlay}
                   className="mt-6 inline-flex items-center gap-2 rounded-full bg-white px-6 py-2.5 text-sm font-semibold text-primary shadow-glow transition-transform hover:-translate-y-0.5"
                 >
