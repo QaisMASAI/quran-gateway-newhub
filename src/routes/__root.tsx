@@ -10,6 +10,14 @@ import { DirectionProvider } from "@/components/DirectionProvider";
 import { LOCALE_DIR, isLocale, DEFAULT_LOCALE } from "@/lib/i18n";
 import "@/lib/i18n";
 
+const ROOT_META = {
+  title: "Noor Al Quran | Discover the Quran",
+  description:
+    "Discover the Quran through clear explanations, guided learning paths, topics, prophets, historical context, and AI-powered exploration.",
+  socialDescription:
+    "Explore, learn, and understand the Quran through an accessible multilingual learning experience.",
+};
+
 function NotFoundComponent() {
   const { t, i18n } = useTranslation("common");
   const isRtl = i18n.dir() === "rtl";
@@ -81,24 +89,23 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Noor Al Quran | Discover the Quran" },
+      { title: ROOT_META.title },
       {
         name: "description",
-        content:
-          "Discover the Quran through clear explanations, guided learning paths, topics, prophets, historical context, and AI-powered exploration.",
+        content: ROOT_META.description,
       },
       { property: "og:type", content: "website" },
       { property: "og:site_name", content: "Noor" },
       { name: "twitter:card", content: "summary_large_image" },
-      { property: "og:title", content: "Noor Al Quran | Discover the Quran" },
-      { name: "twitter:title", content: "Noor Al Quran | Discover the Quran" },
+      { property: "og:title", content: ROOT_META.title },
+      { name: "twitter:title", content: ROOT_META.title },
       {
         property: "og:description",
-        content: "Explore, learn, and understand the Quran through an accessible multilingual learning experience.",
+        content: ROOT_META.socialDescription,
       },
       {
         name: "twitter:description",
-        content: "Explore, learn, and understand the Quran through an accessible multilingual learning experience.",
+        content: ROOT_META.socialDescription,
       },
       { name: "theme-color", content: "#0f1115" },
       { name: "apple-mobile-web-app-capable", content: "yes" },
