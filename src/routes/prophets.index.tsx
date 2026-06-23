@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import i18n, { normalizeLocale } from "@/lib/i18n";
 import { Header } from "@/components/Header";
-import { PROPHETS } from "@/lib/prophets";
+import { ALL_PROPHETS } from "@/lib/prophets";
 import { useProphetT } from "@/lib/content-i18n";
 import { Users, ChevronLeft } from "lucide-react";
 
@@ -65,7 +65,7 @@ function ProphetsIndex() {
           <p className="mx-auto max-w-2xl text-sm leading-relaxed text-muted-foreground sm:text-base">{t("prophets.intro")}</p>
         </header>
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {PROPHETS.map((p) => (
+          {ALL_PROPHETS.map((p) => (
             <ProphetCard key={p.slug} slug={p.slug} nameAr={p.nameAr} refsCount={p.refs.length} />
           ))}
         </div>

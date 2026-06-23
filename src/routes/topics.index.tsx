@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import i18n, { normalizeLocale } from "@/lib/i18n";
 import { Header } from "@/components/Header";
-import { TOPICS } from "@/lib/topics";
+import { ALL_TOPICS } from "@/lib/topics";
 import { useTopicT } from "@/lib/content-i18n";
 import {
   Heart, Scale, BookOpen, Sun, Moon, Shield, Users, Sparkles,
@@ -71,7 +71,7 @@ function TopicsIndex() {
           <p className="mx-auto max-w-2xl text-sm leading-relaxed text-muted-foreground sm:text-base">{t("topics.intro")}</p>
         </header>
         <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          {TOPICS.map((tp) => (
+          {ALL_TOPICS.map((tp) => (
             <TopicCard key={tp.slug} slug={tp.slug} icon={tp.icon} refsCount={tp.refs.length} />
           ))}
         </div>
