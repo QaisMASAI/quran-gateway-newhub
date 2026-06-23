@@ -201,6 +201,53 @@ export interface QuranIndex {
   bySurah: Map<number, IndexedVerse[]>;
 }
 
+function cleanRemoteText(s: string): string {
+  return s
+    .replace(/<sup[^>]*>.*?<\/sup>/g, "")
+    .replace(/<[^>]+>/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+async function fetchRemoteQuranIndex(): Promise<IndexedVerse[]> {
+  const [arRes, heRes, enRes] = await Promise.all([
+    fetch("https://api.quran.com/api/v4/quran/verses/uthmani"),
+    fetch("https://api.quran.com/api/v4/quran/translations/233"),
+    fetch("https://api.quran.com/api/v4/quran/translations/20"),
+  ]);
+  if (!arRes.ok || !heRes.ok || !enRes.ok) return [];
+
+  const arJson = (await arRes.json()) as {
+    verses: Array<{ verse_key: string; text_uthmani: string }>;
+  };
+  const heJson = (await heRes.json()) as {
+    translations: Array<{ verse_key: string; text: string }>;
+  };
+  const enJson = (await enRes.json()) as {
+    translations: Array<{ verse_key: string; text: string }>;
+  };
+
+  const heByKey = new Map(heJson.translations.map((v) => [v.verse_key, cleanRemoteText(v.text)]));
+  const enByKey = new Map(enJson.translations.map((v) => [v.verse_key, cleanRemoteText(v.text)]));
+
+  return arJson.verses.map((v) => {
+    const [s, a] = v.verse_key.split(":").map(Number);
+    const hebrew = heByKey.get(v.verse_key) ?? "";
+    const english = enByKey.get(v.verse_key) ?? "";
+    return {
+      surah: s,
+      ayah: a,
+      verse_key: v.verse_key,
+      arabic: v.text_uthmani,
+      hebrew,
+      english,
+      hebrewNorm: normalizeHebrew(hebrew),
+      arabicNorm: normalizeArabic(v.text_uthmani),
+      englishNorm: normalizeEnglish(english),
+    } satisfies IndexedVerse;
+  });
+}
+
 // --- normalization ---
 
 // Strip Hebrew niqqud (vowel/cantillation marks U+0591–U+05C7)
@@ -252,7 +299,14 @@ export async function buildQuranIndex(): Promise<QuranIndex> {
 
   const sourceIds = [arSourceId, heSourceId, enSourceId].filter(Boolean) as string[];
   if (sourceIds.length === 0) {
-    return { verses: [], chapters, bySurah: new Map<number, IndexedVerse[]>() };
+    const verses = await fetchRemoteQuranIndex();
+    const bySurah = new Map<number, IndexedVerse[]>();
+    for (const v of verses) {
+      const arr = bySurah.get(v.surah) ?? [];
+      arr.push(v);
+      bySurah.set(v.surah, arr);
+    }
+    return { verses, chapters, bySurah };
   }
 
   const { data: rows, error } = await supabase
@@ -304,6 +358,17 @@ export async function buildQuranIndex(): Promise<QuranIndex> {
     const arr = bySurah.get(v.surah) ?? [];
     arr.push(v);
     bySurah.set(v.surah, arr);
+  }
+
+  if (verses.length === 0) {
+    const remoteVerses = await fetchRemoteQuranIndex();
+    const remoteBySurah = new Map<number, IndexedVerse[]>();
+    for (const v of remoteVerses) {
+      const arr = remoteBySurah.get(v.surah) ?? [];
+      arr.push(v);
+      remoteBySurah.set(v.surah, arr);
+    }
+    return { verses: remoteVerses, chapters, bySurah: remoteBySurah };
   }
 
   return { verses, chapters, bySurah };

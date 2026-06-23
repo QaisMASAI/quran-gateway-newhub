@@ -25,6 +25,80 @@ export interface SurahBilingualVerse {
 // Cache resolved source ids per session.
 const sourceIdCache = new Map<string, string>();
 
+function cleanHtml(input: string): string {
+  return input.replace(/<sup[^>]*>.*?<\/sup>/g, "").replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
+}
+
+async function fetchQuranComVerse(
+  surah: number,
+  ayah: number,
+  locale: LocaleCode,
+): Promise<{ arabic: string; translation: string } | null> {
+  try {
+    const [arRes, trRes] = await Promise.all([
+      fetch(`https://api.quran.com/api/v4/verses/by_key/${surah}:${ayah}?words=false&translations=`),
+      fetch(
+        `https://api.quran.com/api/v4/verses/by_key/${surah}:${ayah}?words=false&translations=${
+          locale === "he" ? 233 : locale === "en" ? 20 : 0
+        }`,
+      ),
+    ]);
+    if (!arRes.ok || !trRes.ok) return null;
+    const arJson = (await arRes.json()) as {
+      verse?: { text_uthmani?: string };
+    };
+    const trJson = (await trRes.json()) as {
+      verse?: { text_uthmani?: string; translations?: Array<{ text: string }> };
+    };
+    const arabic = arJson.verse?.text_uthmani ?? trJson.verse?.text_uthmani ?? "";
+    const translation =
+      locale === "ar"
+        ? arabic
+        : cleanHtml(trJson.verse?.translations?.[0]?.text ?? "") || arabic;
+    if (!arabic && !translation) return null;
+    return { arabic, translation };
+  } catch {
+    return null;
+  }
+}
+
+async function fetchQuranComSurah(
+  surah: number,
+  locale: LocaleCode,
+): Promise<SurahBilingualVerse[]> {
+  try {
+    const trId = locale === "he" ? 233 : locale === "en" ? 20 : 0;
+    const res = await fetch(
+      `https://api.quran.com/api/v4/verses/by_chapter/${surah}?per_page=300&words=false${
+        trId ? `&translations=${trId}` : ""
+      }`,
+    );
+    if (!res.ok) return [];
+    const json = (await res.json()) as {
+      verses?: Array<{
+        verse_key: string;
+        text_uthmani: string;
+        translations?: Array<{ text: string }>;
+      }>;
+    };
+    return (json.verses ?? []).map((v) => {
+      const [, ayahStr] = v.verse_key.split(":");
+      const ayah = Number(ayahStr);
+      return {
+        surah,
+        ayah,
+        arabic: v.text_uthmani ?? "",
+        translation:
+          locale === "ar"
+            ? v.text_uthmani ?? ""
+            : cleanHtml(v.translations?.[0]?.text ?? "") || v.text_uthmani || "",
+      };
+    });
+  } catch {
+    return [];
+  }
+}
+
 async function resolveSourceId(code: string): Promise<string | null> {
   const cached = sourceIdCache.get(code);
   if (cached) return cached;
@@ -67,14 +141,18 @@ export async function fetchVerseBilingual(
     resolveSourceId(TRANSLATION_SOURCE_CODE.ar),
     resolveSourceId(TRANSLATION_SOURCE_CODE[locale]),
   ]);
-  if (!arSid || !locSid) return null;
+  if (!arSid || !locSid) {
+    return fetchQuranComVerse(surah, ayah, locale);
+  }
   const { data, error } = await supabase
     .from("ayah_translations")
     .select("source_id, text")
     .in("source_id", Array.from(new Set([arSid, locSid])))
     .eq("surah", surah)
     .eq("ayah", ayah);
-  if (error || !data) return null;
+  if (error || !data || data.length === 0) {
+    return fetchQuranComVerse(surah, ayah, locale);
+  }
   const arRow = data.find((r) => r.source_id === arSid);
   const locRow = data.find((r) => r.source_id === locSid);
   return {
@@ -89,14 +167,20 @@ export async function fetchSurahTranslation(
   locale: LocaleCode,
 ): Promise<AyahTranslation[]> {
   const sourceId = await resolveSourceId(TRANSLATION_SOURCE_CODE[locale]);
-  if (!sourceId) return [];
+  if (!sourceId) {
+    const remote = await fetchQuranComSurah(surah, locale);
+    return remote.map((v) => ({ surah: v.surah, ayah: v.ayah, text: v.translation }));
+  }
   const { data, error } = await supabase
     .from("ayah_translations")
     .select("surah, ayah, text")
     .eq("source_id", sourceId)
     .eq("surah", surah)
     .order("ayah", { ascending: true });
-  if (error || !data) return [];
+  if (error || !data || data.length === 0) {
+    const remote = await fetchQuranComSurah(surah, locale);
+    return remote.map((v) => ({ surah: v.surah, ayah: v.ayah, text: v.translation }));
+  }
   return data;
 }
 
@@ -109,7 +193,9 @@ export async function fetchSurahBilingual(
     resolveSourceId(TRANSLATION_SOURCE_CODE.ar),
     resolveSourceId(TRANSLATION_SOURCE_CODE[locale]),
   ]);
-  if (!arSid) return [];
+  if (!arSid) {
+    return fetchQuranComSurah(surah, locale);
+  }
   const sourceIds = Array.from(new Set([arSid, locSid].filter(Boolean) as string[]));
   const { data, error } = await supabase
     .from("ayah_translations")
@@ -117,7 +203,9 @@ export async function fetchSurahBilingual(
     .eq("surah", surah)
     .in("source_id", sourceIds)
     .order("ayah", { ascending: true });
-  if (error || !data) return [];
+  if (error || !data || data.length === 0) {
+    return fetchQuranComSurah(surah, locale);
+  }
 
   const byAyah = new Map<number, SurahBilingualVerse>();
   for (const row of data) {
@@ -158,7 +246,10 @@ export async function fetchPassage(
     resolveSourceId(TRANSLATION_SOURCE_CODE.ar),
     resolveSourceId(TRANSLATION_SOURCE_CODE[locale]),
   ]);
-  if (!arSid) return [];
+  if (!arSid) {
+    const remote = await fetchQuranComSurah(surah, locale);
+    return remote.filter((v) => v.ayah >= ayahStart && v.ayah <= ayahEnd);
+  }
   const ids = Array.from(new Set([arSid, locSid].filter(Boolean) as string[]));
   const { data, error } = await supabase
     .from("ayah_translations")
@@ -168,7 +259,10 @@ export async function fetchPassage(
     .gte("ayah", ayahStart)
     .lte("ayah", ayahEnd)
     .order("ayah", { ascending: true });
-  if (error || !data) return [];
+  if (error || !data || data.length === 0) {
+    const remote = await fetchQuranComSurah(surah, locale);
+    return remote.filter((v) => v.ayah >= ayahStart && v.ayah <= ayahEnd);
+  }
   const byAyah = new Map<number, PassageVerse>();
   for (const row of data) {
     const v = byAyah.get(row.ayah) ?? {
