@@ -151,7 +151,7 @@ function AskPage() {
                 >
                   <div className="flex items-center justify-between gap-2">
                     <span className="text-xs font-semibold text-primary">
-                      {v.surahNameHe} {v.surah}:{v.ayah}
+                      {surahNameHe(v.surah)} {v.surah}:{v.ayah}
                     </span>
                     <ChevronLeft className="h-3.5 w-3.5 text-muted-foreground group-hover:text-primary ltr:rotate-180" />
                   </div>
