@@ -18,6 +18,8 @@ export interface VerseCitation {
   ayah: number;
   arabic: string;
   hebrew: string;
+  translation_source?: string | null;
+  translator?: string | null;
   similarity: number;
 }
 
@@ -100,6 +102,8 @@ export const askQuranResearch = createServerFn({ method: "POST" })
           ayah: Number(row.ayah_start ?? 0),
           arabic: "",
           hebrew: (row.chunk_text ?? "").slice(0, 800),
+          translation_source: row.source_name ?? "Quran",
+          translator: row.translator_name,
           similarity: row.similarity ?? 0,
         });
       }
