@@ -58,21 +58,21 @@
     "title": "The Qur'an and Human Emotions",
     "intro": "Every human emotion finds expression in the Holy Qur'an. Pick an emotion to see the verses that speak to it — directly to the text, with authentic tafsir. No AI-generated commentary, no generalizations.",
     "selectedVerses": "selected verses",
-    "metaTitle": "The Qur'an and Human Emotions — Qur'an in Hebrew",
+    "metaTitle": "The Qur'an and Human Emotions — Noor Al Quran",
     "metaDescription": "An emotional journey through the Qur'an: anxiety, sadness, fear, loneliness, hope, gratitude, inner peace. Qur'anic verses with authentic tafsir only — no AI interpretation."
   },
   "topics": {
     "title": "Topics in the Qur'an",
     "intro": "A thematic index of the Holy Qur'an. For each topic you'll find references to the central verses that address it — straight to the text. No personal commentary here; meaning is to be read in the Qur'an itself and in authentic tafsir.",
     "refsLabel": "verse references",
-    "metaTitle": "Topics in the Qur'an — Qur'an in Hebrew",
+    "metaTitle": "Topics in the Qur'an — Noor Al Quran",
     "metaDescription": "A thematic index of the Holy Qur'an: prayer, charity, patience, justice, mercy and more. Each topic with verse references — no commentary, only the original text."
   },
   "prophets": {
     "title": "Prophets in the Qur'an",
     "intro": "Prophets mentioned by name in the Holy Qur'an. For each prophet there are references to the central verses where he is named, directly to the Qur'anic text. No commentary or narratives here — to read the story itself, go to the verses and tafsir.",
     "refsLabel": "verse references",
-    "metaTitle": "Prophets in the Qur'an — Qur'an in Hebrew",
+    "metaTitle": "Prophets in the Qur'an — Noor Al Quran",
     "metaDescription": "List of the prophets mentioned in the Holy Qur'an with precise references to surahs and verses. All information based on the Qur'an itself, without additions."
   },
   "plans": {
@@ -80,11 +80,11 @@
     "intro": "Structured plans for daily reading of the Holy Qur'an. Pick a plan that suits your pace.",
     "days": "days",
     "openPlan": "Open plan",
-    "metaTitle": "Reading Plans — Qur'an in Hebrew",
+    "metaTitle": "Reading Plans — Noor Al Quran",
     "metaDescription": "Structured Qur'an reading plans: short surahs and core surahs."
   },
   "search": {
-    "metaTitle": "Search the Qur'an — Qur'an in Hebrew",
+    "metaTitle": "Search the Qur'an — Noor Al Quran",
     "metaDescription": "Advanced search across the Holy Qur'an: translations, surah names and Arabic text, with highlighted matches.",
     "title": "Advanced Qur'an search",
     "subtitle": "Search in Hebrew, Arabic or English — across translations, surah names and the Arabic text.",
@@ -235,7 +235,7 @@
     "emptyTitle": "No saved verses yet.",
     "browseSurahs": "Browse surahs",
     "remove": "Remove",
-    "metaTitle": "Favorites — Qur'an in Hebrew",
+    "metaTitle": "Favorites — Noor Al Quran",
     "metaDescription": "Your bookmarked verses from the Holy Qur'an.",
     "verseLabel": "Surah {{s}} • Verse {{a}}"
   },
