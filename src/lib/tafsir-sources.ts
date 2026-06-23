@@ -1,5 +1,5 @@
-// Client-safe metadata for the approved tafsir sources used by AyahCard.
-// The server fetches & translates these on demand via explainAyah({ source }).
+// Client-safe metadata for approved tafsir sources used by AyahCard.
+// Tafsir content is fetched directly from database tables by source slug.
 export type TafsirSourceKey =
   | "ibn-kathir"
   | "tabari"

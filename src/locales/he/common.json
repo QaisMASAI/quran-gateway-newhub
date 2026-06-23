@@ -64,11 +64,14 @@
       "note": "הערה",
       "related": "קשור:",
       "tafsirCompare": "השוואת תפסירים",
+      "tafsirTitle": "תפסיר מאומת",
       "sababTitle": "סיבת הירידה",
       "loadingContent": "טוען תוכן",
       "loadingSource": "טוען מקור ומתרגם…",
       "source": "מקור:",
-      "networkError": "שגיאת רשת. נסה שוב."
+      "networkError": "שגיאת רשת. נסה שוב.",
+      "noTafsir": "לא נמצא תפסיר מאומת לפסוק זה בשפה הנבחרת.",
+      "noAsbab": "לא נמצאה סיבת ירידה מתועדת לפסוק זה בשפה הנבחרת."
     },
     "share": {
       "copyLink": "העתק קישור",

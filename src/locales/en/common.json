@@ -64,11 +64,14 @@
       "note": "Note",
       "related": "Related:",
       "tafsirCompare": "Compare tafsirs",
+      "tafsirTitle": "Authenticated tafsir",
       "sababTitle": "Reason for revelation",
       "loadingContent": "Loading content",
       "loadingSource": "Loading source and translating…",
       "source": "Source:",
-      "networkError": "Network error. Try again."
+      "networkError": "Network error. Try again.",
+      "noTafsir": "No authenticated tafsir was found for this verse in the selected language.",
+      "noAsbab": "No documented occasion of revelation was found for this verse in the selected language."
     },
     "share": {
       "copyLink": "Copy link",

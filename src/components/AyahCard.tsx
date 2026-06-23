@@ -5,14 +5,14 @@ import ReactMarkdown from "react-markdown";
 import { useTranslation } from "react-i18next";
 import { ayahAudioUrl, cleanText, normalizeHebrew, RECITERS, reciterName, getStoredReciter, setStoredReciter, type ReciterKey } from "@/lib/quran-api";
 import { useFavorites } from "@/lib/favorites";
-import { useServerFn } from "@tanstack/react-start";
-import { explainAyah } from "@/lib/quran-ai.functions";
+import { useQuery } from "@tanstack/react-query";
 import { TAFSIR_SOURCES_META, tafsirSourceName } from "@/lib/tafsir-sources";
 import { ShareButtons } from "./ShareButtons";
 import { NotePanel } from "./NotePanel";
 import { getAyahLinks } from "@/lib/ayah-links";
 import { useReadingSettings, stripArabicDiacritics } from "@/lib/reading-settings";
 import { normalizeLocale } from "@/lib/i18n";
+import { getAsbabForVerse, getTafsirForVerseBySource, sourceName, TAFSIR_SOURCE_SLUG_BY_KEY } from "@/lib/tafsir-content";
 
 interface Props {
   surah: number;
@@ -70,11 +70,19 @@ export function AyahCard({ surah, surahName, ayah, arabic, hebrew, highlight }: 
   const [panel, setPanel] = useState<null | "tafsir" | "sabab">(null);
   const [showNote, setShowNote] = useState(false);
   const [tafsirSource, setTafsirSource] = useState<typeof TAFSIR_SOURCES_META[number]["key"]>("ibn-kathir");
-  const [loadingKey, setLoadingKey] = useState<string | null>(null);
-  // Cache results per (mode + source). Sabab uses key "sabab".
-  const [cache, setCache] = useState<Record<string, { text?: string; source?: { name_he: string; name_ar: string; name_en?: string }; error?: string }>>({});
-
-  const ask = useServerFn(explainAyah);
+  const selectedTafsirSlug = TAFSIR_SOURCE_SLUG_BY_KEY[tafsirSource] ?? "ibn_kathir";
+  const tafsirQ = useQuery({
+    queryKey: ["tafsir-verse", surah, ayah, locale, selectedTafsirSlug],
+    queryFn: () => getTafsirForVerseBySource(surah, ayah, locale, selectedTafsirSlug),
+    enabled: panel === "tafsir",
+    staleTime: 15 * 60_000,
+  });
+  const asbabQ = useQuery({
+    queryKey: ["asbab-verse", surah, ayah, locale],
+    queryFn: () => getAsbabForVerse(surah, ayah, locale),
+    enabled: panel === "sabab",
+    staleTime: 15 * 60_000,
+  });
 
   // Sync reciter across cards
   useEffect(() => {
@@ -115,42 +123,16 @@ export function AyahCard({ surah, surahName, ayah, arabic, hebrew, highlight }: 
     setShowReciter(false);
   };
 
-  const cacheKey = (mode: "tafsir" | "sabab", src?: string) =>
-    mode === "sabab" ? "sabab" : `tafsir:${src ?? "ibn-kathir"}`;
-
-  const loadContent = async (mode: "tafsir" | "sabab", src?: typeof TAFSIR_SOURCES_META[number]["key"]) => {
-    const k = cacheKey(mode, src);
-    if (cache[k]) return;
-    setLoadingKey(k);
-    try {
-      const res = await ask({
-        data: { surah, ayah, arabic, surahName, mode, lang: locale, ...(mode === "tafsir" && src ? { source: src } : {}) },
-      });
-      setCache((c) => ({
-        ...c,
-        [k]: res.error
-          ? { error: res.error }
-          : { text: res.text, source: (res as { source?: { name_he: string; name_ar: string; name_en?: string } }).source },
-      }));
-    } catch {
-      setCache((c) => ({ ...c, [k]: { error: t("ui.ayah.networkError") } }));
-    } finally {
-      setLoadingKey((curr) => (curr === k ? null : curr));
-    }
-  };
-
-  const openPanel = async (mode: "tafsir" | "sabab") => {
+  const openPanel = (mode: "tafsir" | "sabab") => {
     if (panel === mode) {
       setPanel(null);
       return;
     }
     setPanel(mode);
-    await loadContent(mode, mode === "tafsir" ? tafsirSource : undefined);
   };
 
-  const selectTafsirSource = async (src: typeof TAFSIR_SOURCES_META[number]["key"]) => {
+  const selectTafsirSource = (src: typeof TAFSIR_SOURCES_META[number]["key"]) => {
     setTafsirSource(src);
-    await loadContent("tafsir", src);
   };
 
   const heHighlight = useMemo(() => highlightHebrew(hebrew, highlight), [hebrew, highlight]);
@@ -316,24 +298,21 @@ export function AyahCard({ surah, surahName, ayah, arabic, hebrew, highlight }: 
 
 
 
-      {/* AI panel */}
+      {/* Tafsir/Asbab panel */}
       {panel && (() => {
-        const activeKey = panel === "tafsir" ? cacheKey("tafsir", tafsirSource) : "sabab";
-        const entry = cache[activeKey];
-        const isLoading = loadingKey === activeKey;
+        const isLoading = panel === "tafsir" ? tafsirQ.isLoading : asbabQ.isLoading;
+        const hasError = panel === "tafsir" ? tafsirQ.isError : asbabQ.isError;
         return (
           <div className="mt-4 rounded-xl border border-border bg-secondary/40 px-4 py-3.5">
             <div className="mb-2 flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-primary">
               {panel === "tafsir" ? <Sparkles className="h-3 w-3" /> : <BookText className="h-3 w-3" />}
-              {panel === "tafsir" ? t("ui.ayah.tafsirCompare") : t("ui.ayah.sababTitle")}
+              {panel === "tafsir" ? t("ui.ayah.tafsirTitle") : t("ui.ayah.sababTitle")}
             </div>
 
             {panel === "tafsir" && (
               <div className="mb-3 flex flex-wrap gap-1.5 border-b border-border/60 pb-2.5">
                 {TAFSIR_SOURCES_META.map((s) => {
                   const active = tafsirSource === s.key;
-                  const k = cacheKey("tafsir", s.key);
-                  const hasError = cache[k]?.error;
                   return (
                     <button
                       type="button"
@@ -343,9 +322,7 @@ export function AyahCard({ surah, surahName, ayah, arabic, hebrew, highlight }: 
                       className={`rounded-full border px-3 py-1 text-[11.5px] font-medium transition-colors ${
                         active
                           ? "border-primary/40 bg-primary/10 text-primary"
-                          : hasError
-                            ? "border-border bg-background text-muted-foreground/60 line-through"
-                            : "border-border bg-background text-muted-foreground hover:border-primary/30 hover:text-primary"
+                          : "border-border bg-background text-muted-foreground hover:border-primary/30 hover:text-primary"
                       }`}
                     >
                       {tafsirSourceName(s, locale)}
@@ -367,26 +344,48 @@ export function AyahCard({ surah, surahName, ayah, arabic, hebrew, highlight }: 
                 </div>
               </div>
             )}
-            {!isLoading && entry?.error && (
-              <p className="text-sm text-destructive">{entry.error}</p>
+            {!isLoading && hasError && (
+              <p className="text-sm text-destructive">{t("ui.ayah.networkError")}</p>
             )}
-            {!isLoading && !entry?.error && entry?.text && (
-              <>
-                <div className="hebrew-text prose prose-sm max-w-none text-[14.5px] text-foreground/90 [&>p]:my-1.5 [&>h1]:text-base [&>h2]:text-base [&>h3]:text-sm [&>ul]:my-1 [&>ol]:my-1">
-                  <ReactMarkdown skipHtml>{entry.text}</ReactMarkdown>
-                </div>
-                {entry.source && (
-                  <div className="mt-3 flex items-center gap-1.5 border-t border-border pt-2 text-[11px] text-muted-foreground">
-                    <BookText className="h-3 w-3" />
-                    <span>
-                      {t("ui.ayah.source")}{" "}
-                      <strong className="text-foreground/80">{tafsirSourceName(entry.source, locale)}</strong>
-                      {" · "}
-                      <span dir="rtl" className="font-arabic">{entry.source.name_ar}</span>
-                    </span>
+            {!isLoading && panel === "tafsir" && tafsirQ.data && tafsirQ.data.length > 0 && (
+              <div className="space-y-3">
+                {tafsirQ.data.slice(0, 3).map((row) => (
+                  <div key={row.id} className="rounded-lg border border-border/70 bg-background/60 p-3">
+                    <div className="prose prose-sm max-w-none text-[14.5px] text-foreground/90 [&>p]:my-1.5 [&>h1]:text-base [&>h2]:text-base [&>h3]:text-sm [&>ul]:my-1 [&>ol]:my-1">
+                      <ReactMarkdown skipHtml>{row.body}</ReactMarkdown>
+                    </div>
+                    <div className="mt-2 flex items-center gap-1.5 border-t border-border pt-2 text-[11px] text-muted-foreground">
+                      <BookText className="h-3 w-3" />
+                      <span>
+                        {t("ui.ayah.source")} <strong className="text-foreground/80">{sourceName(row.source, locale)}</strong>
+                      </span>
+                    </div>
                   </div>
-                )}
-              </>
+                ))}
+              </div>
+            )}
+            {!isLoading && panel === "sabab" && asbabQ.data && asbabQ.data.length > 0 && (
+              <div className="space-y-3">
+                {asbabQ.data.slice(0, 2).map((row) => (
+                  <div key={row.id} className="rounded-lg border border-border/70 bg-background/60 p-3">
+                    <div className="prose prose-sm max-w-none text-[14.5px] text-foreground/90 [&>p]:my-1.5 [&>h1]:text-base [&>h2]:text-base [&>h3]:text-sm [&>ul]:my-1 [&>ol]:my-1">
+                      <ReactMarkdown skipHtml>{row.body}</ReactMarkdown>
+                    </div>
+                    <div className="mt-2 flex items-center gap-1.5 border-t border-border pt-2 text-[11px] text-muted-foreground">
+                      <BookText className="h-3 w-3" />
+                      <span>
+                        {t("ui.ayah.source")} <strong className="text-foreground/80">{sourceName(row.source, locale)}</strong>
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+            {!isLoading && panel === "tafsir" && tafsirQ.data && tafsirQ.data.length === 0 && (
+              <p className="text-sm text-muted-foreground">{t("ui.ayah.noTafsir")}</p>
+            )}
+            {!isLoading && panel === "sabab" && asbabQ.data && asbabQ.data.length === 0 && (
+              <p className="text-sm text-muted-foreground">{t("ui.ayah.noAsbab")}</p>
             )}
           </div>
         );

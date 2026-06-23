@@ -127,6 +127,75 @@ export function groupByKind(
   return out as Record<EntityKind, KnowledgeEntity[]>;
 }
 
+export interface KnowledgeTextHit {
+  id: string;
+  kind: "tafsir" | "asbab" | "lesson";
+  surah: number | null;
+  ayah_start: number | null;
+  ayah_end: number | null;
+  text: string;
+  source_name: string;
+}
+
+export async function searchKnowledgeTexts(query: string, limit = 10): Promise<KnowledgeTextHit[]> {
+  const q = query.trim();
+  if (q.length < 2) return [];
+  const safe = q.replace(/[*,()]/g, " ");
+
+  const [tafsirRes, asbabRes, lessonRes] = await Promise.all([
+    supabase
+      .from("tafsir_passages")
+      .select("id,surah,ayah_start,ayah_end,body,source:tafsir_sources(name_he,name_en)")
+      .ilike("body", `%${safe}%`)
+      .order("created_at", { ascending: false })
+      .limit(Math.min(6, limit)),
+    supabase
+      .from("asbab_nuzul")
+      .select("id,surah,ayah_start,ayah_end,body,source:tafsir_sources(name_he,name_en)")
+      .ilike("body", `%${safe}%`)
+      .order("created_at", { ascending: false })
+      .limit(Math.min(4, limit)),
+    supabase
+      .from("topic_lessons")
+      .select("id,body,source:tafsir_sources(name_he,name_en)")
+      .ilike("body", `%${safe}%`)
+      .order("created_at", { ascending: false })
+      .limit(Math.min(4, limit)),
+  ]);
+
+  const tafsir = ((tafsirRes.data as Array<{ id: string; surah: number; ayah_start: number; ayah_end: number; body: string; source: { name_he?: string; name_en?: string } | null }> | null) ?? []).map((r) => ({
+    id: r.id,
+    kind: "tafsir" as const,
+    surah: r.surah,
+    ayah_start: r.ayah_start,
+    ayah_end: r.ayah_end,
+    text: r.body,
+    source_name: r.source?.name_en ?? r.source?.name_he ?? "Tafsir",
+  }));
+
+  const asbab = ((asbabRes.data as Array<{ id: string; surah: number; ayah_start: number; ayah_end: number; body: string; source: { name_he?: string; name_en?: string } | null }> | null) ?? []).map((r) => ({
+    id: r.id,
+    kind: "asbab" as const,
+    surah: r.surah,
+    ayah_start: r.ayah_start,
+    ayah_end: r.ayah_end,
+    text: r.body,
+    source_name: r.source?.name_en ?? r.source?.name_he ?? "Asbab",
+  }));
+
+  const lessons = ((lessonRes.data as Array<{ id: string; body: string; source: { name_he?: string; name_en?: string } | null }> | null) ?? []).map((r) => ({
+    id: r.id,
+    kind: "lesson" as const,
+    surah: null,
+    ayah_start: null,
+    ayah_end: null,
+    text: r.body,
+    source_name: r.source?.name_en ?? r.source?.name_he ?? "Lesson",
+  }));
+
+  return [...tafsir, ...asbab, ...lessons].slice(0, limit);
+}
+
 // ===== Journeys =====
 
 export interface Journey {

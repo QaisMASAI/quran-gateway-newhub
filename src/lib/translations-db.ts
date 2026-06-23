@@ -15,6 +15,13 @@ export interface AyahTranslation {
   text: string;
 }
 
+export interface SurahBilingualVerse {
+  surah: number;
+  ayah: number;
+  arabic: string;
+  translation: string;
+}
+
 // Cache resolved source ids per session.
 const sourceIdCache = new Map<string, string>();
 
@@ -91,6 +98,46 @@ export async function fetchSurahTranslation(
     .order("ayah", { ascending: true });
   if (error || !data) return [];
   return data;
+}
+
+/** Fetch an entire surah with Arabic + selected locale translation from DB. */
+export async function fetchSurahBilingual(
+  surah: number,
+  locale: LocaleCode,
+): Promise<SurahBilingualVerse[]> {
+  const [arSid, locSid] = await Promise.all([
+    resolveSourceId(TRANSLATION_SOURCE_CODE.ar),
+    resolveSourceId(TRANSLATION_SOURCE_CODE[locale]),
+  ]);
+  if (!arSid) return [];
+  const sourceIds = Array.from(new Set([arSid, locSid].filter(Boolean) as string[]));
+  const { data, error } = await supabase
+    .from("ayah_translations")
+    .select("source_id,surah,ayah,text")
+    .eq("surah", surah)
+    .in("source_id", sourceIds)
+    .order("ayah", { ascending: true });
+  if (error || !data) return [];
+
+  const byAyah = new Map<number, SurahBilingualVerse>();
+  for (const row of data) {
+    const current = byAyah.get(row.ayah) ?? {
+      surah: row.surah,
+      ayah: row.ayah,
+      arabic: "",
+      translation: "",
+    };
+    if (row.source_id === arSid) current.arabic = row.text;
+    if (row.source_id === locSid) current.translation = row.text;
+    byAyah.set(row.ayah, current);
+  }
+
+  return Array.from(byAyah.values())
+    .sort((a, b) => a.ayah - b.ayah)
+    .map((v) => ({
+      ...v,
+      translation: v.translation || v.arabic,
+    }));
 }
 
 export interface PassageVerse {
