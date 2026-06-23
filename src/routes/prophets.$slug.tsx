@@ -199,7 +199,7 @@ function ProphetPage() {
                       <p className="mt-2 text-xs leading-relaxed text-muted-foreground">
                         {(ref as { tafsirPreview: string }).tafsirPreview}
                       </p>
-                    </div>
+                    )}
                   </article>
                 </li>
               );
