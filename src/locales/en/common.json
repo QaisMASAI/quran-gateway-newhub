@@ -1,0 +1,127 @@
+{
+  "site": {
+    "name": "Noor Al Quran",
+    "tagline": "Discover the Quran",
+    "longTagline": "Explore • Learn • Understand",
+    "description": "Noor Al Quran is a multilingual educational platform designed to help anyone explore, learn, and understand the Quran regardless of prior knowledge."
+  },
+  "nav": {
+    "surahs": "Surahs",
+    "prophets": "Prophets",
+    "topics": "Topics",
+    "emotions": "Emotions",
+    "plans": "Reading plans",
+    "search": "Search",
+    "favorites": "Favorites",
+    "ask": "Ask Noor Al Quran",
+    "glossary": "Glossary",
+    "learn": "Learn",
+    "account": "Account",
+    "signIn": "Sign in",
+    "signOut": "Sign out",
+    "profile": "My profile"
+  },
+  "a11y": {
+    "skipToContent": "Skip to main content",
+    "openMenu": "Open menu",
+    "closeMenu": "Close menu",
+    "toggleTheme": "Toggle theme",
+    "changeLanguage": "Change language",
+    "playAudio": "Play audio",
+    "pauseAudio": "Pause audio",
+    "addToFavorites": "Add to favorites",
+    "removeFromFavorites": "Remove from favorites",
+    "share": "Share"
+  },
+  "common": {
+    "loading": "Loading...",
+    "error": "An error occurred",
+    "retry": "Try again",
+    "back": "Back",
+    "home": "Home",
+    "next": "Next",
+    "previous": "Previous",
+    "close": "Close",
+    "save": "Save",
+    "cancel": "Cancel",
+    "language": "Language"
+  },
+  "errors": {
+    "notFoundTitle": "Page not found",
+    "notFoundBody": "The page you're looking for doesn't exist or has been moved.",
+    "genericTitle": "Something went wrong loading this page",
+    "genericBody": "Something broke on our end. You can try again, or go back home."
+  },
+  "ui": {
+    "ayah": {
+      "play": "Listen",
+      "pause": "Pause",
+      "reciter": "Reciter:",
+      "tafsir": "Tafsir",
+      "sabab": "Reason for revelation",
+      "save": "Save",
+      "saved": "Saved",
+      "note": "Note",
+      "related": "Related:",
+      "tafsirCompare": "Compare tafsirs",
+      "sababTitle": "Reason for revelation",
+      "loadingContent": "Loading content",
+      "loadingSource": "Loading source and translating…",
+      "source": "Source:",
+      "networkError": "Network error. Try again."
+    },
+    "share": {
+      "copyLink": "Copy link",
+      "copyText": "Copy text",
+      "copied": "Copied"
+    },
+    "note": {
+      "placeholder": "Write your personal note for this verse…",
+      "lastUpdated": "Updated: {{when}}",
+      "notSaved": "Not saved yet"
+    },
+    "reading": {
+      "settings": "Reading settings",
+      "close": "Close",
+      "arabicSize": "Arabic font size",
+      "stripTashkil": "Hide diacritics"
+    },
+    "theme": {
+      "light": "Light mode",
+      "dark": "Dark mode"
+    },
+    "surah": {
+      "makkah": "Makkah",
+      "madinah": "Madinah",
+      "stopReciter": "Stop recitation",
+      "playReciter": "Listen — Yasser Al-Dosari"
+    },
+    "plans": {
+      "confirmReset": "Reset progress?",
+      "markRead": "Mark as read",
+      "markUnread": "Mark as unread"
+    },
+    "auth": {
+      "metaTitle": "Sign in | Noor Al Quran",
+      "metaDescription": "Sign in or create an account to save verses, personal notes, and track your reading progress.",
+      "welcomeBack": "Welcome back",
+      "createAccount": "Create account",
+      "signinSubtitle": "Sign in to sync favorites, notes, and reading progress",
+      "signupSubtitle": "Create an account to save verses, notes, and personal progress",
+      "displayName": "Display name (optional)",
+      "displayNamePlaceholder": "Your name",
+      "email": "Email",
+      "password": "Password",
+      "passwordPlaceholder": "At least 6 characters",
+      "submitSignin": "Sign in",
+      "submitSignup": "Create account",
+      "confirmEmail": "A confirmation email was sent. Please verify your address and sign in.",
+      "googleFailed": "Google sign-in failed. Try again.",
+      "genericError": "An error occurred",
+      "invalidCreds": "Invalid email or password.",
+      "alreadyRegistered": "This email is already registered.",
+      "emailNotConfirmed": "Please confirm your email address.",
+      "weakPassword": "Password must be at least 6 characters."
+    }
+  }
+}

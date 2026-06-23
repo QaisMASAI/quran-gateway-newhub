@@ -1,0 +1,284 @@
+@import "tailwindcss" source(none);
+@source "../src";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --radius-2xl: calc(var(--radius) + 8px);
+  --radius-3xl: calc(var(--radius) + 16px);
+
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary-soft: var(--primary-soft);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-olive: var(--olive);
+  --color-olive-foreground: var(--olive-foreground);
+  --color-olive-soft: var(--olive-soft);
+  --color-gold: var(--gold);
+  --color-gold-soft: var(--gold-soft);
+  --color-rose: var(--rose);
+
+  --font-hebrew: "Fira Sans", "Heebo", "Arial Hebrew", system-ui, sans-serif;
+  --font-arabic: "Amiri Quran", "Amiri", "Noto Naskh Arabic", serif;
+  --font-display: "DM Serif Display", "Fira Sans", system-ui, serif;
+
+  --gradient-hero: linear-gradient(180deg,
+      oklch(0.32 0.07 160) 0%,
+      oklch(0.42 0.09 162) 60%,
+      oklch(0.48 0.09 165) 100%);
+  --gradient-hero-soft: linear-gradient(160deg,
+      oklch(0.97 0.025 110) 0%,
+      oklch(0.95 0.04 150) 100%);
+  --gradient-primary: linear-gradient(135deg, oklch(0.32 0.07 160), oklch(0.48 0.09 165));
+  --gradient-olive: linear-gradient(135deg, oklch(0.48 0.09 165), oklch(0.55 0.08 160));
+  --gradient-gold: linear-gradient(135deg, oklch(0.78 0.13 80), oklch(0.7 0.14 60));
+
+  --shadow-card: 0 1px 2px 0 oklch(0.25 0.04 160 / 0.05), 0 1px 3px 0 oklch(0.25 0.04 160 / 0.07);
+  --shadow-soft: 0 4px 24px -10px oklch(0.32 0.07 160 / 0.2);
+  --shadow-glow: 0 12px 40px -12px oklch(0.32 0.07 160 / 0.4);
+  --shadow-hero: 0 30px 80px -20px oklch(0.25 0.06 160 / 0.55);
+}
+
+:root {
+  --radius: 1rem;
+
+  /* Warm ivory background, deep emerald foreground */
+  --background: oklch(0.96 0.025 95);
+  --foreground: oklch(0.3 0.06 160);
+
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.3 0.06 160);
+
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.3 0.06 160);
+
+  /* Deep emerald primary (#064e3b feel) */
+  --primary: oklch(0.34 0.07 160);
+  --primary-foreground: oklch(0.97 0.025 95);
+  --primary-soft: oklch(0.94 0.04 160);
+
+  --secondary: oklch(0.95 0.025 110);
+  --secondary-foreground: oklch(0.3 0.06 160);
+
+  --muted: oklch(0.95 0.02 110);
+  --muted-foreground: oklch(0.5 0.04 160);
+
+  --accent: oklch(0.94 0.05 95);
+  --accent-foreground: oklch(0.3 0.06 160);
+
+  /* Medium emerald (#0d7a5f feel) */
+  --olive: oklch(0.5 0.1 165);
+  --olive-foreground: oklch(0.97 0.025 95);
+  --olive-soft: oklch(0.94 0.05 165);
+
+  /* Antique gold (#c9a84c feel) */
+  --gold: oklch(0.72 0.13 85);
+  --gold-soft: oklch(0.95 0.06 90);
+
+  --rose: oklch(0.62 0.14 30);
+
+  --destructive: oklch(0.58 0.2 25);
+  --destructive-foreground: oklch(0.99 0.005 95);
+
+  --border: oklch(0.9 0.02 110);
+  --input: oklch(0.92 0.02 110);
+  --ring: oklch(0.72 0.13 85);
+}
+
+/* ============== DARK MODE — deep emerald night with warm gold ============== */
+.dark {
+  --background: oklch(0.18 0.025 165);
+  --foreground: oklch(0.94 0.025 95);
+
+  --card: oklch(0.22 0.03 165);
+  --card-foreground: oklch(0.94 0.025 95);
+
+  --popover: oklch(0.22 0.03 165);
+  --popover-foreground: oklch(0.94 0.025 95);
+
+  --primary: oklch(0.72 0.13 85);
+  --primary-foreground: oklch(0.18 0.03 165);
+  --primary-soft: oklch(0.3 0.05 165);
+
+  --secondary: oklch(0.26 0.03 165);
+  --secondary-foreground: oklch(0.94 0.025 95);
+
+  --muted: oklch(0.26 0.03 165);
+  --muted-foreground: oklch(0.72 0.03 110);
+
+  --accent: oklch(0.3 0.05 165);
+  --accent-foreground: oklch(0.94 0.025 95);
+
+  --olive: oklch(0.55 0.08 160);
+  --olive-foreground: oklch(0.97 0.025 95);
+  --olive-soft: oklch(0.28 0.05 165);
+
+  --gold: oklch(0.78 0.13 85);
+  --gold-soft: oklch(0.3 0.06 90);
+
+  --rose: oklch(0.7 0.14 30);
+
+  --destructive: oklch(0.6 0.2 25);
+  --destructive-foreground: oklch(0.99 0.005 95);
+
+  --border: oklch(0.32 0.04 165);
+  --input: oklch(0.3 0.04 165);
+  --ring: oklch(0.78 0.13 85);
+}
+
+@layer base {
+  * { border-color: var(--color-border); }
+
+  html { direction: rtl; }
+
+  body {
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+    font-family: var(--font-hebrew);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    position: relative;
+  }
+
+  /* Islamic Khatam watermark — 8-pointed star (two overlapping squares)
+     with octagons and interlocking circles. Strictly NO 6-pointed star
+     (hexagram) shapes. Inspired by Andalusian tilework. */
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.05;
+    background-image:
+      url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160' viewBox='0 0 160 160'><g fill='none' stroke='%23064e3b' stroke-width='1' stroke-linejoin='round'><rect x='32' y='32' width='96' height='96'/><rect x='32' y='32' width='96' height='96' transform='rotate(45 80 80)'/><circle cx='80' cy='80' r='44'/><circle cx='80' cy='80' r='28'/><polygon points='80,52 96,64 108,80 96,96 80,108 64,96 52,80 64,64'/></g><g fill='none' stroke='%23c9a84c' stroke-width='0.9'><circle cx='0' cy='0' r='20'/><circle cx='160' cy='0' r='20'/><circle cx='0' cy='160' r='20'/><circle cx='160' cy='160' r='20'/><circle cx='80' cy='0' r='10'/><circle cx='0' cy='80' r='10'/><circle cx='160' cy='80' r='10'/><circle cx='80' cy='160' r='10'/></g></svg>");
+    background-size: 160px 160px;
+    background-repeat: repeat;
+  }
+
+  /* Site-wide overlay watermark — floats above section backgrounds/cards. */
+  body::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 9999;
+    opacity: 0.03;
+    mix-blend-mode: multiply;
+    background-image:
+      url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160' viewBox='0 0 160 160'><g fill='none' stroke='%23064e3b' stroke-width='1' stroke-linejoin='round'><rect x='32' y='32' width='96' height='96'/><rect x='32' y='32' width='96' height='96' transform='rotate(45 80 80)'/><circle cx='80' cy='80' r='40'/></g></svg>");
+    background-size: 160px 160px;
+    background-repeat: repeat;
+  }
+
+  /* Dark-mode watermark: switch from emerald ink to warm gold so the pattern
+     stays visible on the deep emerald background. */
+  .dark body::before {
+    opacity: 0.07;
+    background-image:
+      url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160' viewBox='0 0 160 160'><g fill='none' stroke='%23c9a84c' stroke-width='1' stroke-linejoin='round'><rect x='32' y='32' width='96' height='96'/><rect x='32' y='32' width='96' height='96' transform='rotate(45 80 80)'/><circle cx='80' cy='80' r='44'/><circle cx='80' cy='80' r='28'/><polygon points='80,52 96,64 108,80 96,96 80,108 64,96 52,80 64,64'/></g><g fill='none' stroke='%23c9a84c' stroke-width='0.9' stroke-opacity='0.6'><circle cx='0' cy='0' r='20'/><circle cx='160' cy='0' r='20'/><circle cx='0' cy='160' r='20'/><circle cx='160' cy='160' r='20'/></g></svg>");
+  }
+  .dark body::after {
+    opacity: 0.04;
+    mix-blend-mode: screen;
+    background-image:
+      url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160' viewBox='0 0 160 160'><g fill='none' stroke='%23c9a84c' stroke-width='1' stroke-linejoin='round'><rect x='32' y='32' width='96' height='96'/><rect x='32' y='32' width='96' height='96' transform='rotate(45 80 80)'/><circle cx='80' cy='80' r='40'/></g></svg>");
+  }
+
+  body > * { position: relative; z-index: 1; }
+
+  .font-arabic {
+    font-family: var(--font-arabic);
+    direction: rtl;
+    line-height: 2.4;
+  }
+
+  .font-display {
+    font-family: var(--font-display);
+    letter-spacing: -0.01em;
+  }
+
+  .ayah-text {
+    font-family: var(--font-arabic);
+    font-size: 1.85rem;
+    line-height: 2.6;
+    color: var(--color-foreground);
+    direction: rtl;
+  }
+
+  .hebrew-text {
+    font-family: var(--font-hebrew);
+    direction: rtl;
+    line-height: 1.8;
+  }
+
+  mark.search-hit {
+    background: oklch(0.95 0.13 85);
+    color: var(--color-foreground);
+    border-radius: 3px;
+    padding: 0 2px;
+  }
+
+  ::-webkit-scrollbar { width: 10px; height: 10px; }
+  ::-webkit-scrollbar-thumb { background: var(--color-border); border-radius: 8px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--color-muted-foreground); }
+}
+
+@utility surface-card {
+  background: var(--color-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-card);
+}
+
+/* Arabesque pattern overlay for hero gradients (white pattern over dark hero) */
+@utility arabesque-bg {
+  background-image:
+    radial-gradient(circle at 20% 20%, oklch(1 0 0 / 0.08) 0%, transparent 35%),
+    radial-gradient(circle at 80% 80%, oklch(1 0 0 / 0.06) 0%, transparent 40%),
+    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='80' height='80' viewBox='0 0 80 80'><g fill='none' stroke='white' stroke-opacity='0.08' stroke-width='1'><path d='M40 0 L80 40 L40 80 L0 40 Z'/><circle cx='40' cy='40' r='18'/><circle cx='40' cy='40' r='30'/></g></svg>");
+}
+
+/* Subtle mosque arch — decorative svg block usable in section headers */
+@utility mosque-arch {
+  display: block;
+  width: 100%;
+  height: 28px;
+  background-repeat: repeat-x;
+  background-position: center bottom;
+  background-size: 80px 28px;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='80' height='28' viewBox='0 0 80 28'><path d='M0 28 L0 14 Q0 0 14 0 L26 0 Q40 0 40 14 L40 28 Z M40 28 L40 14 Q40 0 54 0 L66 0 Q80 0 80 14 L80 28 Z' fill='none' stroke='%23064e3b' stroke-opacity='0.18' stroke-width='1'/></svg>");
+  opacity: 0.7;
+}
+
+/* Soft arabesque corner ornament (used in hero corners + footer) */
+@utility arabesque-corner {
+  position: absolute;
+  width: 96px;
+  height: 96px;
+  background-repeat: no-repeat;
+  pointer-events: none;
+  opacity: 0.18;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='96' height='96' viewBox='0 0 96 96'><g fill='none' stroke='%23c9a84c' stroke-width='1'><path d='M0 0 Q48 0 48 48 Q48 96 96 96'/><path d='M0 16 Q32 16 32 48 Q32 80 64 80'/><circle cx='8' cy='8' r='4'/><circle cx='88' cy='88' r='4'/><path d='M24 24 L40 8 L56 24 L40 40 Z'/></g></svg>");
+}

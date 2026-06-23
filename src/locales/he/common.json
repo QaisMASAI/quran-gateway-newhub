@@ -1,0 +1,127 @@
+{
+  "site": {
+    "name": "נור הקוראן",
+    "tagline": "לגלות את הקוראן",
+    "longTagline": "לחקור • ללמוד • להבין",
+    "description": "נור הקוראן היא פלטפורמה חינוכית רב-לשונית שנועדה לעזור לכל אדם לחקור, ללמוד ולהבין את הקוראן — ללא ידע מוקדם."
+  },
+  "nav": {
+    "surahs": "סורות",
+    "prophets": "נביאים",
+    "topics": "נושאים",
+    "emotions": "רגשות",
+    "plans": "תכניות",
+    "search": "חיפוש",
+    "favorites": "מועדפים",
+    "ask": "השאל את נור הקוראן",
+    "glossary": "מילון",
+    "learn": "ללמוד",
+    "account": "חשבון",
+    "signIn": "התחברות",
+    "signOut": "התנתקות",
+    "profile": "הפרופיל שלי"
+  },
+  "a11y": {
+    "skipToContent": "דלג לתוכן הראשי",
+    "openMenu": "פתח תפריט",
+    "closeMenu": "סגור תפריט",
+    "toggleTheme": "החלף ערכת צבעים",
+    "changeLanguage": "החלף שפה",
+    "playAudio": "נגן שמע",
+    "pauseAudio": "השהה שמע",
+    "addToFavorites": "הוסף למועדפים",
+    "removeFromFavorites": "הסר מהמועדפים",
+    "share": "שתף"
+  },
+  "common": {
+    "loading": "טוען...",
+    "error": "אירעה שגיאה",
+    "retry": "נסה שוב",
+    "back": "חזרה",
+    "home": "דף הבית",
+    "next": "הבא",
+    "previous": "הקודם",
+    "close": "סגירה",
+    "save": "שמירה",
+    "cancel": "ביטול",
+    "language": "שפה"
+  },
+  "errors": {
+    "notFoundTitle": "העמוד לא נמצא",
+    "notFoundBody": "הדף שחיפשת אינו קיים או הועבר למקום אחר.",
+    "genericTitle": "אירעה תקלה בטעינת העמוד",
+    "genericBody": "משהו השתבש מצידנו. אפשר לנסות שוב, או לחזור לדף הבית."
+  },
+  "ui": {
+    "ayah": {
+      "play": "האזן",
+      "pause": "עצור",
+      "reciter": "קורא:",
+      "tafsir": "פרשנות",
+      "sabab": "סיבת הירידה",
+      "save": "שמור",
+      "saved": "נשמר",
+      "note": "הערה",
+      "related": "קשור:",
+      "tafsirCompare": "השוואת תפסירים",
+      "sababTitle": "סיבת הירידה",
+      "loadingContent": "טוען תוכן",
+      "loadingSource": "טוען מקור ומתרגם…",
+      "source": "מקור:",
+      "networkError": "שגיאת רשת. נסה שוב."
+    },
+    "share": {
+      "copyLink": "העתק קישור",
+      "copyText": "העתק טקסט",
+      "copied": "הועתק"
+    },
+    "note": {
+      "placeholder": "כתבי כאן את ההערה האישית שלך לפסוק...",
+      "lastUpdated": "עודכן: {{when}}",
+      "notSaved": "לא נשמר עדיין"
+    },
+    "reading": {
+      "settings": "הגדרות קריאה",
+      "close": "סגור",
+      "arabicSize": "גודל גופן ערבי",
+      "stripTashkil": "הסתר ניקוד ערבי"
+    },
+    "theme": {
+      "light": "מצב יום",
+      "dark": "מצב לילה"
+    },
+    "surah": {
+      "makkah": "מכה",
+      "madinah": "מדינה",
+      "stopReciter": "עצור תלאוה",
+      "playReciter": "האזן — יאסר א-דוסרי"
+    },
+    "plans": {
+      "confirmReset": "לאפס את ההתקדמות?",
+      "markRead": "סמן כנקרא",
+      "markUnread": "סמן כלא נקרא"
+    },
+    "auth": {
+      "metaTitle": "התחברות | נור הקוראן",
+      "metaDescription": "התחברי או הירשמי כדי לשמור פסוקים, הערות אישיות ולעקוב אחרי התקדמות הקריאה.",
+      "welcomeBack": "ברוכים השבים",
+      "createAccount": "יצירת חשבון",
+      "signinSubtitle": "התחברי כדי לסנכרן מועדפים, הערות וקריאה",
+      "signupSubtitle": "פתחי חשבון לשמירת פסוקים, הערות והתקדמות אישית",
+      "displayName": "שם תצוגה (לא חובה)",
+      "displayNamePlaceholder": "שמך",
+      "email": "דוא״ל",
+      "password": "סיסמה",
+      "passwordPlaceholder": "לפחות 6 תווים",
+      "submitSignin": "התחברות",
+      "submitSignup": "יצירת חשבון",
+      "confirmEmail": "נשלח אליך מייל אישור. אשרי את הכתובת ולאחר מכן התחברי.",
+      "googleFailed": "כניסה עם Google נכשלה. נסי שוב.",
+      "genericError": "אירעה שגיאה",
+      "invalidCreds": "דוא״ל או סיסמה שגויים.",
+      "alreadyRegistered": "כתובת הדוא״ל כבר רשומה.",
+      "emailNotConfirmed": "יש לאשר את כתובת הדוא״ל שלך.",
+      "weakPassword": "סיסמה חייבת לכלול לפחות 6 תווים."
+    }
+  }
+}

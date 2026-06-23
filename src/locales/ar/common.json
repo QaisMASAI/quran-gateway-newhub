@@ -1,0 +1,127 @@
+{
+  "site": {
+    "name": "نور القرآن",
+    "tagline": "اكتشف القرآن",
+    "longTagline": "استكشف • تعلَّم • افهم",
+    "description": "نور القرآن منصة تعليمية متعددة اللغات تساعد كل شخص على استكشاف القرآن وتعلُّمه وفهمه بصرف النظر عن خلفيته السابقة."
+  },
+  "nav": {
+    "surahs": "السور",
+    "prophets": "الأنبياء",
+    "topics": "المواضيع",
+    "emotions": "المشاعر",
+    "plans": "خطط القراءة",
+    "search": "بحث",
+    "favorites": "المفضّلة",
+    "ask": "اسأل نور القرآن",
+    "glossary": "المعجم",
+    "learn": "تعلَّم",
+    "account": "الحساب",
+    "signIn": "تسجيل الدخول",
+    "signOut": "تسجيل الخروج",
+    "profile": "ملفي الشخصي"
+  },
+  "a11y": {
+    "skipToContent": "تجاوز إلى المحتوى الرئيسي",
+    "openMenu": "افتح القائمة",
+    "closeMenu": "أغلق القائمة",
+    "toggleTheme": "تبديل السمة",
+    "changeLanguage": "تغيير اللغة",
+    "playAudio": "تشغيل التلاوة",
+    "pauseAudio": "إيقاف مؤقت",
+    "addToFavorites": "إضافة إلى المفضّلة",
+    "removeFromFavorites": "إزالة من المفضّلة",
+    "share": "مشاركة"
+  },
+  "common": {
+    "loading": "جارٍ التحميل...",
+    "error": "حدث خطأ",
+    "retry": "إعادة المحاولة",
+    "back": "رجوع",
+    "home": "الرئيسية",
+    "next": "التالي",
+    "previous": "السابق",
+    "close": "إغلاق",
+    "save": "حفظ",
+    "cancel": "إلغاء",
+    "language": "اللغة"
+  },
+  "errors": {
+    "notFoundTitle": "الصفحة غير موجودة",
+    "notFoundBody": "الصفحة التي تبحث عنها غير موجودة أو تم نقلها.",
+    "genericTitle": "حدث خطأ أثناء تحميل الصفحة",
+    "genericBody": "حدث خطأ ما من جانبنا. يمكنك المحاولة مرة أخرى أو العودة إلى الصفحة الرئيسية."
+  },
+  "ui": {
+    "ayah": {
+      "play": "استمع",
+      "pause": "إيقاف",
+      "reciter": "القارئ:",
+      "tafsir": "تفسير",
+      "sabab": "سبب النزول",
+      "save": "احفظ",
+      "saved": "محفوظ",
+      "note": "ملاحظة",
+      "related": "ذو صلة:",
+      "tafsirCompare": "مقارنة التفاسير",
+      "sababTitle": "سبب النزول",
+      "loadingContent": "جارٍ تحميل المحتوى",
+      "loadingSource": "جارٍ تحميل المصدر والترجمة…",
+      "source": "المصدر:",
+      "networkError": "خطأ في الشبكة. حاول مرة أخرى."
+    },
+    "share": {
+      "copyLink": "نسخ الرابط",
+      "copyText": "نسخ النص",
+      "copied": "تم النسخ"
+    },
+    "note": {
+      "placeholder": "اكتب ملاحظتك الشخصية لهذه الآية...",
+      "lastUpdated": "تم التحديث: {{when}}",
+      "notSaved": "لم تُحفظ بعد"
+    },
+    "reading": {
+      "settings": "إعدادات القراءة",
+      "close": "إغلاق",
+      "arabicSize": "حجم الخط العربي",
+      "stripTashkil": "إخفاء التشكيل"
+    },
+    "theme": {
+      "light": "الوضع الفاتح",
+      "dark": "الوضع الداكن"
+    },
+    "surah": {
+      "makkah": "مكية",
+      "madinah": "مدنية",
+      "stopReciter": "إيقاف التلاوة",
+      "playReciter": "استمع — ياسر الدوسري"
+    },
+    "plans": {
+      "confirmReset": "إعادة ضبط التقدم؟",
+      "markRead": "تحديد كمقروء",
+      "markUnread": "تحديد كغير مقروء"
+    },
+    "auth": {
+      "metaTitle": "تسجيل الدخول | نور القرآن",
+      "metaDescription": "سجّل الدخول أو أنشئ حسابًا لحفظ الآيات والملاحظات الشخصية وتتبّع تقدّمك في القراءة.",
+      "welcomeBack": "مرحبًا بعودتك",
+      "createAccount": "إنشاء حساب",
+      "signinSubtitle": "سجّل الدخول لمزامنة المفضّلة والملاحظات والقراءة",
+      "signupSubtitle": "أنشئ حسابًا لحفظ الآيات والملاحظات وتتبّع تقدّمك",
+      "displayName": "الاسم الظاهر (اختياري)",
+      "displayNamePlaceholder": "اسمك",
+      "email": "البريد الإلكتروني",
+      "password": "كلمة المرور",
+      "passwordPlaceholder": "6 أحرف على الأقل",
+      "submitSignin": "تسجيل الدخول",
+      "submitSignup": "إنشاء حساب",
+      "confirmEmail": "أُرسل إليك بريد تأكيد. أكّد عنوانك ثم سجّل الدخول.",
+      "googleFailed": "فشل تسجيل الدخول عبر Google. حاول مرة أخرى.",
+      "genericError": "حدث خطأ",
+      "invalidCreds": "بريد إلكتروني أو كلمة مرور غير صحيحة.",
+      "alreadyRegistered": "هذا البريد مسجّل بالفعل.",
+      "emailNotConfirmed": "يجب تأكيد عنوان بريدك الإلكتروني.",
+      "weakPassword": "كلمة المرور يجب أن تكون 6 أحرف على الأقل."
+    }
+  }
+}

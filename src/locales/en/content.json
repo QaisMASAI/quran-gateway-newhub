@@ -1,0 +1,248 @@
+{
+  "level": {
+    "beginner": "Beginner",
+    "intermediate": "Intermediate",
+    "advanced": "Advanced"
+  },
+  "emotions": {
+    "anxiety": {
+      "title": "Anxiety & Worry",
+      "subtitle": "Calm of the heart",
+      "description": "Verses on the heart finding rest in God, and worry lifted through His remembrance."
+    },
+    "sadness": {
+      "title": "Sadness & Pain",
+      "subtitle": "Comfort and light",
+      "description": "Verses reminding us that ease follows hardship, and that God is near the broken-hearted."
+    },
+    "fear": {
+      "title": "Fear & Insecurity",
+      "subtitle": "Trust in God",
+      "description": "Verses on lifting fear through faith and God's protection over the believers."
+    },
+    "loneliness": {
+      "title": "Loneliness",
+      "subtitle": "Nearness to God",
+      "description": "Verses recalling that God is closer to a person than their own jugular vein."
+    },
+    "gratitude": {
+      "title": "Gratitude",
+      "subtitle": "Shukr",
+      "description": "Verses urging thankfulness to God and recognition of His blessings."
+    },
+    "hope": {
+      "title": "Hope",
+      "subtitle": "Never despair of God's mercy",
+      "description": "Verses on hope in God's mercy even after sin and hardship."
+    },
+    "anger": {
+      "title": "Anger",
+      "subtitle": "Restraint and pardon",
+      "description": "Verses on restraining anger and the merit of those who forgive others."
+    },
+    "guilt": {
+      "title": "Guilt & Remorse",
+      "subtitle": "Repentance and forgiveness",
+      "description": "Verses on the open doors of repentance and God's acceptance of those who return."
+    },
+    "peace": {
+      "title": "Inner Peace",
+      "subtitle": "Sakinah",
+      "description": "Verses on the tranquility that God sends down upon the believers."
+    },
+    "hardship": {
+      "title": "Hardship & Trials",
+      "subtitle": "Patience through trials",
+      "description": "Verses on the trials of life, patience, and the reward of the patient."
+    },
+    "love": {
+      "title": "Love & Affection",
+      "subtitle": "Mawaddah and Rahmah",
+      "description": "Verses on love, mercy, and the human bonds God placed between His creation."
+    },
+    "confusion": {
+      "title": "Confusion & Seeking Meaning",
+      "subtitle": "Right guidance",
+      "description": "Verses on asking God for guidance and His promise to those who seek the truth."
+    }
+  },
+  "topics": {
+    "tawhid": {
+      "title": "Oneness of God (Tawhid)",
+      "subtitle": "Belief in one God",
+      "description": "Verses on God's oneness, divinity, and His names and attributes."
+    },
+    "prayer": {
+      "title": "Prayer (Salah)",
+      "subtitle": "The pillar of faith",
+      "description": "Verses on the obligation of prayer, its times, and its virtue."
+    },
+    "charity": {
+      "title": "Charity (Zakat & Sadaqah)",
+      "subtitle": "Giving to others",
+      "description": "Verses on zakat, voluntary charity, and spending in God's path."
+    },
+    "fasting": {
+      "title": "Fasting (Siyam)",
+      "subtitle": "The month of Ramadan",
+      "description": "Verses on the obligation of fasting and its merit."
+    },
+    "patience": {
+      "title": "Patience (Sabr)",
+      "subtitle": "Steadfastness in difficulty",
+      "description": "Verses encouraging patience, endurance in distress, and trust in God."
+    },
+    "mercy": {
+      "title": "God's Mercy",
+      "subtitle": "Ar-Rahman, Ar-Rahim",
+      "description": "Verses on the vast mercy of God and His forgiveness."
+    },
+    "justice": {
+      "title": "Justice (Adl)",
+      "subtitle": "Fairness among people",
+      "description": "Verses on the duty of justice, integrity in judgment, and equity in relationships."
+    },
+    "knowledge": {
+      "title": "Knowledge & Learning",
+      "subtitle": "Iqra — Read",
+      "description": "Verses encouraging the pursuit of knowledge and learning."
+    },
+    "parents": {
+      "title": "Honoring Parents",
+      "subtitle": "Ihsan to parents",
+      "description": "Verses on the duty of treating one's parents with kindness."
+    },
+    "creation": {
+      "title": "Creation of the Universe",
+      "subtitle": "Signs in nature",
+      "description": "Verses on the creation of the heavens and earth and the signs within them."
+    },
+    "afterlife": {
+      "title": "The Hereafter",
+      "subtitle": "The Day of Judgment",
+      "description": "Verses on resurrection, the reckoning, Paradise, and Hellfire."
+    },
+    "repentance": {
+      "title": "Repentance (Tawbah)",
+      "subtitle": "Returning to God",
+      "description": "Verses on the open doors of repentance and God's acceptance of those who return."
+    }
+  },
+  "prophets": {
+    "adam": {
+      "name": "Adam"
+    },
+    "idris": {
+      "name": "Idris",
+      "alt": "Enoch"
+    },
+    "nuh": {
+      "name": "Nuh",
+      "alt": "Noah"
+    },
+    "hud": {
+      "name": "Hud"
+    },
+    "salih": {
+      "name": "Salih"
+    },
+    "ibrahim": {
+      "name": "Ibrahim",
+      "alt": "Abraham"
+    },
+    "lut": {
+      "name": "Lut",
+      "alt": "Lot"
+    },
+    "ismail": {
+      "name": "Isma'il",
+      "alt": "Ishmael"
+    },
+    "ishaq": {
+      "name": "Ishaq",
+      "alt": "Isaac"
+    },
+    "yaqub": {
+      "name": "Ya'qub",
+      "alt": "Jacob"
+    },
+    "yusuf": {
+      "name": "Yusuf",
+      "alt": "Joseph"
+    },
+    "ayyub": {
+      "name": "Ayyub",
+      "alt": "Job"
+    },
+    "shuayb": {
+      "name": "Shu'ayb"
+    },
+    "musa": {
+      "name": "Musa",
+      "alt": "Moses"
+    },
+    "harun": {
+      "name": "Harun",
+      "alt": "Aaron"
+    },
+    "dhul-kifl": {
+      "name": "Dhul-Kifl"
+    },
+    "dawud": {
+      "name": "Dawud",
+      "alt": "David"
+    },
+    "sulayman": {
+      "name": "Sulayman",
+      "alt": "Solomon"
+    },
+    "ilyas": {
+      "name": "Ilyas",
+      "alt": "Elijah"
+    },
+    "alyasa": {
+      "name": "Al-Yasa",
+      "alt": "Elisha"
+    },
+    "yunus": {
+      "name": "Yunus",
+      "alt": "Jonah"
+    },
+    "zakariyya": {
+      "name": "Zakariyya",
+      "alt": "Zechariah"
+    },
+    "yahya": {
+      "name": "Yahya",
+      "alt": "John the Baptist"
+    },
+    "isa": {
+      "name": "Isa",
+      "alt": "Jesus"
+    },
+    "muhammad": {
+      "name": "Muhammad ﷺ"
+    }
+  },
+  "plans": {
+    "short-surahs-30": {
+      "title": "30 Short Surahs in 30 Days",
+      "subtitle": "Short surahs — a starting point",
+      "description": "One short surah a day from the final section of the Qur'an. Ideal for beginners who want to learn the surahs commonly recited in prayer."
+    },
+    "essentials-7": {
+      "title": "7 Days — Core Surahs",
+      "subtitle": "An overview of the best-known surahs",
+      "description": "A week-long tour through the most-recited surahs of the Qur'an — from Al-Fatihah to Al-Ikhlas.",
+      "days": {
+        "1": "Opening and beginning",
+        "2": "Throne Verse (Ayat al-Kursi)",
+        "3": "Surah Ya-Sin",
+        "4": "Surah Ar-Rahman",
+        "5": "Surah Al-Mulk",
+        "6": "Surah Al-Kahf — beginning",
+        "7": "Four closing surahs"
+      }
+    }
+  }
+}
