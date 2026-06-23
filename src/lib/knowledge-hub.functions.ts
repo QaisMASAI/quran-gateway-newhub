@@ -1,5 +1,8 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
+import { ALL_PROPHETS } from "@/lib/prophets";
+import { ALL_TOPICS } from "@/lib/topics";
+import seed from "@/lib/seeds/knowledge-seed.json";
 
 const HubInput = z.object({
   slug: z.string().min(1).max(120),
@@ -24,6 +27,43 @@ function excerpt(input: string | null | undefined, size = 260): string {
   const txt = (input ?? "").trim();
   if (!txt) return "";
   return txt.length > size ? `${txt.slice(0, size)}…` : txt;
+}
+
+function fallbackRefsFor(slug: string, kind: "prophet" | "topic") {
+  const seedLinks = (seed.verses as Array<{ slug: string; links: [number, number, number][] }>).find(
+    (v) => v.slug === slug,
+  )?.links;
+  if (seedLinks && seedLinks.length > 0) {
+    return seedLinks.map((l, idx) => ({
+      id: `seed-fallback:${slug}:${idx}`,
+      surah: l[0],
+      ayah_start: l[1],
+      ayah_end: l[2],
+      sort_order: idx,
+      note_i18n: {},
+    }));
+  }
+
+  if (kind === "prophet") {
+    const p = ALL_PROPHETS.find((x) => x.slug === slug);
+    return (p?.refs ?? []).map((r, idx) => ({
+      id: `fallback:${slug}:${idx}`,
+      surah: r.surah,
+      ayah_start: r.ayah,
+      ayah_end: r.to ?? r.ayah,
+      sort_order: idx,
+      note_i18n: {},
+    }));
+  }
+  const t = ALL_TOPICS.find((x) => x.slug === slug);
+  return (t?.refs ?? []).map((r, idx) => ({
+    id: `fallback:${slug}:${idx}`,
+    surah: r.surah,
+    ayah_start: r.ayah,
+    ayah_end: r.to ?? r.ayah,
+    sort_order: idx,
+    note_i18n: {},
+  }));
 }
 
 export interface KnowledgeHubVerse {
@@ -80,7 +120,7 @@ export const getKnowledgeHub = createServerFn({ method: "POST" })
       .eq("entity_id", entity.id)
       .order("sort_order", { ascending: true });
 
-    const verseLinks = links ?? [];
+    const verseLinks = (links ?? []).length > 0 ? (links ?? []) : fallbackRefsFor(data.slug, data.kind);
     const surahs = [...new Set(verseLinks.map((l) => l.surah))];
     const localeOrder = localeFallback(data.language);
 
@@ -138,7 +178,7 @@ export const getKnowledgeHub = createServerFn({ method: "POST" })
           .limit(600)
       : { data: [] as Array<Record<string, never>> };
 
-    const { data: asbabRows } = surahs.length
+    const { data: asbabRowsBase } = surahs.length
       ? await supabaseAdmin
           .from("asbab_nuzul")
           .select("id,surah,ayah_start,ayah_end,lang,body")
@@ -146,6 +186,37 @@ export const getKnowledgeHub = createServerFn({ method: "POST" })
           .order("created_at", { ascending: false })
           .limit(300)
       : { data: [] as Array<Record<string, never>> };
+
+    const asbabRows = (asbabRowsBase ?? []) as Array<{
+      id: string;
+      surah: number;
+      ayah_start: number;
+      ayah_end: number;
+      lang: string;
+      body: string;
+    }>;
+
+    const asbabFromTafsir = asbabRows.length
+      ? []
+      : ((tafsirRows ?? []) as Array<{
+          id: string;
+          surah: number;
+          ayah_start: number;
+          ayah_end: number;
+          lang: string;
+          body: string;
+        }>)
+          .filter((t) => /سبب\s*النزول|نزلت/i.test(t.body ?? ""))
+          .map((t) => ({
+            id: `tafsir-asbab:${t.id}`,
+            surah: t.surah,
+            ayah_start: t.ayah_start,
+            ayah_end: t.ayah_end,
+            lang: t.lang,
+            body: t.body,
+          }));
+
+    const allAsbabRows = [...asbabRows, ...asbabFromTafsir];
 
     const { data: lessonRows } = await supabaseAdmin
       .from("topic_lessons")
@@ -158,8 +229,25 @@ export const getKnowledgeHub = createServerFn({ method: "POST" })
     for (const lang of localeOrder) {
       lessonByLang.set(lang, (lessonRows ?? []).filter((r) => r.lang === lang));
     }
-    const selectedLessons =
+    let selectedLessons =
       localeOrder.map((lang) => lessonByLang.get(lang) ?? []).find((arr) => arr.length > 0) ?? [];
+
+    if (selectedLessons.length === 0) {
+      selectedLessons = [
+        {
+          id: `fallback-lesson:${entity.id}`,
+          lang: data.language,
+          body:
+            pickLocale(entity.description_i18n as I18nText, data.language) ||
+            pickLocale(entity.summary_i18n as I18nText, data.language),
+          source: {
+            name_he: "מאגר ידע",
+            name_ar: "قاعدة المعرفة",
+            name_en: "Knowledge Base",
+          },
+        },
+      ].filter((l) => l.body && l.body.trim().length > 0);
+    }
 
     const { data: relationRows } = await supabaseAdmin
       .from("knowledge_relations")
@@ -182,7 +270,7 @@ export const getKnowledgeHub = createServerFn({ method: "POST" })
           .find(Boolean) ??
         overlapTafsir[0];
 
-      const overlapAsbab = (asbabRows ?? []).filter(
+      const overlapAsbab = allAsbabRows.filter(
         (a) =>
           Number(a.surah) === Number(link.surah) &&
           Number(a.ayah_start) <= Number(link.ayah_end) &&

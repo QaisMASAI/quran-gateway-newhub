@@ -2,6 +2,7 @@
 // Each topic lists representative verse references only — the platform does
 // not paraphrase or interpret. Readers follow the links to read the actual
 // Quranic text and authenticated tafsir.
+import seed from "@/lib/seeds/knowledge-seed.json";
 
 export type AyahRef = {
   surah: number;
@@ -179,6 +180,44 @@ export const TOPICS: Topic[] = [
   },
 ];
 
-export function getTopic(slug: string): Topic | undefined {
-  return TOPICS.find((t) => t.slug === slug);
+type SeedTopic = {
+  kind: string;
+  slug: string;
+  title: { he?: string; ar?: string; en?: string };
+  summary: { he?: string; ar?: string; en?: string };
+};
+
+const seedTopicLinks = new Map(
+  ((seed.verses as Array<{ slug: string; links: [number, number, number][] }> | undefined) ?? []).map((v) => [
+    v.slug,
+    v.links,
+  ]),
+);
+
+const seedTopics: Topic[] = (((seed.entities as SeedTopic[] | undefined) ?? [])
+  .filter((e) => e.kind === "topic")
+  .map((e) => ({
+    slug: e.slug,
+    title: e.title.he ?? e.title.en ?? e.slug,
+    subtitle: e.title.ar,
+    description: e.summary.he ?? e.summary.en ?? e.summary.ar ?? "",
+    icon: "book" as const,
+    refs: (seedTopicLinks.get(e.slug) ?? []).map(([surah, ayah, to]) => ({
+      surah,
+      ayah,
+      to,
+    })),
+  }))
+  .filter((t) => t.refs.length > 0));
+
+const mergedTopics = [...TOPICS];
+const seenTopicSlugs = new Set(TOPICS.map((t) => t.slug));
+for (const t of seedTopics) {
+  if (!seenTopicSlugs.has(t.slug)) mergedTopics.push(t);
 }
+
+export function getTopic(slug: string): Topic | undefined {
+  return mergedTopics.find((t) => t.slug === slug);
+}
+
+export const ALL_TOPICS: Topic[] = mergedTopics;
