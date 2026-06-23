@@ -4,6 +4,15 @@ import { embedTexts } from "./embeddings.server";
 import { createLovableAiGatewayProvider } from "./ai-gateway.server";
 import { generateText } from "ai";
 
+async function withTimeout<T>(promise: Promise<T>, timeoutMs: number): Promise<T> {
+  return await Promise.race([
+    promise,
+    new Promise<never>((_, reject) =>
+      setTimeout(() => reject(new Error("generation_timeout")), timeoutMs),
+    ),
+  ]);
+}
+
 const RETRIEVAL_MODEL = "openai/text-embedding-3-large";
 
 const IngestSchema = z.object({
@@ -293,12 +302,15 @@ Arabic source:
 ${r.body}`;
 
       try {
-        const { text } = await generateText({
-          model: gateway(data.model),
-          prompt,
-          temperature: 0,
-          maxOutputTokens: 900,
-        });
+        const { text } = await withTimeout(
+          generateText({
+            model: gateway(data.model),
+            prompt,
+            temperature: 0,
+            maxOutputTokens: 900,
+          }),
+          25_000,
+        );
         const heb = clip(text, 5000);
         if (!heb) continue;
         for (let ay = r.ayah_start; ay <= r.ayah_end; ay += 1) {
