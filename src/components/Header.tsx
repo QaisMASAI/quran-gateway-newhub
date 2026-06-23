@@ -20,8 +20,15 @@ export function Header() {
     const onClick = (e: MouseEvent) => {
       if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
     };
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setOpen(false);
+    };
     document.addEventListener("mousedown", onClick);
-    return () => document.removeEventListener("mousedown", onClick);
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("mousedown", onClick);
+      document.removeEventListener("keydown", onKey);
+    };
   }, [open]);
 
   const initial =
@@ -63,6 +70,7 @@ export function Header() {
           {isAuthenticated ? (
             <div ref={ref} className="relative">
               <button
+                type="button"
                 onClick={() => setOpen((v) => !v)}
                 className="flex h-9 w-9 items-center justify-center rounded-full bg-primary/10 text-sm font-semibold text-primary ring-1 ring-primary/20 hover:bg-primary/15"
                 aria-label={t("nav.account")}
@@ -93,6 +101,7 @@ export function Header() {
                     {t("nav.profile")}
                   </Link>
                   <button
+                    type="button"
                     onClick={async () => {
                       setOpen(false);
                       await signOut();
