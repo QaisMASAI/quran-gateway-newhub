@@ -1,7 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
-import { PROPHETS } from "@/lib/prophets";
-import { TOPICS } from "@/lib/topics";
+import { ALL_PROPHETS } from "@/lib/prophets";
+import { ALL_TOPICS } from "@/lib/topics";
 import seed from "@/lib/seeds/knowledge-seed.json";
 
 const HubInput = z.object({
@@ -45,7 +45,7 @@ function fallbackRefsFor(slug: string, kind: "prophet" | "topic") {
   }
 
   if (kind === "prophet") {
-    const p = PROPHETS.find((x) => x.slug === slug);
+    const p = ALL_PROPHETS.find((x) => x.slug === slug);
     return (p?.refs ?? []).map((r, idx) => ({
       id: `fallback:${slug}:${idx}`,
       surah: r.surah,
@@ -55,7 +55,7 @@ function fallbackRefsFor(slug: string, kind: "prophet" | "topic") {
       note_i18n: {},
     }));
   }
-  const t = TOPICS.find((x) => x.slug === slug);
+  const t = ALL_TOPICS.find((x) => x.slug === slug);
   return (t?.refs ?? []).map((r, idx) => ({
     id: `fallback:${slug}:${idx}`,
     surah: r.surah,
