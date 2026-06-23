@@ -51,14 +51,26 @@ export async function getTafsirForVerse(
   ayah: number,
   lang: Locale,
 ): Promise<TafsirPassageRow[]> {
-  const { data } = await supabase
-    .from("tafsir_passages")
-    .select("*, source:tafsir_sources(*)")
-    .eq("surah", surah)
-    .lte("ayah_start", ayah)
-    .gte("ayah_end", ayah)
-    .eq("lang", lang);
-  return (data as TafsirPassageRow[] | null) ?? [];
+  const base = () =>
+    supabase
+      .from("tafsir_passages")
+      .select("*, source:tafsir_sources(*)")
+      .eq("surah", surah)
+      .lte("ayah_start", ayah)
+      .gte("ayah_end", ayah)
+      .order("created_at", { ascending: false });
+
+  const fallbackOrder: Locale[] = [lang, "he", "ar", "en"].filter(
+    (v, i, arr): v is Locale => arr.indexOf(v) === i,
+  );
+
+  for (const candidate of fallbackOrder) {
+    const { data } = await base().eq("lang", candidate);
+    const rows = (data as TafsirPassageRow[] | null) ?? [];
+    if (rows.length > 0) return rows;
+  }
+
+  return [];
 }
 
 export async function getAsbabForVerse(
@@ -66,24 +78,46 @@ export async function getAsbabForVerse(
   ayah: number,
   lang: Locale,
 ): Promise<AsbabRow[]> {
-  const { data } = await supabase
-    .from("asbab_nuzul")
-    .select("*, source:tafsir_sources(*)")
-    .eq("surah", surah)
-    .lte("ayah_start", ayah)
-    .gte("ayah_end", ayah)
-    .eq("lang", lang);
-  return (data as AsbabRow[] | null) ?? [];
+  const base = () =>
+    supabase
+      .from("asbab_nuzul")
+      .select("*, source:tafsir_sources(*)")
+      .eq("surah", surah)
+      .lte("ayah_start", ayah)
+      .gte("ayah_end", ayah)
+      .order("created_at", { ascending: false });
+
+  const fallbackOrder: Locale[] = [lang, "he", "ar", "en"].filter(
+    (v, i, arr): v is Locale => arr.indexOf(v) === i,
+  );
+
+  for (const candidate of fallbackOrder) {
+    const { data } = await base().eq("lang", candidate);
+    const rows = (data as AsbabRow[] | null) ?? [];
+    if (rows.length > 0) return rows;
+  }
+
+  return [];
 }
 
 export async function getLessonsForEntity(
   entityId: string,
   lang: Locale,
 ): Promise<TopicLessonRow[]> {
-  const { data } = await supabase
-    .from("topic_lessons")
-    .select("*, source:tafsir_sources(*)")
-    .eq("entity_id", entityId)
-    .eq("lang", lang);
-  return (data as TopicLessonRow[] | null) ?? [];
+  const fallbackOrder: Locale[] = [lang, "he", "ar", "en"].filter(
+    (v, i, arr): v is Locale => arr.indexOf(v) === i,
+  );
+
+  for (const candidate of fallbackOrder) {
+    const { data } = await supabase
+      .from("topic_lessons")
+      .select("*, source:tafsir_sources(*)")
+      .eq("entity_id", entityId)
+      .eq("lang", candidate)
+      .order("created_at", { ascending: false });
+    const rows = (data as TopicLessonRow[] | null) ?? [];
+    if (rows.length > 0) return rows;
+  }
+
+  return [];
 }

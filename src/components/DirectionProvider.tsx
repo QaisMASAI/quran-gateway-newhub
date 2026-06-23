@@ -1,6 +1,6 @@
 import { useEffect, type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
-import { LOCALE_DIR, isLocale, DEFAULT_LOCALE } from "@/lib/i18n";
+import { LOCALE_DIR, normalizeLocale, DEFAULT_LOCALE } from "@/lib/i18n";
 
 /**
  * Keeps <html lang> and <html dir> in sync with the active i18next language,
@@ -8,7 +8,7 @@ import { LOCALE_DIR, isLocale, DEFAULT_LOCALE } from "@/lib/i18n";
  */
 export function DirectionProvider({ children }: { children: ReactNode }) {
   const { i18n, t } = useTranslation("common");
-  const lang = isLocale(i18n.resolvedLanguage) ? i18n.resolvedLanguage : DEFAULT_LOCALE;
+  const lang = normalizeLocale(i18n.resolvedLanguage) ?? DEFAULT_LOCALE;
   const dir = LOCALE_DIR[lang];
 
   useEffect(() => {

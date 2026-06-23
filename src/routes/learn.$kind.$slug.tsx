@@ -13,7 +13,7 @@ import {
   getLessonsForEntity, getTafsirForVerse, getAsbabForVerse, sourceName,
   type TafsirPassageRow,
 } from "@/lib/tafsir-content";
-import type { Locale } from "@/lib/i18n";
+import { normalizeLocale, type Locale } from "@/lib/i18n";
 import { useMemo } from "react";
 
 const VALID: EntityKind[] = [
@@ -27,7 +27,7 @@ export const Route = createFileRoute("/learn/$kind/$slug")({
 function EntityPage() {
   const { kind, slug } = Route.useParams();
   const { t, i18n } = useTranslation("pages");
-  const locale = (i18n.language?.slice(0, 2) as Locale) || "he";
+  const locale = (normalizeLocale(i18n.language) ?? "he") as Locale;
 
   if (!VALID.includes(kind as EntityKind)) throw notFound();
 

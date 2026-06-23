@@ -5,9 +5,10 @@ import ReactMarkdown from "react-markdown";
 import { useTranslation } from "react-i18next";
 import { useServerFn } from "@tanstack/react-start";
 import { Sparkles, Loader2, Send, BookOpen, ShieldCheck, ChevronLeft } from "lucide-react";
-import { surahNameHe } from "@/lib/surah-names-he";
+import { surahDisplayName } from "@/lib/surah-names-he";
 import { askQuranResearch, type ResearchResult } from "@/lib/ai-research.functions";
 import { Header } from "@/components/Header";
+import { normalizeLocale } from "@/lib/i18n";
 
 export const Route = createLazyFileRoute("/ask")({
   component: AskPage,
@@ -15,10 +16,7 @@ export const Route = createLazyFileRoute("/ask")({
 
 function AskPage() {
   const { t, i18n } = useTranslation("pages");
-  const locale = (i18n.language?.startsWith("he") ? "he" : i18n.language?.startsWith("ar") ? "ar" : "en") as
-    | "he"
-    | "en"
-    | "ar";
+  const locale = (normalizeLocale(i18n.language) ?? "he") as "he" | "en" | "ar";
   const examples = t("ask.examples", { returnObjects: true }) as string[];
 
   const ask = useServerFn(askQuranResearch);
@@ -162,20 +160,26 @@ function AskPage() {
                 >
                   <div className="flex items-center justify-between gap-2">
                     <span className="text-xs font-semibold text-primary">
-                      {surahNameHe(v.surah)} {v.surah}:{v.ayah}
+                      {surahDisplayName(v.surah, locale)} {v.surah}:{v.ayah}
                     </span>
                     <ChevronLeft className="h-3.5 w-3.5 text-muted-foreground group-hover:text-primary ltr:rotate-180" />
                   </div>
                   <p className="font-arabic mt-1.5 text-right text-lg leading-loose text-foreground" dir="rtl">
                     {v.arabic}
                   </p>
-                  <p className="mt-1.5 text-[13.5px] text-foreground/80">{v.hebrew}</p>
+                  <p className="mt-1.5 text-[13.5px] text-foreground/80" dir={locale === "en" ? "ltr" : "rtl"}>
+                    {v.hebrew}
+                  </p>
                   {(v.translation_source || v.translator) && (
                     <div className="mt-2 rounded-lg border border-border bg-background px-2.5 py-1.5 text-[11px] text-muted-foreground">
                       <p>
-                        {v.translation_source ? `Translation source: ${v.translation_source}` : "Translation source: Quran DB"}
+                        {t("research.translationSource", { source: v.translation_source || t("research.localQuranDb") })}
                       </p>
-                      <p>{v.translator ? `Translator: ${v.translator}` : "Translator: Local authenticated source"}</p>
+                      <p>
+                        {t("research.translator", {
+                          translator: v.translator || t("research.localAuthenticatedSource"),
+                        })}
+                      </p>
                     </div>
                   )}
                 </Link>
@@ -196,8 +200,8 @@ function AskPage() {
                   </div>
                   <p className="mt-1 text-xs text-muted-foreground">{tf.text}</p>
                   <div className="mt-2 rounded-md border border-border bg-card px-2 py-1 text-[11px] text-muted-foreground">
-                    Tafsir source: {tf.source}
-                    {tf.translator ? ` · Translator: ${tf.translator}` : ""}
+                      {t("research.tafsirSource", { source: tf.source })}
+                      {tf.translator ? ` · ${t("research.translator", { translator: tf.translator })}` : ""}
                   </div>
                 </div>
               ))}

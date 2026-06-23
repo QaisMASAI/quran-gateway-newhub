@@ -355,6 +355,12 @@ export function searchIndex(idx: QuranIndex, rawQuery: string, limit = 500): Sea
   const normHe = normalizeHebrew(q);
   const normAr = normalizeArabic(q);
   const normEn = normalizeEnglish(q);
+  const heTerms = normHe.split(" ").filter((t) => t.length >= 2);
+  const arTerms = normAr.split(" ").filter((t) => t.length >= 2);
+  const enTerms = normEn.split(" ").filter((t) => t.length >= 2);
+
+  const includesAny = (haystack: string, terms: string[]) =>
+    terms.some((term) => haystack.includes(term));
 
   // Chapter matches (Hebrew + Arabic + English simple name)
   const chapterMatches: SurahMeta[] = [];
@@ -363,9 +369,9 @@ export function searchIndex(idx: QuranIndex, rawQuery: string, limit = 500): Sea
     const arN = normalizeArabic(c.name_arabic);
     const simpleN = c.name_simple.toLowerCase();
     if (
-      (normHe && (heN.includes(normHe) || simpleN.includes(normHe))) ||
-      (normAr && arN.includes(normAr)) ||
-      (normEn && simpleN.includes(normEn))
+      (heTerms.length > 0 && (includesAny(heN, heTerms) || includesAny(simpleN, heTerms))) ||
+      (arTerms.length > 0 && includesAny(arN, arTerms)) ||
+      (enTerms.length > 0 && includesAny(simpleN, enTerms))
     ) {
       chapterMatches.push(c);
     }
@@ -375,16 +381,16 @@ export function searchIndex(idx: QuranIndex, rawQuery: string, limit = 500): Sea
   for (const v of idx.verses) {
     let matched: "hebrew" | "arabic" | "english" | null = null;
     if (arabicQuery) {
-      if (normAr && v.arabicNorm.includes(normAr)) matched = "arabic";
+      if (arTerms.length > 0 && includesAny(v.arabicNorm, arTerms)) matched = "arabic";
     } else if (hebrewQuery) {
-      if (normHe && v.hebrewNorm.includes(normHe)) matched = "hebrew";
+      if (heTerms.length > 0 && includesAny(v.hebrewNorm, heTerms)) matched = "hebrew";
     } else if (englishQuery) {
-      if (normEn && v.englishNorm.includes(normEn)) matched = "english";
+      if (enTerms.length > 0 && includesAny(v.englishNorm, enTerms)) matched = "english";
     } else {
       // Mixed or unknown script — try all
-      if (normHe && v.hebrewNorm.includes(normHe)) matched = "hebrew";
-      else if (normAr && v.arabicNorm.includes(normAr)) matched = "arabic";
-      else if (normEn && v.englishNorm.includes(normEn)) matched = "english";
+      if (heTerms.length > 0 && includesAny(v.hebrewNorm, heTerms)) matched = "hebrew";
+      else if (arTerms.length > 0 && includesAny(v.arabicNorm, arTerms)) matched = "arabic";
+      else if (enTerms.length > 0 && includesAny(v.englishNorm, enTerms)) matched = "english";
     }
     if (!matched) continue;
 

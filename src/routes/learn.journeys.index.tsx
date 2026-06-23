@@ -1,28 +1,35 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
+import i18n from "@/lib/i18n";
 import { Header } from "@/components/Header";
 import { Compass, Loader2, ChevronLeft } from "lucide-react";
 import { listJourneys, pickLocale } from "@/lib/knowledge";
-import type { Locale } from "@/lib/i18n";
+import { normalizeLocale, type Locale } from "@/lib/i18n";
 
 export const Route = createFileRoute("/learn/journeys/")({
-  head: () => ({
-    meta: [
-      { title: "Noor Al Quran| Learning Journeys" },
-      {
-        name: "description",
-        content:
-          "Guided learning paths through the Quran — curated journeys for beginners and learners ready to go deeper.",
-      },
-    ],
-  }),
+  head: () => {
+    const locale = normalizeLocale(i18n.resolvedLanguage) ?? "he";
+    return {
+      meta: [
+        { title: i18n.t("pages:journeys.title", { lng: locale }) },
+        {
+          name: "description",
+          content: i18n.t("pages:journeys.subtitle", { lng: locale }),
+        },
+        { property: "og:title", content: i18n.t("pages:journeys.title", { lng: locale }) },
+        { property: "og:description", content: i18n.t("pages:journeys.subtitle", { lng: locale }) },
+        { property: "og:url", content: "/learn/journeys" },
+      ],
+      links: [{ rel: "canonical", href: "/learn/journeys" }],
+    };
+  },
   component: JourneysIndex,
 });
 
 function JourneysIndex() {
   const { t, i18n } = useTranslation("pages");
-  const locale = (i18n.language?.slice(0, 2) as Locale) || "he";
+  const locale = (normalizeLocale(i18n.language) ?? "he") as Locale;
 
   const q = useQuery({
     queryKey: ["journeys"],

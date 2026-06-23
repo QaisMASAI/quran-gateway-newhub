@@ -1,11 +1,25 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
+import i18n, { normalizeLocale } from "@/lib/i18n";
 import { Header } from "@/components/Header";
 import { PROPHETS } from "@/lib/prophets";
 import { useProphetT } from "@/lib/content-i18n";
 import { Users, ChevronLeft } from "lucide-react";
 
 export const Route = createFileRoute("/prophets/")({
+  head: () => {
+    const locale = normalizeLocale(i18n.resolvedLanguage) ?? "he";
+    return {
+      meta: [
+        { title: i18n.t("pages:prophets.metaTitle", { lng: locale }) },
+        { name: "description", content: i18n.t("pages:prophets.metaDescription", { lng: locale }) },
+        { property: "og:title", content: i18n.t("pages:prophets.metaTitle", { lng: locale }) },
+        { property: "og:description", content: i18n.t("pages:prophets.metaDescription", { lng: locale }) },
+        { property: "og:url", content: "/prophets" },
+      ],
+      links: [{ rel: "canonical", href: "/prophets" }],
+    };
+  },
   component: ProphetsIndex,
 });
 

@@ -9,6 +9,30 @@ import { AyahCard } from "@/components/AyahCard";
 import { ReadingSettings } from "@/components/ReadingSettings";
 import { ChevronRight, ChevronLeft, Loader2, Play, Pause } from "lucide-react";
 import { useReadingProgress } from "@/lib/reading-progress";
+import { normalizeLocale } from "@/lib/i18n";
+
+function SurahNotFound() {
+  const { t } = useTranslation("common");
+  return (
+    <div className="flex min-h-screen items-center justify-center">
+      <div className="text-center">
+        <p className="text-muted-foreground">{t("errors.notFoundTitle")}</p>
+        <Link to="/" className="mt-3 inline-block text-sm text-primary">
+          {t("common.home")}
+        </Link>
+      </div>
+    </div>
+  );
+}
+
+function SurahError() {
+  const { t } = useTranslation("common");
+  return (
+    <div className="flex min-h-screen items-center justify-center">
+      <p className="text-sm text-destructive">{t("errors.genericBody")}</p>
+    </div>
+  );
+}
 
 export const Route = createFileRoute("/surah/$id")({
   validateSearch: (s: Record<string, unknown>) => ({
@@ -34,21 +58,8 @@ export const Route = createFileRoute("/surah/$id")({
     };
   },
   component: SurahPage,
-  notFoundComponent: () => (
-    <div className="flex min-h-screen items-center justify-center">
-      <div className="text-center">
-        <p className="text-muted-foreground">Surah not found</p>
-        <Link to="/" className="mt-3 inline-block text-sm text-primary">
-          Back to list
-        </Link>
-      </div>
-    </div>
-  ),
-  errorComponent: () => (
-    <div className="flex min-h-screen items-center justify-center">
-      <p className="text-sm text-destructive">An error occurred loading this surah.</p>
-    </div>
-  ),
+  notFoundComponent: SurahNotFound,
+  errorComponent: SurahError,
 });
 
 function SurahPage() {
@@ -56,7 +67,7 @@ function SurahPage() {
   const { q } = Route.useSearch();
   const surahId = Number(id);
   const { t, i18n } = useTranslation("common");
-  const lang = ((i18n.language?.split("-")[0] as ApiLang) || "he");
+  const lang = (normalizeLocale(i18n.language) ?? "he") as ApiLang;
   const isRtl = i18n.dir() === "rtl";
   if (!surahId || surahId < 1 || surahId > 114) throw notFound();
 

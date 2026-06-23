@@ -5,6 +5,7 @@ import { Sparkles, ChevronLeft } from "lucide-react";
 import { surahDisplayName } from "@/lib/surah-names-he";
 import { fetchVerseBilingual, type LocaleCode } from "@/lib/translations-db";
 import { ShareButtons } from "./ShareButtons";
+import { normalizeLocale } from "@/lib/i18n";
 
 const ROTATION: { surah: number; ayah: number }[] = [
   { surah: 1, ayah: 1 },
@@ -38,7 +39,7 @@ function pickToday(): { surah: number; ayah: number } {
 
 export function DailyVerse() {
   const { t, i18n } = useTranslation("pages");
-  const lang = ((i18n.language?.split("-")[0] as LocaleCode) || "he");
+  const lang = (normalizeLocale(i18n.language) ?? "he") as LocaleCode;
   const pick = pickToday();
   const q = useQuery({
     queryKey: ["daily-verse-db", pick.surah, pick.ayah, lang],

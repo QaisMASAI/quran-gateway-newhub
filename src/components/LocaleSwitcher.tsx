@@ -1,13 +1,13 @@
 import { useEffect, useRef, useState } from "react";
 import { Globe, Check } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { SUPPORTED_LOCALES, LOCALE_LABEL, setLocale, type Locale, isLocale, DEFAULT_LOCALE } from "@/lib/i18n";
+import { SUPPORTED_LOCALES, LOCALE_LABEL, setLocale, type Locale, normalizeLocale, DEFAULT_LOCALE } from "@/lib/i18n";
 
 export function LocaleSwitcher() {
   const { t, i18n } = useTranslation("common");
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement | null>(null);
-  const current: Locale = isLocale(i18n.resolvedLanguage) ? i18n.resolvedLanguage : DEFAULT_LOCALE;
+  const current: Locale = normalizeLocale(i18n.resolvedLanguage) ?? DEFAULT_LOCALE;
 
   useEffect(() => {
     if (!open) return;

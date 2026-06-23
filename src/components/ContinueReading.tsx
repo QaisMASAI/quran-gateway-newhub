@@ -3,11 +3,11 @@ import { useTranslation } from "react-i18next";
 import { BookOpen, ChevronLeft } from "lucide-react";
 import { useReadingProgress } from "@/lib/reading-progress";
 import { surahDisplayName } from "@/lib/surah-names-he";
-import type { Locale } from "@/lib/i18n";
+import { normalizeLocale, type Locale } from "@/lib/i18n";
 
 export function ContinueReading() {
   const { t, i18n } = useTranslation("pages");
-  const lang = ((i18n.language?.split("-")[0] as Locale) || "he");
+  const lang = (normalizeLocale(i18n.language) ?? "he") as Locale;
   const { progress } = useReadingProgress();
   if (!progress) return null;
   return (

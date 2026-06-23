@@ -210,6 +210,15 @@ export const explainAyah = createServerFn({ method: "POST" })
 
     if (data.mode === "tafsir") {
       const sourceSlug = data.source ? APPROVED_SOURCES[data.source].slug : undefined;
+      let sourceId: string | null = null;
+      if (sourceSlug) {
+        const { data: src } = await supabaseAdmin
+          .from("tafsir_sources")
+          .select("id")
+          .eq("slug", sourceSlug)
+          .maybeSingle();
+        sourceId = src?.id ?? null;
+      }
       const q = supabaseAdmin
         .from("tafsir_passages")
         .select("body,lang,source:tafsir_sources!inner(slug,name_he,name_ar,name_en)")
@@ -218,7 +227,7 @@ export const explainAyah = createServerFn({ method: "POST" })
         .gte("ayah_end", data.ayah)
         .order("created_at", { ascending: false })
         .limit(12);
-      if (sourceSlug) q.eq("source.slug", sourceSlug);
+      if (sourceId) q.eq("source_id", sourceId);
       const { data: rows } = await q;
 
       const preferred =

@@ -12,6 +12,7 @@ import { ShareButtons } from "./ShareButtons";
 import { NotePanel } from "./NotePanel";
 import { getAyahLinks } from "@/lib/ayah-links";
 import { useReadingSettings, stripArabicDiacritics } from "@/lib/reading-settings";
+import { normalizeLocale } from "@/lib/i18n";
 
 interface Props {
   surah: number;
@@ -58,7 +59,7 @@ export function AyahCard({ surah, surahName, ayah, arabic, hebrew, highlight }: 
   const { isFav, toggle } = useFavorites();
   const fav = isFav(surah, ayah);
   const { t, i18n } = useTranslation("common");
-  const locale = ((i18n.language?.split("-")[0] as "he" | "ar" | "en") || "he");
+  const locale = (normalizeLocale(i18n.language) ?? "he") as "he" | "ar" | "en";
 
 
   const [playing, setPlaying] = useState(false);

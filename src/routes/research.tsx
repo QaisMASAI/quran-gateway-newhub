@@ -1,24 +1,27 @@
 import { createFileRoute } from "@tanstack/react-router";
+import i18n, { normalizeLocale } from "@/lib/i18n";
 
 export const Route = createFileRoute("/research")({
-  head: () => ({
+  head: () => {
+    const locale = normalizeLocale(i18n.resolvedLanguage) ?? "he";
+    return {
     meta: [
-      { title: "AI Research Assistant — Discover Quran" },
+      { title: i18n.t("pages:research.title", { lng: locale }) },
       {
         name: "description",
-        content:
-          "Ask deep questions about the Quran. Every answer is grounded in verses and authenticated Tafsir, with citations and a confidence score.",
+        content: i18n.t("pages:research.subtitle", { lng: locale }),
       },
-      { property: "og:title", content: "Quran AI Research Assistant" },
+      { property: "og:title", content: i18n.t("pages:research.title", { lng: locale }) },
       {
         property: "og:description",
-        content: "Source-grounded answers with verse + Tafsir citations.",
+        content: i18n.t("pages:research.subtitle", { lng: locale }),
       },
       { property: "og:url", content: "/research" },
-      { name: "twitter:title", content: "Quran AI Research Assistant" },
-      { name: "twitter:description", content: "Source-grounded answers with verse + Tafsir citations." },
+      { name: "twitter:title", content: i18n.t("pages:research.title", { lng: locale }) },
+      { name: "twitter:description", content: i18n.t("pages:research.subtitle", { lng: locale }) },
     ],
     links: [{ rel: "canonical", href: "/research" }],
-  }),
+  };
+  },
   pendingComponent: () => <div className="mx-auto max-w-4xl px-4 py-10 text-sm text-muted-foreground">Loading…</div>,
 });

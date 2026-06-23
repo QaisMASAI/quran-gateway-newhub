@@ -123,13 +123,24 @@ export const askQuranResearch = createServerFn({ method: "POST" })
     if (!embedding) return { ...base, error: "no_embedding" };
 
     // 2) Strictly grounded retrieval from local database only.
-    const { data: chunkRows } = await supabaseAdmin.rpc("match_grounded_chunks", {
+    let { data: chunkRows } = await supabaseAdmin.rpc("match_grounded_chunks", {
       query_embedding: embedding as unknown as string,
       match_count: Math.max(20, data.k * 4),
       min_similarity: 0.12,
-      language_filter: undefined,
+      language_filter: data.language,
       surah_filter: undefined,
     });
+
+    if (!chunkRows || chunkRows.length === 0) {
+      const retry = await supabaseAdmin.rpc("match_grounded_chunks", {
+        query_embedding: embedding as unknown as string,
+        match_count: Math.max(20, data.k * 4),
+        min_similarity: 0.12,
+        language_filter: undefined,
+        surah_filter: undefined,
+      });
+      chunkRows = retry.data;
+    }
 
     type ChunkRow = {
       content_type: string;
@@ -169,6 +180,24 @@ export const askQuranResearch = createServerFn({ method: "POST" })
           translator: row.translator_name,
           similarity: row.similarity ?? 0,
         });
+      }
+
+      const surahs = [...new Set(verses.map((v) => v.surah).filter((s) => Number.isFinite(s) && s > 0))];
+      if (surahs.length > 0) {
+        const { data: verseRows } = await supabaseAdmin
+          .from("verse_embeddings")
+          .select("surah,ayah,arabic,hebrew")
+          .in("surah", surahs);
+        const byKey = new Map<string, { arabic: string; hebrew: string | null }>();
+        for (const r of verseRows ?? []) {
+          byKey.set(`${r.surah}:${r.ayah}`, { arabic: r.arabic ?? "", hebrew: r.hebrew ?? null });
+        }
+        for (const v of verses) {
+          const match = byKey.get(`${v.surah}:${v.ayah}`);
+          if (!match) continue;
+          if (!v.arabic) v.arabic = match.arabic;
+          if (!v.hebrew && match.hebrew) v.hebrew = match.hebrew;
+        }
       }
     } else {
       const { data: verseRows } = await supabaseAdmin.rpc("match_verses", {

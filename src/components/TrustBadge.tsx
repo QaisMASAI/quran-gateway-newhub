@@ -1,5 +1,6 @@
 import { ShieldCheck } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { normalizeLocale } from "@/lib/i18n";
 
 interface Props {
   size?: "sm" | "md";
@@ -27,7 +28,7 @@ const COPY = {
 
 export function TrustBadge({ size = "sm", variant = "inline", className = "" }: Props) {
   const { i18n } = useTranslation();
-  const lang = (i18n.language?.slice(0, 2) as keyof typeof COPY) ?? "en";
+  const lang = (normalizeLocale(i18n.language) as keyof typeof COPY) ?? "en";
   const c = COPY[lang] ?? COPY.en;
 
   if (variant === "block") {

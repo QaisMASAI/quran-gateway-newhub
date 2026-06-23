@@ -8,27 +8,45 @@ import { useTranslation } from "react-i18next";
 
 export function useEmotionT(slug: string) {
   const { t } = useTranslation("content");
+  const pick = (key: string, fallback: string) => {
+    const current = t(key, { defaultValue: "" });
+    if (current) return current;
+    const hebrewFallback = t(key, { lng: "he", defaultValue: "" });
+    return hebrewFallback || fallback;
+  };
   return {
-    title: t(`emotions.${slug}.title`, { defaultValue: slug }),
-    subtitle: t(`emotions.${slug}.subtitle`, { defaultValue: "" }),
-    description: t(`emotions.${slug}.description`, { defaultValue: "" }),
+    title: pick(`emotions.${slug}.title`, slug),
+    subtitle: pick(`emotions.${slug}.subtitle`, ""),
+    description: pick(`emotions.${slug}.description`, ""),
   };
 }
 
 export function useTopicT(slug: string) {
   const { t } = useTranslation("content");
+  const pick = (key: string, fallback: string) => {
+    const current = t(key, { defaultValue: "" });
+    if (current) return current;
+    const hebrewFallback = t(key, { lng: "he", defaultValue: "" });
+    return hebrewFallback || fallback;
+  };
   return {
-    title: t(`topics.${slug}.title`, { defaultValue: slug }),
-    subtitle: t(`topics.${slug}.subtitle`, { defaultValue: "" }),
-    description: t(`topics.${slug}.description`, { defaultValue: "" }),
+    title: pick(`topics.${slug}.title`, slug),
+    subtitle: pick(`topics.${slug}.subtitle`, ""),
+    description: pick(`topics.${slug}.description`, ""),
   };
 }
 
 export function useProphetT(slug: string) {
   const { t } = useTranslation("content");
+  const pick = (key: string, fallback: string) => {
+    const current = t(key, { defaultValue: "" });
+    if (current) return current;
+    const hebrewFallback = t(key, { lng: "he", defaultValue: "" });
+    return hebrewFallback || fallback;
+  };
   return {
-    name: t(`prophets.${slug}.name`, { defaultValue: slug }),
-    alt: t(`prophets.${slug}.alt`, { defaultValue: "" }),
+    name: pick(`prophets.${slug}.name`, slug),
+    alt: pick(`prophets.${slug}.alt`, ""),
   };
 }
 
@@ -39,10 +57,16 @@ export function usePlanDayT(slug: string, day: number, fallback: string) {
 
 export function usePlanT(slug: string) {
   const { t } = useTranslation("content");
+  const pick = (key: string, fallback: string) => {
+    const current = t(key, { defaultValue: "" });
+    if (current) return current;
+    const hebrewFallback = t(key, { lng: "he", defaultValue: "" });
+    return hebrewFallback || fallback;
+  };
   return {
-    title: t(`plans.${slug}.title`, { defaultValue: slug }),
-    subtitle: t(`plans.${slug}.subtitle`, { defaultValue: "" }),
-    description: t(`plans.${slug}.description`, { defaultValue: "" }),
+    title: pick(`plans.${slug}.title`, slug),
+    subtitle: pick(`plans.${slug}.subtitle`, ""),
+    description: pick(`plans.${slug}.description`, ""),
   };
 }
 
