@@ -3,7 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import i18n from "@/lib/i18n";
 import { Header } from "@/components/Header";
-import { Loader2, Compass, Network } from "lucide-react";
+import { Loader2, Compass, Network, Clock, MapPin } from "lucide-react";
 import { listAllEntities, groupByKind, type EntityKind } from "@/lib/knowledge";
 import { EntityCard } from "@/components/discovery/EntityCard";
 import { normalizeLocale, type Locale } from "@/lib/i18n";
@@ -96,6 +96,30 @@ function LearnIndex() {
                 {t("learn.openGraph")}
               </div>
               <p className="mt-0.5 text-xs text-muted-foreground">{t("learn.openGraphHint")}</p>
+            </div>
+          </Link>
+          <Link
+            to="/explore/timeline"
+            className="group flex items-start gap-3 rounded-2xl border border-border bg-gradient-to-br from-primary-soft/40 to-card p-4 transition hover:border-primary/60 hover:shadow-sm"
+          >
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
+              <Clock className="h-5 w-5" />
+            </div>
+            <div className="min-w-0">
+              <div className="text-base font-semibold text-foreground group-hover:text-primary">{t("learn.openTimeline")}</div>
+              <p className="mt-0.5 text-xs text-muted-foreground">{t("learn.openTimelineHint")}</p>
+            </div>
+          </Link>
+          <Link
+            to="/explore/map"
+            className="group flex items-start gap-3 rounded-2xl border border-border bg-gradient-to-br from-primary-soft/40 to-card p-4 transition hover:border-primary/60 hover:shadow-sm"
+          >
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
+              <MapPin className="h-5 w-5" />
+            </div>
+            <div className="min-w-0">
+              <div className="text-base font-semibold text-foreground group-hover:text-primary">{t("learn.openMap")}</div>
+              <p className="mt-0.5 text-xs text-muted-foreground">{t("learn.openMapHint")}</p>
             </div>
           </Link>
         </div>
