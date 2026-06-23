@@ -16,14 +16,14 @@ const KIND_ICON: Record<EntityKind, typeof BookOpen> = {
 };
 
 const KIND_TONE: Record<EntityKind, string> = {
-  topic: "from-emerald-500/10 to-emerald-500/0 text-emerald-700 dark:text-emerald-300",
-  prophet: "from-amber-500/10 to-amber-500/0 text-amber-700 dark:text-amber-300",
-  story: "from-sky-500/10 to-sky-500/0 text-sky-700 dark:text-sky-300",
-  event: "from-rose-500/10 to-rose-500/0 text-rose-700 dark:text-rose-300",
-  place: "from-violet-500/10 to-violet-500/0 text-violet-700 dark:text-violet-300",
-  nation: "from-indigo-500/10 to-indigo-500/0 text-indigo-700 dark:text-indigo-300",
-  concept: "from-teal-500/10 to-teal-500/0 text-teal-700 dark:text-teal-300",
-  theme: "from-fuchsia-500/10 to-fuchsia-500/0 text-fuchsia-700 dark:text-fuchsia-300",
+  topic: "from-primary/14 to-primary/0 text-primary",
+  prophet: "from-gold/16 to-gold/0 text-foreground",
+  story: "from-secondary to-secondary/0 text-foreground",
+  event: "from-primary-soft to-primary-soft/0 text-primary",
+  place: "from-gold-soft to-gold-soft/0 text-foreground",
+  nation: "from-muted to-muted/0 text-foreground",
+  concept: "from-secondary to-secondary/0 text-foreground",
+  theme: "from-primary/12 to-primary/0 text-primary",
 };
 
 export function EntityCard({
