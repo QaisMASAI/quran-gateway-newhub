@@ -322,13 +322,102 @@ export interface JourneyStep {
   entity?: KnowledgeEntity | null;
 }
 
+const seedJourneyTemplates: Array<{
+  slug: string;
+  level: number;
+  title_i18n: I18nText;
+  summary_i18n: I18nText;
+  stepSlugs: string[];
+}> = [
+  {
+    slug: "foundations-of-faith",
+    level: 1,
+    title_i18n: {
+      he: "יסודות האמונה בקוראן",
+      ar: "أساسيات الإيمان في القرآن",
+      en: "Foundations of Faith in the Quran",
+    },
+    summary_i18n: {
+      he: "מסלול פתיחה: ייחוד, תפילה, סבלנות ורחמים.",
+      ar: "مسار افتتاحي: التوحيد، الصلاة، الصبر والرحمة.",
+      en: "Starter journey: tawhid, prayer, patience, and mercy.",
+    },
+    stepSlugs: ["tawhid", "prayer", "patience", "mercy", "afterlife"],
+  },
+  {
+    slug: "prophetic-journey",
+    level: 2,
+    title_i18n: {
+      he: "מסע הנביאים",
+      ar: "رحلة الأنبياء",
+      en: "Journey of the Prophets",
+    },
+    summary_i18n: {
+      he: "עקבו אחרי שליחותם של אברהם, משה, יוסף ומוחמד.",
+      ar: "تتبّع دعوة إبراهيم وموسى ويوسف ومحمد.",
+      en: "Follow the missions of Abraham, Moses, Joseph, and Muhammad.",
+    },
+    stepSlugs: ["ibrahim", "musa", "yusuf", "isa", "muhammad"],
+  },
+  {
+    slug: "quranic-ethics",
+    level: 2,
+    title_i18n: {
+      he: "מוסר ויחסים בקוראן",
+      ar: "الأخلاق والعلاقات في القرآن",
+      en: "Quranic Ethics and Relationships",
+    },
+    summary_i18n: {
+      he: "צדק, צדקה, כיבוד הורים ותשובה.",
+      ar: "العدل، الزكاة، برّ الوالدين والتوبة.",
+      en: "Justice, charity, honoring parents, and repentance.",
+    },
+    stepSlugs: ["justice", "charity", "parents", "repentance", "knowledge"],
+  },
+];
+
+function buildSeedJourneys(): Journey[] {
+  return seedJourneyTemplates.map((j, idx) => ({
+    id: `seed-journey:${j.slug}`,
+    slug: j.slug,
+    title_i18n: j.title_i18n,
+    summary_i18n: j.summary_i18n,
+    level: j.level,
+    sort_order: idx,
+  }));
+}
+
+function buildSeedJourneySteps(journeySlug: string): JourneyStep[] {
+  const template = seedJourneyTemplates.find((j) => j.slug === journeySlug);
+  if (!template) return [];
+  return template.stepSlugs
+    .map((slug, idx) => {
+      const entity = seedBySlug.get(slug);
+      if (!entity) return null;
+      return {
+        id: `seed-step:${journeySlug}:${idx}`,
+        journey_id: `seed-journey:${journeySlug}`,
+        step_order: idx + 1,
+        entity_id: entity.id,
+        surah: null,
+        ayah_start: null,
+        ayah_end: null,
+        notes_i18n: entity.summary_i18n,
+        entity,
+      } satisfies JourneyStep;
+    })
+    .filter((s): s is JourneyStep => !!s);
+}
+
 export async function listJourneys(): Promise<Journey[]> {
   const { data } = await supabase
     .from("knowledge_journeys")
     .select("*")
     .eq("published", true)
     .order("sort_order", { ascending: true });
-  return (data as Journey[] | null) ?? [];
+  const db = (data as Journey[] | null) ?? [];
+  if (db.length > 0) return db;
+  return buildSeedJourneys();
 }
 
 export async function getJourneyBySlug(
@@ -340,7 +429,11 @@ export async function getJourneyBySlug(
     .eq("slug", slug)
     .eq("published", true)
     .maybeSingle();
-  if (!j) return null;
+  if (!j) {
+    const seedJourney = buildSeedJourneys().find((x) => x.slug === slug);
+    if (!seedJourney) return null;
+    return { journey: seedJourney, steps: buildSeedJourneySteps(slug) };
+  }
   const { data: steps } = await supabase
     .from("knowledge_journey_steps")
     .select("*, entity:knowledge_entities(*)")
