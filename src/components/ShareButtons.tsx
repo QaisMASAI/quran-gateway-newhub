@@ -1,11 +1,7 @@
 import { Share2, Copy, Check, ImageDown, Loader2, ChevronDown } from "lucide-react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import {
-  renderVerseImage,
-  FORMAT_LABELS,
-  type VerseImageFormat,
-} from "@/lib/verse-image";
+import { renderVerseImage, type VerseImageFormat } from "@/lib/verse-image";
 
 interface Props {
   surah: number;
@@ -39,6 +35,18 @@ export function ShareButtons(props: Props) {
   const [format, setFormat] = useState<VerseImageFormat>("square");
   const [open, setOpen] = useState(false);
   const { t } = useTranslation("common");
+
+  const formatLabel = (f: VerseImageFormat) =>
+    t(`ui.share.formats.${f}` as const, {
+      defaultValue:
+        f === "square"
+          ? "Square · Instagram / General"
+          : f === "story"
+            ? "Story · 9:16"
+            : f === "landscape"
+              ? "Landscape · Facebook / X"
+              : "Portrait · Instagram 4:5",
+    });
 
 
   const url = buildUrl(props);
@@ -133,7 +141,7 @@ export function ShareButtons(props: Props) {
           onClick={() => setOpen((v) => !v)}
           className="inline-flex items-center gap-1 rounded-full border border-border bg-background px-2.5 py-1 text-[11px] font-medium text-foreground/80 hover:border-primary/40 hover:text-primary"
         >
-          {FORMAT_LABELS[format]}
+          {formatLabel(format)}
           <ChevronDown className="h-3 w-3" />
         </button>
         {open && (
@@ -153,7 +161,7 @@ export function ShareButtons(props: Props) {
                   f === format ? "text-primary font-semibold" : "text-foreground/80"
                 }`}
               >
-                {FORMAT_LABELS[f]}
+                {formatLabel(f)}
               </button>
             ))}
           </div>
