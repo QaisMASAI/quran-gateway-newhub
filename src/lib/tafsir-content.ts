@@ -39,6 +39,14 @@ export interface TopicLessonRow {
   source?: TafsirSourceRow | null;
 }
 
+export const TAFSIR_SOURCE_SLUG_BY_KEY: Record<string, string> = {
+  "ibn-kathir": "ibn_kathir",
+  tabari: "al_tabari",
+  qurtubi: "al_qurtubi",
+  saadi: "al_saadi",
+  muyassar: "al_muyassar",
+};
+
 export function sourceName(s: TafsirSourceRow | null | undefined, locale: Locale): string {
   if (!s) return "";
   if (locale === "ar") return s.name_ar;
@@ -70,6 +78,36 @@ export async function getTafsirForVerse(
     if (rows.length > 0) return rows;
   }
 
+  return [];
+}
+
+export async function getTafsirForVerseBySource(
+  surah: number,
+  ayah: number,
+  lang: Locale,
+  sourceSlug?: string,
+): Promise<TafsirPassageRow[]> {
+  const base = () => {
+    let q = supabase
+      .from("tafsir_passages")
+      .select("*, source:tafsir_sources(*)")
+      .eq("surah", surah)
+      .lte("ayah_start", ayah)
+      .gte("ayah_end", ayah)
+      .order("created_at", { ascending: false });
+    if (sourceSlug) q = q.eq("source.slug", sourceSlug);
+    return q;
+  };
+
+  const fallbackOrder: Locale[] = [lang, "he", "ar", "en"].filter(
+    (v, i, arr): v is Locale => arr.indexOf(v) === i,
+  );
+
+  for (const candidate of fallbackOrder) {
+    const { data } = await base().eq("lang", candidate);
+    const rows = (data as TafsirPassageRow[] | null) ?? [];
+    if (rows.length > 0) return rows;
+  }
   return [];
 }
 

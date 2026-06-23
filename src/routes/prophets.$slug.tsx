@@ -6,10 +6,10 @@ import { Header } from "@/components/Header";
 import { getProphet, type AyahRef } from "@/lib/prophets";
 import { useProphetT } from "@/lib/content-i18n";
 import { surahDisplayName } from "@/lib/surah-names-he";
-import { ChevronLeft, BookOpen, ArrowRight, Sparkles, Loader2 } from "lucide-react";
+import { ChevronLeft, BookOpen, ArrowRight, Sparkles, Loader2, ScrollText, Network, Milestone } from "lucide-react";
 import { normalizeLocale, type Locale } from "@/lib/i18n";
-import { getEntityBySlug, pickLocale } from "@/lib/knowledge";
-import { getLessonsForEntity, sourceName } from "@/lib/tafsir-content";
+import { useServerFn } from "@tanstack/react-start";
+import { getKnowledgeHub } from "@/lib/knowledge-hub.functions";
 
 export const Route = createFileRoute("/prophets/$slug")({
   loader: ({ params }) => {
@@ -74,111 +74,209 @@ function ProphetPage() {
   const { t, i18n } = useTranslation("pages");
   const p = useProphetT(prophet.slug);
   const locale = normalizeLocale(i18n.language) ?? "he";
+  const isRtl = locale !== "en";
+  const fetchHub = useServerFn(getKnowledgeHub);
 
-  const entityQ = useQuery({
-    queryKey: ["prophet-entity", prophet.slug],
-    queryFn: () => getEntityBySlug(prophet.slug),
-    staleTime: 5 * 60_000,
+  const hubQ = useQuery({
+    queryKey: ["prophet-hub", prophet.slug, locale],
+    queryFn: () => fetchHub({ data: { slug: prophet.slug, kind: "prophet", language: locale as Locale } }),
+    staleTime: 10 * 60_000,
   });
 
-  const lessonsQ = useQuery({
-    queryKey: ["prophet-lessons", entityQ.data?.id, locale],
-    queryFn: () => getLessonsForEntity(entityQ.data!.id, locale as Locale),
-    enabled: !!entityQ.data?.id,
-    staleTime: 5 * 60_000,
-  });
+  const entity = hubQ.data?.entity;
+  const verses = hubQ.data?.verses ?? [];
+  const chronology = hubQ.data?.chronology ?? [];
+  const lessons = hubQ.data?.lessons ?? [];
+  const related = (hubQ.data?.related ?? []).filter((r) => r.kind === "prophet");
 
   return (
     <div className="min-h-screen bg-background">
       <Header />
-      <main id="main" className="mx-auto max-w-3xl px-4 py-10 sm:px-6">
+      <main id="main" className="mx-auto max-w-5xl px-4 py-10 sm:px-6" dir={isRtl ? "rtl" : "ltr"}>
         <Link to="/prophets" className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-primary">
           <ArrowRight className="h-4 w-4 ltr:rotate-180" aria-hidden="true" />
           {t("detail.backToProphets")}
         </Link>
 
         <header className="mt-6 rounded-3xl border border-primary/10 bg-card p-8 text-center shadow-sm">
-          <p className="font-arabic text-4xl text-primary" dir="rtl">{prophet.nameAr}</p>
-          <h1 className="mt-3 font-display text-4xl font-bold text-primary">{p.name}</h1>
+          <p className="font-arabic text-4xl text-primary" dir="rtl">{entity?.titleAr || prophet.nameAr}</p>
+          <h1 className="mt-3 font-display text-4xl font-bold text-primary">{entity?.titleHe || p.name}</h1>
+          <p className="mt-1 text-sm text-muted-foreground" dir="ltr">{entity?.titleEn || prophet.slug}</p>
           {p.alt && (
             <p className="mt-1 text-sm text-muted-foreground">
               {t("detail.alsoKnownAs")}: {p.alt}
             </p>
           )}
+          {(entity?.summary || entity?.description) && (
+            <p className="mx-auto mt-4 max-w-3xl text-sm leading-relaxed text-foreground/85">
+              {entity.description || entity.summary}
+            </p>
+          )}
         </header>
 
-        <section className="mt-10">
+        <nav className="sticky top-16 z-20 mt-6 rounded-2xl border border-border bg-background/90 p-2 backdrop-blur">
+          <div className="flex flex-wrap items-center gap-2 text-xs">
+            <a href="#overview" className="rounded-full border border-border px-3 py-1.5 hover:border-primary/40 hover:text-primary">{t("learn.toc.overview")}</a>
+            <a href="#verses" className="rounded-full border border-border px-3 py-1.5 hover:border-primary/40 hover:text-primary">{t("learn.toc.verses")}</a>
+            <a href="#tafsir" className="rounded-full border border-border px-3 py-1.5 hover:border-primary/40 hover:text-primary">{t("learn.toc.tafsir")}</a>
+            <a href="#lessons" className="rounded-full border border-border px-3 py-1.5 hover:border-primary/40 hover:text-primary">{t("learn.toc.lessons")}</a>
+            <a href="#related" className="rounded-full border border-border px-3 py-1.5 hover:border-primary/40 hover:text-primary">{t("learn.toc.related")}</a>
+          </div>
+        </nav>
+
+        {hubQ.isLoading && (
+          <div className="mt-8 flex items-center justify-center gap-2 text-sm text-muted-foreground">
+            <Loader2 className="h-4 w-4 animate-spin" />
+          </div>
+        )}
+
+        {hubQ.isError && (
+          <p className="mt-8 rounded-xl border border-destructive/30 bg-destructive/5 p-4 text-sm text-destructive">
+            {t("detail.errorGeneric")}
+          </p>
+        )}
+
+        <section id="overview" className="mt-10 space-y-4">
+          <h2 className="flex items-center gap-2 font-display text-xl font-bold text-primary">
+            <Milestone className="h-5 w-5 text-gold" aria-hidden="true" />
+            {t("learn.overview")}
+          </h2>
+          {chronology.length > 0 ? (
+            <ol className="space-y-3">
+              {chronology.slice(0, 8).map((step, idx) => (
+                <li key={`${step.title}-${idx}`} className="rounded-xl border border-border bg-card p-4">
+                  <p className="text-xs font-semibold text-primary">{idx + 1}. {step.title}</p>
+                  <p className="mt-1 text-sm leading-relaxed text-foreground/90">{step.summary}</p>
+                  {step.evidence && <p className="mt-2 text-xs text-muted-foreground">{step.evidence}</p>}
+                </li>
+              ))}
+            </ol>
+          ) : (
+            <p className="rounded-xl border border-primary/10 bg-card p-4 text-sm leading-relaxed text-muted-foreground">{t("learn.noAuthSource")}</p>
+          )}
+        </section>
+
+        <section id="verses" className="mt-10">
           <h2 className="mb-4 flex items-center gap-2 font-display text-xl font-bold text-primary">
             <BookOpen className="h-5 w-5 text-gold" aria-hidden="true" />
             {t("detail.verseReferences")}
           </h2>
-          <p className="mb-5 text-xs text-muted-foreground">
-            {t("detail.prophetIntro", { name: p.name })}
-          </p>
 
           <ul className="space-y-2">
-            {prophet.refs.map((ref: AyahRef, i: number) => {
+            {(verses.length ? verses : prophet.refs.map((ref: AyahRef) => ({
+              surah: ref.surah,
+              ayahStart: ref.ayah,
+              ayahEnd: ref.to ?? ref.ayah,
+              reference: `${ref.surah}:${ref.ayah}${ref.to ? `-${ref.to}` : ""}`,
+              translation: "",
+              tafsirPreview: "",
+            }))).map((ref, i: number) => {
               const surahName = surahDisplayName(ref.surah, locale) ?? t("detail.surahFallback", { n: ref.surah });
-              const label = ref.to ? t("detail.rangeVerses", { from: ref.ayah, to: ref.to }) : t("detail.singleVerse", { n: ref.ayah });
+              const label = ref.ayahEnd > ref.ayahStart
+                ? t("detail.rangeVerses", { from: ref.ayahStart, to: ref.ayahEnd })
+                : t("detail.singleVerse", { n: ref.ayahStart });
               return (
                 <li key={i}>
-                  <Link
-                    to="/surah/$id"
-                    params={{ id: String(ref.surah) }}
-                    hash={`v-${ref.ayah}`}
-                    className="group flex items-center justify-between gap-4 rounded-xl border border-primary/5 bg-card p-4 transition-all hover:border-gold hover:shadow-md"
-                  >
-                    <div className="min-w-0">
-                      <div className="truncate font-semibold text-primary">{surahName}</div>
-                      <div className="text-xs text-muted-foreground">{label}</div>
+                  <article className="rounded-xl border border-primary/5 bg-card p-4">
+                    <Link
+                      to="/surah/$id"
+                      params={{ id: String(ref.surah) }}
+                      hash={`v-${ref.ayahStart}`}
+                      className="group flex items-center justify-between gap-4"
+                    >
+                      <div className="min-w-0">
+                        <div className="truncate font-semibold text-primary">{surahName}</div>
+                        <div className="text-xs text-muted-foreground">{label}</div>
+                      </div>
+                      <ChevronLeft className="h-4 w-4 shrink-0 text-muted-foreground transition-all group-hover:-translate-x-0.5 group-hover:text-gold ltr:rotate-180" aria-hidden="true" />
+                    </Link>
+                    {(ref as { translation?: string }).translation && (
+                      <p className="mt-3 text-sm leading-relaxed text-foreground/90" dir={locale === "en" ? "ltr" : "rtl"}>
+                        {(ref as { translation: string }).translation}
+                      </p>
+                    )}
+                    {(ref as { tafsirPreview?: string }).tafsirPreview && (
+                      <p className="mt-2 text-xs leading-relaxed text-muted-foreground">
+                        {(ref as { tafsirPreview: string }).tafsirPreview}
+                      </p>
                     </div>
-                    <ChevronLeft className="h-4 w-4 shrink-0 text-muted-foreground transition-all group-hover:-translate-x-0.5 group-hover:text-gold ltr:rotate-180" aria-hidden="true" />
-                  </Link>
+                  </article>
                 </li>
               );
             })}
           </ul>
         </section>
 
-        {entityQ.isLoading && (
-          <div className="mt-8 flex items-center justify-center gap-2 text-sm text-muted-foreground">
-            <Loader2 className="h-4 w-4 animate-spin" />
-          </div>
-        )}
+        <section id="tafsir" className="mt-10 space-y-4">
+          <h2 className="flex items-center gap-2 font-display text-xl font-bold text-primary">
+            <ScrollText className="h-5 w-5 text-gold" aria-hidden="true" />
+            {t("learn.tafsirTitle")}
+          </h2>
+          {verses.some((v) => v.tafsirSources.length > 0) ? (
+            <div className="space-y-3">
+              {verses.filter((v) => v.tafsirSources.length > 0).slice(0, 6).map((v) => (
+                <details key={v.reference} className="rounded-xl border border-border bg-card p-4">
+                  <summary className="cursor-pointer text-sm font-semibold text-primary">{v.reference}</summary>
+                  <div className="mt-2 space-y-2">
+                    {v.tafsirSources.map((src) => (
+                      <article key={src.id} className="rounded-lg border border-border/60 bg-background/60 p-3">
+                        <p className="text-xs font-semibold text-primary">{src.source} <span dir="rtl" className="font-arabic">{src.sourceArabic}</span></p>
+                        <p className="mt-1 text-sm leading-relaxed text-foreground/90">{src.text}</p>
+                      </article>
+                    ))}
+                  </div>
+                </details>
+              ))}
+            </div>
+          ) : (
+            <p className="rounded-xl border border-primary/10 bg-card p-4 text-sm leading-relaxed text-muted-foreground">{t("learn.noAuthSource")}</p>
+          )}
+        </section>
 
-        {entityQ.data && (
-          <section className="mt-10 space-y-4">
-            <h2 className="flex items-center gap-2 font-display text-xl font-bold text-primary">
-              <Sparkles className="h-5 w-5 text-gold" aria-hidden="true" />
-              {t("learn.overview")}
-            </h2>
-            <p className="rounded-xl border border-primary/10 bg-card p-4 text-sm leading-relaxed text-foreground/90">
-              {pickLocale(entityQ.data.description_i18n, locale as Locale) || pickLocale(entityQ.data.summary_i18n, locale as Locale)}
-            </p>
+        <section id="lessons" className="mt-10 space-y-4">
+          <h2 className="flex items-center gap-2 font-display text-xl font-bold text-primary">
+            <Sparkles className="h-5 w-5 text-gold" aria-hidden="true" />
+            {t("learn.lessonsTitle")}
+          </h2>
+          {lessons.length > 0 ? (
+            <div className="space-y-3">
+              {lessons.map((lesson) => (
+                <article key={lesson.id} className="rounded-xl border border-border bg-card p-4">
+                  <p className="text-sm leading-relaxed text-foreground/90" dir={locale === "en" ? "ltr" : "rtl"}>{lesson.body}</p>
+                  <p className="mt-2 text-xs text-muted-foreground">{lesson.source}</p>
+                </article>
+              ))}
+            </div>
+          ) : (
+            <p className="rounded-xl border border-primary/10 bg-card p-4 text-sm leading-relaxed text-muted-foreground">{t("learn.noAuthSource")}</p>
+          )}
+        </section>
 
-            {lessonsQ.data && lessonsQ.data.length > 0 && (
-              <div className="space-y-3">
-                <h3 className="text-sm font-semibold text-primary">{t("learn.lessonsTitle")}</h3>
-                {lessonsQ.data.slice(0, 3).map((lesson) => (
-                  <article key={lesson.id} className="rounded-xl border border-border bg-card p-4">
-                    <p className="text-sm leading-relaxed text-foreground/90" dir={locale === "en" ? "ltr" : "rtl"}>
-                      {lesson.body}
-                    </p>
-                    <p className="mt-2 text-xs text-muted-foreground">{sourceName(lesson.source, locale as Locale)}</p>
-                  </article>
-                ))}
-              </div>
-            )}
-
-            <Link
-              to="/learn/$kind/$slug"
-              params={{ kind: "prophet", slug: prophet.slug }}
-              className="inline-flex items-center gap-1.5 text-sm font-semibold text-primary hover:underline"
-            >
-              {t("learn.continueExploring")}
-            </Link>
-          </section>
-        )}
+        <section id="related" className="mt-10 space-y-4">
+          <h2 className="flex items-center gap-2 font-display text-xl font-bold text-primary">
+            <Network className="h-5 w-5 text-gold" aria-hidden="true" />
+            {t("learn.relatedEntities")}
+          </h2>
+          {related.length > 0 ? (
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+              {related.map((r) => (
+                <Link key={r.id} to="/prophets/$slug" params={{ slug: r.slug }} className="rounded-xl border border-border bg-card p-4 hover:border-primary/40">
+                  <p className="font-semibold text-primary">{r.title}</p>
+                  <p className="mt-1 text-xs leading-relaxed text-muted-foreground">{r.summary}</p>
+                </Link>
+              ))}
+            </div>
+          ) : (
+            <p className="rounded-xl border border-primary/10 bg-card p-4 text-sm leading-relaxed text-muted-foreground">{t("learn.noAuthSource")}</p>
+          )}
+          <Link
+            to="/learn/$kind/$slug"
+            params={{ kind: "prophet", slug: prophet.slug }}
+            className="inline-flex items-center gap-1.5 text-sm font-semibold text-primary hover:underline"
+          >
+            {t("learn.continueExploring")}
+          </Link>
+        </section>
 
         <p className="mt-10 rounded-xl border border-primary/10 bg-secondary/40 p-4 text-xs leading-relaxed text-muted-foreground">
           {t("detail.prophetsNote")}
