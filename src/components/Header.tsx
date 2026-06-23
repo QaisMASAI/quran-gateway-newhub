@@ -50,15 +50,13 @@ export function Header() {
         {/* Desktop nav — hidden on mobile (BottomNav takes over there) */}
         <nav className="hidden items-center gap-1 sm:flex" aria-label={t("nav.surahs")}>
           <NavLink to="/" label={t("nav.surahs")} icon={<BookOpen className="h-4 w-4" />} />
-          <NavLink to="/research" label="Research" icon={<Sparkles className="h-4 w-4" />} />
+          <NavLink to="/research" label={t("nav.research")} icon={<Sparkles className="h-4 w-4" />} />
           <NavLink to="/learn" label={t("nav.learn")} icon={<BookMarked className="h-4 w-4" />} />
           <NavLink to="/prophets" label={t("nav.prophets")} icon={<Users className="h-4 w-4" />} />
           <NavLink to="/topics" label={t("nav.topics")} icon={<Compass className="h-4 w-4" />} />
-          <NavLink to="/explore/timeline" label="Timeline" icon={<Clock className="h-4 w-4" />} />
-          <NavLink to="/explore/map" label="Map" icon={<MapPin className="h-4 w-4" />} />
           <NavLink to="/search" label={t("nav.search")} icon={<Search className="h-4 w-4" />} />
           {isAuthenticated && (
-            <NavLink to="/collections" label="Collections" icon={<Folder className="h-4 w-4" />} />
+            <NavLink to="/collections" label={t("nav.collections")} icon={<Folder className="h-4 w-4" />} />
           )}
 
         </nav>
