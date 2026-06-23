@@ -1,21 +1,24 @@
 import { createFileRoute } from "@tanstack/react-router";
+import i18n, { normalizeLocale } from "@/lib/i18n";
 
 export const Route = createFileRoute("/ask")({
-  head: () => ({
+  head: () => {
+    const locale = normalizeLocale(i18n.resolvedLanguage) ?? "he";
+    return {
     meta: [
-      { title: "Noor Al Quran| Ask Noor Al QuranAI" },
+      { title: i18n.t("pages:ask.metaTitle", { lng: locale }) },
       {
         name: "description",
-        content:
-          "Ask questions in Hebrew, Arabic or English and get answers built only on verses from the Holy Quran, with precise references.",
+        content: i18n.t("pages:ask.metaDescription", { lng: locale }),
       },
-      { property: "og:title", content: "Noor Al Quran| Ask Noor Al QuranAI" },
-      { property: "og:description", content: "Verse-grounded answers — no fabrications." },
+      { property: "og:title", content: i18n.t("pages:ask.ogTitle", { lng: locale }) },
+      { property: "og:description", content: i18n.t("pages:ask.ogDescription", { lng: locale }) },
       { property: "og:url", content: "/ask" },
-      { name: "twitter:title", content: "Noor Al Quran| Ask Noor Al QuranAI" },
-      { name: "twitter:description", content: "Verse-grounded answers — no fabrications." },
+      { name: "twitter:title", content: i18n.t("pages:ask.ogTitle", { lng: locale }) },
+      { name: "twitter:description", content: i18n.t("pages:ask.ogDescription", { lng: locale }) },
     ],
     links: [{ rel: "canonical", href: "/ask" }],
-  }),
+  };
+  },
   pendingComponent: () => <div className="mx-auto max-w-3xl px-4 py-10 text-sm text-muted-foreground">Loading…</div>,
 });
