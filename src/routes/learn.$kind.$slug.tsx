@@ -242,6 +242,26 @@ function EntityPage() {
                 )}
               </Section>
 
+              <Section id="ask" icon={<Sparkles className="h-4 w-4" />} title={t("learn.askSectionTitle")}>
+                <div className="rounded-2xl border border-primary/10 bg-card p-5">
+                  <p className="text-sm text-muted-foreground">{t("learn.askSectionBody")}</p>
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    <Link
+                      to="/ask"
+                      className="inline-flex items-center rounded-full border border-primary/25 bg-primary/10 px-3 py-1.5 text-xs font-semibold text-primary hover:border-primary/40"
+                    >
+                      {t("learn.askNow")}
+                    </Link>
+                    <Link
+                      to="/research"
+                      className="inline-flex items-center rounded-full border border-border bg-background px-3 py-1.5 text-xs font-semibold text-foreground hover:border-primary/30"
+                    >
+                      {t("learn.researchMore")}
+                    </Link>
+                  </div>
+                </div>
+              </Section>
+
               {/* Prophet timeline placeholder section */}
               {isProphet && (
                 <Section id="prophet-extras" icon={<Compass className="h-4 w-4" />} title={t("learn.prophetExtras")}>
