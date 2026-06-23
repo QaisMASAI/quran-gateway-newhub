@@ -185,10 +185,10 @@ export function AyahCard({ surah, surahName, ayah, arabic, hebrew, highlight }: 
           <span>{playing ? t("ui.ayah.pause") : t("ui.ayah.play")}</span>
         </ActionBtn>
 
-        <ActionBtn onClick={() => {}} active>
+        <div className="inline-flex items-center gap-1.5 rounded-full border border-primary/30 bg-primary/10 px-3 py-1.5 text-xs font-medium text-primary">
           <span className="text-[10px] opacity-70">{t("ui.ayah.reciter")}</span>
           <span>{(() => { const r = RECITERS.find((x) => x.key === reciter); return r ? reciterName(r, locale) : ""; })()}</span>
-        </ActionBtn>
+        </div>
 
 
         <ActionBtn onClick={() => openPanel("tafsir")} active={panel === "tafsir"}>
