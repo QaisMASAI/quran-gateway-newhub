@@ -16,6 +16,8 @@
     "ask": "Ask Noor Al Quran",
     "glossary": "Glossary",
     "learn": "Learn",
+    "research": "Research",
+    "collections": "Collections",
     "account": "Account",
     "signIn": "Sign in",
     "signOut": "Sign out",
@@ -76,7 +78,14 @@
     "share": {
       "copyLink": "Copy link",
       "copyText": "Copy text",
-      "copied": "Copied"
+      "copied": "Copied",
+      "facebook": "Share on Facebook",
+      "formats": {
+        "square": "Square · Instagram / General",
+        "story": "Story · 9:16",
+        "landscape": "Landscape · Facebook / X",
+        "portrait": "Portrait · Instagram 4:5"
+      }
     },
     "note": {
       "placeholder": "Write your personal note for this verse…",

@@ -126,7 +126,7 @@ function Home() {
               {t("home.subtitle")}
             </p>
             <div className="flex justify-center">
-              <TrustBadge size="md" className="border-primary-foreground/20 bg-primary-foreground/10 text-primary-foreground" />
+              <TrustBadge size="md" className="border-gold/40 bg-background/90 text-foreground shadow-sm" />
             </div>
 
             <div className="flex flex-wrap justify-center gap-3 pt-3">

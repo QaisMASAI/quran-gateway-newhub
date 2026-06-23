@@ -14,6 +14,22 @@ type Locale = "he" | "ar" | "en";
 
 type I18nText = { he?: string; ar?: string; en?: string } | null;
 
+type SeedEntityRow = {
+  kind: string;
+  slug: string;
+  title: { he?: string; ar?: string; en?: string };
+  summary: { he?: string; ar?: string; en?: string };
+};
+
+const SEED_ENTITIES = (seed.entities as SeedEntityRow[]) ?? [];
+const SEED_VERSE_LINKS = new Map(
+  ((seed.verses as Array<{ slug: string; links: [number, number, number][] }>) ?? []).map((v) => [
+    v.slug,
+    v.links,
+  ]),
+);
+const SEED_RELATIONS = (seed.relations as Array<[string, string, string]>) ?? [];
+
 function pickLocale(t: I18nText, lang: Locale): string {
   if (!t) return "";
   return t[lang] || t.he || t.ar || t.en || "";
@@ -102,7 +118,7 @@ export const getKnowledgeHub = createServerFn({ method: "POST" })
   .handler(async ({ data }): Promise<KnowledgeHubData> => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
-    const { data: entity } = await supabaseAdmin
+    const { data: dbEntity } = await supabaseAdmin
       .from("knowledge_entities")
       .select("id,slug,kind,title_i18n,summary_i18n,description_i18n,published")
       .eq("slug", data.slug)
@@ -110,17 +126,92 @@ export const getKnowledgeHub = createServerFn({ method: "POST" })
       .eq("published", true)
       .maybeSingle();
 
-    if (!entity) {
+    const seedEntity = SEED_ENTITIES.find((e) => e.slug === data.slug && e.kind === data.kind);
+    const fallbackFromList =
+      data.kind === "prophet"
+        ? ALL_PROPHETS.find((p) => p.slug === data.slug)
+        : ALL_TOPICS.find((t) => t.slug === data.slug);
+
+    const entity =
+      dbEntity ??
+      (seedEntity
+        ? {
+            id: `seed:${seedEntity.slug}`,
+            slug: seedEntity.slug,
+            kind: seedEntity.kind,
+            title_i18n: {
+              he: seedEntity.title.he,
+              ar: seedEntity.title.ar,
+              en: seedEntity.title.en,
+            },
+            summary_i18n: {
+              he: seedEntity.summary.he,
+              ar: seedEntity.summary.ar,
+              en: seedEntity.summary.en,
+            },
+            description_i18n: {
+              he: seedEntity.summary.he,
+              ar: seedEntity.summary.ar,
+              en: seedEntity.summary.en,
+            },
+            published: true,
+          }
+        : null);
+
+    if (!entity && !fallbackFromList) {
       return { entity: null, verses: [], chronology: [], lessons: [], related: [] };
     }
 
-    const { data: links } = await supabaseAdmin
-      .from("knowledge_entity_verses")
-      .select("id,surah,ayah_start,ayah_end,sort_order,relevance,note_i18n")
-      .eq("entity_id", entity.id)
-      .order("sort_order", { ascending: true });
+    const entityResolved = entity as NonNullable<typeof entity>;
 
-    const verseLinks = (links ?? []).length > 0 ? (links ?? []) : fallbackRefsFor(data.slug, data.kind);
+    const links =
+      dbEntity
+        ? (
+            await supabaseAdmin
+              .from("knowledge_entity_verses")
+              .select("id,surah,ayah_start,ayah_end,sort_order,relevance,note_i18n")
+              .eq("entity_id", dbEntity.id)
+              .order("sort_order", { ascending: true })
+          ).data
+        : [];
+
+    const seedLinksForSlug = (SEED_VERSE_LINKS.get(data.slug) ?? []).map((l, idx) => ({
+      id: `seed:${data.slug}:${idx}`,
+      surah: l[0],
+      ayah_start: l[1],
+      ayah_end: l[2],
+      sort_order: idx,
+      relevance: 7,
+      note_i18n: {},
+    }));
+
+    const fallbackLinksFromList =
+      data.kind === "prophet"
+        ? (fallbackFromList?.refs ?? []).map((r, idx) => ({
+            id: `fallback:${data.slug}:${idx}`,
+            surah: r.surah,
+            ayah_start: r.ayah,
+            ayah_end: r.to ?? r.ayah,
+            sort_order: idx,
+            relevance: 6,
+            note_i18n: {},
+          }))
+        : (fallbackFromList?.refs ?? []).map((r, idx) => ({
+            id: `fallback:${data.slug}:${idx}`,
+            surah: r.surah,
+            ayah_start: r.ayah,
+            ayah_end: r.to ?? r.ayah,
+            sort_order: idx,
+            relevance: 6,
+            note_i18n: {},
+          }));
+
+    const verseLinks =
+      (links ?? []).length > 0
+        ? (links ?? [])
+        : seedLinksForSlug.length > 0
+          ? seedLinksForSlug
+          : fallbackLinksFromList;
     const surahs = [...new Set(verseLinks.map((l) => l.surah))];
     const localeOrder = localeFallback(data.language);
 
@@ -155,11 +246,35 @@ export const getKnowledgeHub = createServerFn({ method: "POST" })
           : { data: [] as Array<{ source_id: string; surah: number; ayah: number; text: string }> };
 
         const firstAyah = link.ayah_start;
-        const ar = (rangeRows ?? []).find((r) => r.ayah === firstAyah && r.source_id === arabicSourceId)?.text ?? "";
-        const tr =
+        let ar = (rangeRows ?? []).find((r) => r.ayah === firstAyah && r.source_id === arabicSourceId)?.text ?? "";
+        let tr =
           (rangeRows ?? []).find((r) => r.ayah === firstAyah && r.source_id === localeSourceId)?.text ??
           (rangeRows ?? []).find((r) => r.ayah === firstAyah && r.source_id === arabicSourceId)?.text ??
           "";
+
+        if (!ar || !tr) {
+          try {
+            const trId = data.language === "he" ? 233 : data.language === "en" ? 20 : 0;
+            const remote = await fetch(
+              `https://api.quran.com/api/v4/verses/by_key/${link.surah}:${firstAyah}?words=false${
+                trId ? `&translations=${trId}` : ""
+              }`,
+            );
+            if (remote.ok) {
+              const remoteJson = (await remote.json()) as {
+                verse?: { text_uthmani?: string; translations?: Array<{ text?: string }> };
+              };
+              ar = ar || remoteJson.verse?.text_uthmani || "";
+              tr =
+                tr ||
+                (data.language === "ar"
+                  ? remoteJson.verse?.text_uthmani || ""
+                  : (remoteJson.verse?.translations?.[0]?.text ?? "").replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim());
+            }
+          } catch {
+            // keep DB values if remote fallback fails
+          }
+        }
 
         return {
           link,
@@ -218,12 +333,16 @@ export const getKnowledgeHub = createServerFn({ method: "POST" })
 
     const allAsbabRows = [...asbabRows, ...asbabFromTafsir];
 
-    const { data: lessonRows } = await supabaseAdmin
-      .from("topic_lessons")
-      .select("id,lang,body,source:tafsir_sources(name_he,name_ar,name_en)")
-      .eq("entity_id", entity.id)
-      .order("created_at", { ascending: false })
-      .limit(60);
+    const lessonRows = dbEntity
+      ? (
+          await supabaseAdmin
+            .from("topic_lessons")
+            .select("id,lang,body,source:tafsir_sources(name_he,name_ar,name_en)")
+            .eq("entity_id", dbEntity.id)
+            .order("created_at", { ascending: false })
+            .limit(60)
+        ).data
+      : [];
 
     const lessonByLang = new Map<string, typeof lessonRows>();
     for (const lang of localeOrder) {
@@ -235,11 +354,11 @@ export const getKnowledgeHub = createServerFn({ method: "POST" })
     if (selectedLessons.length === 0) {
       selectedLessons = [
         {
-          id: `fallback-lesson:${entity.id}`,
+          id: `fallback-lesson:${entityResolved.id}`,
           lang: data.language,
           body:
-            pickLocale(entity.description_i18n as I18nText, data.language) ||
-            pickLocale(entity.summary_i18n as I18nText, data.language),
+            pickLocale(entityResolved.description_i18n as I18nText, data.language) ||
+            pickLocale(entityResolved.summary_i18n as I18nText, data.language),
           source: {
             name_he: "מאגר ידע",
             name_ar: "قاعدة المعرفة",
@@ -249,12 +368,16 @@ export const getKnowledgeHub = createServerFn({ method: "POST" })
       ].filter((l) => l.body && l.body.trim().length > 0);
     }
 
-    const { data: relationRows } = await supabaseAdmin
-      .from("knowledge_relations")
-      .select("weight,to:knowledge_entities!knowledge_relations_to_id_fkey(id,slug,kind,title_i18n,summary_i18n,published)")
-      .eq("from_id", entity.id)
-      .order("weight", { ascending: false })
-      .limit(12);
+    const relationRows = dbEntity
+      ? (
+          await supabaseAdmin
+            .from("knowledge_relations")
+            .select("weight,to:knowledge_entities!knowledge_relations_to_id_fkey(id,slug,kind,title_i18n,summary_i18n,published)")
+            .eq("from_id", dbEntity.id)
+            .order("weight", { ascending: false })
+            .limit(12)
+        ).data
+      : null;
 
     const verses: KnowledgeHubVerse[] = versePayload.map(({ link, arabic, translation }) => {
       const overlapTafsir = (tafsirRows ?? []).filter(
@@ -264,11 +387,13 @@ export const getKnowledgeHub = createServerFn({ method: "POST" })
           Number(t.ayah_end) >= Number(link.ayah_start),
       );
 
+      const jalalaynOnly = overlapTafsir.filter((t) => t.source?.name_ar === "تفسير الجلالين");
+
       const preferredTafsir =
         localeOrder
-          .map((lang) => overlapTafsir.find((t) => t.lang === lang))
+          .map((lang) => (jalalaynOnly.length > 0 ? jalalaynOnly : overlapTafsir).find((t) => t.lang === lang))
           .find(Boolean) ??
-        overlapTafsir[0];
+        (jalalaynOnly[0] ?? overlapTafsir[0]);
 
       const overlapAsbab = allAsbabRows.filter(
         (a) =>
@@ -294,7 +419,7 @@ export const getKnowledgeHub = createServerFn({ method: "POST" })
         note: pickLocale(link.note_i18n as I18nText, data.language),
         tafsirPreview: excerpt(preferredTafsir?.body, 320),
         asbabPreview: excerpt(preferredAsbab?.body, 220),
-        tafsirSources: overlapTafsir.slice(0, 3).map((item) => ({
+        tafsirSources: (jalalaynOnly.length > 0 ? jalalaynOnly : overlapTafsir).slice(0, 3).map((item) => ({
           id: String(item.id),
           source: item.source?.name_en ?? item.source?.name_he ?? "Tafsir",
           sourceArabic: item.source?.name_ar ?? "",
@@ -315,7 +440,7 @@ export const getKnowledgeHub = createServerFn({ method: "POST" })
       source: pickLocale(l.source as I18nText, data.language) || "Tafsir",
     }));
 
-    const related = (relationRows ?? [])
+    const relatedFromDb = (relationRows ?? [])
       .map((r) => r.to)
       .filter((r): r is NonNullable<typeof r> => !!r && r.published)
       .map((r) => ({
@@ -326,16 +451,32 @@ export const getKnowledgeHub = createServerFn({ method: "POST" })
         summary: pickLocale(r.summary_i18n as I18nText, data.language),
       }));
 
+    const relatedFromSeed = SEED_RELATIONS.filter(([from]) => from === data.slug)
+      .map(([, to]) => {
+        const target = SEED_ENTITIES.find((e) => e.slug === to);
+        if (!target) return null;
+        return {
+          id: `seed:${target.slug}`,
+          slug: target.slug,
+          kind: target.kind,
+          title: pickLocale({ he: target.title.he, ar: target.title.ar, en: target.title.en }, data.language) || target.slug,
+          summary: pickLocale({ he: target.summary.he, ar: target.summary.ar, en: target.summary.en }, data.language),
+        };
+      })
+      .filter((r): r is { id: string; slug: string; kind: string; title: string; summary: string } => !!r);
+
+    const related = relatedFromDb.length > 0 ? relatedFromDb : relatedFromSeed;
+
     return {
       entity: {
-        id: entity.id,
-        slug: entity.slug,
-        kind: entity.kind,
-        titleHe: pickLocale(entity.title_i18n as I18nText, "he") || entity.slug,
-        titleAr: pickLocale(entity.title_i18n as I18nText, "ar") || entity.slug,
-        titleEn: pickLocale(entity.title_i18n as I18nText, "en") || entity.slug,
-        summary: pickLocale(entity.summary_i18n as I18nText, data.language),
-        description: pickLocale(entity.description_i18n as I18nText, data.language),
+        id: entityResolved.id,
+        slug: entityResolved.slug,
+        kind: entityResolved.kind,
+        titleHe: pickLocale(entityResolved.title_i18n as I18nText, "he") || entityResolved.slug,
+        titleAr: pickLocale(entityResolved.title_i18n as I18nText, "ar") || entityResolved.slug,
+        titleEn: pickLocale(entityResolved.title_i18n as I18nText, "en") || entityResolved.slug,
+        summary: pickLocale(entityResolved.summary_i18n as I18nText, data.language),
+        description: pickLocale(entityResolved.description_i18n as I18nText, data.language),
       },
       verses,
       chronology,

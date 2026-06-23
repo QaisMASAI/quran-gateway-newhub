@@ -281,8 +281,8 @@ export async function renderVerseImage(input: VerseImageInput): Promise<Blob> {
 }
 
 export const FORMAT_LABELS: Record<VerseImageFormat, string> = {
-  square: "מרובע · אינסטגרם / כללי",
-  story: "סטורי · 9:16",
-  landscape: "אופקי · פייסבוק / טוויטר",
-  portrait: "פורטרט · אינסטגרם 4:5",
+  square: "Square · Instagram / General",
+  story: "Story · 9:16",
+  landscape: "Landscape · Facebook / X",
+  portrait: "Portrait · Instagram 4:5",
 };

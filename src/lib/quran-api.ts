@@ -111,7 +111,7 @@ export function surahAudioUrl(surahId: number): string {
 // Per-ayah recitation — multiple authenticated reciters
 // Source: everyayah.com (public CDN of well-known murattal recitations)
 // ============================================================
-export type ReciterKey = "yasser-ad-dussary" | "mishary-alafasy" | "abdul-basit-murattal" | "husary-muallim" | "sudais";
+export type ReciterKey = "yasser-ad-dussary";
 
 export interface Reciter {
   key: ReciterKey;
@@ -123,16 +123,6 @@ export interface Reciter {
 
 export const RECITERS: Reciter[] = [
   { key: "yasser-ad-dussary", name_he: "יאסר א-דוסרי", name_ar: "ياسر الدوسري", name_en: "Yasser Al-Dosari", folder: "Yasser_Ad-Dussary_128kbps" },
-  { key: "mishary-alafasy", name_he: "משארי אל-עפאסי", name_ar: "مشاري العفاسي", name_en: "Mishary Al-Afasy", folder: "Alafasy_128kbps" },
-  {
-    key: "abdul-basit-murattal",
-    name_he: "עבד אל-באסט (מורתל)",
-    name_ar: "عبد الباسط مرتل",
-    name_en: "Abdul-Basit (Murattal)",
-    folder: "Abdul_Basit_Murattal_192kbps",
-  },
-  { key: "husary-muallim", name_he: "אל-חוסרי (מועלם)", name_ar: "الحصري معلم", name_en: "Al-Husary (Mu'allim)", folder: "Husary_128kbps" },
-  { key: "sudais", name_he: "א-סודייס", name_ar: "السديس", name_en: "As-Sudais", folder: "Abdurrahmaan_As-Sudais_192kbps" },
 ];
 
 export function reciterName(r: Reciter, locale: "he" | "ar" | "en"): string {
