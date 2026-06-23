@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { BookOpen, Star, Search, LogIn, LogOut, Users, Compass, CalendarCheck, HeartHandshake, BookMarked, Sparkles, Folder } from "lucide-react";
+import { BookOpen, Search, LogIn, LogOut, Users, Compass, BookMarked, Sparkles, Folder } from "lucide-react";
 
 import { Logo } from "@/components/Logo";
 import { useAuth } from "@/lib/use-auth";
