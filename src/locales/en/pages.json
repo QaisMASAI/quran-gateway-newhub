@@ -155,7 +155,11 @@
       "asbab": "Asbab al-Nuzul",
       "lessons": "Lessons",
       "related": "Related"
-    }
+    },
+    "askSectionTitle": "Ask about this topic",
+    "askSectionBody": "Need deeper clarification? Continue to AI Q&A or full research with answers grounded in Quran and authenticated tafsir.",
+    "askNow": "Ask now",
+    "researchMore": "Deep research"
   },
   "onboarding": {
     "skip": "Skip for now",
