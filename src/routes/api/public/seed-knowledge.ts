@@ -5,8 +5,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import seed from "@/lib/seeds/knowledge-seed.json";
 
-const SEED_TOKEN = process.env.QURAN_ADMIN_TOKEN;
-
 type EntityKind = "concept" | "event" | "nation" | "place" | "prophet" | "story" | "theme" | "topic";
 type RelationKind = "child_of" | "happened_in" | "involves" | "mentions" | "part_of" | "related" | "teaches";
 type Entity = { kind: EntityKind; slug: string; title: Record<string, string>; summary: Record<string, string>; keywords?: string[] };
@@ -17,8 +15,9 @@ export const Route = createFileRoute("/api/public/seed-knowledge")({
   server: {
     handlers: {
       POST: async ({ request }) => {
+        const seedToken = process.env.QURAN_ADMIN_TOKEN;
         const url = new URL(request.url);
-        if (!SEED_TOKEN || url.searchParams.get("token") !== SEED_TOKEN) {
+        if (!seedToken || url.searchParams.get("token") !== seedToken) {
           return new Response("Unauthorized", { status: 401 });
         }
         const { supabaseAdmin } = await import("@/integrations/supabase/client.server");

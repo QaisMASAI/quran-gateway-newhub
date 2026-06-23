@@ -35,9 +35,25 @@ function ResearchPage() {
     | "en"
     | "ar";
   const [q, setQ] = useState("");
+  const [chatTurns, setChatTurns] = useState<Array<{ question: string; answer: string }>>([]);
   const ask = useServerFn(askQuranResearch);
   const mutation = useMutation<ResearchResult, Error, string>({
-    mutationFn: (question) => ask({ data: { question, language: lang } }),
+    mutationFn: (question) =>
+      ask({
+        data: {
+          question,
+          language: lang,
+          history: chatTurns.flatMap((turn) => [
+            { role: "user" as const, content: turn.question },
+            { role: "assistant" as const, content: turn.answer },
+          ]),
+        },
+      }),
+    onSuccess: (res, question) => {
+      if (res.answer) {
+        setChatTurns((prev) => [...prev.slice(-5), { question, answer: res.answer }]);
+      }
+    },
   });
 
   const result = mutation.data;
@@ -145,7 +161,7 @@ function ResearchPage() {
                 <ConfidenceBadge confidence={result.confidence} />
               </div>
               <div className="prose prose-sm dark:prose-invert max-w-none">
-                <ReactMarkdown>{result.answer}</ReactMarkdown>
+                <ReactMarkdown skipHtml>{result.answer}</ReactMarkdown>
               </div>
             </div>
 
@@ -179,11 +195,14 @@ function ResearchPage() {
                         {v.hebrew}
                       </p>
                       {(v.translation_source || v.translator) && (
-                        <p className="mt-2 text-xs text-muted-foreground">
-                          {v.translation_source ? `Translation: ${v.translation_source}` : ""}
-                          {v.translation_source && v.translator ? " · " : ""}
-                          {v.translator ? `Translator: ${v.translator}` : ""}
-                        </p>
+                        <div className="mt-2 rounded-md border border-border bg-background px-2 py-1 text-[11px] text-muted-foreground">
+                          <p>
+                            {v.translation_source
+                              ? `Translation source: ${v.translation_source}`
+                              : "Translation source: Quran DB"}
+                          </p>
+                          <p>{v.translator ? `Translator: ${v.translator}` : "Translator: Local authenticated source"}</p>
+                        </div>
                       )}
                     </Link>
                   ))}
@@ -204,6 +223,10 @@ function ResearchPage() {
                         {tf.translator ? ` · ${tf.translator}` : ""}
                       </div>
                       <p className="text-sm text-foreground/90">{tf.text}</p>
+                      <div className="mt-2 rounded-md border border-border bg-background px-2 py-1 text-[11px] text-muted-foreground">
+                        Tafsir source: {tf.source}
+                        {tf.translator ? ` · Translator: ${tf.translator}` : ""}
+                      </div>
                     </div>
                   ))}
                 </div>
@@ -220,10 +243,10 @@ function ConfidenceBadge({ confidence }: { confidence: number }) {
   const pct = Math.round(confidence * 100);
   const tone =
     confidence >= 0.6
-      ? "bg-emerald-500/15 text-emerald-700 dark:text-emerald-300"
+      ? "bg-primary-soft text-primary"
       : confidence >= 0.35
-        ? "bg-amber-500/15 text-amber-700 dark:text-amber-300"
-        : "bg-rose-500/15 text-rose-700 dark:text-rose-300";
+        ? "bg-gold-soft text-foreground"
+        : "bg-secondary text-muted-foreground";
   return (
     <span className={`text-xs font-medium px-2.5 py-1 rounded-full ${tone}`}>
       {pct}% confidence

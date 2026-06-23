@@ -78,7 +78,7 @@ export const semanticRetrieveVerses = createServerFn({ method: "POST" })
     }
 
     type Row = Database["public"]["Functions"]["match_verses"]["Returns"][number];
-    const verses: RetrievedVerse[] = (rows ?? []).map((r: Row) => ({
+    const semanticVerses: RetrievedVerse[] = (rows ?? []).map((r: Row) => ({
       surah: r.surah as number,
       ayah: r.ayah as number,
       arabic: r.arabic,
@@ -86,6 +86,36 @@ export const semanticRetrieveVerses = createServerFn({ method: "POST" })
       themes: r.themes ?? [],
       similarity: r.similarity ?? 0,
     }));
+
+    // Hybrid fallback (lexical + semantic) for conceptual and typo-heavy queries.
+    const normalizedQuestion = data.question.trim().slice(0, 280);
+    let hybridVerses: RetrievedVerse[] = [];
+    if (normalizedQuestion.length >= 2) {
+      const { data: hybridRows } = await supabaseAdmin.rpc("search_verses_hybrid", {
+        q: normalizedQuestion,
+        query_embedding: queryEmbedding as unknown as string,
+        theme_filter: data.themes && data.themes.length > 0 ? data.themes : undefined,
+        match_count: Math.min(30, data.k * 2),
+      });
+      type HybridRow = Database["public"]["Functions"]["search_verses_hybrid"]["Returns"][number];
+      hybridVerses = ((hybridRows ?? []) as HybridRow[]).map((r) => ({
+        surah: r.surah as number,
+        ayah: r.ayah as number,
+        arabic: r.arabic,
+        hebrew: r.hebrew,
+        themes: r.themes ?? [],
+        similarity: Math.max(0, Math.min(1, Number(r.score ?? 0))),
+      }));
+    }
+
+    const deduped = new Map<string, RetrievedVerse>();
+    for (const v of [...semanticVerses, ...hybridVerses]) {
+      const key = `${v.surah}:${v.ayah}`;
+      const existing = deduped.get(key);
+      if (!existing || v.similarity > existing.similarity) deduped.set(key, v);
+    }
+
+    const verses = [...deduped.values()].sort((a, b) => b.similarity - a.similarity).slice(0, data.k);
     return { verses };
   });
 

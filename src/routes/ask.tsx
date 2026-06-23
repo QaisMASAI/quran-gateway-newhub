@@ -35,8 +35,24 @@ function AskPage() {
 
   const ask = useServerFn(askQuranResearch);
   const [question, setQuestion] = useState("");
+  const [chatTurns, setChatTurns] = useState<Array<{ question: string; answer: string }>>([]);
   const mutation = useMutation<ResearchResult, Error, string>({
-    mutationFn: (q) => ask({ data: { question: q, language: locale } }),
+    mutationFn: (q) =>
+      ask({
+        data: {
+          question: q,
+          language: locale,
+          history: chatTurns.flatMap((turn) => [
+            { role: "user" as const, content: turn.question },
+            { role: "assistant" as const, content: turn.answer },
+          ]),
+        },
+      }),
+    onSuccess: (res, q) => {
+      if (res.answer) {
+        setChatTurns((prev) => [...prev.slice(-5), { question: q, answer: res.answer }]);
+      }
+    },
   });
 
   const result = mutation.data;
@@ -121,7 +137,7 @@ function AskPage() {
               <p className="text-sm text-destructive">{result.error}</p>
             ) : (
               <div className="prose prose-sm max-w-none text-[15px] text-foreground/90 [&>p]:my-2">
-                <ReactMarkdown>{result.answer}</ReactMarkdown>
+                <ReactMarkdown skipHtml>{result.answer}</ReactMarkdown>
               </div>
             )}
           </div>
@@ -160,11 +176,12 @@ function AskPage() {
                   </p>
                   <p className="mt-1.5 text-[13.5px] text-foreground/80">{v.hebrew}</p>
                   {(v.translation_source || v.translator) && (
-                    <p className="mt-1 text-[11px] text-muted-foreground">
-                      {v.translation_source ? `Translation: ${v.translation_source}` : ""}
-                      {v.translation_source && v.translator ? " · " : ""}
-                      {v.translator ? `Translator: ${v.translator}` : ""}
-                    </p>
+                    <div className="mt-2 rounded-lg border border-border bg-background px-2.5 py-1.5 text-[11px] text-muted-foreground">
+                      <p>
+                        {v.translation_source ? `Translation source: ${v.translation_source}` : "Translation source: Quran DB"}
+                      </p>
+                      <p>{v.translator ? `Translator: ${v.translator}` : "Translator: Local authenticated source"}</p>
+                    </div>
                   )}
                 </Link>
               ))}
@@ -183,6 +200,10 @@ function AskPage() {
                     {tf.translator ? ` · ${tf.translator}` : ""}
                   </div>
                   <p className="mt-1 text-xs text-muted-foreground">{tf.text}</p>
+                  <div className="mt-2 rounded-md border border-border bg-card px-2 py-1 text-[11px] text-muted-foreground">
+                    Tafsir source: {tf.source}
+                    {tf.translator ? ` · Translator: ${tf.translator}` : ""}
+                  </div>
                 </div>
               ))}
             </div>
