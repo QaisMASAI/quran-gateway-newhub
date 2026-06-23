@@ -5,6 +5,7 @@ import { z } from "zod";
 const BodySchema = z.object({
   batch: z.number().int().min(1).max(200).optional(),
   model: z.string().min(3).max(120).optional(),
+  token: z.string().min(8).optional(),
 });
 
 export const Route = createFileRoute("/api/public/admin/translate-tafsir-hebrew")({
@@ -12,13 +13,16 @@ export const Route = createFileRoute("/api/public/admin/translate-tafsir-hebrew"
     handlers: {
       POST: async ({ request }) => {
         const token = process.env.QURAN_ADMIN_TOKEN;
-        const url = new URL(request.url);
-        if (!token || url.searchParams.get("token") !== token) {
+        const bodyRaw = await request.json().catch(() => ({}));
+        const parsed = BodySchema.safeParse(bodyRaw);
+        if (!parsed.success) return new Response("Bad request", { status: 400 });
+
+        const authHeader = request.headers.get("authorization");
+        const bearerToken = authHeader?.startsWith("Bearer ") ? authHeader.slice(7).trim() : null;
+        const bodyToken = parsed.data.token ?? null;
+        if (!token || (bearerToken !== token && bodyToken !== token)) {
           return new Response("Unauthorized", { status: 401 });
         }
-
-        const parsed = BodySchema.safeParse(await request.json().catch(() => ({})));
-        if (!parsed.success) return new Response("Bad request", { status: 400 });
 
         const result = await generateHebrewTafsir({
           data: {
