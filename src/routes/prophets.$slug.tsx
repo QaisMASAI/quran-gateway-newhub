@@ -163,14 +163,16 @@ function ProphetPage() {
           </h2>
 
           <ul className="space-y-2">
-            {(verses.length ? verses : prophet.refs.map((ref: AyahRef) => ({
+            {((verses.length
+              ? verses
+              : prophet.refs.map((ref: AyahRef) => ({
               surah: ref.surah,
               ayahStart: ref.ayah,
               ayahEnd: ref.to ?? ref.ayah,
               reference: `${ref.surah}:${ref.ayah}${ref.to ? `-${ref.to}` : ""}`,
               translation: "",
               tafsirPreview: "",
-            }))).map((ref, i: number) => {
+            }))) as Array<{ surah: number; ayahStart: number; ayahEnd: number; reference: string; translation?: string; tafsirPreview?: string }>).map((ref, i: number) => {
               const surahName = surahDisplayName(ref.surah, locale) ?? t("detail.surahFallback", { n: ref.surah });
               const label = ref.ayahEnd > ref.ayahStart
                 ? t("detail.rangeVerses", { from: ref.ayahStart, to: ref.ayahEnd })
