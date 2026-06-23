@@ -390,23 +390,24 @@ function buildSeedJourneys(): Journey[] {
 function buildSeedJourneySteps(journeySlug: string): JourneyStep[] {
   const template = seedJourneyTemplates.find((j) => j.slug === journeySlug);
   if (!template) return [];
-  return template.stepSlugs
-    .map((slug, idx) => {
-      const entity = seedBySlug.get(slug);
-      if (!entity) return null;
-      return {
-        id: `seed-step:${journeySlug}:${idx}`,
-        journey_id: `seed-journey:${journeySlug}`,
-        step_order: idx + 1,
-        entity_id: entity.id,
-        surah: null,
-        ayah_start: null,
-        ayah_end: null,
-        notes_i18n: entity.summary_i18n,
-        entity,
-      } satisfies JourneyStep;
-    })
-    .filter((s): s is JourneyStep => !!s);
+  const steps: JourneyStep[] = [];
+  for (let idx = 0; idx < template.stepSlugs.length; idx += 1) {
+    const slug = template.stepSlugs[idx];
+    const entity = seedBySlug.get(slug);
+    if (!entity) continue;
+    steps.push({
+      id: `seed-step:${journeySlug}:${idx}`,
+      journey_id: `seed-journey:${journeySlug}`,
+      step_order: idx + 1,
+      entity_id: entity.id,
+      surah: null,
+      ayah_start: null,
+      ayah_end: null,
+      notes_i18n: entity.summary_i18n,
+      entity,
+    });
+  }
+  return steps;
 }
 
 export async function listJourneys(): Promise<Journey[]> {
