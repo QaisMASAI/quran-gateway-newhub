@@ -138,7 +138,7 @@ const LearnGraphRoute = LearnGraphRouteImport.update({
   id: '/learn/graph',
   path: '/learn/graph',
   getParentRoute: () => rootRouteImport,
-} as any)
+} as any).lazy(() => import('./routes/learn.graph.lazy').then((d) => d.Route))
 const ExploreTimelineRoute = ExploreTimelineRouteImport.update({
   id: '/explore/timeline',
   path: '/explore/timeline',
