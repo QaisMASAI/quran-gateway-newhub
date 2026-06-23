@@ -2,6 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { PROPHETS } from "@/lib/prophets";
 import { TOPICS } from "@/lib/topics";
+import seed from "@/lib/seeds/knowledge-seed.json";
 
 const HubInput = z.object({
   slug: z.string().min(1).max(120),
@@ -29,6 +30,20 @@ function excerpt(input: string | null | undefined, size = 260): string {
 }
 
 function fallbackRefsFor(slug: string, kind: "prophet" | "topic") {
+  const seedLinks = (seed.verses as Array<{ slug: string; links: [number, number, number][] }>).find(
+    (v) => v.slug === slug,
+  )?.links;
+  if (seedLinks && seedLinks.length > 0) {
+    return seedLinks.map((l, idx) => ({
+      id: `seed-fallback:${slug}:${idx}`,
+      surah: l[0],
+      ayah_start: l[1],
+      ayah_end: l[2],
+      sort_order: idx,
+      note_i18n: {},
+    }));
+  }
+
   if (kind === "prophet") {
     const p = PROPHETS.find((x) => x.slug === slug);
     return (p?.refs ?? []).map((r, idx) => ({
