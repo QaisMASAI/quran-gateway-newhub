@@ -53,7 +53,7 @@ export function Header() {
           <NavLink to="/research" label={t("nav.research")} icon={<Sparkles className="h-4 w-4" />} />
           <NavLink to="/learn" label={t("nav.learn")} icon={<BookMarked className="h-4 w-4" />} />
           <NavLink to="/prophets" label={t("nav.prophets")} icon={<Users className="h-4 w-4" />} />
-          <NavLink to="/topics" label={t("nav.topics")} icon={<Compass className="h-4 w-4" />} />
+          <NavLink to="/learn" hash="topics-library" label={t("nav.topics")} icon={<Compass className="h-4 w-4" />} />
           <NavLink to="/search" label={t("nav.search")} icon={<Search className="h-4 w-4" />} />
           {isAuthenticated && (
             <NavLink to="/collections" label={t("nav.collections")} icon={<Folder className="h-4 w-4" />} />
@@ -128,10 +128,11 @@ export function Header() {
   );
 }
 
-function NavLink({ to, label, icon }: { to: string; label: string; icon: React.ReactNode }) {
+function NavLink({ to, hash, label, icon }: { to: string; hash?: string; label: string; icon: React.ReactNode }) {
   return (
     <Link
       to={to}
+      hash={hash}
       activeOptions={{ exact: to === "/" }}
       activeProps={{ className: "bg-secondary text-foreground", "aria-current": "page" }}
       inactiveProps={{ className: "text-muted-foreground hover:bg-secondary/60 hover:text-foreground" }}

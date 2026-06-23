@@ -57,8 +57,9 @@ const PLACE_COORDS: Record<string, { latitude: number; longitude: number; countr
 };
 
 function MapPage() {
-  const { i18n } = useTranslation();
+  const { t, i18n } = useTranslation("pages");
   const locale = (normalizeLocale(i18n.language) ?? "he") as Locale;
+  const isRtl = i18n.dir() === "rtl";
 
   const { data, isLoading } = useQuery({
     queryKey: ["map-places"],
@@ -96,10 +97,10 @@ function MapPage() {
       <Header />
       <div className="container mx-auto max-w-6xl px-4 py-8">
         <Link
-          to="/"
-          className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground mb-4"
+          to="/learn"
+          className="mb-4 inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"
         >
-          <ChevronLeft className="w-4 h-4" /> Back
+          <ChevronLeft className="h-4 w-4 ltr:rotate-180" /> {t("research.back")}
         </Link>
 
         <div className="flex items-center gap-3 mb-6">
@@ -107,9 +108,9 @@ function MapPage() {
             <MapPin className="w-6 h-6 text-primary" />
           </div>
           <div>
-            <h1 className="text-3xl font-bold tracking-tight">Quran World Map</h1>
+            <h1 className="text-3xl font-bold tracking-tight">{t("learn.openMap")}</h1>
             <p className="text-sm text-muted-foreground">
-              Places mentioned in the Quran, plotted geographically.
+              {t("learn.openMapHint")}
             </p>
           </div>
         </div>
@@ -125,11 +126,13 @@ function MapPage() {
                   <circle cx={x} cy={y} r="8" fill="hsl(var(--primary))" opacity="0.85" />
                   <circle cx={x} cy={y} r="14" fill="hsl(var(--primary))" opacity="0.25" />
                   <text
-                    x={x + 12}
+                    x={x + (isRtl ? -12 : 12)}
                     y={y + 4}
                     fontSize="11"
                     fill="hsl(var(--foreground))"
                     className="pointer-events-none"
+                    textAnchor={isRtl ? "end" : "start"}
+                    direction={isRtl ? "rtl" : "ltr"}
                   >
                     {title}
                   </text>
@@ -140,7 +143,7 @@ function MapPage() {
         </div>
 
         {isLoading && (
-          <div className="text-sm text-muted-foreground mt-4">Loading places…</div>
+          <div className="mt-4 text-sm text-muted-foreground">{t("dailyVerse.loading")}</div>
         )}
 
         <div className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
@@ -170,7 +173,7 @@ function MapPage() {
           })}
           {!isLoading && (data ?? []).length === 0 && (
             <div className="col-span-full rounded-xl border border-dashed border-border p-8 text-center text-sm text-muted-foreground">
-              No mapped places yet. As Places are enriched with coordinates they will appear here.
+              {t("learn.noAuthSource")}
             </div>
           )}
         </div>

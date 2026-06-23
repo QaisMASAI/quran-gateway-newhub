@@ -4,11 +4,11 @@ import { BookOpen, Search, Sparkles, Star, Compass } from "lucide-react";
 
 export function BottomNav() {
   const { t } = useTranslation("pages");
-  const items: Array<{ to: string; labelKey: string; icon: React.ReactNode; exact?: boolean }> = [
+  const items: Array<{ to: string; hash?: string; labelKey: string; icon: React.ReactNode; exact?: boolean }> = [
     { to: "/", labelKey: "surahs", icon: <BookOpen className="h-5 w-5" aria-hidden="true" />, exact: true },
     { to: "/search", labelKey: "search", icon: <Search className="h-5 w-5" aria-hidden="true" /> },
     { to: "/ask", labelKey: "ask", icon: <Sparkles className="h-5 w-5" aria-hidden="true" /> },
-    { to: "/topics", labelKey: "discover", icon: <Compass className="h-5 w-5" aria-hidden="true" /> },
+    { to: "/learn", hash: "topics-library", labelKey: "discover", icon: <Compass className="h-5 w-5" aria-hidden="true" /> },
     { to: "/favorites", labelKey: "favorites", icon: <Star className="h-5 w-5" aria-hidden="true" /> },
   ];
 
@@ -20,9 +20,10 @@ export function BottomNav() {
     >
       <ul className="mx-auto flex max-w-md items-stretch justify-around">
         {items.map((it) => (
-          <li key={it.to} className="flex-1">
+          <li key={`${it.to}-${it.labelKey}`} className="flex-1">
             <Link
               to={it.to}
+              hash={it.hash}
               activeOptions={{ exact: !!it.exact }}
               activeProps={{ className: "text-primary", "aria-current": "page" }}
               inactiveProps={{ className: "text-muted-foreground" }}

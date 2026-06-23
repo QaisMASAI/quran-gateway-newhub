@@ -202,7 +202,8 @@ function Home() {
       <section className="mx-auto mt-8 max-w-6xl px-4 sm:px-6">
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
           <FeatureCard
-            to="/topics"
+            to="/learn"
+            hash="topics-library"
             title={t("home.featureTopicsTitle")}
             body={t("home.featureTopicsBody")}
             icon={<Compass className="h-5 w-5" />}
@@ -332,12 +333,14 @@ function Home() {
 
 function FeatureCard({
   to,
+  hash,
   title,
   body,
   icon,
   cta,
 }: {
-  to: "/topics" | "/learn/journeys" | "/learn" | "/research";
+  to: "/learn/journeys" | "/learn" | "/research";
+  hash?: string;
   title: string;
   body: string;
   icon: React.ReactNode;
@@ -346,6 +349,7 @@ function FeatureCard({
   return (
     <Link
       to={to}
+      hash={hash}
       className="surface-card group block p-4 transition-all hover:border-primary/35 hover:shadow-soft"
     >
       <div className="mb-3 inline-flex h-10 w-10 items-center justify-center rounded-xl bg-primary-soft text-primary">
