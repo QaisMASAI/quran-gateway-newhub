@@ -249,13 +249,24 @@ export const askQuranResearch = createServerFn({ method: "POST" })
 
     const gateway = createLovableAiGatewayProvider(apiKey);
     let answer = "";
+    const withTimeout = async <T>(promise: Promise<T>, timeoutMs: number): Promise<T> => {
+      return await Promise.race([
+        promise,
+        new Promise<never>((_, reject) =>
+          setTimeout(() => reject(new Error("generation_timeout")), timeoutMs),
+        ),
+      ]);
+    };
     try {
-      const { text } = await generateText({
-        model: gateway("google/gemini-2.5-flash"),
-        prompt: userMsg,
-        temperature: 0,
-        maxOutputTokens: 700,
-      });
+      const { text } = await withTimeout(
+        generateText({
+          model: gateway("google/gemini-2.5-flash"),
+          prompt: userMsg,
+          temperature: 0,
+          maxOutputTokens: 700,
+        }),
+        20_000,
+      );
       answer = text;
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err);

@@ -49,12 +49,12 @@ const SearchRoute = SearchRouteImport.update({
   id: '/search',
   path: '/search',
   getParentRoute: () => rootRouteImport,
-} as any)
+} as any).lazy(() => import('./routes/search.lazy').then((d) => d.Route))
 const ResearchRoute = ResearchRouteImport.update({
   id: '/research',
   path: '/research',
   getParentRoute: () => rootRouteImport,
-} as any)
+} as any).lazy(() => import('./routes/research.lazy').then((d) => d.Route))
 const ProfileRoute = ProfileRouteImport.update({
   id: '/profile',
   path: '/profile',
@@ -74,12 +74,12 @@ const AuthRoute = AuthRouteImport.update({
   id: '/auth',
   path: '/auth',
   getParentRoute: () => rootRouteImport,
-} as any)
+} as any).lazy(() => import('./routes/auth.lazy').then((d) => d.Route))
 const AskRoute = AskRouteImport.update({
   id: '/ask',
   path: '/ask',
   getParentRoute: () => rootRouteImport,
-} as any)
+} as any).lazy(() => import('./routes/ask.lazy').then((d) => d.Route))
 const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
   id: '/_authenticated',
   getParentRoute: () => rootRouteImport,
@@ -679,13 +679,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
