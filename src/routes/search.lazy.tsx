@@ -6,7 +6,7 @@ import { buildQuranIndex, chapterDisplayName, type SurahGroup } from "@/lib/qura
 import { searchWithFallback } from "@/lib/quran-search";
 import { Header } from "@/components/Header";
 import { Search as SearchIcon, Loader2, ChevronLeft, ChevronRight, BookOpen } from "lucide-react";
-import { searchEntities, type EntityKind } from "@/lib/knowledge";
+import { searchEntities, searchKnowledgeTexts, type EntityKind } from "@/lib/knowledge";
 import { EntityCard } from "@/components/discovery/EntityCard";
 import { normalizeLocale, type Locale } from "@/lib/i18n";
 
@@ -32,6 +32,13 @@ function SearchPage() {
   const entitiesQ = useQuery({
     queryKey: ["entity-search", trimmed],
     queryFn: () => searchEntities(trimmed, 12),
+    enabled: trimmed.length >= 2,
+    staleTime: 60_000,
+  });
+
+  const textsQ = useQuery({
+    queryKey: ["knowledge-text-search", trimmed],
+    queryFn: () => searchKnowledgeTexts(trimmed, 10),
     enabled: trimmed.length >= 2,
     staleTime: 60_000,
   });
@@ -108,6 +115,23 @@ function SearchPage() {
             <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
               {entitiesQ.data.map((e) => (
                 <EntityCard key={e.id} entity={e} locale={locale} kindLabel={kindLabel(e.kind)} />
+              ))}
+            </div>
+          </section>
+        )}
+
+        {textsQ.data && textsQ.data.length > 0 && (
+          <section className="mt-6">
+            <SectionTitle>{t("search.tafsirHits", "Tafsir and context matches")}</SectionTitle>
+            <div className="space-y-2">
+              {textsQ.data.map((row) => (
+                <article key={`${row.kind}-${row.id}`} className="surface-card px-4 py-3">
+                  <p className="text-xs font-semibold text-primary">
+                    {row.kind.toUpperCase()} · {row.source_name}
+                    {row.surah && row.ayah_start ? ` · ${row.surah}:${row.ayah_start}${row.ayah_end && row.ayah_end !== row.ayah_start ? `-${row.ayah_end}` : ""}` : ""}
+                  </p>
+                  <p className="mt-1 text-sm leading-relaxed text-foreground/90">{row.text.slice(0, 220)}{row.text.length > 220 ? "…" : ""}</p>
+                </article>
               ))}
             </div>
           </section>
