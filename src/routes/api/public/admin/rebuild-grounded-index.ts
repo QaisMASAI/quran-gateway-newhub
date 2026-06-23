@@ -1,5 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { rebuildGroundedChunks } from "@/lib/grounded-chunks.functions";
+import { z } from "zod";
+
+const BodySchema = z.object({
+  limit: z.number().int().min(1).max(10000).optional(),
+});
 
 export const Route = createFileRoute("/api/public/admin/rebuild-grounded-index")({
   server: {
@@ -11,8 +16,10 @@ export const Route = createFileRoute("/api/public/admin/rebuild-grounded-index")
           return new Response("Unauthorized", { status: 401 });
         }
 
-        const body = (await request.json().catch(() => ({}))) as { limit?: number };
-        const result = await rebuildGroundedChunks({ data: { limit: body.limit } });
+        const parsed = BodySchema.safeParse(await request.json().catch(() => ({})));
+        if (!parsed.success) return new Response("Bad request", { status: 400 });
+
+        const result = await rebuildGroundedChunks({ data: { limit: parsed.data.limit } });
         if (!result.ok) {
           return Response.json(result, { status: 500 });
         }
