@@ -88,6 +88,7 @@ function ProphetPage() {
   const chronology = hubQ.data?.chronology ?? [];
   const lessons = hubQ.data?.lessons ?? [];
   const related = (hubQ.data?.related ?? []).filter((r) => r.kind === "prophet");
+  const overviewFallback = entity?.description || entity?.summary || t("detail.prophetIntro", { name: entity?.titleHe || p.name });
 
   return (
     <div className="min-h-screen bg-background">
@@ -151,6 +152,10 @@ function ProphetPage() {
                 </li>
               ))}
             </ol>
+          ) : overviewFallback ? (
+            <p className="rounded-xl border border-primary/10 bg-card p-4 text-sm leading-relaxed text-foreground/90" dir={locale === "en" ? "ltr" : "rtl"}>
+              {overviewFallback}
+            </p>
           ) : (
             <p className="rounded-xl border border-primary/10 bg-card p-4 text-sm leading-relaxed text-muted-foreground">{t("learn.noAuthSource")}</p>
           )}

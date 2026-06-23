@@ -87,6 +87,7 @@ function TopicPage() {
   const chronology = hubQ.data?.chronology ?? [];
   const lessons = hubQ.data?.lessons ?? [];
   const related = hubQ.data?.related ?? [];
+  const overviewFallback = entity?.description || entity?.summary || tp.description;
 
   return (
     <div className="min-h-screen bg-background">
@@ -142,6 +143,10 @@ function TopicPage() {
                 </li>
               ))}
             </ol>
+          ) : overviewFallback ? (
+            <p className="rounded-xl border border-primary/10 bg-card p-4 text-sm leading-relaxed text-foreground/90" dir={locale === "en" ? "ltr" : "rtl"}>
+              {overviewFallback}
+            </p>
           ) : (
             <p className="rounded-xl border border-primary/10 bg-card p-4 text-sm leading-relaxed text-muted-foreground">{t("learn.noAuthSource")}</p>
           )}
