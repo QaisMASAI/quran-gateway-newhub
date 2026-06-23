@@ -8,6 +8,7 @@ import { useAuth } from "@/lib/use-auth";
 import { supabase } from "@/integrations/supabase/client";
 import { pickLocale, type KnowledgeEntity } from "@/lib/knowledge";
 import { normalizeLocale, type Locale } from "@/lib/i18n";
+import { surahDisplayName } from "@/lib/surah-names-he";
 
 export const Route = createLazyFileRoute("/profile")({
   component: ProfilePage,
@@ -17,7 +18,13 @@ interface ProfileSummary {
   bookmarkCount: number;
   noteCount: number;
   readingProgressCount: number;
-  journeyProgress: { journey_id: string; slug: string; title_he: string; done: number; total: number }[];
+  journeyProgress: {
+    journey_id: string;
+    slug: string;
+    title_i18n: { he?: string; ar?: string; en?: string };
+    done: number;
+    total: number;
+  }[];
   recommended: KnowledgeEntity[];
   continueReading: { surah: number; ayah: number; last_read_at: string } | null;
   recentBookmarks: { surah: number; ayah: number; surah_name: string | null; hebrew_snapshot: string | null; created_at: string }[];
@@ -72,7 +79,7 @@ async function fetchProfileSummary(userId: string): Promise<ProfileSummary> {
   const journeyProgress = ((journeys.data ?? []) as J[]).map((j) => ({
     journey_id: j.id,
     slug: j.slug,
-    title_he: j.title_i18n?.he ?? j.title_i18n?.en ?? j.slug,
+    title_i18n: j.title_i18n ?? {},
     done: doneByJourney.get(j.id) ?? 0,
     total: stepsByJourney.get(j.id) ?? 0,
   }));
@@ -178,7 +185,7 @@ function ProfilePage() {
             <div className="mb-1 text-xs font-semibold uppercase tracking-wide text-primary">{t("profile.continueLearning")}</div>
             <div className="flex items-center justify-between gap-3">
               <div>
-                <div className="text-lg font-semibold">{topJourney.title_he}</div>
+                <div className="text-lg font-semibold">{pickLocale(topJourney.title_i18n, locale)}</div>
                 <div className="text-xs text-muted-foreground">
                   {topJourney.done} / {topJourney.total} {t("profile.stepsDone")}
                 </div>
@@ -213,7 +220,7 @@ function ProfilePage() {
                       className="block rounded-lg border border-border bg-background px-3 py-2 text-sm hover:border-primary/40"
                     >
                       <div className="text-xs font-semibold text-primary">
-                        {b.surah_name ?? `Surah ${b.surah}`} {b.surah}:{b.ayah}
+                        {b.surah_name ?? surahDisplayName(b.surah, locale)} {b.surah}:{b.ayah}
                       </div>
                       {b.hebrew_snapshot && (
                         <div className="mt-1 line-clamp-2 text-xs text-muted-foreground" dir="auto">
