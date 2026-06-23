@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
+import i18n, { normalizeLocale } from "@/lib/i18n";
 import { Header } from "@/components/Header";
 import { TOPICS } from "@/lib/topics";
 import { useTopicT } from "@/lib/content-i18n";
@@ -14,6 +15,19 @@ const ICONS = {
 } as const;
 
 export const Route = createFileRoute("/topics/")({
+  head: () => {
+    const locale = normalizeLocale(i18n.resolvedLanguage) ?? "he";
+    return {
+      meta: [
+        { title: i18n.t("pages:topics.metaTitle", { lng: locale }) },
+        { name: "description", content: i18n.t("pages:topics.metaDescription", { lng: locale }) },
+        { property: "og:title", content: i18n.t("pages:topics.metaTitle", { lng: locale }) },
+        { property: "og:description", content: i18n.t("pages:topics.metaDescription", { lng: locale }) },
+        { property: "og:url", content: "/topics" },
+      ],
+      links: [{ rel: "canonical", href: "/topics" }],
+    };
+  },
   component: TopicsIndex,
 });
 
