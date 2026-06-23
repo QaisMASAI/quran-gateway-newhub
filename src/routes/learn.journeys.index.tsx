@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next";
 import { Header } from "@/components/Header";
 import { Compass, Loader2, ChevronLeft } from "lucide-react";
 import { listJourneys, pickLocale } from "@/lib/knowledge";
-import type { Locale } from "@/lib/i18n";
+import { normalizeLocale, type Locale } from "@/lib/i18n";
 
 export const Route = createFileRoute("/learn/journeys/")({
   head: () => ({
@@ -22,7 +22,7 @@ export const Route = createFileRoute("/learn/journeys/")({
 
 function JourneysIndex() {
   const { t, i18n } = useTranslation("pages");
-  const locale = (i18n.language?.slice(0, 2) as Locale) || "he";
+  const locale = (normalizeLocale(i18n.language) ?? "he") as Locale;
 
   const q = useQuery({
     queryKey: ["journeys"],

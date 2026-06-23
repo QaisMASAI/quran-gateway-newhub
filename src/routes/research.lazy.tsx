@@ -6,8 +6,9 @@ import ReactMarkdown from "react-markdown";
 import { useServerFn } from "@tanstack/react-start";
 import { Sparkles, Loader2, Send, BookOpen, ShieldCheck, ChevronLeft } from "lucide-react";
 import { askQuranResearch, type ResearchResult } from "@/lib/ai-research.functions";
-import { surahNameHe } from "@/lib/surah-names-he";
+import { surahDisplayName } from "@/lib/surah-names-he";
 import { Header } from "@/components/Header";
+import { normalizeLocale } from "@/lib/i18n";
 
 export const Route = createLazyFileRoute("/research")({
   component: ResearchPage,
@@ -15,10 +16,7 @@ export const Route = createLazyFileRoute("/research")({
 
 function ResearchPage() {
   const { t, i18n } = useTranslation("pages");
-  const lang = (i18n.language?.startsWith("he") ? "he" : i18n.language?.startsWith("ar") ? "ar" : "en") as
-    | "he"
-    | "en"
-    | "ar";
+  const lang = (normalizeLocale(i18n.language) ?? "he") as "he" | "en" | "ar";
   const [q, setQ] = useState("");
   const [chatTurns, setChatTurns] = useState<Array<{ question: string; answer: string }>>([]);
   const historyPayload = useMemo(
@@ -82,7 +80,7 @@ function ResearchPage() {
             <p className="text-sm text-muted-foreground">
               {t(
                 "research.subtitle",
-                "Grounded in the Quran and authenticated Tafsir — with full citations.",
+                "Grounded in local Quran and authenticated tafsir with full citations.",
               )}
             </p>
           </div>
@@ -116,6 +114,7 @@ function ResearchPage() {
           <div className="mt-6 flex flex-wrap gap-2">
             {examples.map((ex) => (
               <button
+                  type="button"
                 key={ex}
                 onClick={() => {
                   setQ(ex);
@@ -162,29 +161,33 @@ function ResearchPage() {
                       key={`${v.surah}-${v.ayah}`}
                       to="/surah/$id"
                       params={{ id: String(v.surah) }}
-                      hash={`a-${v.ayah}`}
+                      hash={`v-${v.ayah}`}
                       className="block rounded-xl border border-border bg-card p-4 transition hover:border-primary"
                     >
                       <div className="mb-2 flex items-center justify-between">
                         <span className="text-sm font-medium">
-                          {surahNameHe(v.surah)} · {v.surah}:{v.ayah}
+                          {surahDisplayName(v.surah, lang)} · {v.surah}:{v.ayah}
                         </span>
                         <span className="text-xs text-muted-foreground">{Math.round(v.similarity * 100)}% match</span>
                       </div>
                       <p className="font-arabic text-right text-lg leading-loose" dir="rtl">
                         {v.arabic}
                       </p>
-                      <p className="mt-2 text-sm text-muted-foreground" dir="rtl">
+                      <p className="mt-2 text-sm text-muted-foreground" dir={lang === "en" ? "ltr" : "rtl"}>
                         {v.hebrew}
                       </p>
                       {(v.translation_source || v.translator) && (
                         <div className="mt-2 rounded-md border border-border bg-background px-2 py-1 text-[11px] text-muted-foreground">
                           <p>
-                            {v.translation_source
-                              ? `Translation source: ${v.translation_source}`
-                              : "Translation source: Quran DB"}
+                            {t("research.translationSource", {
+                              source: v.translation_source || t("research.localQuranDb"),
+                            })}
                           </p>
-                          <p>{v.translator ? `Translator: ${v.translator}` : "Translator: Local authenticated source"}</p>
+                          <p>
+                            {t("research.translator", {
+                              translator: v.translator || t("research.localAuthenticatedSource"),
+                            })}
+                          </p>
                         </div>
                       )}
                     </Link>
@@ -207,8 +210,8 @@ function ResearchPage() {
                       </div>
                       <p className="text-sm text-foreground/90">{tf.text}</p>
                       <div className="mt-2 rounded-md border border-border bg-background px-2 py-1 text-[11px] text-muted-foreground">
-                        Tafsir source: {tf.source}
-                        {tf.translator ? ` · Translator: ${tf.translator}` : ""}
+                        {t("research.tafsirSource", { source: tf.source })}
+                        {tf.translator ? ` · ${t("research.translator", { translator: tf.translator })}` : ""}
                       </div>
                     </div>
                   ))}

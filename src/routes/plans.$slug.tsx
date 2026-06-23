@@ -5,7 +5,7 @@ import { getPlan, type DailyReading } from "@/lib/reading-plans";
 import { surahDisplayName } from "@/lib/surah-names-he";
 import { usePlanProgress } from "@/lib/reading-plan-progress";
 import { usePlanT } from "@/lib/content-i18n";
-import type { Locale } from "@/lib/i18n";
+import { normalizeLocale, type Locale } from "@/lib/i18n";
 import { ArrowRight, Check, ChevronLeft, Cloud, RotateCcw, CalendarCheck } from "lucide-react";
 
 export const Route = createFileRoute("/plans/$slug")({
@@ -86,7 +86,7 @@ function PlanPage() {
   const { plan } = Route.useLoaderData();
   const { t, i18n } = useTranslation("pages");
   const { t: tContent } = useTranslation("content");
-  const locale = (i18n.language?.slice(0, 2) as Locale) || "he";
+  const locale = (normalizeLocale(i18n.language) ?? "he") as Locale;
   const planT = usePlanT(plan.slug);
   const { done, toggle, reset, isAuthenticated } = usePlanProgress(plan.slug);
 

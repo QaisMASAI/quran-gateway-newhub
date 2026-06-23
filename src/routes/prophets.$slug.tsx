@@ -3,8 +3,9 @@ import { useTranslation } from "react-i18next";
 import { Header } from "@/components/Header";
 import { getProphet, type AyahRef } from "@/lib/prophets";
 import { useProphetT } from "@/lib/content-i18n";
-import { SURAH_NAMES_HE } from "@/lib/surah-names-he";
+import { surahDisplayName } from "@/lib/surah-names-he";
 import { ChevronLeft, BookOpen, ArrowRight } from "lucide-react";
+import { normalizeLocale } from "@/lib/i18n";
 
 export const Route = createFileRoute("/prophets/$slug")({
   loader: ({ params }) => {
@@ -64,8 +65,9 @@ function ErrorView({ reset }: { reset: () => void }) {
 
 function ProphetPage() {
   const { prophet } = Route.useLoaderData();
-  const { t } = useTranslation("pages");
+  const { t, i18n } = useTranslation("pages");
   const p = useProphetT(prophet.slug);
+  const locale = normalizeLocale(i18n.language) ?? "he";
 
   return (
     <div className="min-h-screen bg-background">
@@ -97,7 +99,7 @@ function ProphetPage() {
 
           <ul className="space-y-2">
             {prophet.refs.map((ref: AyahRef, i: number) => {
-              const surahName = SURAH_NAMES_HE[ref.surah] ?? t("detail.surahFallback", { n: ref.surah });
+              const surahName = surahDisplayName(ref.surah, locale) ?? t("detail.surahFallback", { n: ref.surah });
               const label = ref.to ? t("detail.rangeVerses", { from: ref.ayah, to: ref.to }) : t("detail.singleVerse", { n: ref.ayah });
               return (
                 <li key={i}>

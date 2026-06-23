@@ -9,6 +9,7 @@ import { AyahCard } from "@/components/AyahCard";
 import { ReadingSettings } from "@/components/ReadingSettings";
 import { ChevronRight, ChevronLeft, Loader2, Play, Pause } from "lucide-react";
 import { useReadingProgress } from "@/lib/reading-progress";
+import { normalizeLocale } from "@/lib/i18n";
 
 export const Route = createFileRoute("/surah/$id")({
   validateSearch: (s: Record<string, unknown>) => ({
@@ -56,7 +57,7 @@ function SurahPage() {
   const { q } = Route.useSearch();
   const surahId = Number(id);
   const { t, i18n } = useTranslation("common");
-  const lang = ((i18n.language?.split("-")[0] as ApiLang) || "he");
+  const lang = (normalizeLocale(i18n.language) ?? "he") as ApiLang;
   const isRtl = i18n.dir() === "rtl";
   if (!surahId || surahId < 1 || surahId > 114) throw notFound();
 

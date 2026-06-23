@@ -5,7 +5,7 @@ import { Header } from "@/components/Header";
 import { Loader2, Compass, Network } from "lucide-react";
 import { listAllEntities, groupByKind, type EntityKind } from "@/lib/knowledge";
 import { EntityCard } from "@/components/discovery/EntityCard";
-import type { Locale } from "@/lib/i18n";
+import { normalizeLocale, type Locale } from "@/lib/i18n";
 
 export const Route = createFileRoute("/learn/")({
   head: () => ({
@@ -25,7 +25,7 @@ const ORDER: EntityKind[] = ["topic", "prophet", "story", "event", "place", "nat
 
 function LearnIndex() {
   const { t, i18n } = useTranslation("pages");
-  const locale = (i18n.language?.slice(0, 2) as Locale) || "he";
+  const locale = (normalizeLocale(i18n.language) ?? "he") as Locale;
 
   const q = useQuery({
     queryKey: ["all-entities"],

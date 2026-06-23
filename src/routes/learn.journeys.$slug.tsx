@@ -12,7 +12,7 @@ import {
   type EntityKind,
 } from "@/lib/knowledge";
 import { supabase } from "@/integrations/supabase/client";
-import type { Locale } from "@/lib/i18n";
+import { normalizeLocale, type Locale } from "@/lib/i18n";
 
 export const Route = createFileRoute("/learn/journeys/$slug")({
   component: JourneyPage,
@@ -22,7 +22,7 @@ function JourneyPage() {
   const { slug } = Route.useParams();
   const { t, i18n } = useTranslation("pages");
   const qc = useQueryClient();
-  const locale = (i18n.language?.slice(0, 2) as Locale) || "he";
+  const locale = (normalizeLocale(i18n.language) ?? "he") as Locale;
   const [userId, setUserId] = useState<string | null>(null);
 
   useEffect(() => {

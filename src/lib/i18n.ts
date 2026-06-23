@@ -59,6 +59,12 @@ export function isLocale(value: string | undefined | null): value is Locale {
   return !!value && (SUPPORTED_LOCALES as string[]).includes(value);
 }
 
+export function normalizeLocale(value: string | undefined | null): Locale | null {
+  if (!value) return null;
+  const base = value.toLowerCase().split("-")[0];
+  return isLocale(base) ? base : null;
+}
+
 /**
  * Apply direction to all necessary DOM elements
  */
@@ -109,7 +115,7 @@ export default i18n;
 // Initialize direction on app startup
 if (typeof window !== "undefined") {
   const storedLocale = localStorage.getItem(STORAGE_KEY);
-  const locale = storedLocale && isLocale(storedLocale) ? storedLocale : DEFAULT_LOCALE;
+  const locale = normalizeLocale(storedLocale) ?? DEFAULT_LOCALE;
   const dir = LOCALE_DIR[locale];
   applyDirectionGlobally(dir, locale);
 }

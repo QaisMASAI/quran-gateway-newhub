@@ -5,7 +5,7 @@ import { useMemo, useRef, useState } from "react";
 import { Header } from "@/components/Header";
 import { ChevronLeft, Loader2, Network } from "lucide-react";
 import { listAllEntities, listRelations, pickLocale, type KnowledgeEntity, type EntityKind } from "@/lib/knowledge";
-import type { Locale } from "@/lib/i18n";
+import { normalizeLocale, type Locale } from "@/lib/i18n";
 
 export const Route = createLazyFileRoute("/learn/graph")({
   component: GraphPage,
@@ -31,7 +31,7 @@ const KIND_COLOR: Record<EntityKind, string> = {
 
 function GraphPage() {
   const { t, i18n } = useTranslation("pages");
-  const locale = (i18n.language?.slice(0, 2) as Locale) || "he";
+  const locale = (normalizeLocale(i18n.language) ?? "he") as Locale;
   const svgRef = useRef<SVGSVGElement>(null);
   const [hover, setHover] = useState<string | null>(null);
   const [filter, setFilter] = useState<EntityKind | "all">("all");

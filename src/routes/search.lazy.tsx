@@ -8,7 +8,7 @@ import { Header } from "@/components/Header";
 import { Search as SearchIcon, Loader2, ChevronLeft, ChevronRight, BookOpen } from "lucide-react";
 import { searchEntities, type EntityKind } from "@/lib/knowledge";
 import { EntityCard } from "@/components/discovery/EntityCard";
-import type { Locale } from "@/lib/i18n";
+import { normalizeLocale, type Locale } from "@/lib/i18n";
 
 export const Route = createLazyFileRoute("/search")({
   component: SearchPage,
@@ -16,7 +16,7 @@ export const Route = createLazyFileRoute("/search")({
 
 function SearchPage() {
   const { t, i18n } = useTranslation("pages");
-  const locale = (i18n.language?.slice(0, 2) as Locale) || "he";
+  const locale = (normalizeLocale(i18n.language) ?? "he") as Locale;
   const isRtl = i18n.dir() === "rtl";
   const [input, setInput] = useState("");
   const deferred = useDeferredValue(input);
@@ -91,6 +91,7 @@ function SearchPage() {
               {suggestions.map((s) => (
                 <button
                   key={s}
+                  type="button"
                   onClick={() => setInput(s)}
                   className="rounded-full border border-border bg-card px-3 py-1.5 text-sm text-foreground hover:border-primary/40 hover:bg-primary-soft"
                 >

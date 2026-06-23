@@ -22,6 +22,7 @@ import {
   Compass,
   ArrowUpRight,
 } from "lucide-react";
+import { normalizeLocale } from "@/lib/i18n";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -51,7 +52,7 @@ export const Route = createFileRoute("/")({
 
 function Home() {
   const { t, i18n } = useTranslation("pages");
-  const lang = ((i18n.language?.split("-")[0] as ApiLang) || "he");
+  const lang = (normalizeLocale(i18n.language) ?? "he") as ApiLang;
   const isRtl = i18n.dir() === "rtl";
   const { data, isLoading, error } = useQuery({
     queryKey: ["chapters", lang],
@@ -171,18 +172,18 @@ function Home() {
         <div className="surface-card p-5 sm:p-7">
           <div className={`flex items-start justify-between gap-4 ${isRtl ? "flex-row-reverse" : ""}`}>
             <div>
-              <h2 className="font-display text-2xl font-bold text-foreground sm:text-3xl">Immersive AI Quran Search</h2>
+              <h2 className="font-display text-2xl font-bold text-foreground sm:text-3xl">{t("home.aiSectionTitle")}</h2>
               <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
-                Ask emotional, conceptual, or thematic questions — every answer is grounded only in authenticated local Quran and Tafsir sources.
+                {t("home.aiSectionBody")}
               </p>
             </div>
             <Sparkles className="h-6 w-6 shrink-0 text-gold" />
           </div>
           <div className={`mt-5 grid gap-3 sm:grid-cols-3 ${isRtl ? "sm:[&>*]:text-right" : ""}`}>
             {[
-              { q: "Why do people suffer?", to: "/ask" },
-              { q: "What does the Quran say about anxiety?", to: "/research" },
-              { q: "Explain patience in Islam.", to: "/ask" },
+              { q: t("home.aiPrompt1"), to: "/ask" },
+              { q: t("home.aiPrompt2"), to: "/research" },
+              { q: t("home.aiPrompt3"), to: "/ask" },
             ].map((item) => (
               <Link
                 key={item.q}
@@ -200,27 +201,31 @@ function Home() {
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
           <FeatureCard
             to="/topics"
-            title="Topic Exploration"
-            body="Discover mercy, patience, justice, forgiveness, and more through connected Quran passages."
+            title={t("home.featureTopicsTitle")}
+            body={t("home.featureTopicsBody")}
             icon={<Compass className="h-5 w-5" />}
+            cta={t("home.featureExploreCta")}
           />
           <FeatureCard
             to="/learn/journeys"
-            title="Guided Quran Journeys"
-            body="Follow curated pathways designed for spiritual reflection and structured learning."
+            title={t("home.featureJourneysTitle")}
+            body={t("home.featureJourneysBody")}
             icon={<BookOpen className="h-5 w-5" />}
+            cta={t("home.featureExploreCta")}
           />
           <FeatureCard
             to="/learn"
-            title="Featured Themes"
-            body="Explore prophets, stories, events, and themes as interconnected knowledge maps."
+            title={t("home.featureThemesTitle")}
+            body={t("home.featureThemesBody")}
             icon={<Star className="h-5 w-5" />}
+            cta={t("home.featureExploreCta")}
           />
           <FeatureCard
             to="/research"
-            title="Premium Tafsir Experience"
-            body="Compare grounded tafsir citations with elegant source cards and confidence context."
+            title={t("home.featureResearchTitle")}
+            body={t("home.featureResearchBody")}
             icon={<Sparkles className="h-5 w-5" />}
+            cta={t("home.featureExploreCta")}
           />
         </div>
       </section>
@@ -328,11 +333,13 @@ function FeatureCard({
   title,
   body,
   icon,
+  cta,
 }: {
   to: "/topics" | "/learn/journeys" | "/learn" | "/research";
   title: string;
   body: string;
   icon: React.ReactNode;
+  cta: string;
 }) {
   return (
     <Link
@@ -345,7 +352,7 @@ function FeatureCard({
       <h3 className="text-sm font-semibold text-foreground">{title}</h3>
       <p className="mt-1.5 text-xs leading-relaxed text-muted-foreground">{body}</p>
       <div className="mt-3 inline-flex items-center gap-1 text-xs font-semibold text-primary">
-        Explore <ArrowUpRight className="h-3.5 w-3.5 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
+        {cta} <ArrowUpRight className="h-3.5 w-3.5 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
       </div>
     </Link>
   );
