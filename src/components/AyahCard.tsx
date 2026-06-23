@@ -356,7 +356,7 @@ export function AyahCard({ surah, surahName, ayah, arabic, hebrew, highlight }: 
             {!isLoading && !entry?.error && entry?.text && (
               <>
                 <div className="hebrew-text prose prose-sm max-w-none text-[14.5px] text-foreground/90 [&>p]:my-1.5 [&>h1]:text-base [&>h2]:text-base [&>h3]:text-sm [&>ul]:my-1 [&>ol]:my-1">
-                  <ReactMarkdown>{entry.text}</ReactMarkdown>
+                  <ReactMarkdown skipHtml>{entry.text}</ReactMarkdown>
                 </div>
                 {entry.source && (
                   <div className="mt-3 flex items-center gap-1.5 border-t border-border pt-2 text-[11px] text-muted-foreground">
