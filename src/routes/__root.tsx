@@ -104,9 +104,6 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "apple-mobile-web-app-capable", content: "yes" },
       { name: "apple-mobile-web-app-title", content: "Noor" },
       { name: "apple-mobile-web-app-status-bar-style", content: "black-translucent" },
-      { name: "description", content: "Discover the Quran" },
-      { property: "og:description", content: "Discover the Quran" },
-      { name: "twitter:description", content: "Discover the Quran" },
       { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/87bafc24-36c0-4a04-9932-644fb84a2d25/id-preview-ec15e1b6--9bec4b72-99d0-482a-9a96-e54882215014.lovable.app-1782073376472.png" },
       { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/87bafc24-36c0-4a04-9932-644fb84a2d25/id-preview-ec15e1b6--9bec4b72-99d0-482a-9a96-e54882215014.lovable.app-1782073376472.png" },
     ],
@@ -130,7 +127,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
           "@type": "Organization",
           name: "Noor",
           description: "Multilingual Quran learning platform.",
-          url: "https://noor-hebrew-guide.lovable.app",
+          url: "/",
         }),
       },
       {
@@ -139,12 +136,12 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
           "@context": "https://schema.org",
           "@type": "WebSite",
           name: "Noor",
-          url: "https://noor-hebrew-guide.lovable.app",
+          url: "/",
           description:
             "Discover the Quran through clear explanations, guided learning paths, topics, prophets, and AI-powered exploration.",
           potentialAction: {
             "@type": "SearchAction",
-            target: "https://noor-hebrew-guide.lovable.app/search?q={query}",
+            target: "/search?q={query}",
             "query-input": "required name=query",
           },
         }),
