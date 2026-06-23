@@ -222,6 +222,7 @@ export function AyahCard({ surah, surahName, ayah, arabic, hebrew, highlight }: 
             <div className="absolute end-0 z-20 mt-1 w-56 rounded-xl border border-border bg-background shadow-lg">
               {RECITERS.map((r) => (
                 <button
+                  type="button"
                   key={r.key}
                   onClick={() => pickReciter(r.key)}
                   className={`flex w-full items-center justify-between gap-2 px-3 py-2 text-start text-[12.5px] hover:bg-secondary/60 ${
@@ -334,6 +335,7 @@ export function AyahCard({ surah, surahName, ayah, arabic, hebrew, highlight }: 
                   const hasError = cache[k]?.error;
                   return (
                     <button
+                      type="button"
                       key={s.key}
                       onClick={() => selectTafsirSource(s.key)}
                       title={s.name_ar}
@@ -411,7 +413,7 @@ function ActionBtn({
       : "border-primary/30 bg-primary/10 text-primary"
     : "border-border bg-background text-muted-foreground hover:border-primary/30 hover:text-primary";
   return (
-    <button onClick={onClick} className={`${base} ${styles}`}>
+    <button type="button" onClick={onClick} className={`${base} ${styles}`}>
       {children}
     </button>
   );
