@@ -11,6 +11,29 @@ import { ChevronRight, ChevronLeft, Loader2, Play, Pause } from "lucide-react";
 import { useReadingProgress } from "@/lib/reading-progress";
 import { normalizeLocale } from "@/lib/i18n";
 
+function SurahNotFound() {
+  const { t } = useTranslation("common");
+  return (
+    <div className="flex min-h-screen items-center justify-center">
+      <div className="text-center">
+        <p className="text-muted-foreground">{t("errors.notFoundTitle")}</p>
+        <Link to="/" className="mt-3 inline-block text-sm text-primary">
+          {t("common.home")}
+        </Link>
+      </div>
+    </div>
+  );
+}
+
+function SurahError() {
+  const { t } = useTranslation("common");
+  return (
+    <div className="flex min-h-screen items-center justify-center">
+      <p className="text-sm text-destructive">{t("errors.genericBody")}</p>
+    </div>
+  );
+}
+
 export const Route = createFileRoute("/surah/$id")({
   validateSearch: (s: Record<string, unknown>) => ({
     q: typeof s.q === "string" ? s.q : undefined,
@@ -38,29 +61,6 @@ export const Route = createFileRoute("/surah/$id")({
   notFoundComponent: SurahNotFound,
   errorComponent: SurahError,
 });
-
-function SurahNotFound() {
-  const { t } = useTranslation("common");
-  return (
-    <div className="flex min-h-screen items-center justify-center">
-      <div className="text-center">
-        <p className="text-muted-foreground">{t("errors.notFoundTitle")}</p>
-        <Link to="/" className="mt-3 inline-block text-sm text-primary">
-          {t("common.home")}
-        </Link>
-      </div>
-    </div>
-  );
-}
-
-function SurahError() {
-  const { t } = useTranslation("common");
-  return (
-    <div className="flex min-h-screen items-center justify-center">
-      <p className="text-sm text-destructive">{t("errors.genericBody")}</p>
-    </div>
-  );
-}
 
 function SurahPage() {
   const { id } = Route.useParams();
