@@ -355,3 +355,7 @@ export function surahDisplayName(id: number, locale: "he" | "ar" | "en"): string
   if (locale === "en") return SURAH_NAMES_EN[id] ?? `Surah ${id}`;
   return SURAH_NAMES_HE[id] ?? `סורה ${id}`;
 }
+
+export function surahNameHe(id: number): string {
+  return SURAH_NAMES_HE[id] ?? `סורה ${id}`;
+}
