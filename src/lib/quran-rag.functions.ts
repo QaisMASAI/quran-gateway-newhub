@@ -4,7 +4,6 @@
 // — no AI-generated text is ever read from or written to this table.
 
 import { createServerFn } from "@tanstack/react-start";
-import { createClient } from "@supabase/supabase-js";
 import { z } from "zod";
 import type { Database } from "@/integrations/supabase/types";
 import { embedTexts } from "./embeddings.server";
@@ -22,6 +21,20 @@ export interface RetrievedVerse {
   arabic: string;
   hebrew: string;
   themes: string[];
+  similarity: number;
+}
+
+export interface RetrievedChunk {
+  id: string;
+  content_type: "quran_ayah" | "tafsir" | "asbab" | "lesson";
+  language: "he" | "ar" | "en";
+  source_name: string;
+  translator_name: string | null;
+  surah: number | null;
+  ayah_start: number | null;
+  ayah_end: number | null;
+  ayah_key: string | null;
+  chunk_text: string;
   similarity: number;
 }
 
@@ -94,3 +107,52 @@ export const embeddingsStatus = createServerFn({ method: "GET" }).handler(async 
     embedded: embedded.count ?? 0,
   };
 });
+
+const GroundedRetrieveSchema = z.object({
+  question: z.string().min(2).max(500),
+  language: z.enum(["he", "ar", "en"]).optional(),
+  surah: z.number().int().min(1).max(114).optional(),
+  k: z.number().int().min(1).max(40).optional().default(12),
+  minSimilarity: z.number().min(0).max(1).optional().default(0.12),
+});
+
+export const semanticRetrieveGroundedChunks = createServerFn({ method: "POST" })
+  .inputValidator((input: unknown) => GroundedRetrieveSchema.parse(input))
+  .handler(async ({ data }): Promise<{ chunks: RetrievedChunk[]; error?: string }> => {
+    const apiKey = process.env.LOVABLE_API_KEY;
+    if (!apiKey) {
+      return { chunks: [], error: "Server not configured for grounded retrieval." };
+    }
+
+    let queryEmbedding: number[];
+    try {
+      const [vec] = await embedTexts({ apiKey, input: data.question });
+      if (!vec) return { chunks: [], error: "Embedding failed." };
+      queryEmbedding = vec;
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      if (msg.includes("429")) return { chunks: [], error: "rate_limit" };
+      if (msg.includes("402")) return { chunks: [], error: "credits_exhausted" };
+      return { chunks: [], error: "embedding_failed" };
+    }
+
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: rows, error } = await supabaseAdmin.rpc("match_grounded_chunks", {
+      query_embedding: queryEmbedding as unknown as string,
+      match_count: data.k,
+      min_similarity: data.minSimilarity,
+      language_filter: data.language,
+      surah_filter: data.surah,
+    });
+
+    if (error) {
+      return { chunks: [], error: `retrieval_failed: ${error.message.slice(0, 120)}` };
+    }
+
+    const chunks: RetrievedChunk[] = ((rows ?? []) as RetrievedChunk[]).map((r) => ({
+      ...r,
+      chunk_text: (r.chunk_text ?? "").slice(0, 1600),
+    }));
+
+    return { chunks };
+  });

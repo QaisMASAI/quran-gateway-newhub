@@ -1,11 +1,11 @@
 /**
  * One-shot knowledge seeder HTTP endpoint.
- * Gated by ?token=qc-seed-2026-knowledge-v2. Safe to delete after use.
+ * Gated by ?token=<QURAN_ADMIN_TOKEN>.
  */
 import { createFileRoute } from "@tanstack/react-router";
 import seed from "@/lib/seeds/knowledge-seed.json";
 
-const SEED_TOKEN = "qc-seed-2026-knowledge-v2";
+const SEED_TOKEN = process.env.QURAN_ADMIN_TOKEN;
 
 type EntityKind = "concept" | "event" | "nation" | "place" | "prophet" | "story" | "theme" | "topic";
 type RelationKind = "child_of" | "happened_in" | "involves" | "mentions" | "part_of" | "related" | "teaches";
@@ -18,7 +18,7 @@ export const Route = createFileRoute("/api/public/seed-knowledge")({
     handlers: {
       POST: async ({ request }) => {
         const url = new URL(request.url);
-        if (url.searchParams.get("token") !== SEED_TOKEN) {
+        if (!SEED_TOKEN || url.searchParams.get("token") !== SEED_TOKEN) {
           return new Response("Unauthorized", { status: 401 });
         }
         const { supabaseAdmin } = await import("@/integrations/supabase/client.server");

@@ -37,6 +37,8 @@ import { Route as AuthenticatedCollectionsIndexRouteImport } from './routes/_aut
 import { Route as LearnJourneysSlugRouteImport } from './routes/learn.journeys.$slug'
 import { Route as LearnKindSlugRouteImport } from './routes/learn.$kind.$slug'
 import { Route as ApiPublicSeedKnowledgeRouteImport } from './routes/api/public/seed-knowledge'
+import { Route as ApiPublicAdminTranslateTafsirHebrewRouteImport } from './routes/api/public/admin/translate-tafsir-hebrew'
+import { Route as ApiPublicAdminRebuildGroundedIndexRouteImport } from './routes/api/public/admin/rebuild-grounded-index'
 
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   id: '/sitemap.xml',
@@ -178,6 +180,18 @@ const ApiPublicSeedKnowledgeRoute = ApiPublicSeedKnowledgeRouteImport.update({
   path: '/api/public/seed-knowledge',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicAdminTranslateTafsirHebrewRoute =
+  ApiPublicAdminTranslateTafsirHebrewRouteImport.update({
+    id: '/api/public/admin/translate-tafsir-hebrew',
+    path: '/api/public/admin/translate-tafsir-hebrew',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiPublicAdminRebuildGroundedIndexRoute =
+  ApiPublicAdminRebuildGroundedIndexRouteImport.update({
+    id: '/api/public/admin/rebuild-grounded-index',
+    path: '/api/public/admin/rebuild-grounded-index',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -207,6 +221,8 @@ export interface FileRoutesByFullPath {
   '/learn/journeys/$slug': typeof LearnJourneysSlugRoute
   '/collections/': typeof AuthenticatedCollectionsIndexRoute
   '/learn/journeys/': typeof LearnJourneysIndexRoute
+  '/api/public/admin/rebuild-grounded-index': typeof ApiPublicAdminRebuildGroundedIndexRoute
+  '/api/public/admin/translate-tafsir-hebrew': typeof ApiPublicAdminTranslateTafsirHebrewRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -236,6 +252,8 @@ export interface FileRoutesByTo {
   '/learn/journeys/$slug': typeof LearnJourneysSlugRoute
   '/collections': typeof AuthenticatedCollectionsIndexRoute
   '/learn/journeys': typeof LearnJourneysIndexRoute
+  '/api/public/admin/rebuild-grounded-index': typeof ApiPublicAdminRebuildGroundedIndexRoute
+  '/api/public/admin/translate-tafsir-hebrew': typeof ApiPublicAdminTranslateTafsirHebrewRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -267,6 +285,8 @@ export interface FileRoutesById {
   '/learn/journeys/$slug': typeof LearnJourneysSlugRoute
   '/_authenticated/collections/': typeof AuthenticatedCollectionsIndexRoute
   '/learn/journeys/': typeof LearnJourneysIndexRoute
+  '/api/public/admin/rebuild-grounded-index': typeof ApiPublicAdminRebuildGroundedIndexRoute
+  '/api/public/admin/translate-tafsir-hebrew': typeof ApiPublicAdminTranslateTafsirHebrewRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -298,6 +318,8 @@ export interface FileRouteTypes {
     | '/learn/journeys/$slug'
     | '/collections/'
     | '/learn/journeys/'
+    | '/api/public/admin/rebuild-grounded-index'
+    | '/api/public/admin/translate-tafsir-hebrew'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -327,6 +349,8 @@ export interface FileRouteTypes {
     | '/learn/journeys/$slug'
     | '/collections'
     | '/learn/journeys'
+    | '/api/public/admin/rebuild-grounded-index'
+    | '/api/public/admin/translate-tafsir-hebrew'
   id:
     | '__root__'
     | '/'
@@ -357,6 +381,8 @@ export interface FileRouteTypes {
     | '/learn/journeys/$slug'
     | '/_authenticated/collections/'
     | '/learn/journeys/'
+    | '/api/public/admin/rebuild-grounded-index'
+    | '/api/public/admin/translate-tafsir-hebrew'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -387,6 +413,8 @@ export interface RootRouteChildren {
   LearnKindSlugRoute: typeof LearnKindSlugRoute
   LearnJourneysSlugRoute: typeof LearnJourneysSlugRoute
   LearnJourneysIndexRoute: typeof LearnJourneysIndexRoute
+  ApiPublicAdminRebuildGroundedIndexRoute: typeof ApiPublicAdminRebuildGroundedIndexRoute
+  ApiPublicAdminTranslateTafsirHebrewRoute: typeof ApiPublicAdminTranslateTafsirHebrewRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -587,6 +615,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicSeedKnowledgeRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/admin/translate-tafsir-hebrew': {
+      id: '/api/public/admin/translate-tafsir-hebrew'
+      path: '/api/public/admin/translate-tafsir-hebrew'
+      fullPath: '/api/public/admin/translate-tafsir-hebrew'
+      preLoaderRoute: typeof ApiPublicAdminTranslateTafsirHebrewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/admin/rebuild-grounded-index': {
+      id: '/api/public/admin/rebuild-grounded-index'
+      path: '/api/public/admin/rebuild-grounded-index'
+      fullPath: '/api/public/admin/rebuild-grounded-index'
+      preLoaderRoute: typeof ApiPublicAdminRebuildGroundedIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -629,17 +671,11 @@ const rootRouteChildren: RootRouteChildren = {
   LearnKindSlugRoute: LearnKindSlugRoute,
   LearnJourneysSlugRoute: LearnJourneysSlugRoute,
   LearnJourneysIndexRoute: LearnJourneysIndexRoute,
+  ApiPublicAdminRebuildGroundedIndexRoute:
+    ApiPublicAdminRebuildGroundedIndexRoute,
+  ApiPublicAdminTranslateTafsirHebrewRoute:
+    ApiPublicAdminTranslateTafsirHebrewRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

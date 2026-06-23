@@ -314,6 +314,66 @@ export type Database = {
           },
         ]
       }
+      grounded_chunks: {
+        Row: {
+          ayah_end: number | null
+          ayah_key: string | null
+          ayah_start: number | null
+          chunk_text: string
+          content_type: string
+          created_at: string
+          embedding: string | null
+          embedding_model: string
+          fts: unknown
+          id: string
+          language: string
+          source_key: string
+          source_name: string
+          source_row_id: string | null
+          source_table: string
+          surah: number | null
+          translator_name: string | null
+        }
+        Insert: {
+          ayah_end?: number | null
+          ayah_key?: string | null
+          ayah_start?: number | null
+          chunk_text: string
+          content_type: string
+          created_at?: string
+          embedding?: string | null
+          embedding_model?: string
+          fts?: unknown
+          id?: string
+          language: string
+          source_key: string
+          source_name: string
+          source_row_id?: string | null
+          source_table: string
+          surah?: number | null
+          translator_name?: string | null
+        }
+        Update: {
+          ayah_end?: number | null
+          ayah_key?: string | null
+          ayah_start?: number | null
+          chunk_text?: string
+          content_type?: string
+          created_at?: string
+          embedding?: string | null
+          embedding_model?: string
+          fts?: unknown
+          id?: string
+          language?: string
+          source_key?: string
+          source_name?: string
+          source_row_id?: string | null
+          source_table?: string
+          surah?: number | null
+          translator_name?: string | null
+        }
+        Relationships: []
+      }
       knowledge_entities: {
         Row: {
           alt_names_i18n: Json
@@ -726,6 +786,56 @@ export type Database = {
         }
         Relationships: []
       }
+      tafsir_hebrew: {
+        Row: {
+          ayah_key: string | null
+          ayah_number: number
+          created_at: string
+          hebrew_translation: string
+          id: string
+          original_arabic_text: string
+          original_tafsir_id: string
+          quality_score: number | null
+          source_tafsir_name: string
+          surah_id: number
+          translation_model: string
+        }
+        Insert: {
+          ayah_key?: string | null
+          ayah_number: number
+          created_at?: string
+          hebrew_translation: string
+          id?: string
+          original_arabic_text: string
+          original_tafsir_id: string
+          quality_score?: number | null
+          source_tafsir_name: string
+          surah_id: number
+          translation_model: string
+        }
+        Update: {
+          ayah_key?: string | null
+          ayah_number?: number
+          created_at?: string
+          hebrew_translation?: string
+          id?: string
+          original_arabic_text?: string
+          original_tafsir_id?: string
+          quality_score?: number | null
+          source_tafsir_name?: string
+          surah_id?: number
+          translation_model?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tafsir_hebrew_original_tafsir_id_fkey"
+            columns: ["original_tafsir_id"]
+            isOneToOne: false
+            referencedRelation: "tafsir_passages"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       tafsir_passages: {
         Row: {
           ayah_end: number
@@ -961,6 +1071,28 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      match_grounded_chunks: {
+        Args: {
+          language_filter?: string
+          match_count?: number
+          min_similarity?: number
+          query_embedding: string
+          surah_filter?: number
+        }
+        Returns: {
+          ayah_end: number
+          ayah_key: string
+          ayah_start: number
+          chunk_text: string
+          content_type: string
+          id: string
+          language: string
+          similarity: number
+          source_name: string
+          surah: number
+          translator_name: string
+        }[]
+      }
       match_verses: {
         Args: {
           match_count?: number

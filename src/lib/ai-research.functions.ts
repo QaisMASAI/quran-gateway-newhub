@@ -18,11 +18,14 @@ export interface VerseCitation {
   ayah: number;
   arabic: string;
   hebrew: string;
+  translation_source?: string | null;
+  translator?: string | null;
   similarity: number;
 }
 
 export interface TafsirCitation {
   source: string;
+  translator?: string | null;
   surah: number;
   ayah: number;
   text: string;
@@ -79,46 +82,84 @@ export const askQuranResearch = createServerFn({ method: "POST" })
     }
     if (!embedding) return { ...base, error: "no_embedding" };
 
-    // 2) Semantic verse retrieval
-    const { data: verseRows } = await supabaseAdmin.rpc("match_verses", {
+    // 2) Strictly grounded retrieval from local database only.
+    const { data: chunkRows } = await supabaseAdmin.rpc("match_grounded_chunks", {
       query_embedding: embedding as unknown as string,
-      match_count: data.k,
-      min_similarity: 0.15,
+      match_count: Math.max(8, data.k * 2),
+      min_similarity: 0.12,
+      language_filter: data.language,
+      surah_filter: undefined,
     });
-    const verses: VerseCitation[] = (verseRows ?? []).map((r) => ({
-      surah: r.surah as number,
-      ayah: r.ayah as number,
-      arabic: r.arabic,
-      hebrew: r.hebrew,
-      similarity: r.similarity ?? 0,
-    }));
 
-    // 3) Pull any matching tafsir passages for those verses
+    const chunkVerses = (chunkRows ?? []).filter((r) => r.content_type === "quran_ayah");
+    const chunkTafsir = (chunkRows ?? []).filter((r) => r.content_type !== "quran_ayah");
+
+    const verses: VerseCitation[] = [];
+    if (chunkVerses.length > 0) {
+      for (const row of chunkVerses.slice(0, data.k)) {
+        verses.push({
+          surah: Number(row.surah ?? 0),
+          ayah: Number(row.ayah_start ?? 0),
+          arabic: "",
+          hebrew: (row.chunk_text ?? "").slice(0, 800),
+          translation_source: row.source_name ?? "Quran",
+          translator: row.translator_name,
+          similarity: row.similarity ?? 0,
+        });
+      }
+    } else {
+      const { data: verseRows } = await supabaseAdmin.rpc("match_verses", {
+        query_embedding: embedding as unknown as string,
+        match_count: data.k,
+        min_similarity: 0.15,
+      });
+      for (const r of verseRows ?? []) {
+        verses.push({
+          surah: r.surah as number,
+          ayah: r.ayah as number,
+          arabic: r.arabic,
+          hebrew: r.hebrew,
+          similarity: r.similarity ?? 0,
+        });
+      }
+    }
+
     const tafsir: TafsirCitation[] = [];
-    if (verses.length > 0) {
+    if (chunkTafsir.length > 0) {
+      for (const row of chunkTafsir.slice(0, 12)) {
+        tafsir.push({
+          source: row.source_name ?? "Tafsir",
+          translator: row.translator_name,
+          surah: Number(row.surah ?? 0),
+          ayah: Number(row.ayah_start ?? 0),
+          text: (row.chunk_text ?? "").slice(0, 600),
+        });
+      }
+    } else if (verses.length > 0) {
       const surahs = [...new Set(verses.map((v) => v.surah))];
       const { data: tafRows } = await supabaseAdmin
         .from("tafsir_passages")
-        .select("surah,ayah_start,ayah_end,lang,body,source_id,tafsir_sources(name_en)")
+        .select("surah,ayah_start,ayah_end,lang,body,source_id,tafsir_sources(name_en,author)")
         .in("surah", surahs)
         .eq("lang", data.language)
         .limit(10);
+
       for (const t of tafRows ?? []) {
         const matchVerse = verses.find(
           (v) =>
             v.surah === t.surah && v.ayah >= (t.ayah_start ?? 0) && v.ayah <= (t.ayah_end ?? 9999),
         );
-        if (matchVerse) {
-          tafsir.push({
-            source:
-              (t as { tafsir_sources?: { name_en?: string } }).tafsir_sources?.name_en ?? "Tafsir",
-            surah: t.surah as number,
-            ayah: matchVerse.ayah,
-            text: (t.body ?? "").slice(0, 600),
-          });
-        }
+        if (!matchVerse) continue;
+        tafsir.push({
+          source:
+            (t as { tafsir_sources?: { name_en?: string } }).tafsir_sources?.name_en ?? "Tafsir",
+          translator:
+            (t as { tafsir_sources?: { author?: string | null } }).tafsir_sources?.author ?? null,
+          surah: t.surah as number,
+          ayah: matchVerse.ayah,
+          text: (t.body ?? "").slice(0, 600),
+        });
       }
-
     }
 
     // 4) Build grounded prompt
@@ -132,7 +173,7 @@ export const askQuranResearch = createServerFn({ method: "POST" })
       .map((t) => `(${t.source} on ${t.surah}:${t.ayah}) ${sanitize(t.text, 400)}`)
       .join("\n\n");
 
-    const userMsg = `${SYSTEM_BY_LANG[data.language]}\n\n=== Question ===\n${sanitize(data.question)}\n\n=== Verses ===\n${versesBlock || "(none)"}\n\n=== Tafsir ===\n${tafsirBlock || "(none)"}\n\nProduce a concise, well-cited answer.`;
+    const userMsg = `${SYSTEM_BY_LANG[data.language]}\n\n=== Question ===\n${sanitize(data.question)}\n\n=== Retrieved Evidence (LOCAL DATABASE ONLY) ===\nVerses:\n${versesBlock || "(none)"}\n\nTafsir:\n${tafsirBlock || "(none)"}\n\nRules:\n- Use only the evidence above.\n- If evidence is insufficient, output exactly: No authenticated Islamic source was found in the database for this question.\n- Cite verses as [surah:ayah].\n\nProduce a concise, well-cited answer.`;
 
     const gateway = createLovableAiGatewayProvider(apiKey);
     let answer = "";
