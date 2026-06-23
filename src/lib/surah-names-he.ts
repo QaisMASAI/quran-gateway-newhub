@@ -116,10 +116,6 @@ export const SURAH_NAMES_HE: Record<number, string> = {
   114: "אן-נאס (בני האדם)",
 };
 
-export function surahNameHe(id: number): string {
-  return SURAH_NAMES_HE[id] ?? "";
-}
-
 export const SURAH_NAMES_EN: Record<number, string> = {
   1: "Al-Fatihah",
   2: "Al-Baqarah",
