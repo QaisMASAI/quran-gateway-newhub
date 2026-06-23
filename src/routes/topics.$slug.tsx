@@ -1,11 +1,14 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { Header } from "@/components/Header";
 import { getTopic, type AyahRef } from "@/lib/topics";
 import { useTopicT } from "@/lib/content-i18n";
 import { surahDisplayName } from "@/lib/surah-names-he";
-import { ArrowRight, ChevronLeft, BookOpen } from "lucide-react";
-import { normalizeLocale } from "@/lib/i18n";
+import { ArrowRight, ChevronLeft, BookOpen, Sparkles, Loader2 } from "lucide-react";
+import { normalizeLocale, type Locale } from "@/lib/i18n";
+import { getEntityBySlug, pickLocale } from "@/lib/knowledge";
+import { getLessonsForEntity, sourceName } from "@/lib/tafsir-content";
 
 export const Route = createFileRoute("/topics/$slug")({
   loader: ({ params }) => {
@@ -67,6 +70,19 @@ function TopicPage() {
   const tp = useTopicT(topic.slug);
   const locale = normalizeLocale(i18n.language) ?? "he";
 
+  const entityQ = useQuery({
+    queryKey: ["topic-entity", topic.slug],
+    queryFn: () => getEntityBySlug(topic.slug),
+    staleTime: 5 * 60_000,
+  });
+
+  const lessonsQ = useQuery({
+    queryKey: ["topic-lessons", entityQ.data?.id, locale],
+    queryFn: () => getLessonsForEntity(entityQ.data!.id, locale as Locale),
+    enabled: !!entityQ.data?.id,
+    staleTime: 5 * 60_000,
+  });
+
   return (
     <div className="min-h-screen bg-background">
       <Header />
@@ -111,6 +127,46 @@ function TopicPage() {
             })}
           </ul>
         </section>
+
+        {entityQ.isLoading && (
+          <div className="mt-8 flex items-center justify-center gap-2 text-sm text-muted-foreground">
+            <Loader2 className="h-4 w-4 animate-spin" />
+          </div>
+        )}
+
+        {entityQ.data && (
+          <section className="mt-10 space-y-4">
+            <h2 className="flex items-center gap-2 font-display text-xl font-bold text-primary">
+              <Sparkles className="h-5 w-5 text-gold" aria-hidden="true" />
+              {t("learn.overview")}
+            </h2>
+            <p className="rounded-xl border border-primary/10 bg-card p-4 text-sm leading-relaxed text-foreground/90">
+              {pickLocale(entityQ.data.description_i18n, locale as Locale) || pickLocale(entityQ.data.summary_i18n, locale as Locale)}
+            </p>
+
+            {lessonsQ.data && lessonsQ.data.length > 0 && (
+              <div className="space-y-3">
+                <h3 className="text-sm font-semibold text-primary">{t("learn.lessonsTitle")}</h3>
+                {lessonsQ.data.slice(0, 3).map((lesson) => (
+                  <article key={lesson.id} className="rounded-xl border border-border bg-card p-4">
+                    <p className="text-sm leading-relaxed text-foreground/90" dir={locale === "en" ? "ltr" : "rtl"}>
+                      {lesson.body}
+                    </p>
+                    <p className="mt-2 text-xs text-muted-foreground">{sourceName(lesson.source, locale as Locale)}</p>
+                  </article>
+                ))}
+              </div>
+            )}
+
+            <Link
+              to="/learn/$kind/$slug"
+              params={{ kind: "topic", slug: topic.slug }}
+              className="inline-flex items-center gap-1.5 text-sm font-semibold text-primary hover:underline"
+            >
+              {t("learn.continueExploring")}
+            </Link>
+          </section>
+        )}
 
         <p className="mt-10 rounded-xl border border-primary/10 bg-secondary/40 p-4 text-xs leading-relaxed text-muted-foreground">
           {t("detail.topicsNote")}
