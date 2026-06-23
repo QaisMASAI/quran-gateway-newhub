@@ -206,9 +206,20 @@ export async function fetchVerseBilingual(
   }
   const arRow = data.find((r) => r.source_id === arSid);
   const locRow = data.find((r) => r.source_id === locSid);
+  const localArabic = arRow?.text ?? "";
+  const localTranslation = locRow?.text ?? arRow?.text ?? "";
+
+  if (localArabic && localTranslation) {
+    return {
+      arabic: localArabic,
+      translation: localTranslation,
+    };
+  }
+
+  const remote = (await fetchQuranComVerse(surah, ayah, locale)) ?? (await fetchAltVerse(surah, ayah, locale));
   return {
-    arabic: arRow?.text ?? "",
-    translation: locRow?.text ?? arRow?.text ?? "",
+    arabic: localArabic || remote?.arabic || "",
+    translation: localTranslation || remote?.translation || localArabic || "",
   };
 }
 
