@@ -5,8 +5,6 @@ import { EMOTIONS } from "@/lib/emotions";
 import { PROPHETS } from "@/lib/prophets";
 import { READING_PLANS } from "@/lib/reading-plans";
 
-const BASE_URL = "";
-
 export const Route = createFileRoute("/sitemap.xml")({
   server: {
     handlers: {
