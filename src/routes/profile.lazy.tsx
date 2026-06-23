@@ -7,7 +7,7 @@ import { Header } from "@/components/Header";
 import { useAuth } from "@/lib/use-auth";
 import { supabase } from "@/integrations/supabase/client";
 import { pickLocale, type KnowledgeEntity } from "@/lib/knowledge";
-import type { Locale } from "@/lib/i18n";
+import { normalizeLocale, type Locale } from "@/lib/i18n";
 
 export const Route = createLazyFileRoute("/profile")({
   component: ProfilePage,
@@ -94,7 +94,7 @@ async function fetchProfileSummary(userId: string): Promise<ProfileSummary> {
 
 function ProfilePage() {
   const { t, i18n } = useTranslation("pages");
-  const locale = (i18n.language?.slice(0, 2) as Locale) || "he";
+  const locale = (normalizeLocale(i18n.language) ?? "he") as Locale;
   const { user, isAuthenticated, loading: authLoading } = useAuth();
 
   const { data, isLoading } = useQuery({
