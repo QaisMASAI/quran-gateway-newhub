@@ -37,8 +37,14 @@ export const Route = createFileRoute("/")({
         property: "og:description",
         content: "Explore, learn, and understand the Quran through an accessible multilingual learning experience.",
       },
+      { property: "og:url", content: "/" },
+      { name: "twitter:title", content: "Noor Al Quran | Discover the Quran" },
+      {
+        name: "twitter:description",
+        content: "Explore, learn, and understand the Quran through an accessible multilingual learning experience.",
+      },
     ],
-    links: [{ rel: "canonical", href: "https://noor-hebrew-guide.lovable.app/" }],
+    links: [{ rel: "canonical", href: "/" }],
   }),
   component: Home,
 });
