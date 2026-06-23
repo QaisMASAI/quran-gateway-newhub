@@ -4,6 +4,8 @@ import i18n, { normalizeLocale } from "@/lib/i18n";
 import { Header } from "@/components/Header";
 import { ALL_TOPICS } from "@/lib/topics";
 import { useTopicT } from "@/lib/content-i18n";
+import { useQuery } from "@tanstack/react-query";
+import { listAllEntities, pickLocale } from "@/lib/knowledge";
 import {
   Heart, Scale, BookOpen, Sun, Moon, Shield, Users, Sparkles,
   HandHelping, Star, ChevronLeft, Compass,
@@ -59,6 +61,14 @@ function TopicCard({ slug, icon, refsCount }: { slug: string; icon: keyof typeof
 
 function TopicsIndex() {
   const { t } = useTranslation("pages");
+  const locale = normalizeLocale(i18n.resolvedLanguage) ?? "he";
+  const entitiesQ = useQuery({
+    queryKey: ["topics-and-stories"],
+    queryFn: listAllEntities,
+    staleTime: 5 * 60_000,
+  });
+  const stories = (entitiesQ.data ?? []).filter((e) => e.kind === "story");
+
   return (
     <div className="min-h-screen bg-background">
       <Header />
@@ -75,6 +85,25 @@ function TopicsIndex() {
             <TopicCard key={tp.slug} slug={tp.slug} icon={tp.icon} refsCount={tp.refs.length} />
           ))}
         </div>
+
+        {stories.length > 0 && (
+          <section className="mt-12">
+            <h2 className="mb-4 text-xl font-bold text-primary">{t("search.kindStory")}</h2>
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {stories.map((s) => (
+                <Link
+                  key={s.id}
+                  to="/learn/$kind/$slug"
+                  params={{ kind: "story", slug: s.slug }}
+                  className="group rounded-2xl border border-primary/5 bg-card p-5 transition-all hover:-translate-y-0.5 hover:border-gold hover:shadow-xl"
+                >
+                  <div className="text-lg font-semibold text-primary">{pickLocale(s.title_i18n, locale)}</div>
+                  <p className="mt-2 line-clamp-3 text-sm text-muted-foreground">{pickLocale(s.summary_i18n, locale)}</p>
+                </Link>
+              ))}
+            </div>
+          </section>
+        )}
       </main>
     </div>
   );
