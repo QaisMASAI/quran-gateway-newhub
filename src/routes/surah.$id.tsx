@@ -35,22 +35,32 @@ export const Route = createFileRoute("/surah/$id")({
     };
   },
   component: SurahPage,
-  notFoundComponent: () => (
+  notFoundComponent: SurahNotFound,
+  errorComponent: SurahError,
+});
+
+function SurahNotFound() {
+  const { t } = useTranslation("common");
+  return (
     <div className="flex min-h-screen items-center justify-center">
       <div className="text-center">
-        <p className="text-muted-foreground">Surah not found</p>
+        <p className="text-muted-foreground">{t("errors.notFoundTitle")}</p>
         <Link to="/" className="mt-3 inline-block text-sm text-primary">
-          Back to list
+          {t("common.home")}
         </Link>
       </div>
     </div>
-  ),
-  errorComponent: () => (
+  );
+}
+
+function SurahError() {
+  const { t } = useTranslation("common");
+  return (
     <div className="flex min-h-screen items-center justify-center">
-      <p className="text-sm text-destructive">An error occurred loading this surah.</p>
+      <p className="text-sm text-destructive">{t("errors.genericBody")}</p>
     </div>
-  ),
-});
+  );
+}
 
 function SurahPage() {
   const { id } = Route.useParams();
