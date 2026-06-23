@@ -62,6 +62,29 @@ async function fetchQuranComVerse(
   }
 }
 
+async function fetchAltVerse(
+  surah: number,
+  ayah: number,
+  locale: LocaleCode,
+): Promise<{ arabic: string; translation: string } | null> {
+  try {
+    const translationEdition = locale === "en" ? "en.asad" : locale === "ar" ? "ar.uthmani" : "en.asad";
+    const [arRes, trRes] = await Promise.all([
+      fetch(`https://api.alquran.cloud/v1/ayah/${surah}:${ayah}/ar.uthmani`),
+      fetch(`https://api.alquran.cloud/v1/ayah/${surah}:${ayah}/${translationEdition}`),
+    ]);
+    if (!arRes.ok || !trRes.ok) return null;
+    const arJson = (await arRes.json()) as { data?: { text?: string } };
+    const trJson = (await trRes.json()) as { data?: { text?: string } };
+    const arabic = arJson.data?.text ?? "";
+    const translation = locale === "ar" ? arabic : cleanHtml(trJson.data?.text ?? "") || arabic;
+    if (!arabic && !translation) return null;
+    return { arabic, translation };
+  } catch {
+    return null;
+  }
+}
+
 async function fetchQuranComSurah(
   surah: number,
   locale: LocaleCode,
@@ -94,6 +117,34 @@ async function fetchQuranComSurah(
             : cleanHtml(v.translations?.[0]?.text ?? "") || v.text_uthmani || "",
       };
     });
+  } catch {
+    return [];
+  }
+}
+
+async function fetchAltSurah(surah: number, locale: LocaleCode): Promise<SurahBilingualVerse[]> {
+  try {
+    const translationEdition = locale === "en" ? "en.asad" : locale === "ar" ? "ar.uthmani" : "en.asad";
+    const [arRes, trRes] = await Promise.all([
+      fetch(`https://api.alquran.cloud/v1/surah/${surah}/ar.uthmani`),
+      fetch(`https://api.alquran.cloud/v1/surah/${surah}/${translationEdition}`),
+    ]);
+    if (!arRes.ok || !trRes.ok) return [];
+    const arJson = (await arRes.json()) as {
+      data?: { ayahs?: Array<{ numberInSurah: number; text: string }> };
+    };
+    const trJson = (await trRes.json()) as {
+      data?: { ayahs?: Array<{ numberInSurah: number; text: string }> };
+    };
+    const trByAyah = new Map(
+      (trJson.data?.ayahs ?? []).map((a) => [a.numberInSurah, cleanHtml(a.text ?? "")]),
+    );
+    return (arJson.data?.ayahs ?? []).map((a) => ({
+      surah,
+      ayah: a.numberInSurah,
+      arabic: a.text ?? "",
+      translation: locale === "ar" ? a.text ?? "" : trByAyah.get(a.numberInSurah) ?? a.text ?? "",
+    }));
   } catch {
     return [];
   }
@@ -142,7 +193,7 @@ export async function fetchVerseBilingual(
     resolveSourceId(TRANSLATION_SOURCE_CODE[locale]),
   ]);
   if (!arSid || !locSid) {
-    return fetchQuranComVerse(surah, ayah, locale);
+    return (await fetchQuranComVerse(surah, ayah, locale)) ?? fetchAltVerse(surah, ayah, locale);
   }
   const { data, error } = await supabase
     .from("ayah_translations")
@@ -151,7 +202,7 @@ export async function fetchVerseBilingual(
     .eq("surah", surah)
     .eq("ayah", ayah);
   if (error || !data || data.length === 0) {
-    return fetchQuranComVerse(surah, ayah, locale);
+    return (await fetchQuranComVerse(surah, ayah, locale)) ?? fetchAltVerse(surah, ayah, locale);
   }
   const arRow = data.find((r) => r.source_id === arSid);
   const locRow = data.find((r) => r.source_id === locSid);
@@ -169,6 +220,10 @@ export async function fetchSurahTranslation(
   const sourceId = await resolveSourceId(TRANSLATION_SOURCE_CODE[locale]);
   if (!sourceId) {
     const remote = await fetchQuranComSurah(surah, locale);
+    if (remote.length === 0) {
+      const alt = await fetchAltSurah(surah, locale);
+      return alt.map((v) => ({ surah: v.surah, ayah: v.ayah, text: v.translation }));
+    }
     return remote.map((v) => ({ surah: v.surah, ayah: v.ayah, text: v.translation }));
   }
   const { data, error } = await supabase
@@ -179,6 +234,10 @@ export async function fetchSurahTranslation(
     .order("ayah", { ascending: true });
   if (error || !data || data.length === 0) {
     const remote = await fetchQuranComSurah(surah, locale);
+    if (remote.length === 0) {
+      const alt = await fetchAltSurah(surah, locale);
+      return alt.map((v) => ({ surah: v.surah, ayah: v.ayah, text: v.translation }));
+    }
     return remote.map((v) => ({ surah: v.surah, ayah: v.ayah, text: v.translation }));
   }
   return data;
@@ -194,7 +253,9 @@ export async function fetchSurahBilingual(
     resolveSourceId(TRANSLATION_SOURCE_CODE[locale]),
   ]);
   if (!arSid) {
-    return fetchQuranComSurah(surah, locale);
+    const remote = await fetchQuranComSurah(surah, locale);
+    if (remote.length > 0) return remote;
+    return fetchAltSurah(surah, locale);
   }
   const sourceIds = Array.from(new Set([arSid, locSid].filter(Boolean) as string[]));
   const { data, error } = await supabase
@@ -204,7 +265,9 @@ export async function fetchSurahBilingual(
     .in("source_id", sourceIds)
     .order("ayah", { ascending: true });
   if (error || !data || data.length === 0) {
-    return fetchQuranComSurah(surah, locale);
+    const remote = await fetchQuranComSurah(surah, locale);
+    if (remote.length > 0) return remote;
+    return fetchAltSurah(surah, locale);
   }
 
   const byAyah = new Map<number, SurahBilingualVerse>();
@@ -248,6 +311,10 @@ export async function fetchPassage(
   ]);
   if (!arSid) {
     const remote = await fetchQuranComSurah(surah, locale);
+    if (remote.length === 0) {
+      const alt = await fetchAltSurah(surah, locale);
+      return alt.filter((v) => v.ayah >= ayahStart && v.ayah <= ayahEnd);
+    }
     return remote.filter((v) => v.ayah >= ayahStart && v.ayah <= ayahEnd);
   }
   const ids = Array.from(new Set([arSid, locSid].filter(Boolean) as string[]));
@@ -261,6 +328,10 @@ export async function fetchPassage(
     .order("ayah", { ascending: true });
   if (error || !data || data.length === 0) {
     const remote = await fetchQuranComSurah(surah, locale);
+    if (remote.length === 0) {
+      const alt = await fetchAltSurah(surah, locale);
+      return alt.filter((v) => v.ayah >= ayahStart && v.ayah <= ayahEnd);
+    }
     return remote.filter((v) => v.ayah >= ayahStart && v.ayah <= ayahEnd);
   }
   const byAyah = new Map<number, PassageVerse>();
