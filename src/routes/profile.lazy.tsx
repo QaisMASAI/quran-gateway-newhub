@@ -277,7 +277,9 @@ function ProfilePage() {
                   params={{ kind: e.kind, slug: e.slug }}
                   className="rounded-xl border border-border bg-background p-4 transition-colors hover:border-primary/40"
                 >
-                  <div className="text-[10px] uppercase tracking-wide text-muted-foreground">{e.kind}</div>
+                  <div className="text-[10px] uppercase tracking-wide text-muted-foreground">
+                    {t(`search.kind${e.kind.charAt(0).toUpperCase()}${e.kind.slice(1)}` as const)}
+                  </div>
                   <div className="mt-1 font-semibold text-foreground">{pickLocale(e.title_i18n, locale)}</div>
                   <div className="mt-1 line-clamp-2 text-xs text-muted-foreground">{pickLocale(e.summary_i18n, locale)}</div>
                 </Link>
