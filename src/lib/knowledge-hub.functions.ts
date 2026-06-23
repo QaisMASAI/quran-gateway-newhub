@@ -162,6 +162,8 @@ export const getKnowledgeHub = createServerFn({ method: "POST" })
       return { entity: null, verses: [], chronology: [], lessons: [], related: [] };
     }
 
+    const entityResolved = entity as NonNullable<typeof entity>;
+
     const links =
       dbEntity
         ? (
@@ -328,11 +330,11 @@ export const getKnowledgeHub = createServerFn({ method: "POST" })
     if (selectedLessons.length === 0) {
       selectedLessons = [
         {
-          id: `fallback-lesson:${entity.id}`,
+          id: `fallback-lesson:${entityResolved.id}`,
           lang: data.language,
           body:
-            pickLocale(entity.description_i18n as I18nText, data.language) ||
-            pickLocale(entity.summary_i18n as I18nText, data.language),
+            pickLocale(entityResolved.description_i18n as I18nText, data.language) ||
+            pickLocale(entityResolved.summary_i18n as I18nText, data.language),
           source: {
             name_he: "מאגר ידע",
             name_ar: "قاعدة المعرفة",
@@ -443,14 +445,14 @@ export const getKnowledgeHub = createServerFn({ method: "POST" })
 
     return {
       entity: {
-        id: entity.id,
-        slug: entity.slug,
-        kind: entity.kind,
-        titleHe: pickLocale(entity.title_i18n as I18nText, "he") || entity.slug,
-        titleAr: pickLocale(entity.title_i18n as I18nText, "ar") || entity.slug,
-        titleEn: pickLocale(entity.title_i18n as I18nText, "en") || entity.slug,
-        summary: pickLocale(entity.summary_i18n as I18nText, data.language),
-        description: pickLocale(entity.description_i18n as I18nText, data.language),
+        id: entityResolved.id,
+        slug: entityResolved.slug,
+        kind: entityResolved.kind,
+        titleHe: pickLocale(entityResolved.title_i18n as I18nText, "he") || entityResolved.slug,
+        titleAr: pickLocale(entityResolved.title_i18n as I18nText, "ar") || entityResolved.slug,
+        titleEn: pickLocale(entityResolved.title_i18n as I18nText, "en") || entityResolved.slug,
+        summary: pickLocale(entityResolved.summary_i18n as I18nText, data.language),
+        description: pickLocale(entityResolved.description_i18n as I18nText, data.language),
       },
       verses,
       chronology,
