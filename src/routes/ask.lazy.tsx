@@ -208,6 +208,32 @@ function AskPage() {
             </div>
           </div>
         )}
+
+        {result && result.hadith && result.hadith.length > 0 && (
+          <div className="mt-6 rounded-xl border border-border bg-card p-4">
+            <h3 className="mb-2 text-sm font-semibold text-foreground">
+              {t("research.hadithCitations", "Hadith citations")}
+            </h3>
+            <div className="space-y-2">
+              {result.hadith.map((h, i) => (
+                <a
+                  key={`${h.collection}-${h.global_id}-${i}`}
+                  href={`/hadith/${h.collection}/${h.global_id}`}
+                  className="block rounded-lg border border-border bg-background px-3 py-2 hover:border-primary/40"
+                >
+                  <div className="text-xs text-primary">
+                    {h.collection_label} · #{h.id_in_book}
+                  </div>
+                  {h.narrator && <div className="text-[11px] italic text-muted-foreground">{h.narrator}</div>}
+                  {h.english && <p className="mt-1 text-xs text-muted-foreground">{h.english}</p>}
+                  <p className="font-arabic mt-1 text-right text-xs text-foreground" dir="rtl" lang="ar">
+                    {h.arabic}
+                  </p>
+                </a>
+              ))}
+            </div>
+          </div>
+        )}
       </main>
     </div>
   );

@@ -1,0 +1,1 @@
+ALTER TABLE public.hadith_entries ALTER COLUMN english_text DROP NOT NULL;

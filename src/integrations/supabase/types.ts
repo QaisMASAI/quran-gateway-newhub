@@ -374,6 +374,175 @@ export type Database = {
         }
         Relationships: []
       }
+      hadith_books: {
+        Row: {
+          book_id: number
+          collection_slug: string
+          hadith_count: number
+          id: number
+          name_ar: string
+          name_en: string
+          name_he: string | null
+        }
+        Insert: {
+          book_id: number
+          collection_slug: string
+          hadith_count?: number
+          id?: number
+          name_ar: string
+          name_en: string
+          name_he?: string | null
+        }
+        Update: {
+          book_id?: number
+          collection_slug?: string
+          hadith_count?: number
+          id?: number
+          name_ar?: string
+          name_en?: string
+          name_he?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "hadith_books_collection_slug_fkey"
+            columns: ["collection_slug"]
+            isOneToOne: false
+            referencedRelation: "hadith_collections"
+            referencedColumns: ["slug"]
+          },
+        ]
+      }
+      hadith_collections: {
+        Row: {
+          author_ar: string | null
+          author_en: string | null
+          created_at: string
+          slug: string
+          sort_order: number
+          title_ar: string
+          title_en: string
+          title_he: string | null
+          total_books: number
+          total_hadith: number
+        }
+        Insert: {
+          author_ar?: string | null
+          author_en?: string | null
+          created_at?: string
+          slug: string
+          sort_order?: number
+          title_ar: string
+          title_en: string
+          title_he?: string | null
+          total_books?: number
+          total_hadith?: number
+        }
+        Update: {
+          author_ar?: string | null
+          author_en?: string | null
+          created_at?: string
+          slug?: string
+          sort_order?: number
+          title_ar?: string
+          title_en?: string
+          title_he?: string | null
+          total_books?: number
+          total_hadith?: number
+        }
+        Relationships: []
+      }
+      hadith_entity_links: {
+        Row: {
+          ayah: number | null
+          entity_id: string | null
+          hadith_id: number
+          id: number
+          surah: number | null
+          weight: number
+        }
+        Insert: {
+          ayah?: number | null
+          entity_id?: string | null
+          hadith_id: number
+          id?: number
+          surah?: number | null
+          weight?: number
+        }
+        Update: {
+          ayah?: number | null
+          entity_id?: string | null
+          hadith_id?: number
+          id?: number
+          surah?: number | null
+          weight?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "hadith_entity_links_entity_id_fkey"
+            columns: ["entity_id"]
+            isOneToOne: false
+            referencedRelation: "knowledge_entities"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "hadith_entity_links_hadith_id_fkey"
+            columns: ["hadith_id"]
+            isOneToOne: false
+            referencedRelation: "hadith_entries"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      hadith_entries: {
+        Row: {
+          arabic_text: string
+          book_id: number
+          collection_slug: string
+          created_at: string
+          english_text: string | null
+          fts: unknown
+          global_id: number
+          hebrew_text: string | null
+          id: number
+          id_in_book: number
+          narrator: string | null
+        }
+        Insert: {
+          arabic_text: string
+          book_id: number
+          collection_slug: string
+          created_at?: string
+          english_text?: string | null
+          fts?: unknown
+          global_id: number
+          hebrew_text?: string | null
+          id?: number
+          id_in_book: number
+          narrator?: string | null
+        }
+        Update: {
+          arabic_text?: string
+          book_id?: number
+          collection_slug?: string
+          created_at?: string
+          english_text?: string | null
+          fts?: unknown
+          global_id?: number
+          hebrew_text?: string | null
+          id?: number
+          id_in_book?: number
+          narrator?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "hadith_entries_collection_slug_fkey"
+            columns: ["collection_slug"]
+            isOneToOne: false
+            referencedRelation: "hadith_collections"
+            referencedColumns: ["slug"]
+          },
+        ]
+      }
       knowledge_entities: {
         Row: {
           alt_names_i18n: Json
@@ -1068,7 +1237,14 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      hadith_narrators: {
+        Row: {
+          collections: string[] | null
+          hadith_count: number | null
+          narrator: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       match_grounded_chunks: {
@@ -1125,6 +1301,20 @@ export type Database = {
           slug: string
           summary_i18n: Json
           title_i18n: Json
+        }[]
+      }
+      search_hadith_hybrid: {
+        Args: { collections?: string[]; match_count?: number; q: string }
+        Returns: {
+          arabic_text: string
+          book_id: number
+          collection_slug: string
+          english_text: string
+          global_id: number
+          id: number
+          id_in_book: number
+          narrator: string
+          score: number
         }[]
       }
       search_verses_hybrid: {
