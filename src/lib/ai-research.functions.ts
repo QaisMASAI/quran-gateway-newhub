@@ -41,10 +41,22 @@ export interface TafsirCitation {
   text: string;
 }
 
+export interface HadithCitation {
+  collection: string;
+  collection_label: string;
+  book_id: number;
+  id_in_book: number;
+  global_id: number;
+  narrator: string | null;
+  arabic: string;
+  english: string;
+}
+
 export interface ResearchResult {
   answer: string;
   verses: VerseCitation[];
   tafsir: TafsirCitation[];
+  hadith: HadithCitation[];
   confidence: number; // 0..1
   language: string;
   error?: string;
@@ -161,6 +173,7 @@ export const askQuranResearch = createServerFn({ method: "POST" })
       answer: "",
       verses: [],
       tafsir: [],
+      hadith: [],
       confidence: 0,
       language: data.language,
     };
@@ -340,8 +353,48 @@ export const askQuranResearch = createServerFn({ method: "POST" })
         }
         verses.push(...fallbackVerses);
       } else {
-        return { ...base, answer: NO_SOURCE_MESSAGE };
+        // continue; hadith may still provide grounding
       }
+    }
+
+    // 3b) Hadith retrieval (FTS, language-agnostic — Arabic + English indexed)
+    const hadithList: HadithCitation[] = [];
+    try {
+      const { data: hRows } = await supabaseAdmin.rpc("search_hadith_hybrid" as never, {
+        q: data.question,
+        collections: null,
+        match_count: 6,
+      } as never);
+      const labelMap: Record<string, string> = {
+        bukhari: "Sahih al-Bukhari",
+        muslim: "Sahih Muslim",
+      };
+      for (const r of (hRows ?? []) as Array<{
+        collection_slug: string;
+        book_id: number;
+        id_in_book: number;
+        global_id: number;
+        narrator: string | null;
+        arabic_text: string;
+        english_text: string | null;
+      }>) {
+        hadithList.push({
+          collection: r.collection_slug,
+          collection_label: labelMap[r.collection_slug] ?? r.collection_slug,
+          book_id: r.book_id,
+          id_in_book: r.id_in_book,
+          global_id: r.global_id,
+          narrator: r.narrator,
+          arabic: (r.arabic_text ?? "").slice(0, 600),
+          english: (r.english_text ?? "").slice(0, 600),
+        });
+      }
+    } catch {
+      // non-fatal
+    }
+
+    if (verses.length === 0 && tafsir.length === 0 && hadithList.length === 0) {
+      return { ...base, answer: NO_SOURCE_MESSAGE };
     }
 
     // 4) Build grounded prompt
@@ -359,8 +412,14 @@ export const askQuranResearch = createServerFn({ method: "POST" })
     const tafsirBlock = tafsir
       .map((t) => `(${t.source} on ${t.surah}:${t.ayah}) ${sanitize(t.text, 400)}`)
       .join("\n\n");
+    const hadithBlock = hadithList
+      .map(
+        (h, i) =>
+          `[H${i + 1}] (${h.collection_label} #${h.id_in_book}) ${h.narrator ? `Narrator: ${sanitize(h.narrator, 120)} — ` : ""}EN: ${sanitize(h.english, 360)}\nAR: ${sanitize(h.arabic, 360)}`,
+      )
+      .join("\n\n");
 
-    const userMsg = `${SYSTEM_BY_LANG[data.language]}\n\n=== Conversation Memory ===\n${historyBlock || "(none)"}\n\n=== Current Question ===\n${sanitize(data.question)}\n\n=== Retrieved Evidence (LOCAL DATABASE ONLY) ===\nVerses:\n${versesBlock || "(none)"}\n\nTafsir:\n${tafsirBlock || "(none)"}\n\nRules:\n- Use only the evidence above.\n- If evidence is insufficient, output exactly: ${NO_SOURCE_MESSAGE}\n- Cite verses as [surah:ayah].\n- Keep answer concise, structured, and faithful to sources.\n\nProduce a concise, well-cited answer.`;
+    const userMsg = `${SYSTEM_BY_LANG[data.language]}\n\n=== Conversation Memory ===\n${historyBlock || "(none)"}\n\n=== Current Question ===\n${sanitize(data.question)}\n\n=== Retrieved Evidence (LOCAL DATABASE ONLY) ===\nVerses:\n${versesBlock || "(none)"}\n\nTafsir:\n${tafsirBlock || "(none)"}\n\nHadith:\n${hadithBlock || "(none)"}\n\nRules:\n- Use only the evidence above (verses, tafsir, and hadith).\n- If evidence is insufficient, output exactly: ${NO_SOURCE_MESSAGE}\n- Cite verses as [surah:ayah]. Cite hadith as [Bukhari #N] or [Muslim #N].\n- Keep answer concise, structured, and faithful to sources.\n\nProduce a concise, well-cited answer.`;
 
     const gateway = createLovableAiGatewayProvider(apiKey);
     let answer = "";
@@ -385,9 +444,9 @@ export const askQuranResearch = createServerFn({ method: "POST" })
       answer = text;
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err);
-      if (msg.includes("429")) return { ...base, verses, tafsir, error: "rate_limit" };
-      if (msg.includes("402")) return { ...base, verses, tafsir, error: "credits_exhausted" };
-      return { ...base, verses, tafsir, error: "generation_failed" };
+      if (msg.includes("429")) return { ...base, verses, tafsir, hadith: hadithList, error: "rate_limit" };
+      if (msg.includes("402")) return { ...base, verses, tafsir, hadith: hadithList, error: "credits_exhausted" };
+      return { ...base, verses, tafsir, hadith: hadithList, error: "generation_failed" };
     }
 
     // 5) Confidence = avg of top-3 similarities clamped + tafsir boost
@@ -401,7 +460,7 @@ export const askQuranResearch = createServerFn({ method: "POST" })
       await supabaseAdmin.from("ai_research_queries").insert({
         question: data.question.slice(0, 500),
         answer: answer.slice(0, 4000),
-        citations: { verses, tafsir } as never,
+        citations: { verses, tafsir, hadith: hadithList } as never,
         confidence,
         language: data.language,
       });
@@ -413,6 +472,7 @@ export const askQuranResearch = createServerFn({ method: "POST" })
       answer: answer?.trim() || NO_SOURCE_MESSAGE,
       verses,
       tafsir,
+      hadith: hadithList,
       confidence,
       language: data.language,
     };
