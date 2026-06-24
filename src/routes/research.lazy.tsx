@@ -218,6 +218,34 @@ function ResearchPage() {
                 </div>
               </div>
             )}
+
+            {result.hadith && result.hadith.length > 0 && (
+              <div>
+                <h3 className="mb-3 text-lg font-semibold">
+                  {t("research.hadithCitations", "Hadith Citations")} ({result.hadith.length})
+                </h3>
+                <div className="space-y-3">
+                  {result.hadith.map((h, i) => (
+                    <a
+                      key={`${h.collection}-${h.global_id}-${i}`}
+                      href={`/hadith/${h.collection}/${h.global_id}`}
+                      className="block rounded-xl border border-border bg-card p-4 hover:border-primary/40"
+                    >
+                      <div className="mb-1 text-xs font-medium text-primary">
+                        {h.collection_label} · #{h.id_in_book}
+                      </div>
+                      {h.narrator && (
+                        <div className="text-[11px] italic text-muted-foreground">{h.narrator}</div>
+                      )}
+                      {h.english && <p className="mt-1 text-sm text-foreground/90">{h.english}</p>}
+                      <p className="font-arabic mt-2 text-right text-sm text-foreground" dir="rtl" lang="ar">
+                        {h.arabic}
+                      </p>
+                    </a>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         )}
       </div>
