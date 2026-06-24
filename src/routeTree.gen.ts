@@ -14,6 +14,7 @@ import { Route as SearchRouteImport } from './routes/search'
 import { Route as ResearchRouteImport } from './routes/research'
 import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as OnboardingRouteImport } from './routes/onboarding'
+import { Route as HadithRouteImport } from './routes/hadith'
 import { Route as FavoritesRouteImport } from './routes/favorites'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AskRouteImport } from './routes/ask'
@@ -23,12 +24,19 @@ import { Route as TopicsIndexRouteImport } from './routes/topics.index'
 import { Route as ProphetsIndexRouteImport } from './routes/prophets.index'
 import { Route as PlansIndexRouteImport } from './routes/plans.index'
 import { Route as LearnIndexRouteImport } from './routes/learn.index'
+import { Route as HadithIndexRouteImport } from './routes/hadith.index'
 import { Route as EmotionsIndexRouteImport } from './routes/emotions.index'
 import { Route as TopicsSlugRouteImport } from './routes/topics.$slug'
 import { Route as SurahIdRouteImport } from './routes/surah.$id'
 import { Route as ProphetsSlugRouteImport } from './routes/prophets.$slug'
 import { Route as PlansSlugRouteImport } from './routes/plans.$slug'
 import { Route as LearnGraphRouteImport } from './routes/learn.graph'
+import { Route as KnowledgeHadithRouteImport } from './routes/knowledge.hadith'
+import { Route as HadithTopicsRouteImport } from './routes/hadith.topics'
+import { Route as HadithNarratorsRouteImport } from './routes/hadith.narrators'
+import { Route as HadithMuslimRouteImport } from './routes/hadith.muslim'
+import { Route as HadithBukhariRouteImport } from './routes/hadith.bukhari'
+import { Route as HadithCollectionRouteImport } from './routes/hadith.$collection'
 import { Route as ExploreTimelineRouteImport } from './routes/explore.timeline'
 import { Route as ExploreMapRouteImport } from './routes/explore.map'
 import { Route as EmotionsSlugRouteImport } from './routes/emotions.$slug'
@@ -36,6 +44,8 @@ import { Route as LearnJourneysIndexRouteImport } from './routes/learn.journeys.
 import { Route as AuthenticatedCollectionsIndexRouteImport } from './routes/_authenticated/collections.index'
 import { Route as LearnJourneysSlugRouteImport } from './routes/learn.journeys.$slug'
 import { Route as LearnKindSlugRouteImport } from './routes/learn.$kind.$slug'
+import { Route as HadithCollectionNumRouteImport } from './routes/hadith.$collection.$num'
+import { Route as HadithCollectionBookRouteImport } from './routes/hadith.$collection.$book'
 import { Route as ApiPublicSeedKnowledgeRouteImport } from './routes/api/public/seed-knowledge'
 import { Route as ApiPublicAdminTranslateTafsirHebrewRouteImport } from './routes/api/public/admin/translate-tafsir-hebrew'
 import { Route as ApiPublicAdminRebuildGroundedIndexRouteImport } from './routes/api/public/admin/rebuild-grounded-index'
@@ -63,6 +73,11 @@ const ProfileRoute = ProfileRouteImport.update({
 const OnboardingRoute = OnboardingRouteImport.update({
   id: '/onboarding',
   path: '/onboarding',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const HadithRoute = HadithRouteImport.update({
+  id: '/hadith',
+  path: '/hadith',
   getParentRoute: () => rootRouteImport,
 } as any)
 const FavoritesRoute = FavoritesRouteImport.update({
@@ -109,6 +124,11 @@ const LearnIndexRoute = LearnIndexRouteImport.update({
   path: '/learn/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const HadithIndexRoute = HadithIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => HadithRoute,
+} as any)
 const EmotionsIndexRoute = EmotionsIndexRouteImport.update({
   id: '/emotions/',
   path: '/emotions/',
@@ -139,6 +159,36 @@ const LearnGraphRoute = LearnGraphRouteImport.update({
   path: '/learn/graph',
   getParentRoute: () => rootRouteImport,
 } as any).lazy(() => import('./routes/learn.graph.lazy').then((d) => d.Route))
+const KnowledgeHadithRoute = KnowledgeHadithRouteImport.update({
+  id: '/knowledge/hadith',
+  path: '/knowledge/hadith',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const HadithTopicsRoute = HadithTopicsRouteImport.update({
+  id: '/topics',
+  path: '/topics',
+  getParentRoute: () => HadithRoute,
+} as any)
+const HadithNarratorsRoute = HadithNarratorsRouteImport.update({
+  id: '/narrators',
+  path: '/narrators',
+  getParentRoute: () => HadithRoute,
+} as any)
+const HadithMuslimRoute = HadithMuslimRouteImport.update({
+  id: '/muslim',
+  path: '/muslim',
+  getParentRoute: () => HadithRoute,
+} as any)
+const HadithBukhariRoute = HadithBukhariRouteImport.update({
+  id: '/bukhari',
+  path: '/bukhari',
+  getParentRoute: () => HadithRoute,
+} as any)
+const HadithCollectionRoute = HadithCollectionRouteImport.update({
+  id: '/$collection',
+  path: '/$collection',
+  getParentRoute: () => HadithRoute,
+} as any)
 const ExploreTimelineRoute = ExploreTimelineRouteImport.update({
   id: '/explore/timeline',
   path: '/explore/timeline',
@@ -175,6 +225,16 @@ const LearnKindSlugRoute = LearnKindSlugRouteImport.update({
   path: '/learn/$kind/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const HadithCollectionNumRoute = HadithCollectionNumRouteImport.update({
+  id: '/$num',
+  path: '/$num',
+  getParentRoute: () => HadithCollectionRoute,
+} as any)
+const HadithCollectionBookRoute = HadithCollectionBookRouteImport.update({
+  id: '/$book',
+  path: '/$book',
+  getParentRoute: () => HadithCollectionRoute,
+} as any)
 const ApiPublicSeedKnowledgeRoute = ApiPublicSeedKnowledgeRouteImport.update({
   id: '/api/public/seed-knowledge',
   path: '/api/public/seed-knowledge',
@@ -198,6 +258,7 @@ export interface FileRoutesByFullPath {
   '/ask': typeof AskRoute
   '/auth': typeof AuthRoute
   '/favorites': typeof FavoritesRoute
+  '/hadith': typeof HadithRouteWithChildren
   '/onboarding': typeof OnboardingRoute
   '/profile': typeof ProfileRoute
   '/research': typeof ResearchRoute
@@ -206,17 +267,26 @@ export interface FileRoutesByFullPath {
   '/emotions/$slug': typeof EmotionsSlugRoute
   '/explore/map': typeof ExploreMapRoute
   '/explore/timeline': typeof ExploreTimelineRoute
+  '/hadith/$collection': typeof HadithCollectionRouteWithChildren
+  '/hadith/bukhari': typeof HadithBukhariRoute
+  '/hadith/muslim': typeof HadithMuslimRoute
+  '/hadith/narrators': typeof HadithNarratorsRoute
+  '/hadith/topics': typeof HadithTopicsRoute
+  '/knowledge/hadith': typeof KnowledgeHadithRoute
   '/learn/graph': typeof LearnGraphRoute
   '/plans/$slug': typeof PlansSlugRoute
   '/prophets/$slug': typeof ProphetsSlugRoute
   '/surah/$id': typeof SurahIdRoute
   '/topics/$slug': typeof TopicsSlugRoute
   '/emotions/': typeof EmotionsIndexRoute
+  '/hadith/': typeof HadithIndexRoute
   '/learn/': typeof LearnIndexRoute
   '/plans/': typeof PlansIndexRoute
   '/prophets/': typeof ProphetsIndexRoute
   '/topics/': typeof TopicsIndexRoute
   '/api/public/seed-knowledge': typeof ApiPublicSeedKnowledgeRoute
+  '/hadith/$collection/$book': typeof HadithCollectionBookRoute
+  '/hadith/$collection/$num': typeof HadithCollectionNumRoute
   '/learn/$kind/$slug': typeof LearnKindSlugRoute
   '/learn/journeys/$slug': typeof LearnJourneysSlugRoute
   '/collections/': typeof AuthenticatedCollectionsIndexRoute
@@ -237,17 +307,26 @@ export interface FileRoutesByTo {
   '/emotions/$slug': typeof EmotionsSlugRoute
   '/explore/map': typeof ExploreMapRoute
   '/explore/timeline': typeof ExploreTimelineRoute
+  '/hadith/$collection': typeof HadithCollectionRouteWithChildren
+  '/hadith/bukhari': typeof HadithBukhariRoute
+  '/hadith/muslim': typeof HadithMuslimRoute
+  '/hadith/narrators': typeof HadithNarratorsRoute
+  '/hadith/topics': typeof HadithTopicsRoute
+  '/knowledge/hadith': typeof KnowledgeHadithRoute
   '/learn/graph': typeof LearnGraphRoute
   '/plans/$slug': typeof PlansSlugRoute
   '/prophets/$slug': typeof ProphetsSlugRoute
   '/surah/$id': typeof SurahIdRoute
   '/topics/$slug': typeof TopicsSlugRoute
   '/emotions': typeof EmotionsIndexRoute
+  '/hadith': typeof HadithIndexRoute
   '/learn': typeof LearnIndexRoute
   '/plans': typeof PlansIndexRoute
   '/prophets': typeof ProphetsIndexRoute
   '/topics': typeof TopicsIndexRoute
   '/api/public/seed-knowledge': typeof ApiPublicSeedKnowledgeRoute
+  '/hadith/$collection/$book': typeof HadithCollectionBookRoute
+  '/hadith/$collection/$num': typeof HadithCollectionNumRoute
   '/learn/$kind/$slug': typeof LearnKindSlugRoute
   '/learn/journeys/$slug': typeof LearnJourneysSlugRoute
   '/collections': typeof AuthenticatedCollectionsIndexRoute
@@ -262,6 +341,7 @@ export interface FileRoutesById {
   '/ask': typeof AskRoute
   '/auth': typeof AuthRoute
   '/favorites': typeof FavoritesRoute
+  '/hadith': typeof HadithRouteWithChildren
   '/onboarding': typeof OnboardingRoute
   '/profile': typeof ProfileRoute
   '/research': typeof ResearchRoute
@@ -270,17 +350,26 @@ export interface FileRoutesById {
   '/emotions/$slug': typeof EmotionsSlugRoute
   '/explore/map': typeof ExploreMapRoute
   '/explore/timeline': typeof ExploreTimelineRoute
+  '/hadith/$collection': typeof HadithCollectionRouteWithChildren
+  '/hadith/bukhari': typeof HadithBukhariRoute
+  '/hadith/muslim': typeof HadithMuslimRoute
+  '/hadith/narrators': typeof HadithNarratorsRoute
+  '/hadith/topics': typeof HadithTopicsRoute
+  '/knowledge/hadith': typeof KnowledgeHadithRoute
   '/learn/graph': typeof LearnGraphRoute
   '/plans/$slug': typeof PlansSlugRoute
   '/prophets/$slug': typeof ProphetsSlugRoute
   '/surah/$id': typeof SurahIdRoute
   '/topics/$slug': typeof TopicsSlugRoute
   '/emotions/': typeof EmotionsIndexRoute
+  '/hadith/': typeof HadithIndexRoute
   '/learn/': typeof LearnIndexRoute
   '/plans/': typeof PlansIndexRoute
   '/prophets/': typeof ProphetsIndexRoute
   '/topics/': typeof TopicsIndexRoute
   '/api/public/seed-knowledge': typeof ApiPublicSeedKnowledgeRoute
+  '/hadith/$collection/$book': typeof HadithCollectionBookRoute
+  '/hadith/$collection/$num': typeof HadithCollectionNumRoute
   '/learn/$kind/$slug': typeof LearnKindSlugRoute
   '/learn/journeys/$slug': typeof LearnJourneysSlugRoute
   '/_authenticated/collections/': typeof AuthenticatedCollectionsIndexRoute
@@ -295,6 +384,7 @@ export interface FileRouteTypes {
     | '/ask'
     | '/auth'
     | '/favorites'
+    | '/hadith'
     | '/onboarding'
     | '/profile'
     | '/research'
@@ -303,17 +393,26 @@ export interface FileRouteTypes {
     | '/emotions/$slug'
     | '/explore/map'
     | '/explore/timeline'
+    | '/hadith/$collection'
+    | '/hadith/bukhari'
+    | '/hadith/muslim'
+    | '/hadith/narrators'
+    | '/hadith/topics'
+    | '/knowledge/hadith'
     | '/learn/graph'
     | '/plans/$slug'
     | '/prophets/$slug'
     | '/surah/$id'
     | '/topics/$slug'
     | '/emotions/'
+    | '/hadith/'
     | '/learn/'
     | '/plans/'
     | '/prophets/'
     | '/topics/'
     | '/api/public/seed-knowledge'
+    | '/hadith/$collection/$book'
+    | '/hadith/$collection/$num'
     | '/learn/$kind/$slug'
     | '/learn/journeys/$slug'
     | '/collections/'
@@ -334,17 +433,26 @@ export interface FileRouteTypes {
     | '/emotions/$slug'
     | '/explore/map'
     | '/explore/timeline'
+    | '/hadith/$collection'
+    | '/hadith/bukhari'
+    | '/hadith/muslim'
+    | '/hadith/narrators'
+    | '/hadith/topics'
+    | '/knowledge/hadith'
     | '/learn/graph'
     | '/plans/$slug'
     | '/prophets/$slug'
     | '/surah/$id'
     | '/topics/$slug'
     | '/emotions'
+    | '/hadith'
     | '/learn'
     | '/plans'
     | '/prophets'
     | '/topics'
     | '/api/public/seed-knowledge'
+    | '/hadith/$collection/$book'
+    | '/hadith/$collection/$num'
     | '/learn/$kind/$slug'
     | '/learn/journeys/$slug'
     | '/collections'
@@ -358,6 +466,7 @@ export interface FileRouteTypes {
     | '/ask'
     | '/auth'
     | '/favorites'
+    | '/hadith'
     | '/onboarding'
     | '/profile'
     | '/research'
@@ -366,17 +475,26 @@ export interface FileRouteTypes {
     | '/emotions/$slug'
     | '/explore/map'
     | '/explore/timeline'
+    | '/hadith/$collection'
+    | '/hadith/bukhari'
+    | '/hadith/muslim'
+    | '/hadith/narrators'
+    | '/hadith/topics'
+    | '/knowledge/hadith'
     | '/learn/graph'
     | '/plans/$slug'
     | '/prophets/$slug'
     | '/surah/$id'
     | '/topics/$slug'
     | '/emotions/'
+    | '/hadith/'
     | '/learn/'
     | '/plans/'
     | '/prophets/'
     | '/topics/'
     | '/api/public/seed-knowledge'
+    | '/hadith/$collection/$book'
+    | '/hadith/$collection/$num'
     | '/learn/$kind/$slug'
     | '/learn/journeys/$slug'
     | '/_authenticated/collections/'
@@ -391,6 +509,7 @@ export interface RootRouteChildren {
   AskRoute: typeof AskRoute
   AuthRoute: typeof AuthRoute
   FavoritesRoute: typeof FavoritesRoute
+  HadithRoute: typeof HadithRouteWithChildren
   OnboardingRoute: typeof OnboardingRoute
   ProfileRoute: typeof ProfileRoute
   ResearchRoute: typeof ResearchRoute
@@ -399,6 +518,7 @@ export interface RootRouteChildren {
   EmotionsSlugRoute: typeof EmotionsSlugRoute
   ExploreMapRoute: typeof ExploreMapRoute
   ExploreTimelineRoute: typeof ExploreTimelineRoute
+  KnowledgeHadithRoute: typeof KnowledgeHadithRoute
   LearnGraphRoute: typeof LearnGraphRoute
   PlansSlugRoute: typeof PlansSlugRoute
   ProphetsSlugRoute: typeof ProphetsSlugRoute
@@ -452,6 +572,13 @@ declare module '@tanstack/react-router' {
       path: '/onboarding'
       fullPath: '/onboarding'
       preLoaderRoute: typeof OnboardingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/hadith': {
+      id: '/hadith'
+      path: '/hadith'
+      fullPath: '/hadith'
+      preLoaderRoute: typeof HadithRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/favorites': {
@@ -517,6 +644,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LearnIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/hadith/': {
+      id: '/hadith/'
+      path: '/'
+      fullPath: '/hadith/'
+      preLoaderRoute: typeof HadithIndexRouteImport
+      parentRoute: typeof HadithRoute
+    }
     '/emotions/': {
       id: '/emotions/'
       path: '/emotions'
@@ -558,6 +692,48 @@ declare module '@tanstack/react-router' {
       fullPath: '/learn/graph'
       preLoaderRoute: typeof LearnGraphRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/knowledge/hadith': {
+      id: '/knowledge/hadith'
+      path: '/knowledge/hadith'
+      fullPath: '/knowledge/hadith'
+      preLoaderRoute: typeof KnowledgeHadithRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/hadith/topics': {
+      id: '/hadith/topics'
+      path: '/topics'
+      fullPath: '/hadith/topics'
+      preLoaderRoute: typeof HadithTopicsRouteImport
+      parentRoute: typeof HadithRoute
+    }
+    '/hadith/narrators': {
+      id: '/hadith/narrators'
+      path: '/narrators'
+      fullPath: '/hadith/narrators'
+      preLoaderRoute: typeof HadithNarratorsRouteImport
+      parentRoute: typeof HadithRoute
+    }
+    '/hadith/muslim': {
+      id: '/hadith/muslim'
+      path: '/muslim'
+      fullPath: '/hadith/muslim'
+      preLoaderRoute: typeof HadithMuslimRouteImport
+      parentRoute: typeof HadithRoute
+    }
+    '/hadith/bukhari': {
+      id: '/hadith/bukhari'
+      path: '/bukhari'
+      fullPath: '/hadith/bukhari'
+      preLoaderRoute: typeof HadithBukhariRouteImport
+      parentRoute: typeof HadithRoute
+    }
+    '/hadith/$collection': {
+      id: '/hadith/$collection'
+      path: '/$collection'
+      fullPath: '/hadith/$collection'
+      preLoaderRoute: typeof HadithCollectionRouteImport
+      parentRoute: typeof HadithRoute
     }
     '/explore/timeline': {
       id: '/explore/timeline'
@@ -608,6 +784,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LearnKindSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/hadith/$collection/$num': {
+      id: '/hadith/$collection/$num'
+      path: '/$num'
+      fullPath: '/hadith/$collection/$num'
+      preLoaderRoute: typeof HadithCollectionNumRouteImport
+      parentRoute: typeof HadithCollectionRoute
+    }
+    '/hadith/$collection/$book': {
+      id: '/hadith/$collection/$book'
+      path: '/$book'
+      fullPath: '/hadith/$collection/$book'
+      preLoaderRoute: typeof HadithCollectionBookRouteImport
+      parentRoute: typeof HadithCollectionRoute
+    }
     '/api/public/seed-knowledge': {
       id: '/api/public/seed-knowledge'
       path: '/api/public/seed-knowledge'
@@ -643,12 +833,47 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
 const AuthenticatedRouteRouteWithChildren =
   AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
 
+interface HadithCollectionRouteChildren {
+  HadithCollectionBookRoute: typeof HadithCollectionBookRoute
+  HadithCollectionNumRoute: typeof HadithCollectionNumRoute
+}
+
+const HadithCollectionRouteChildren: HadithCollectionRouteChildren = {
+  HadithCollectionBookRoute: HadithCollectionBookRoute,
+  HadithCollectionNumRoute: HadithCollectionNumRoute,
+}
+
+const HadithCollectionRouteWithChildren =
+  HadithCollectionRoute._addFileChildren(HadithCollectionRouteChildren)
+
+interface HadithRouteChildren {
+  HadithCollectionRoute: typeof HadithCollectionRouteWithChildren
+  HadithBukhariRoute: typeof HadithBukhariRoute
+  HadithMuslimRoute: typeof HadithMuslimRoute
+  HadithNarratorsRoute: typeof HadithNarratorsRoute
+  HadithTopicsRoute: typeof HadithTopicsRoute
+  HadithIndexRoute: typeof HadithIndexRoute
+}
+
+const HadithRouteChildren: HadithRouteChildren = {
+  HadithCollectionRoute: HadithCollectionRouteWithChildren,
+  HadithBukhariRoute: HadithBukhariRoute,
+  HadithMuslimRoute: HadithMuslimRoute,
+  HadithNarratorsRoute: HadithNarratorsRoute,
+  HadithTopicsRoute: HadithTopicsRoute,
+  HadithIndexRoute: HadithIndexRoute,
+}
+
+const HadithRouteWithChildren =
+  HadithRoute._addFileChildren(HadithRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AskRoute: AskRoute,
   AuthRoute: AuthRoute,
   FavoritesRoute: FavoritesRoute,
+  HadithRoute: HadithRouteWithChildren,
   OnboardingRoute: OnboardingRoute,
   ProfileRoute: ProfileRoute,
   ResearchRoute: ResearchRoute,
@@ -657,6 +882,7 @@ const rootRouteChildren: RootRouteChildren = {
   EmotionsSlugRoute: EmotionsSlugRoute,
   ExploreMapRoute: ExploreMapRoute,
   ExploreTimelineRoute: ExploreTimelineRoute,
+  KnowledgeHadithRoute: KnowledgeHadithRoute,
   LearnGraphRoute: LearnGraphRoute,
   PlansSlugRoute: PlansSlugRoute,
   ProphetsSlugRoute: ProphetsSlugRoute,
