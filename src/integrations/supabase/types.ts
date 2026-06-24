@@ -499,7 +499,7 @@ export type Database = {
           book_id: number
           collection_slug: string
           created_at: string
-          english_text: string
+          english_text: string | null
           fts: unknown
           global_id: number
           hebrew_text: string | null
@@ -512,7 +512,7 @@ export type Database = {
           book_id: number
           collection_slug: string
           created_at?: string
-          english_text: string
+          english_text?: string | null
           fts?: unknown
           global_id: number
           hebrew_text?: string | null
@@ -525,7 +525,7 @@ export type Database = {
           book_id?: number
           collection_slug?: string
           created_at?: string
-          english_text?: string
+          english_text?: string | null
           fts?: unknown
           global_id?: number
           hebrew_text?: string | null
