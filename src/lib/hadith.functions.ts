@@ -1,0 +1,146 @@
+// Hadith server functions — Bukhari, Muslim and unified retrieval.
+import { createServerFn } from "@tanstack/react-start";
+import { z } from "zod";
+
+export type HadithCollection = {
+  slug: string;
+  title_ar: string;
+  title_en: string;
+  title_he: string | null;
+  author_ar: string | null;
+  author_en: string | null;
+  total_hadith: number;
+  total_books: number;
+  sort_order: number;
+};
+
+export type HadithBook = {
+  collection_slug: string;
+  book_id: number;
+  name_ar: string;
+  name_en: string;
+  name_he: string | null;
+  hadith_count: number;
+};
+
+export type HadithEntry = {
+  id: number;
+  collection_slug: string;
+  book_id: number;
+  id_in_book: number;
+  global_id: number;
+  narrator: string | null;
+  arabic_text: string;
+  english_text: string | null;
+  hebrew_text: string | null;
+};
+
+export const listHadithCollections = createServerFn({ method: "GET" }).handler(
+  async (): Promise<HadithCollection[]> => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data } = await supabaseAdmin
+      .from("hadith_collections" as never)
+      .select("*")
+      .order("sort_order", { ascending: true });
+    return (data ?? []) as unknown as HadithCollection[];
+  },
+);
+
+export const listHadithBooks = createServerFn({ method: "GET" })
+  .inputValidator((input: unknown) => z.object({ collection: z.string().min(1).max(40) }).parse(input))
+  .handler(async ({ data }): Promise<HadithBook[]> => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: rows } = await supabaseAdmin
+      .from("hadith_books" as never)
+      .select("collection_slug,book_id,name_ar,name_en,name_he,hadith_count")
+      .eq("collection_slug", data.collection)
+      .order("book_id", { ascending: true });
+    return (rows ?? []) as unknown as HadithBook[];
+  });
+
+export const listHadithEntries = createServerFn({ method: "GET" })
+  .inputValidator((input: unknown) =>
+    z
+      .object({
+        collection: z.string().min(1).max(40),
+        book: z.number().int().min(1),
+        page: z.number().int().min(0).max(500).optional().default(0),
+        pageSize: z.number().int().min(1).max(100).optional().default(40),
+      })
+      .parse(input),
+  )
+  .handler(async ({ data }): Promise<{ items: HadithEntry[]; total: number }> => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const from = data.page * data.pageSize;
+    const to = from + data.pageSize - 1;
+    const { data: rows, count } = await supabaseAdmin
+      .from("hadith_entries" as never)
+      .select("id,collection_slug,book_id,id_in_book,global_id,narrator,arabic_text,english_text,hebrew_text", {
+        count: "exact",
+      })
+      .eq("collection_slug", data.collection)
+      .eq("book_id", data.book)
+      .order("id_in_book", { ascending: true })
+      .range(from, to);
+    return { items: (rows ?? []) as unknown as HadithEntry[], total: count ?? 0 };
+  });
+
+export const getHadithEntry = createServerFn({ method: "GET" })
+  .inputValidator((input: unknown) =>
+    z
+      .object({
+        collection: z.string().min(1).max(40),
+        num: z.number().int().min(1),
+      })
+      .parse(input),
+  )
+  .handler(async ({ data }): Promise<HadithEntry | null> => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: row } = await supabaseAdmin
+      .from("hadith_entries" as never)
+      .select("id,collection_slug,book_id,id_in_book,global_id,narrator,arabic_text,english_text,hebrew_text")
+      .eq("collection_slug", data.collection)
+      .eq("global_id", data.num)
+      .maybeSingle();
+    return (row ?? null) as unknown as HadithEntry | null;
+  });
+
+export const searchHadith = createServerFn({ method: "POST" })
+  .inputValidator((input: unknown) =>
+    z
+      .object({
+        q: z.string().min(1).max(300),
+        collections: z.array(z.string()).max(5).optional(),
+        limit: z.number().int().min(1).max(50).optional().default(20),
+      })
+      .parse(input),
+  )
+  .handler(async ({ data }): Promise<HadithEntry[]> => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: rows } = await supabaseAdmin.rpc("search_hadith_hybrid" as never, {
+      q: data.q,
+      collections: data.collections ?? null,
+      match_count: data.limit,
+    } as never);
+    return (rows ?? []) as unknown as HadithEntry[];
+  });
+
+export const listTopNarrators = createServerFn({ method: "GET" })
+  .inputValidator((input: unknown) =>
+    z.object({ limit: z.number().int().min(1).max(500).optional().default(100) }).parse(input ?? {}),
+  )
+  .handler(
+    async ({ data }): Promise<Array<{ narrator: string; hadith_count: number; collections: string[] }>> => {
+      const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+      const { data: rows } = await supabaseAdmin
+        .from("hadith_narrators" as never)
+        .select("narrator,hadith_count,collections")
+        .order("hadith_count", { ascending: false })
+        .limit(data.limit);
+      return (rows ?? []) as unknown as Array<{
+        narrator: string;
+        hadith_count: number;
+        collections: string[];
+      }>;
+    },
+  );
