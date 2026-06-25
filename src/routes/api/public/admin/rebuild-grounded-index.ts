@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { rebuildGroundedChunks } from "@/lib/grounded-chunks.functions";
+import { rebuildGroundedChunksJob } from "@/lib/grounded-chunks.functions";
 import { z } from "zod";
 
 const BodySchema = z.object({
@@ -23,7 +23,7 @@ export const Route = createFileRoute("/api/public/admin/rebuild-grounded-index")
           return new Response("Unauthorized", { status: 401 });
         }
 
-        const result = await rebuildGroundedChunks({ data: { limit: parsed.data.limit } });
+        const result = await rebuildGroundedChunksJob({ limit: parsed.data.limit });
         if (!result.ok) {
           return Response.json(result, { status: 500 });
         }
