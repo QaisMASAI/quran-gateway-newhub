@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { generateHebrewTafsirJob } from "@/lib/grounded-chunks.functions";
+import { generateHebrewTafsirJob } from "@/lib/grounded-chunks.server";
 import { z } from "zod";
 
 const BodySchema = z.object({
