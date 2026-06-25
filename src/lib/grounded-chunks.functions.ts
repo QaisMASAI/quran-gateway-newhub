@@ -42,12 +42,18 @@ function clip(input: string, max = 1800) {
 
 async function buildChunkEmbeddings(texts: string[], apiKey: string) {
   if (texts.length === 0) return [] as number[][];
-  const vectors = await embedTexts({
-    apiKey,
-    model: RETRIEVAL_MODEL,
-    input: texts,
-  });
-  return vectors;
+  const BATCH = 256;
+  const out: number[][] = [];
+  for (let i = 0; i < texts.length; i += BATCH) {
+    const slice = texts.slice(i, i + BATCH);
+    const vectors = await embedTexts({
+      apiKey,
+      model: RETRIEVAL_MODEL,
+      input: slice,
+    });
+    out.push(...vectors);
+  }
+  return out;
 }
 
 function toVectorLiteral(vec: number[]) {
@@ -232,10 +238,20 @@ export const rebuildGroundedChunks = createServerFn({ method: "POST" })
       chunks[i].embedding = vectors[i] ? toVectorLiteral(vectors[i]) : null;
     }
 
-    const { error: upsertError } = await supabaseAdmin
-      .from("grounded_chunks")
-      .upsert(chunks, { onConflict: "source_key" });
-    if (upsertError) return { ok: false, error: `upsert_failed:${upsertError.message}` as const };
+    const UPSERT_BATCH = 100;
+    for (let i = 0; i < chunks.length; i += UPSERT_BATCH) {
+      const slice = chunks.slice(i, i + UPSERT_BATCH);
+      const { error: upsertError } = await supabaseAdmin
+        .from("grounded_chunks")
+        .upsert(slice, { onConflict: "source_key" });
+      if (upsertError) {
+        return {
+          ok: false,
+          error: `upsert_failed:${upsertError.message}` as const,
+          upserted: i,
+        };
+      }
+    }
 
     return {
       ok: true,
