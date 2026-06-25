@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { z } from "zod";
-import { linkHadithToGraphJob } from "@/lib/hadith-graph.functions";
+import { linkHadithToGraphJob } from "@/lib/hadith-graph.server";
 
 const BodySchema = z.object({
   batch: z.number().int().min(1).max(500).optional(),
