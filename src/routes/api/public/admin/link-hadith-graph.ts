@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { z } from "zod";
-import { linkHadithToGraph } from "@/lib/hadith-graph.functions";
+import { linkHadithToGraphJob } from "@/lib/hadith-graph.functions";
 
 const BodySchema = z.object({
   batch: z.number().int().min(1).max(500).optional(),
@@ -25,7 +25,7 @@ export const Route = createFileRoute("/api/public/admin/link-hadith-graph")({
           return new Response("Unauthorized", { status: 401 });
         }
         const { token: _t, ...rest } = parsed.data;
-        const result = await linkHadithToGraph({ data: rest });
+        const result = await linkHadithToGraphJob(rest);
         return Response.json(result, { status: result.ok ? 200 : 500 });
       },
     },
