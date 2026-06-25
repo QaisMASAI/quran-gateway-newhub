@@ -42,12 +42,18 @@ function clip(input: string, max = 1800) {
 
 async function buildChunkEmbeddings(texts: string[], apiKey: string) {
   if (texts.length === 0) return [] as number[][];
-  const vectors = await embedTexts({
-    apiKey,
-    model: RETRIEVAL_MODEL,
-    input: texts,
-  });
-  return vectors;
+  const BATCH = 256;
+  const out: number[][] = [];
+  for (let i = 0; i < texts.length; i += BATCH) {
+    const slice = texts.slice(i, i + BATCH);
+    const vectors = await embedTexts({
+      apiKey,
+      model: RETRIEVAL_MODEL,
+      input: slice,
+    });
+    out.push(...vectors);
+  }
+  return out;
 }
 
 function toVectorLiteral(vec: number[]) {
