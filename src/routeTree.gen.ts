@@ -48,7 +48,10 @@ import { Route as HadithCollectionNumRouteImport } from './routes/hadith.$collec
 import { Route as HadithCollectionBookRouteImport } from './routes/hadith.$collection.$book'
 import { Route as ApiPublicSeedKnowledgeRouteImport } from './routes/api/public/seed-knowledge'
 import { Route as ApiPublicAdminTranslateTafsirHebrewRouteImport } from './routes/api/public/admin/translate-tafsir-hebrew'
+import { Route as ApiPublicAdminTranslateHadithHebrewRouteImport } from './routes/api/public/admin/translate-hadith-hebrew'
 import { Route as ApiPublicAdminRebuildGroundedIndexRouteImport } from './routes/api/public/admin/rebuild-grounded-index'
+import { Route as ApiPublicAdminLinkHadithGraphRouteImport } from './routes/api/public/admin/link-hadith-graph'
+import { Route as ApiPublicAdminEmbedHadithRouteImport } from './routes/api/public/admin/embed-hadith'
 
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   id: '/sitemap.xml',
@@ -246,10 +249,28 @@ const ApiPublicAdminTranslateTafsirHebrewRoute =
     path: '/api/public/admin/translate-tafsir-hebrew',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicAdminTranslateHadithHebrewRoute =
+  ApiPublicAdminTranslateHadithHebrewRouteImport.update({
+    id: '/api/public/admin/translate-hadith-hebrew',
+    path: '/api/public/admin/translate-hadith-hebrew',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPublicAdminRebuildGroundedIndexRoute =
   ApiPublicAdminRebuildGroundedIndexRouteImport.update({
     id: '/api/public/admin/rebuild-grounded-index',
     path: '/api/public/admin/rebuild-grounded-index',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiPublicAdminLinkHadithGraphRoute =
+  ApiPublicAdminLinkHadithGraphRouteImport.update({
+    id: '/api/public/admin/link-hadith-graph',
+    path: '/api/public/admin/link-hadith-graph',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiPublicAdminEmbedHadithRoute =
+  ApiPublicAdminEmbedHadithRouteImport.update({
+    id: '/api/public/admin/embed-hadith',
+    path: '/api/public/admin/embed-hadith',
     getParentRoute: () => rootRouteImport,
   } as any)
 
@@ -291,7 +312,10 @@ export interface FileRoutesByFullPath {
   '/learn/journeys/$slug': typeof LearnJourneysSlugRoute
   '/collections/': typeof AuthenticatedCollectionsIndexRoute
   '/learn/journeys/': typeof LearnJourneysIndexRoute
+  '/api/public/admin/embed-hadith': typeof ApiPublicAdminEmbedHadithRoute
+  '/api/public/admin/link-hadith-graph': typeof ApiPublicAdminLinkHadithGraphRoute
   '/api/public/admin/rebuild-grounded-index': typeof ApiPublicAdminRebuildGroundedIndexRoute
+  '/api/public/admin/translate-hadith-hebrew': typeof ApiPublicAdminTranslateHadithHebrewRoute
   '/api/public/admin/translate-tafsir-hebrew': typeof ApiPublicAdminTranslateTafsirHebrewRoute
 }
 export interface FileRoutesByTo {
@@ -331,7 +355,10 @@ export interface FileRoutesByTo {
   '/learn/journeys/$slug': typeof LearnJourneysSlugRoute
   '/collections': typeof AuthenticatedCollectionsIndexRoute
   '/learn/journeys': typeof LearnJourneysIndexRoute
+  '/api/public/admin/embed-hadith': typeof ApiPublicAdminEmbedHadithRoute
+  '/api/public/admin/link-hadith-graph': typeof ApiPublicAdminLinkHadithGraphRoute
   '/api/public/admin/rebuild-grounded-index': typeof ApiPublicAdminRebuildGroundedIndexRoute
+  '/api/public/admin/translate-hadith-hebrew': typeof ApiPublicAdminTranslateHadithHebrewRoute
   '/api/public/admin/translate-tafsir-hebrew': typeof ApiPublicAdminTranslateTafsirHebrewRoute
 }
 export interface FileRoutesById {
@@ -374,7 +401,10 @@ export interface FileRoutesById {
   '/learn/journeys/$slug': typeof LearnJourneysSlugRoute
   '/_authenticated/collections/': typeof AuthenticatedCollectionsIndexRoute
   '/learn/journeys/': typeof LearnJourneysIndexRoute
+  '/api/public/admin/embed-hadith': typeof ApiPublicAdminEmbedHadithRoute
+  '/api/public/admin/link-hadith-graph': typeof ApiPublicAdminLinkHadithGraphRoute
   '/api/public/admin/rebuild-grounded-index': typeof ApiPublicAdminRebuildGroundedIndexRoute
+  '/api/public/admin/translate-hadith-hebrew': typeof ApiPublicAdminTranslateHadithHebrewRoute
   '/api/public/admin/translate-tafsir-hebrew': typeof ApiPublicAdminTranslateTafsirHebrewRoute
 }
 export interface FileRouteTypes {
@@ -417,7 +447,10 @@ export interface FileRouteTypes {
     | '/learn/journeys/$slug'
     | '/collections/'
     | '/learn/journeys/'
+    | '/api/public/admin/embed-hadith'
+    | '/api/public/admin/link-hadith-graph'
     | '/api/public/admin/rebuild-grounded-index'
+    | '/api/public/admin/translate-hadith-hebrew'
     | '/api/public/admin/translate-tafsir-hebrew'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -457,7 +490,10 @@ export interface FileRouteTypes {
     | '/learn/journeys/$slug'
     | '/collections'
     | '/learn/journeys'
+    | '/api/public/admin/embed-hadith'
+    | '/api/public/admin/link-hadith-graph'
     | '/api/public/admin/rebuild-grounded-index'
+    | '/api/public/admin/translate-hadith-hebrew'
     | '/api/public/admin/translate-tafsir-hebrew'
   id:
     | '__root__'
@@ -499,7 +535,10 @@ export interface FileRouteTypes {
     | '/learn/journeys/$slug'
     | '/_authenticated/collections/'
     | '/learn/journeys/'
+    | '/api/public/admin/embed-hadith'
+    | '/api/public/admin/link-hadith-graph'
     | '/api/public/admin/rebuild-grounded-index'
+    | '/api/public/admin/translate-hadith-hebrew'
     | '/api/public/admin/translate-tafsir-hebrew'
   fileRoutesById: FileRoutesById
 }
@@ -533,7 +572,10 @@ export interface RootRouteChildren {
   LearnKindSlugRoute: typeof LearnKindSlugRoute
   LearnJourneysSlugRoute: typeof LearnJourneysSlugRoute
   LearnJourneysIndexRoute: typeof LearnJourneysIndexRoute
+  ApiPublicAdminEmbedHadithRoute: typeof ApiPublicAdminEmbedHadithRoute
+  ApiPublicAdminLinkHadithGraphRoute: typeof ApiPublicAdminLinkHadithGraphRoute
   ApiPublicAdminRebuildGroundedIndexRoute: typeof ApiPublicAdminRebuildGroundedIndexRoute
+  ApiPublicAdminTranslateHadithHebrewRoute: typeof ApiPublicAdminTranslateHadithHebrewRoute
   ApiPublicAdminTranslateTafsirHebrewRoute: typeof ApiPublicAdminTranslateTafsirHebrewRoute
 }
 
@@ -812,11 +854,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicAdminTranslateTafsirHebrewRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/admin/translate-hadith-hebrew': {
+      id: '/api/public/admin/translate-hadith-hebrew'
+      path: '/api/public/admin/translate-hadith-hebrew'
+      fullPath: '/api/public/admin/translate-hadith-hebrew'
+      preLoaderRoute: typeof ApiPublicAdminTranslateHadithHebrewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/admin/rebuild-grounded-index': {
       id: '/api/public/admin/rebuild-grounded-index'
       path: '/api/public/admin/rebuild-grounded-index'
       fullPath: '/api/public/admin/rebuild-grounded-index'
       preLoaderRoute: typeof ApiPublicAdminRebuildGroundedIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/admin/link-hadith-graph': {
+      id: '/api/public/admin/link-hadith-graph'
+      path: '/api/public/admin/link-hadith-graph'
+      fullPath: '/api/public/admin/link-hadith-graph'
+      preLoaderRoute: typeof ApiPublicAdminLinkHadithGraphRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/admin/embed-hadith': {
+      id: '/api/public/admin/embed-hadith'
+      path: '/api/public/admin/embed-hadith'
+      fullPath: '/api/public/admin/embed-hadith'
+      preLoaderRoute: typeof ApiPublicAdminEmbedHadithRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
@@ -897,21 +960,15 @@ const rootRouteChildren: RootRouteChildren = {
   LearnKindSlugRoute: LearnKindSlugRoute,
   LearnJourneysSlugRoute: LearnJourneysSlugRoute,
   LearnJourneysIndexRoute: LearnJourneysIndexRoute,
+  ApiPublicAdminEmbedHadithRoute: ApiPublicAdminEmbedHadithRoute,
+  ApiPublicAdminLinkHadithGraphRoute: ApiPublicAdminLinkHadithGraphRoute,
   ApiPublicAdminRebuildGroundedIndexRoute:
     ApiPublicAdminRebuildGroundedIndexRoute,
+  ApiPublicAdminTranslateHadithHebrewRoute:
+    ApiPublicAdminTranslateHadithHebrewRoute,
   ApiPublicAdminTranslateTafsirHebrewRoute:
     ApiPublicAdminTranslateTafsirHebrewRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
