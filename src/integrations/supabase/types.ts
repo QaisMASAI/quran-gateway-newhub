@@ -499,6 +499,9 @@ export type Database = {
           book_id: number
           collection_slug: string
           created_at: string
+          embedded_at: string | null
+          embedding: string | null
+          embedding_model: string | null
           english_text: string | null
           fts: unknown
           global_id: number
@@ -512,6 +515,9 @@ export type Database = {
           book_id: number
           collection_slug: string
           created_at?: string
+          embedded_at?: string | null
+          embedding?: string | null
+          embedding_model?: string | null
           english_text?: string | null
           fts?: unknown
           global_id: number
@@ -525,6 +531,9 @@ export type Database = {
           book_id?: number
           collection_slug?: string
           created_at?: string
+          embedded_at?: string | null
+          embedding?: string | null
+          embedding_model?: string | null
           english_text?: string | null
           fts?: unknown
           global_id?: number
@@ -1267,6 +1276,29 @@ export type Database = {
           source_name: string
           surah: number
           translator_name: string
+        }[]
+      }
+      match_hadith_to_entities: {
+        Args: {
+          match_count?: number
+          min_similarity?: number
+          query_embedding: string
+        }
+        Returns: {
+          entity_id: string
+          similarity: number
+        }[]
+      }
+      match_hadith_to_verses: {
+        Args: {
+          match_count?: number
+          min_similarity?: number
+          query_embedding: string
+        }
+        Returns: {
+          ayah: number
+          similarity: number
+          surah: number
         }[]
       }
       match_verses: {
