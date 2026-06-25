@@ -50,7 +50,7 @@ function NotFound() {
       <Header />
       <div className="mx-auto max-w-xl px-6 py-20 text-center">
         <h1 className="mb-2 font-display text-2xl font-bold text-primary">{t("detail.notFoundTopic")}</h1>
-        <Link to="/topics" className="text-sm text-gold underline">{t("detail.backToTopics")}</Link>
+        <Link to="/learn" hash="topics-library" className="text-sm text-gold underline">{t("detail.backToTopics")}</Link>
       </div>
     </div>
   );
@@ -93,7 +93,7 @@ function TopicPage() {
     <div className="min-h-screen bg-background">
       <Header />
       <main id="main" className="mx-auto max-w-5xl px-4 py-10 sm:px-6" dir={isRtl ? "rtl" : "ltr"}>
-        <Link to="/topics" className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-primary">
+        <Link to="/learn" hash="topics-library" className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-primary">
           <ArrowRight className="h-4 w-4 ltr:rotate-180" aria-hidden="true" />
           {t("detail.backToTopics")}
         </Link>
@@ -258,8 +258,8 @@ function TopicPage() {
               {related.map((r) => (
                 <Link
                   key={r.id}
-                  to={r.kind === "prophet" ? "/prophets/$slug" : "/topics/$slug"}
-                  params={{ slug: r.slug }}
+                  to="/learn/$kind/$slug"
+                  params={{ kind: r.kind, slug: r.slug }}
                   className="rounded-xl border border-border bg-card p-4 hover:border-primary/40"
                 >
                   <p className="font-semibold text-primary">{r.title}</p>
