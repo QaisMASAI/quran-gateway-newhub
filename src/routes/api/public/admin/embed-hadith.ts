@@ -20,8 +20,13 @@ export const Route = createFileRoute("/api/public/admin/embed-hadith")({
         if (!token || (bearer !== token && parsed.data.token !== token)) {
           return new Response("Unauthorized", { status: 401 });
         }
-        const result = await embedHadithBatchJob({ batch: parsed.data.batch });
-        return Response.json(result, { status: result.ok ? 200 : 500 });
+        try {
+          const result = await embedHadithBatchJob({ batch: parsed.data.batch });
+          return Response.json(result, { status: result.ok ? 200 : 500 });
+        } catch (error) {
+          const message = error instanceof Error ? error.message : "unknown_error";
+          return Response.json({ ok: false, error: message }, { status: 500 });
+        }
       },
     },
   },
