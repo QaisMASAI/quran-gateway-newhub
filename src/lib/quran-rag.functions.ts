@@ -120,10 +120,10 @@ export const semanticRetrieveVerses = createServerFn({ method: "POST" })
   });
 
 /**
- * Lightweight status check used by the admin/dev surface (and by the
- * backfill script) to verify embeddings exist.
+ * Lightweight status check used by admin scripts to verify embeddings exist.
+ * Kept as a plain server-side helper (not a public server function endpoint).
  */
-export const embeddingsStatus = createServerFn({ method: "GET" }).handler(async () => {
+export async function embeddingsStatusJob() {
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
   const [total, embedded] = await Promise.all([
     supabaseAdmin.from("verse_embeddings").select("*", { count: "exact", head: true }),
@@ -136,7 +136,7 @@ export const embeddingsStatus = createServerFn({ method: "GET" }).handler(async 
     total: total.count ?? 0,
     embedded: embedded.count ?? 0,
   };
-});
+}
 
 const GroundedRetrieveSchema = z.object({
   question: z.string().min(2).max(500),
