@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { BookOpen, Search, LogIn, LogOut, Users, Compass, BookMarked, Sparkles, Folder } from "lucide-react";
+import { BookOpen, Search, LogIn, LogOut, Compass, BookMarked, Sparkles, Folder } from "lucide-react";
 
 import { Logo } from "@/components/Logo";
 import { useAuth } from "@/lib/use-auth";
@@ -52,7 +52,7 @@ export function Header() {
           <NavLink to="/" label={t("nav.surahs")} icon={<BookOpen className="h-4 w-4" />} />
           <NavLink to="/research" label={t("nav.research")} icon={<Sparkles className="h-4 w-4" />} />
           <NavLink to="/learn" label={t("nav.learn")} icon={<BookMarked className="h-4 w-4" />} />
-          <NavLink to="/prophets" label={t("nav.prophets")} icon={<Users className="h-4 w-4" />} />
+          <NavLink to="/learn" hash="prophets-library" label={t("nav.prophets")} icon={<Compass className="h-4 w-4" />} />
           <NavLink to="/learn" hash="topics-library" label={t("nav.topics")} icon={<Compass className="h-4 w-4" />} />
           <NavLink to="/hadith" label="Hadith" icon={<BookMarked className="h-4 w-4" />} />
           <NavLink to="/search" label={t("nav.search")} icon={<Search className="h-4 w-4" />} />

@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { z } from "zod";
-import { translateHadithHebrewBatch } from "@/lib/hadith-graph.functions";
+import { translateHadithHebrewBatchJob } from "@/lib/hadith-graph.server";
 
 const BodySchema = z.object({
   batch: z.number().int().min(1).max(50).optional(),
@@ -21,8 +21,9 @@ export const Route = createFileRoute("/api/public/admin/translate-hadith-hebrew"
         if (!token || (bearer !== token && parsed.data.token !== token)) {
           return new Response("Unauthorized", { status: 401 });
         }
-        const result = await translateHadithHebrewBatch({
-          data: { batch: parsed.data.batch, model: parsed.data.model },
+        const result = await translateHadithHebrewBatchJob({
+          batch: parsed.data.batch,
+          model: parsed.data.model,
         });
         return Response.json(result, { status: result.ok ? 200 : 500 });
       },

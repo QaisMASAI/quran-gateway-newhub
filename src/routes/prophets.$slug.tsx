@@ -51,7 +51,7 @@ function NotFound() {
       <Header />
       <div className="mx-auto max-w-xl px-6 py-20 text-center">
         <h1 className="mb-2 font-display text-2xl font-bold text-primary">{t("detail.notFoundProphet")}</h1>
-        <Link to="/prophets" className="text-sm text-gold underline">{t("detail.backToProphets")}</Link>
+        <Link to="/learn" hash="prophets-library" className="text-sm text-gold underline">{t("detail.backToProphets")}</Link>
       </div>
     </div>
   );
@@ -94,7 +94,7 @@ function ProphetPage() {
     <div className="min-h-screen bg-background">
       <Header />
       <main id="main" className="mx-auto max-w-5xl px-4 py-10 sm:px-6" dir={isRtl ? "rtl" : "ltr"}>
-        <Link to="/prophets" className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-primary">
+        <Link to="/learn" hash="prophets-library" className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-primary">
           <ArrowRight className="h-4 w-4 ltr:rotate-180" aria-hidden="true" />
           {t("detail.backToProphets")}
         </Link>
@@ -267,7 +267,7 @@ function ProphetPage() {
           {related.length > 0 ? (
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
               {related.map((r) => (
-                <Link key={r.id} to="/prophets/$slug" params={{ slug: r.slug }} className="rounded-xl border border-border bg-card p-4 hover:border-primary/40">
+                <Link key={r.id} to="/learn/$kind/$slug" params={{ kind: "prophet", slug: r.slug }} className="rounded-xl border border-border bg-card p-4 hover:border-primary/40">
                   <p className="font-semibold text-primary">{r.title}</p>
                   <p className="mt-1 text-xs leading-relaxed text-muted-foreground">{r.summary}</p>
                 </Link>

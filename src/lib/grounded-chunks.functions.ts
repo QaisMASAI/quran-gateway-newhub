@@ -1,4 +1,3 @@
-import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { embedTexts } from "./embeddings.server";
 import { createLovableAiGatewayProvider } from "./ai-gateway.server";
@@ -60,9 +59,8 @@ function toVectorLiteral(vec: number[]) {
   return `[${vec.join(",")}]`;
 }
 
-export const rebuildGroundedChunks = createServerFn({ method: "POST" })
-  .inputValidator((input: unknown) => IngestSchema.parse(input))
-  .handler(async ({ data }) => {
+export async function rebuildGroundedChunksJob(input: unknown) {
+  const data = IngestSchema.parse(input);
     const apiKey = process.env.LOVABLE_API_KEY;
     if (!apiKey) return { ok: false, error: "ai_not_configured" as const };
 
@@ -259,16 +257,15 @@ export const rebuildGroundedChunks = createServerFn({ method: "POST" })
       vectors: vectors.length,
       model: RETRIEVAL_MODEL,
     };
-  });
+  }
 
 const TranslateSchema = z.object({
   batch: z.number().int().min(1).max(200).optional().default(60),
   model: z.string().min(3).optional().default("google/gemini-2.5-flash"),
 });
 
-export const generateHebrewTafsir = createServerFn({ method: "POST" })
-  .inputValidator((input: unknown) => TranslateSchema.parse(input))
-  .handler(async ({ data }) => {
+export async function generateHebrewTafsirJob(input: unknown) {
+  const data = TranslateSchema.parse(input);
     const apiKey = process.env.LOVABLE_API_KEY;
     if (!apiKey) return { ok: false, error: "ai_not_configured" as const };
     const gateway = createLovableAiGatewayProvider(apiKey);
@@ -358,4 +355,4 @@ ${r.body}`;
       translated_rows: out.length,
       model: data.model,
     };
-  });
+  }

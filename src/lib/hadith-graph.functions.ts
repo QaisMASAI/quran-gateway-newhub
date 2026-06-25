@@ -1,4 +1,3 @@
-import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { generateText } from "ai";
 import { embedTexts } from "./embeddings.server";
@@ -30,9 +29,8 @@ const EmbedSchema = z.object({
  * have no embedding yet. Reuses the same model as grounded_chunks so vectors
  * are comparable across the tables.
  */
-export const embedHadithBatch = createServerFn({ method: "POST" })
-  .inputValidator((input: unknown) => EmbedSchema.parse(input))
-  .handler(async ({ data }) => {
+export async function embedHadithBatchJob(input: unknown) {
+  const data = EmbedSchema.parse(input);
     const apiKey = process.env.LOVABLE_API_KEY;
     if (!apiKey) return { ok: false as const, error: "ai_not_configured" };
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
@@ -72,7 +70,7 @@ export const embedHadithBatch = createServerFn({ method: "POST" })
     }
 
     return { ok: true as const, embedded, model: EMBED_MODEL, done: false };
-  });
+  }
 
 const LinkSchema = z.object({
   batch: z.number().int().min(1).max(500).optional().default(150),
@@ -87,9 +85,8 @@ const LinkSchema = z.object({
  * Quran verses (from grounded_chunks) and knowledge entities, then insert
  * rows into hadith_entity_links. Idempotent via partial unique indexes.
  */
-export const linkHadithToGraph = createServerFn({ method: "POST" })
-  .inputValidator((input: unknown) => LinkSchema.parse(input))
-  .handler(async ({ data }) => {
+export async function linkHadithToGraphJob(input: unknown) {
+  const data = LinkSchema.parse(input);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
     const { data: rows, error } = await supabaseAdmin
@@ -182,7 +179,7 @@ export const linkHadithToGraph = createServerFn({ method: "POST" })
       linkedEntities,
       done: false,
     };
-  });
+  }
 
 const TranslateSchema = z.object({
   batch: z.number().int().min(1).max(50).optional().default(20),
@@ -193,9 +190,8 @@ const TranslateSchema = z.object({
  * Translate hadith english_text → hebrew_text using Lovable AI Gateway.
  * Conservative batch size because each call is sequential to respect rate limits.
  */
-export const translateHadithHebrewBatch = createServerFn({ method: "POST" })
-  .inputValidator((input: unknown) => TranslateSchema.parse(input))
-  .handler(async ({ data }) => {
+export async function translateHadithHebrewBatchJob(input: unknown) {
+  const data = TranslateSchema.parse(input);
     const apiKey = process.env.LOVABLE_API_KEY;
     if (!apiKey) return { ok: false as const, error: "ai_not_configured" };
     const gateway = createLovableAiGatewayProvider(apiKey);
@@ -246,4 +242,4 @@ ${r.english_text}`;
     }
 
     return { ok: true as const, translated, model: data.model, done: false };
-  });
+  }

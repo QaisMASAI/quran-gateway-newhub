@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { generateHebrewTafsir } from "@/lib/grounded-chunks.functions";
+import { generateHebrewTafsirJob } from "@/lib/grounded-chunks.server";
 import { z } from "zod";
 
 const BodySchema = z.object({
@@ -24,11 +24,9 @@ export const Route = createFileRoute("/api/public/admin/translate-tafsir-hebrew"
           return new Response("Unauthorized", { status: 401 });
         }
 
-        const result = await generateHebrewTafsir({
-          data: {
-            batch: parsed.data.batch,
-            model: parsed.data.model,
-          },
+        const result = await generateHebrewTafsirJob({
+          batch: parsed.data.batch,
+          model: parsed.data.model,
         });
         if (!result.ok) {
           return Response.json(result, { status: 500 });
