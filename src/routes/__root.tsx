@@ -11,11 +11,11 @@ import { LOCALE_DIR, isLocale, DEFAULT_LOCALE } from "@/lib/i18n";
 import "@/lib/i18n";
 
 const ROOT_META = {
-  title: "Noor Al Quran | Discover the Quran",
+  title: "Noor Quran & Hadith | Jalalayn Knowledge Hub",
   description:
-    "Discover the Quran through clear explanations, guided learning paths, topics, prophets, historical context, and AI-powered exploration.",
+    "Explore Quran and Sahih Hadith with grounded citations, Jalalayn-only tafsir, knowledge graph discovery, and multilingual AI research.",
   socialDescription:
-    "Explore, learn, and understand the Quran through an accessible multilingual learning experience.",
+    "Grounded Quran + Hadith learning with Jalalayn-only tafsir and citation-first AI research.",
 };
 
 function NotFoundComponent() {
@@ -95,7 +95,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         content: ROOT_META.description,
       },
       { property: "og:type", content: "website" },
-      { property: "og:site_name", content: "Noor" },
+      { property: "og:site_name", content: "Noor Quran & Hadith" },
       { name: "twitter:card", content: "summary_large_image" },
       { property: "og:title", content: ROOT_META.title },
       { name: "twitter:title", content: ROOT_META.title },
@@ -109,14 +109,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       },
       { name: "theme-color", content: "#0f1115" },
       { name: "apple-mobile-web-app-capable", content: "yes" },
-      { name: "apple-mobile-web-app-title", content: "Noor" },
+      { name: "apple-mobile-web-app-title", content: "Noor Quran & Hadith" },
       { name: "apple-mobile-web-app-status-bar-style", content: "black-translucent" },
-      { title: "Lovable App" },
-      { property: "og:title", content: "Lovable App" },
-      { name: "twitter:title", content: "Lovable App" },
-      { name: "description", content: "A web platform for Hebrew speakers to learn the Quran with Arabic text, Hebrew translation, and AI-powered explanations." },
-      { property: "og:description", content: "A web platform for Hebrew speakers to learn the Quran with Arabic text, Hebrew translation, and AI-powered explanations." },
-      { name: "twitter:description", content: "A web platform for Hebrew speakers to learn the Quran with Arabic text, Hebrew translation, and AI-powered explanations." },
       { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/74a0abc9-e4cc-4b74-8c76-a48ecb318cad/id-preview-85576619--684dac9d-8cf9-47d7-8d1b-d26c7de3781f.lovable.app-1782305499036.png" },
       { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/74a0abc9-e4cc-4b74-8c76-a48ecb318cad/id-preview-85576619--684dac9d-8cf9-47d7-8d1b-d26c7de3781f.lovable.app-1782305499036.png" },
     ],
@@ -127,7 +121,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { rel: "preconnect", href: "https://api.quran.com", crossOrigin: "anonymous" },
       {
         rel: "stylesheet",
-        href: "https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Fira+Sans:wght@300;400;500;600;700&family=Heebo:wght@400;500;600;700&family=Amiri+Quran&family=Amiri:wght@400;700&display=swap",
+        href: "https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;600;700;800&family=Amiri+Quran&family=Amiri:wght@400;700&display=swap",
       },
       { rel: "stylesheet", href: appCss },
       { rel: "manifest", href: "/manifest.webmanifest" },
@@ -138,8 +132,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         children: JSON.stringify({
           "@context": "https://schema.org",
           "@type": "Organization",
-          name: "Noor",
-          description: "Multilingual Quran learning platform.",
+          name: "Noor Quran & Hadith",
+          description: "Multilingual Quran and Hadith learning platform with Jalalayn-only tafsir.",
           url: "/",
         }),
       },
@@ -148,10 +142,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         children: JSON.stringify({
           "@context": "https://schema.org",
           "@type": "WebSite",
-          name: "Noor",
+          name: "Noor Quran & Hadith",
           url: "/",
           description:
-            "Discover the Quran through clear explanations, guided learning paths, topics, prophets, and AI-powered exploration.",
+            "Explore Quran and Sahih Hadith with Jalalayn-only tafsir, grounded citations, and AI-powered multilingual research.",
           potentialAction: {
             "@type": "SearchAction",
             target: "/search?q={query}",
