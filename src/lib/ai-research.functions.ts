@@ -303,9 +303,10 @@ export const askQuranResearch = createServerFn({ method: "POST" })
       const surahs = [...new Set(verses.map((v) => v.surah))];
       const { data: tafRows } = await supabaseAdmin
         .from("tafsir_passages")
-        .select("surah,ayah_start,ayah_end,lang,body,source_id,tafsir_sources(name_en,author)")
+        .select("surah,ayah_start,ayah_end,lang,body,source_id,tafsir_sources!inner(slug,name_en,author)")
         .in("surah", surahs)
         .eq("lang", data.language)
+        .eq("tafsir_sources.slug", "al_jalalayn")
         .limit(10);
 
       for (const t of tafRows ?? []) {
@@ -332,8 +333,9 @@ export const askQuranResearch = createServerFn({ method: "POST" })
         const surahs = [...new Set(fallbackVerses.map((v) => v.surah))];
         const { data: tafRows } = await supabaseAdmin
           .from("tafsir_passages")
-          .select("surah,ayah_start,ayah_end,lang,body,source_id,tafsir_sources(name_en,author)")
+          .select("surah,ayah_start,ayah_end,lang,body,source_id,tafsir_sources!inner(slug,name_en,author)")
           .in("surah", surahs)
+          .eq("tafsir_sources.slug", "al_jalalayn")
           .limit(10);
         for (const t of tafRows ?? []) {
           const matchVerse = fallbackVerses.find(
