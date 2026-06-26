@@ -457,18 +457,8 @@ export const askQuranResearch = createServerFn({ method: "POST" })
     const tafsirBoost = Math.min(0.15, tafsir.length * 0.05);
     const confidence = Math.max(0, Math.min(1, avgSim + tafsirBoost));
 
-    // 6) Log the query (best-effort)
-    try {
-      await supabaseAdmin.from("ai_research_queries").insert({
-        question: data.question.slice(0, 500),
-        answer: answer.slice(0, 4000),
-        citations: { verses, tafsir, hadith: hadithList } as never,
-        confidence,
-        language: data.language,
-      });
-    } catch {
-      // non-fatal
-    }
+    // Query logging disabled until user-bound auth context is attached to this
+    // server function, to prevent anonymous/null-user privacy leakage.
 
     return {
       answer: answer?.trim() || NO_SOURCE_MESSAGE,
