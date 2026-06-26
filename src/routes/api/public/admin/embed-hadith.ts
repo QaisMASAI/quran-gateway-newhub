@@ -4,6 +4,8 @@ import { embedHadithBatchJob } from "@/lib/hadith-graph.server";
 
 const BodySchema = z.object({
   batch: z.number().int().min(1).max(500).optional(),
+  untilDone: z.boolean().optional(),
+  maxRuns: z.number().int().min(1).max(500).optional(),
   token: z.string().min(8).optional(),
 });
 
@@ -21,7 +23,11 @@ export const Route = createFileRoute("/api/public/admin/embed-hadith")({
           return new Response("Unauthorized", { status: 401 });
         }
         try {
-          const result = await embedHadithBatchJob({ batch: parsed.data.batch });
+          const result = await embedHadithBatchJob({
+            batch: parsed.data.batch,
+            untilDone: parsed.data.untilDone,
+            maxRuns: parsed.data.maxRuns,
+          });
           return Response.json(result, { status: result.ok ? 200 : 500 });
         } catch (error) {
           const message = error instanceof Error ? error.message : "unknown_error";

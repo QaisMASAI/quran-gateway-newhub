@@ -22,6 +22,8 @@ async function withTimeout<T>(p: Promise<T>, ms: number): Promise<T> {
 
 const EmbedSchema = z.object({
   batch: z.number().int().min(1).max(500).optional().default(200),
+  untilDone: z.boolean().optional().default(false),
+  maxRuns: z.number().int().min(1).max(500).optional().default(20),
 });
 
 export async function embedHadithBatchJob(input: unknown) {
@@ -30,37 +32,48 @@ export async function embedHadithBatchJob(input: unknown) {
   if (!apiKey) return { ok: false as const, error: "ai_not_configured" };
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
-  const { data: rows, error } = await supabaseAdmin
-    .from("hadith_entries")
-    .select("id, english_text, arabic_text, narrator")
-    .is("embedding", null)
-    .order("id", { ascending: true })
-    .limit(data.batch);
-  if (error) return { ok: false as const, error: error.message };
-  if (!rows || rows.length === 0) return { ok: true as const, embedded: 0, done: true };
-
-  const inputs = rows.map((r) =>
-    clip([r.narrator ?? "", r.english_text ?? r.arabic_text ?? ""].filter(Boolean).join(" — ")),
-  );
-  const vectors = await embedTexts({ apiKey, model: EMBED_MODEL, input: inputs });
-
-  const now = new Date().toISOString();
   let embedded = 0;
-  for (let i = 0; i < rows.length; i += 1) {
-    const v = vectors[i];
-    if (!v) continue;
-    const { error: upErr } = await supabaseAdmin
+  let runs = 0;
+  let done = false;
+
+  while (runs < data.maxRuns) {
+    runs += 1;
+    const { data: rows, error } = await supabaseAdmin
       .from("hadith_entries")
-      .update({
-        embedding: toVectorLiteral(v) as unknown as never,
-        embedding_model: EMBED_MODEL,
-        embedded_at: now,
-      })
-      .eq("id", rows[i].id);
-    if (!upErr) embedded += 1;
+      .select("id, english_text, arabic_text, narrator")
+      .is("embedding", null)
+      .order("id", { ascending: true })
+      .limit(data.batch);
+    if (error) return { ok: false as const, error: error.message, embedded, runs, done: false };
+    if (!rows || rows.length === 0) {
+      done = true;
+      break;
+    }
+
+    const inputs = rows.map((r) =>
+      clip([r.narrator ?? "", r.english_text ?? r.arabic_text ?? ""].filter(Boolean).join(" — ")),
+    );
+    const vectors = await embedTexts({ apiKey, model: EMBED_MODEL, input: inputs });
+
+    const now = new Date().toISOString();
+    for (let i = 0; i < rows.length; i += 1) {
+      const v = vectors[i];
+      if (!v) continue;
+      const { error: upErr } = await supabaseAdmin
+        .from("hadith_entries")
+        .update({
+          embedding: toVectorLiteral(v) as unknown as never,
+          embedding_model: EMBED_MODEL,
+          embedded_at: now,
+        })
+        .eq("id", rows[i].id);
+      if (!upErr) embedded += 1;
+    }
+
+    if (!data.untilDone) break;
   }
 
-  return { ok: true as const, embedded, model: EMBED_MODEL, done: false };
+  return { ok: true as const, embedded, model: EMBED_MODEL, runs, done };
 }
 
 const LinkSchema = z.object({
