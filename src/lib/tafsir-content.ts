@@ -40,14 +40,10 @@ export interface TopicLessonRow {
 }
 
 export const TAFSIR_SOURCE_SLUG_BY_KEY: Record<string, string> = {
-  muyassar: "al_muyassar",
-  qurtubi: "al_qurtubi",
-  saadi: "al_saadi",
   jalalayn: "al_jalalayn",
-  baghawi: "al_baghawi",
-  waseet: "al_waseet",
-  tanweer: "al_tanweer",
 };
+
+const JALALAYN_SLUG = "al_jalalayn";
 
 export function sourceName(s: TafsirSourceRow | null | undefined, locale: Locale): string {
   if (!s) return "";
@@ -64,10 +60,11 @@ export async function getTafsirForVerse(
   const base = () =>
     supabase
       .from("tafsir_passages")
-      .select("*, source:tafsir_sources(*)")
+      .select("*, source:tafsir_sources!inner(*)")
       .eq("surah", surah)
       .lte("ayah_start", ayah)
       .gte("ayah_end", ayah)
+      .eq("source.slug", JALALAYN_SLUG)
       .order("created_at", { ascending: false });
 
   const fallbackOrder: Locale[] = [lang, "he", "ar", "en"].filter(
@@ -89,25 +86,17 @@ export async function getTafsirForVerseBySource(
   lang: Locale,
   sourceSlug?: string,
 ): Promise<TafsirPassageRow[]> {
-  let sourceId: string | null = null;
-  if (sourceSlug) {
-    const { data: src } = await supabase
-      .from("tafsir_sources")
-      .select("id")
-      .eq("slug", sourceSlug)
-      .maybeSingle();
-    sourceId = src?.id ?? null;
-  }
+  const effectiveSlug = sourceSlug === JALALAYN_SLUG ? sourceSlug : JALALAYN_SLUG;
 
   const base = () => {
-    let q = supabase
+    const q = supabase
       .from("tafsir_passages")
-      .select("*, source:tafsir_sources(*)")
+      .select("*, source:tafsir_sources!inner(*)")
       .eq("surah", surah)
       .lte("ayah_start", ayah)
       .gte("ayah_end", ayah)
+      .eq("source.slug", effectiveSlug)
       .order("created_at", { ascending: false });
-    if (sourceId) q = q.eq("source_id", sourceId);
     return q;
   };
 
@@ -131,10 +120,11 @@ export async function getAsbabForVerse(
   const base = () =>
     supabase
       .from("asbab_nuzul")
-      .select("*, source:tafsir_sources(*)")
+      .select("*, source:tafsir_sources!inner(*)")
       .eq("surah", surah)
       .lte("ayah_start", ayah)
       .gte("ayah_end", ayah)
+      .eq("source.slug", JALALAYN_SLUG)
       .order("created_at", { ascending: false });
 
   const fallbackOrder: Locale[] = [lang, "he", "ar", "en"].filter(
@@ -153,11 +143,12 @@ export async function getAsbabForVerse(
   for (const candidate of fallbackOrder) {
     const { data } = await supabase
       .from("tafsir_passages")
-      .select("id,source_id,surah,ayah_start,ayah_end,lang,body,citation,source:tafsir_sources(*)")
+      .select("id,source_id,surah,ayah_start,ayah_end,lang,body,citation,source:tafsir_sources!inner(*)")
       .eq("surah", surah)
       .lte("ayah_start", ayah)
       .gte("ayah_end", ayah)
       .eq("lang", candidate)
+      .eq("source.slug", JALALAYN_SLUG)
       .or("body.ilike.%سبب النزول%,body.ilike.%نزلت%")
       .order("created_at", { ascending: false })
       .limit(4);
@@ -182,9 +173,10 @@ export async function getLessonsForEntity(
   for (const candidate of fallbackOrder) {
     const { data } = await supabase
       .from("topic_lessons")
-      .select("*, source:tafsir_sources(*)")
+      .select("*, source:tafsir_sources!inner(*)")
       .eq("entity_id", entityId)
       .eq("lang", candidate)
+      .eq("source.slug", JALALAYN_SLUG)
       .order("created_at", { ascending: false });
     const rows = (data as TopicLessonRow[] | null) ?? [];
     if (rows.length > 0) return rows;

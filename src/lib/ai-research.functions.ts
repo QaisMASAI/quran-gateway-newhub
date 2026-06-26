@@ -303,9 +303,10 @@ export const askQuranResearch = createServerFn({ method: "POST" })
       const surahs = [...new Set(verses.map((v) => v.surah))];
       const { data: tafRows } = await supabaseAdmin
         .from("tafsir_passages")
-        .select("surah,ayah_start,ayah_end,lang,body,source_id,tafsir_sources(name_en,author)")
+        .select("surah,ayah_start,ayah_end,lang,body,source_id,tafsir_sources!inner(slug,name_en,author)")
         .in("surah", surahs)
         .eq("lang", data.language)
+        .eq("tafsir_sources.slug", "al_jalalayn")
         .limit(10);
 
       for (const t of tafRows ?? []) {
@@ -332,8 +333,9 @@ export const askQuranResearch = createServerFn({ method: "POST" })
         const surahs = [...new Set(fallbackVerses.map((v) => v.surah))];
         const { data: tafRows } = await supabaseAdmin
           .from("tafsir_passages")
-          .select("surah,ayah_start,ayah_end,lang,body,source_id,tafsir_sources(name_en,author)")
+          .select("surah,ayah_start,ayah_end,lang,body,source_id,tafsir_sources!inner(slug,name_en,author)")
           .in("surah", surahs)
+          .eq("tafsir_sources.slug", "al_jalalayn")
           .limit(10);
         for (const t of tafRows ?? []) {
           const matchVerse = fallbackVerses.find(
@@ -455,18 +457,8 @@ export const askQuranResearch = createServerFn({ method: "POST" })
     const tafsirBoost = Math.min(0.15, tafsir.length * 0.05);
     const confidence = Math.max(0, Math.min(1, avgSim + tafsirBoost));
 
-    // 6) Log the query (best-effort)
-    try {
-      await supabaseAdmin.from("ai_research_queries").insert({
-        question: data.question.slice(0, 500),
-        answer: answer.slice(0, 4000),
-        citations: { verses, tafsir, hadith: hadithList } as never,
-        confidence,
-        language: data.language,
-      });
-    } catch {
-      // non-fatal
-    }
+    // Query logging disabled until user-bound auth context is attached to this
+    // server function, to prevent anonymous/null-user privacy leakage.
 
     return {
       answer: answer?.trim() || NO_SOURCE_MESSAGE,

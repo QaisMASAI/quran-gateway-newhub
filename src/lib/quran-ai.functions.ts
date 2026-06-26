@@ -45,47 +45,11 @@ function sanitizeUntrusted(input: string, maxLen = 4000): string {
 // ============================================================
 
 const APPROVED_SOURCES = {
-  muyassar: {
-    slug: "al_muyassar",
-    name_he: "תפסיר אל-מויסר",
-    name_ar: "التفسير الميسر",
-    name_en: "Tafsir Al-Muyassar",
-  },
-  qurtubi: {
-    slug: "al_qurtubi",
-    name_he: "תפסיר אל-קורטובי",
-    name_ar: "تفسير القرطبي",
-    name_en: "Tafsir Al-Qurtubi",
-  },
-  saadi: {
-    slug: "al_saadi",
-    name_he: "תפסיר אל-סעדי",
-    name_ar: "تفسير السعدي",
-    name_en: "Tafsir Al-Sa'di",
-  },
   jalalayn: {
     slug: "al_jalalayn",
     name_he: "תפסיר אל-ג׳לאלין",
     name_ar: "تفسير الجلالين",
     name_en: "Tafsir Al-Jalalayn",
-  },
-  baghawi: {
-    slug: "al_baghawi",
-    name_he: "תפסיר אל-בע׳אווי",
-    name_ar: "تفسير البغوي",
-    name_en: "Tafsir Al-Baghawi",
-  },
-  waseet: {
-    slug: "al_waseet",
-    name_he: "א-תפסיר אל-ווסיט",
-    name_ar: "التفسير الوسيط",
-    name_en: "Tafsir Al-Waseet",
-  },
-  tanweer: {
-    slug: "al_tanweer",
-    name_he: "א-תחריר וא-תנוויר",
-    name_ar: "التحرير والتنوير",
-    name_en: "Tafsir Al-Tanweer",
   },
 } as const;
 
@@ -99,7 +63,7 @@ const InputSchema = z.object({
   arabic: z.string().min(1).max(2000),
   surahName: z.string().min(1).max(120),
   mode: z.enum(["tafsir", "sabab"]),
-  source: z.enum(["muyassar", "qurtubi", "saadi", "jalalayn", "baghawi", "waseet", "tanweer"]).optional(),
+  source: z.enum(["jalalayn"]).optional(),
   lang: z.enum(["he", "ar", "en"]).optional(),
 });
 
@@ -221,16 +185,14 @@ export const explainAyah = createServerFn({ method: "POST" })
     let sourceMeta: { name_he: string; name_ar: string; name_en: string } | null = null;
 
     if (data.mode === "tafsir") {
-      const sourceSlug = data.source ? APPROVED_SOURCES[data.source].slug : undefined;
+      const sourceSlug = APPROVED_SOURCES.jalalayn.slug;
       let sourceId: string | null = null;
-      if (sourceSlug) {
-        const { data: src } = await supabaseAdmin
-          .from("tafsir_sources")
-          .select("id")
-          .eq("slug", sourceSlug)
-          .maybeSingle();
-        sourceId = src?.id ?? null;
-      }
+      const { data: src } = await supabaseAdmin
+        .from("tafsir_sources")
+        .select("id")
+        .eq("slug", sourceSlug)
+        .maybeSingle();
+      sourceId = src?.id ?? null;
       const q = supabaseAdmin
         .from("tafsir_passages")
         .select("body,lang,source:tafsir_sources!inner(slug,name_he,name_ar,name_en)")

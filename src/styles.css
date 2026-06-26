@@ -39,9 +39,9 @@
   --color-gold-soft: var(--gold-soft);
   --color-rose: var(--rose);
 
-  --font-hebrew: "Fira Sans", "Heebo", "Arial Hebrew", system-ui, sans-serif;
+  --font-hebrew: "Heebo", "Arial Hebrew", system-ui, sans-serif;
   --font-arabic: "Amiri Quran", "Amiri", "Noto Naskh Arabic", serif;
-  --font-display: "DM Serif Display", "Fira Sans", system-ui, serif;
+  --font-display: "Heebo", "Arial Hebrew", system-ui, sans-serif;
 
   --gradient-hero: linear-gradient(180deg,
       oklch(0.32 0.07 160) 0%,
@@ -216,7 +216,7 @@
 
   .font-display {
     font-family: var(--font-display);
-    letter-spacing: -0.01em;
+    letter-spacing: 0;
   }
 
   .ayah-text {

@@ -1,9 +1,9 @@
 {
   "site": {
-    "name": "Noor Al Quran",
-    "tagline": "Discover the Quran",
+    "name": "Noor Quran & Hadith",
+    "tagline": "Jalalayn Knowledge Hub",
     "longTagline": "Explore • Learn • Understand",
-    "description": "Noor Al Quran is a multilingual educational platform designed to help anyone explore, learn, and understand the Quran regardless of prior knowledge."
+    "description": "Noor Quran & Hadith is a multilingual educational platform for grounded Quran and Sahih Hadith learning with Jalalayn-only tafsir."
   },
   "nav": {
     "surahs": "Surahs",
@@ -13,7 +13,7 @@
     "plans": "Reading plans",
     "search": "Search",
     "favorites": "Favorites",
-    "ask": "Ask Noor Al Quran",
+    "ask": "Ask Noor Quran & Hadith",
     "glossary": "Glossary",
     "learn": "Learn",
     "research": "Research",
@@ -114,7 +114,7 @@
       "markUnread": "Mark as unread"
     },
     "auth": {
-      "metaTitle": "Sign in | Noor Al Quran",
+      "metaTitle": "Sign in | Noor Quran & Hadith",
       "metaDescription": "Sign in or create an account to save verses, personal notes, and track your reading progress.",
       "welcomeBack": "Welcome back",
       "createAccount": "Create account",
