@@ -163,6 +163,23 @@ async function resolveSourceId(code: string): Promise<string | null> {
   return data.id;
 }
 
+async function fetchVerseFromEmbeddings(
+  surah: number,
+  ayah: number,
+): Promise<{ arabic: string; translation: string } | null> {
+  const { data, error } = await supabase
+    .from("verse_embeddings")
+    .select("arabic, hebrew")
+    .eq("surah", surah)
+    .eq("ayah", ayah)
+    .maybeSingle();
+  if (error || !data) return null;
+  const arabic = data.arabic ?? "";
+  const translation = data.hebrew ?? arabic;
+  if (!arabic && !translation) return null;
+  return { arabic, translation };
+}
+
 /** Fetch a single verse translation for a given locale from our DB. */
 export async function fetchVerseTranslation(
   surah: number,
@@ -193,7 +210,11 @@ export async function fetchVerseBilingual(
     resolveSourceId(TRANSLATION_SOURCE_CODE[locale]),
   ]);
   if (!arSid || !locSid) {
-    return (await fetchQuranComVerse(surah, ayah, locale)) ?? fetchAltVerse(surah, ayah, locale);
+    return (
+      (await fetchVerseFromEmbeddings(surah, ayah)) ??
+      (await fetchQuranComVerse(surah, ayah, locale)) ??
+      (await fetchAltVerse(surah, ayah, locale))
+    );
   }
   const { data, error } = await supabase
     .from("ayah_translations")
@@ -202,7 +223,11 @@ export async function fetchVerseBilingual(
     .eq("surah", surah)
     .eq("ayah", ayah);
   if (error || !data || data.length === 0) {
-    return (await fetchQuranComVerse(surah, ayah, locale)) ?? fetchAltVerse(surah, ayah, locale);
+    return (
+      (await fetchVerseFromEmbeddings(surah, ayah)) ??
+      (await fetchQuranComVerse(surah, ayah, locale)) ??
+      (await fetchAltVerse(surah, ayah, locale))
+    );
   }
   const arRow = data.find((r) => r.source_id === arSid);
   const locRow = data.find((r) => r.source_id === locSid);
@@ -216,7 +241,10 @@ export async function fetchVerseBilingual(
     };
   }
 
-  const remote = (await fetchQuranComVerse(surah, ayah, locale)) ?? (await fetchAltVerse(surah, ayah, locale));
+  const remote =
+    (await fetchVerseFromEmbeddings(surah, ayah)) ??
+    (await fetchQuranComVerse(surah, ayah, locale)) ??
+    (await fetchAltVerse(surah, ayah, locale));
   return {
     arabic: localArabic || remote?.arabic || "",
     translation: localTranslation || remote?.translation || localArabic || "",
