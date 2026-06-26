@@ -69,7 +69,7 @@ export function AyahCard({ surah, surahName, ayah, arabic, hebrew, highlight }: 
   const [panel, setPanel] = useState<null | "tafsir" | "sabab">(null);
   const [showNote, setShowNote] = useState(false);
   const [tafsirSource] = useState<typeof TAFSIR_SOURCES_META[number]["key"]>("jalalayn");
-  const selectedTafsirSlug = TAFSIR_SOURCE_SLUG_BY_KEY[tafsirSource] ?? "al_muyassar";
+  const selectedTafsirSlug = TAFSIR_SOURCE_SLUG_BY_KEY[tafsirSource] ?? "al_jalalayn";
   const tafsirQ = useQuery({
     queryKey: ["tafsir-verse", surah, ayah, locale, selectedTafsirSlug],
     queryFn: () => getTafsirForVerseBySource(surah, ayah, locale, selectedTafsirSlug),
