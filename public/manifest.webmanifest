@@ -1,7 +1,7 @@
 {
-  "name": "Noor Al Quran — Discover the Quran",
-  "short_name": "Noor Al Quran",
-  "description": "Multilingual Quran learning platform. Discover the Quran through clear explanations, guided learning paths, topics, prophets, and AI-powered exploration.",
+  "name": "Noor Quran & Hadith — Jalalayn Hub",
+  "short_name": "Noor Q&H",
+  "description": "Multilingual Quran and Sahih Hadith learning platform with Jalalayn-only tafsir, grounded citations, and AI-powered research.",
   "lang": "en",
   "dir": "ltr",
   "start_url": "/",
