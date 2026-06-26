@@ -14,6 +14,7 @@ const RETRIEVAL_MODEL = "openai/text-embedding-3-large";
 
 const IngestSchema = z.object({
   limit: z.number().int().min(1).max(10000).optional().default(2000),
+  offset: z.number().int().min(0).optional().default(0),
 });
 
 type UpsertChunk = {
@@ -96,7 +97,11 @@ export async function rebuildGroundedChunksJob(input: unknown) {
             .maybeSingle()).data?.id ?? "",
         )
         .limit(data.limit),
-      supabaseAdmin.from("tafsir_passages").select("id, source_id, surah, ayah_start, ayah_end, lang, body").limit(data.limit),
+      supabaseAdmin
+        .from("tafsir_passages")
+        .select("id, source_id, surah, ayah_start, ayah_end, lang, body")
+        .order("id", { ascending: true })
+        .range(data.offset, data.offset + data.limit - 1),
       supabaseAdmin.from("asbab_nuzul").select("id, source_id, surah, ayah_start, ayah_end, lang, body").limit(data.limit),
       supabaseAdmin.from("topic_lessons").select("id, source_id, entity_id, lang, body").limit(data.limit),
       supabaseAdmin
