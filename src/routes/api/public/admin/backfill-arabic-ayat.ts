@@ -12,7 +12,8 @@ export const Route = createFileRoute("/api/public/admin/backfill-arabic-ayat")({
         const token = process.env.QURAN_ADMIN_TOKEN;
         const auth = request.headers.get("authorization");
         const bearer = auth?.startsWith("Bearer ") ? auth.slice(7).trim() : null;
-        if (!token || bearer !== token) {
+        const body = await request.json().catch(() => ({} as { token?: string }));
+        if (!token || (bearer !== token && body.token !== token)) {
           return new Response("Unauthorized", { status: 401 });
         }
 
