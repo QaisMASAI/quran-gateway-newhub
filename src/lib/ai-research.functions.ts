@@ -6,7 +6,6 @@ import { generateText } from "ai";
 import { z } from "zod";
 import { createLovableAiGatewayProvider } from "./ai-gateway.server";
 import { embedTexts } from "./embeddings.server";
-import { createMCPClient } from "@ai-sdk/mcp";
 
 const ResearchSchema = z.object({
   question: z.string().min(2).max(500),
@@ -133,8 +132,9 @@ async function fetchQuranAiMcpEvidence(
   language: "he" | "en" | "ar",
   k: number,
 ): Promise<VerseCitation[]> {
-  let client: Awaited<ReturnType<typeof createMCPClient>> | null = null;
+  let client: { listTools: () => Promise<{ tools?: Array<{ name: string }> }>; callTool: (args: { name: string; arguments?: Record<string, unknown> }) => Promise<unknown>; close: () => Promise<void> } | null = null;
   try {
+    const { createMCPClient } = await import("@ai-sdk/mcp");
     client = await withTimeout(
       createMCPClient({
         transport: {
