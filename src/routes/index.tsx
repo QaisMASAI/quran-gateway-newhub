@@ -12,15 +12,11 @@ import { TrustBadge } from "@/components/TrustBadge";
 import {
   BookOpen,
   Sparkles,
-  Volume2,
-  Star,
   Search as SearchIcon,
   ChevronRight,
   ChevronLeft,
   Loader2,
   MapPin,
-  Compass,
-  ArrowUpRight,
 } from "lucide-react";
 import i18n, { normalizeLocale } from "@/lib/i18n";
 
@@ -290,16 +286,3 @@ function Home() {
   );
 }
 
-function StatCard({ icon, label, value }: { icon: React.ReactNode; label: string; value: string }) {
-  return (
-    <div className="group flex items-center gap-3 rounded-2xl border border-primary/5 bg-card p-4 shadow-xl transition-colors hover:border-gold/30 sm:gap-4 sm:p-5">
-      <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-primary/5 text-primary transition-all group-hover:bg-gold/10 group-hover:text-gold sm:h-12 sm:w-12">
-        {icon}
-      </div>
-      <div className="min-w-0 flex-1">
-        <p className="truncate text-[11px] font-medium text-muted-foreground sm:text-xs">{label}</p>
-        <h3 className="text-sm font-bold leading-tight text-primary sm:text-base">{value}</h3>
-      </div>
-    </div>
-  );
-}
