@@ -1,6 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
-import { BookOpen, Search, Sparkles, Star, Compass } from "lucide-react";
+import { BookOpen, Search, Sparkles, Star } from "lucide-react";
 
 export function BottomNav() {
   const { t } = useTranslation("pages");
@@ -8,7 +8,7 @@ export function BottomNav() {
     { to: "/", labelKey: "surahs", icon: <BookOpen className="h-5 w-5" aria-hidden="true" />, exact: true },
     { to: "/search", labelKey: "search", icon: <Search className="h-5 w-5" aria-hidden="true" /> },
     { to: "/ask", labelKey: "ask", icon: <Sparkles className="h-5 w-5" aria-hidden="true" /> },
-    { to: "/learn", hash: "topics-library", labelKey: "discover", icon: <Compass className="h-5 w-5" aria-hidden="true" /> },
+    { to: "/learn", labelKey: "discover", icon: <BookOpen className="h-5 w-5" aria-hidden="true" /> },
     { to: "/favorites", labelKey: "favorites", icon: <Star className="h-5 w-5" aria-hidden="true" /> },
   ];
 
