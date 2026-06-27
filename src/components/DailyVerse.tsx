@@ -76,7 +76,7 @@ export function DailyVerse() {
               >
                 {q.data.arabic}
               </p>
-              {lang !== "ar" && q.data.translation && (
+              {lang !== "ar" && q.data.translation && q.data.translation !== q.data.arabic && (
                 <p
                   className="mt-4 text-[15px] text-foreground/85"
                   dir={lang === "he" ? "rtl" : "ltr"}
