@@ -159,35 +159,6 @@ function Home() {
         <DailyVerse />
       </div>
 
-      <section className="mx-auto mt-12 max-w-6xl px-4 sm:px-6">
-        <div className="surface-card p-5 sm:p-7">
-          <div className={`flex items-start justify-between gap-4 ${isRtl ? "flex-row-reverse" : ""}`}>
-            <div>
-              <h2 className="font-display text-2xl font-bold text-foreground sm:text-3xl">{t("home.aiSectionTitle")}</h2>
-              <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
-                {t("home.aiSectionBody")}
-              </p>
-            </div>
-            <Sparkles className="h-6 w-6 shrink-0 text-gold" />
-          </div>
-          <div className={`mt-5 grid gap-3 sm:grid-cols-3 ${isRtl ? "sm:[&>*]:text-right" : ""}`}>
-            {[
-              { q: t("home.aiPrompt1"), to: "/ask" },
-              { q: t("home.aiPrompt2"), to: "/research" },
-              { q: t("home.aiPrompt3"), to: "/ask" },
-            ].map((item) => (
-              <Link
-                key={item.q}
-                to={item.to}
-                className="rounded-xl border border-border bg-secondary/40 px-4 py-3 text-sm text-foreground/90 transition-colors hover:border-primary/40 hover:bg-secondary"
-              >
-                “{item.q}”
-              </Link>
-            ))}
-          </div>
-        </div>
-      </section>
-
       <main id="main" className="mx-auto max-w-6xl px-4 py-16 sm:px-6 scroll-mt-20">
         <div className={`mb-10 flex flex-col gap-5 md:flex-row md:items-end md:justify-between ${isRtl ? "md:flex-row-reverse" : ""}`}>
           <div className="space-y-1.5">
