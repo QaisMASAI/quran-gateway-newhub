@@ -225,11 +225,9 @@ export function AyahCard({ surah, surahName, ayah, arabic, hebrew, highlight }: 
           </span>
           {links.map((l) => {
             const to =
-              l.kind === "prophet"
-                ? "/prophets/$slug"
-                : l.kind === "emotion"
+              l.kind === "emotion"
                   ? "/emotions/$slug"
-                  : "/topics/$slug";
+                  : "/learn/$kind/$slug";
             const styles =
               l.kind === "prophet"
                 ? "border-gold/30 bg-gold/10 text-foreground/80 hover:border-gold hover:text-primary"
@@ -242,7 +240,7 @@ export function AyahCard({ surah, surahName, ayah, arabic, hebrew, highlight }: 
               <Link
                 key={`${l.kind}-${l.slug}`}
                 to={to}
-                params={{ slug: l.slug }}
+                params={l.kind === "emotion" ? { slug: l.slug } : { kind: l.kind === "prophet" ? "prophet" : "topic", slug: l.slug }}
                 className={`inline-flex items-center gap-1 rounded-full border px-2.5 py-0.5 text-[11px] font-medium transition-colors ${styles}`}
               >
                 <Icon className="h-3 w-3" />
