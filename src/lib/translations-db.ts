@@ -211,10 +211,17 @@ export async function fetchVerseBilingual(
     resolveSourceId(TRANSLATION_SOURCE_CODE[locale]),
   ]);
   if (!arSid || !locSid) {
+    if (locale === "ar") {
+      return (
+        (await fetchVerseFromEmbeddings(surah, ayah, locale)) ??
+        (await fetchQuranComVerse(surah, ayah, locale)) ??
+        (await fetchAltVerse(surah, ayah, locale))
+      );
+    }
     return (
-      (await fetchVerseFromEmbeddings(surah, ayah, locale)) ??
       (await fetchQuranComVerse(surah, ayah, locale)) ??
-      (await fetchAltVerse(surah, ayah, locale))
+      (await fetchAltVerse(surah, ayah, locale)) ??
+      (await fetchVerseFromEmbeddings(surah, ayah, locale))
     );
   }
   const { data, error } = await supabase
@@ -292,6 +299,11 @@ export async function fetchSurahBilingual(
     resolveSourceId(TRANSLATION_SOURCE_CODE.ar),
     resolveSourceId(TRANSLATION_SOURCE_CODE[locale]),
   ]);
+  if (locale !== "ar" && !locSid) {
+    const remote = await fetchQuranComSurah(surah, locale);
+    if (remote.length > 0) return remote;
+    return fetchAltSurah(surah, locale);
+  }
   if (!arSid) {
     const remote = await fetchQuranComSurah(surah, locale);
     if (remote.length > 0) return remote;
@@ -323,12 +335,48 @@ export async function fetchSurahBilingual(
     byAyah.set(row.ayah, current);
   }
 
-  return Array.from(byAyah.values())
+  const localRows = Array.from(byAyah.values())
     .sort((a, b) => a.ayah - b.ayah)
     .map((v) => ({
       ...v,
       translation: v.translation || v.arabic,
     }));
+
+  if (locale === "ar") return localRows;
+
+  const missingTranslations = localRows.some((v) => !v.translation || v.translation === v.arabic);
+  if (!missingTranslations) return localRows;
+
+  const remote = await fetchQuranComSurah(surah, locale);
+  if (remote.length === 0) {
+    const alt = await fetchAltSurah(surah, locale);
+    if (alt.length === 0) return localRows;
+    const byAyahRemote = new Map(alt.map((v) => [v.ayah, v]));
+    return localRows.map((v) => {
+      const r = byAyahRemote.get(v.ayah);
+      if (!r) return v;
+      return {
+        ...v,
+        translation:
+          !v.translation || v.translation === v.arabic
+            ? r.translation || v.translation || v.arabic
+            : v.translation,
+      };
+    });
+  }
+
+  const byAyahRemote = new Map(remote.map((v) => [v.ayah, v]));
+  return localRows.map((v) => {
+    const r = byAyahRemote.get(v.ayah);
+    if (!r) return v;
+    return {
+      ...v,
+      translation:
+        !v.translation || v.translation === v.arabic
+          ? r.translation || v.translation || v.arabic
+          : v.translation,
+    };
+  });
 }
 
 export interface PassageVerse {
@@ -349,6 +397,14 @@ export async function fetchPassage(
     resolveSourceId(TRANSLATION_SOURCE_CODE.ar),
     resolveSourceId(TRANSLATION_SOURCE_CODE[locale]),
   ]);
+  if (locale !== "ar" && !locSid) {
+    const remote = await fetchQuranComSurah(surah, locale);
+    if (remote.length === 0) {
+      const alt = await fetchAltSurah(surah, locale);
+      return alt.filter((v) => v.ayah >= ayahStart && v.ayah <= ayahEnd);
+    }
+    return remote.filter((v) => v.ayah >= ayahStart && v.ayah <= ayahEnd);
+  }
   if (!arSid) {
     const remote = await fetchQuranComSurah(surah, locale);
     if (remote.length === 0) {
@@ -386,5 +442,26 @@ export async function fetchPassage(
     if (row.source_id === locSid) v.translation = row.text;
     byAyah.set(row.ayah, v);
   }
-  return Array.from(byAyah.values()).sort((a, b) => a.ayah - b.ayah);
+  const localRows = Array.from(byAyah.values()).sort((a, b) => a.ayah - b.ayah);
+  if (locale === "ar") return localRows;
+
+  const missingTranslations = localRows.some((v) => !v.translation);
+  if (!missingTranslations) return localRows;
+
+  const remote = await fetchQuranComSurah(surah, locale);
+  if (remote.length === 0) {
+    const alt = await fetchAltSurah(surah, locale);
+    if (alt.length === 0) return localRows;
+    const altByAyah = new Map(alt.map((v) => [v.ayah, v.translation]));
+    return localRows.map((v) => ({
+      ...v,
+      translation: v.translation || altByAyah.get(v.ayah) || v.arabic,
+    }));
+  }
+
+  const remoteByAyah = new Map(remote.map((v) => [v.ayah, v.translation]));
+  return localRows.map((v) => ({
+    ...v,
+    translation: v.translation || remoteByAyah.get(v.ayah) || v.arabic,
+  }));
 }

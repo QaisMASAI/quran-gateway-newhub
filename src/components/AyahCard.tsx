@@ -162,21 +162,23 @@ export function AyahCard({ surah, surahName, ayah, arabic, hebrew, highlight }: 
         {displayArabic}
       </p>
 
-      {/* Translation in the active UI language */}
-      <div className="mt-4 border-t border-border pt-4">
-        {(() => {
-          const isHe = locale === "he";
-          const translationClass = isHe
-            ? "hebrew-text text-[15px] text-foreground/85"
-            : "text-[15px] leading-relaxed text-foreground/85 text-start";
-          const translationDir = isHe ? "rtl" : "ltr";
-          return heHighlight ? (
-            <p className={translationClass} dir={translationDir}>{heHighlight}</p>
-          ) : (
-            <p className={translationClass} dir={translationDir}>{cleanText(hebrew)}</p>
-          );
-        })()}
-      </div>
+      {/* Translation in the active UI language (hidden for Arabic UI) */}
+      {locale !== "ar" && (
+        <div className="mt-4 border-t border-border pt-4">
+          {(() => {
+            const isHe = locale === "he";
+            const translationClass = isHe
+              ? "hebrew-text text-[15px] text-foreground/85"
+              : "text-[15px] leading-relaxed text-foreground/85 text-start";
+            const translationDir = isHe ? "rtl" : "ltr";
+            return heHighlight ? (
+              <p className={translationClass} dir={translationDir}>{heHighlight}</p>
+            ) : (
+              <p className={translationClass} dir={translationDir}>{cleanText(hebrew)}</p>
+            );
+          })()}
+        </div>
+      )}
 
       {/* Actions */}
       <div className="mt-5 flex flex-wrap items-center gap-2">

@@ -34,8 +34,6 @@ import { Route as LearnGraphRouteImport } from './routes/learn.graph'
 import { Route as KnowledgeHadithRouteImport } from './routes/knowledge.hadith'
 import { Route as HadithTopicsRouteImport } from './routes/hadith.topics'
 import { Route as HadithNarratorsRouteImport } from './routes/hadith.narrators'
-import { Route as HadithMuslimRouteImport } from './routes/hadith.muslim'
-import { Route as HadithBukhariRouteImport } from './routes/hadith.bukhari'
 import { Route as HadithCollectionRouteImport } from './routes/hadith.$collection'
 import { Route as ExploreTimelineRouteImport } from './routes/explore.timeline'
 import { Route as ExploreMapRouteImport } from './routes/explore.map'
@@ -178,16 +176,6 @@ const HadithNarratorsRoute = HadithNarratorsRouteImport.update({
   path: '/narrators',
   getParentRoute: () => HadithRoute,
 } as any)
-const HadithMuslimRoute = HadithMuslimRouteImport.update({
-  id: '/muslim',
-  path: '/muslim',
-  getParentRoute: () => HadithRoute,
-} as any)
-const HadithBukhariRoute = HadithBukhariRouteImport.update({
-  id: '/bukhari',
-  path: '/bukhari',
-  getParentRoute: () => HadithRoute,
-} as any)
 const HadithCollectionRoute = HadithCollectionRouteImport.update({
   id: '/$collection',
   path: '/$collection',
@@ -296,8 +284,6 @@ export interface FileRoutesByFullPath {
   '/explore/map': typeof ExploreMapRoute
   '/explore/timeline': typeof ExploreTimelineRoute
   '/hadith/$collection': typeof HadithCollectionRouteWithChildren
-  '/hadith/bukhari': typeof HadithBukhariRoute
-  '/hadith/muslim': typeof HadithMuslimRoute
   '/hadith/narrators': typeof HadithNarratorsRoute
   '/hadith/topics': typeof HadithTopicsRoute
   '/knowledge/hadith': typeof KnowledgeHadithRoute
@@ -340,8 +326,6 @@ export interface FileRoutesByTo {
   '/explore/map': typeof ExploreMapRoute
   '/explore/timeline': typeof ExploreTimelineRoute
   '/hadith/$collection': typeof HadithCollectionRouteWithChildren
-  '/hadith/bukhari': typeof HadithBukhariRoute
-  '/hadith/muslim': typeof HadithMuslimRoute
   '/hadith/narrators': typeof HadithNarratorsRoute
   '/hadith/topics': typeof HadithTopicsRoute
   '/knowledge/hadith': typeof KnowledgeHadithRoute
@@ -387,8 +371,6 @@ export interface FileRoutesById {
   '/explore/map': typeof ExploreMapRoute
   '/explore/timeline': typeof ExploreTimelineRoute
   '/hadith/$collection': typeof HadithCollectionRouteWithChildren
-  '/hadith/bukhari': typeof HadithBukhariRoute
-  '/hadith/muslim': typeof HadithMuslimRoute
   '/hadith/narrators': typeof HadithNarratorsRoute
   '/hadith/topics': typeof HadithTopicsRoute
   '/knowledge/hadith': typeof KnowledgeHadithRoute
@@ -434,8 +416,6 @@ export interface FileRouteTypes {
     | '/explore/map'
     | '/explore/timeline'
     | '/hadith/$collection'
-    | '/hadith/bukhari'
-    | '/hadith/muslim'
     | '/hadith/narrators'
     | '/hadith/topics'
     | '/knowledge/hadith'
@@ -478,8 +458,6 @@ export interface FileRouteTypes {
     | '/explore/map'
     | '/explore/timeline'
     | '/hadith/$collection'
-    | '/hadith/bukhari'
-    | '/hadith/muslim'
     | '/hadith/narrators'
     | '/hadith/topics'
     | '/knowledge/hadith'
@@ -524,8 +502,6 @@ export interface FileRouteTypes {
     | '/explore/map'
     | '/explore/timeline'
     | '/hadith/$collection'
-    | '/hadith/bukhari'
-    | '/hadith/muslim'
     | '/hadith/narrators'
     | '/hadith/topics'
     | '/knowledge/hadith'
@@ -770,20 +746,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof HadithNarratorsRouteImport
       parentRoute: typeof HadithRoute
     }
-    '/hadith/muslim': {
-      id: '/hadith/muslim'
-      path: '/muslim'
-      fullPath: '/hadith/muslim'
-      preLoaderRoute: typeof HadithMuslimRouteImport
-      parentRoute: typeof HadithRoute
-    }
-    '/hadith/bukhari': {
-      id: '/hadith/bukhari'
-      path: '/bukhari'
-      fullPath: '/hadith/bukhari'
-      preLoaderRoute: typeof HadithBukhariRouteImport
-      parentRoute: typeof HadithRoute
-    }
     '/hadith/$collection': {
       id: '/hadith/$collection'
       path: '/$collection'
@@ -932,8 +894,6 @@ const HadithCollectionRouteWithChildren =
 
 interface HadithRouteChildren {
   HadithCollectionRoute: typeof HadithCollectionRouteWithChildren
-  HadithBukhariRoute: typeof HadithBukhariRoute
-  HadithMuslimRoute: typeof HadithMuslimRoute
   HadithNarratorsRoute: typeof HadithNarratorsRoute
   HadithTopicsRoute: typeof HadithTopicsRoute
   HadithIndexRoute: typeof HadithIndexRoute
@@ -941,8 +901,6 @@ interface HadithRouteChildren {
 
 const HadithRouteChildren: HadithRouteChildren = {
   HadithCollectionRoute: HadithCollectionRouteWithChildren,
-  HadithBukhariRoute: HadithBukhariRoute,
-  HadithMuslimRoute: HadithMuslimRoute,
   HadithNarratorsRoute: HadithNarratorsRoute,
   HadithTopicsRoute: HadithTopicsRoute,
   HadithIndexRoute: HadithIndexRoute,

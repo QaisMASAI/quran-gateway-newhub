@@ -62,6 +62,188 @@ export interface ResearchResult {
   error?: string;
 }
 
+const QURAN_AI_MCP_URL = process.env.QURAN_AI_MCP_URL?.trim() || "https://mcp.quran.ai/";
+
+async function withTimeout<T>(promise: Promise<T>, timeoutMs: number): Promise<T> {
+  return await Promise.race([
+    promise,
+    new Promise<never>((_, reject) =>
+      setTimeout(() => reject(new Error("timeout")), timeoutMs),
+    ),
+  ]);
+}
+
+function toNumber(value: unknown): number | null {
+  if (typeof value === "number" && Number.isFinite(value)) return value;
+  if (typeof value === "string") {
+    const n = Number(value);
+    if (Number.isFinite(n)) return n;
+  }
+  return null;
+}
+
+function collectObjects(input: unknown): Record<string, unknown>[] {
+  if (input == null) return [];
+  if (Array.isArray(input)) return input.flatMap((x) => collectObjects(x));
+  if (typeof input === "object") {
+    const obj = input as Record<string, unknown>;
+    return [obj, ...Object.values(obj).flatMap((x) => collectObjects(x))];
+  }
+  return [];
+}
+
+function extractMcpTextParts(result: unknown): string[] {
+  if (!result || typeof result !== "object") return [];
+  const content = (result as { content?: unknown }).content;
+  if (!Array.isArray(content)) return [];
+
+  const texts: string[] = [];
+  for (const part of content) {
+    if (!part || typeof part !== "object") continue;
+    const p = part as { type?: string; text?: string; data?: unknown; content?: unknown };
+    if (p.type === "text" && typeof p.text === "string") {
+      texts.push(p.text);
+      continue;
+    }
+    if (p.type === "json" && p.data !== undefined) {
+      texts.push(JSON.stringify(p.data));
+      continue;
+    }
+    if (typeof p.text === "string") texts.push(p.text);
+    else if (p.content !== undefined) texts.push(JSON.stringify(p.content));
+    else texts.push(JSON.stringify(p));
+  }
+  return texts;
+}
+
+function extractVerseKeysFromText(input: string): Array<{ surah: number; ayah: number }> {
+  const out: Array<{ surah: number; ayah: number }> = [];
+  const re = /\b(\d{1,3})\s*[:：]\s*(\d{1,3})\b/g;
+  for (const m of input.matchAll(re)) {
+    const surah = Number(m[1]);
+    const ayah = Number(m[2]);
+    if (surah >= 1 && surah <= 114 && ayah >= 1 && ayah <= 286) out.push({ surah, ayah });
+  }
+  return out;
+}
+
+async function fetchQuranAiMcpEvidence(
+  question: string,
+  language: "he" | "en" | "ar",
+  k: number,
+): Promise<VerseCitation[]> {
+  let client: { listTools: () => Promise<{ tools?: Array<{ name: string }> }>; callTool: (args: { name: string; arguments?: Record<string, unknown> }) => Promise<unknown>; close: () => Promise<void> } | null = null;
+  try {
+    const { createMCPClient } = await import("@ai-sdk/mcp");
+    client = await withTimeout(
+      createMCPClient({
+        transport: {
+          type: "http",
+          url: QURAN_AI_MCP_URL,
+          redirect: "error",
+        },
+      }),
+      7000,
+    );
+
+    const toolList = await withTimeout(client.listTools(), 5000);
+    const candidateTools = (toolList.tools ?? [])
+      .map((t) => t.name)
+      .filter((name) => /quran|search|verse|ayah|query/i.test(name))
+      .slice(0, 8);
+
+    const seen = new Map<string, VerseCitation>();
+
+    for (const toolName of candidateTools) {
+      const attempts: Array<Record<string, unknown>> = [
+        { query: question, limit: k, language },
+        { question, limit: k, language },
+        { q: question, k, lang: language },
+        { text: question, language, top_k: k },
+      ];
+
+      for (const args of attempts) {
+        let result: unknown;
+        try {
+          result = await withTimeout(client.callTool({ name: toolName, arguments: args }), 7000);
+        } catch {
+          continue;
+        }
+
+        const textParts = extractMcpTextParts(result);
+        const objects = [
+          ...collectObjects(result),
+          ...textParts.flatMap((p) => {
+            try {
+              return collectObjects(JSON.parse(p));
+            } catch {
+              return [];
+            }
+          }),
+        ];
+
+        for (const obj of objects) {
+          const surah = toNumber(obj.surah ?? obj.surah_id ?? obj.chapter ?? obj.chapter_number);
+          const ayah = toNumber(obj.ayah ?? obj.verse ?? obj.verse_number ?? obj.ayah_number);
+          if (!surah || !ayah || surah < 1 || surah > 114 || ayah < 1 || ayah > 286) continue;
+
+          const key = `${surah}:${ayah}`;
+          if (seen.has(key)) continue;
+
+          const arabic =
+            String(obj.arabic ?? obj.text_uthmani ?? obj.ayah_arabic ?? obj.text_ar ?? "").trim();
+          const translationCandidate =
+            language === "he"
+              ? obj.hebrew ?? obj.translation_he ?? obj.translation ?? obj.text_en
+              : language === "en"
+                ? obj.english ?? obj.translation_en ?? obj.translation ?? obj.text_en
+                : "";
+
+          seen.set(key, {
+            surah,
+            ayah,
+            arabic,
+            hebrew: String(translationCandidate ?? "").trim(),
+            similarity: 0.25,
+            translation_source: "Quran.ai MCP (grounded from Quran.com)",
+            translator: null,
+          });
+        }
+
+        for (const part of textParts) {
+          for (const v of extractVerseKeysFromText(part)) {
+            const key = `${v.surah}:${v.ayah}`;
+            if (seen.has(key)) continue;
+            seen.set(key, {
+              surah: v.surah,
+              ayah: v.ayah,
+              arabic: "",
+              hebrew: "",
+              similarity: 0.2,
+              translation_source: "Quran.ai MCP (grounded from Quran.com)",
+              translator: null,
+            });
+          }
+        }
+
+        if (seen.size >= k) return [...seen.values()].slice(0, k);
+      }
+    }
+
+    return [...seen.values()].slice(0, k);
+  } catch {
+    return [];
+  } finally {
+    if (client) {
+      try {
+        await client.close();
+      } catch {
+        // ignore close failures
+      }
+    }
+  }
+}
+
 function sanitize(s: string, max = 600) {
   return s
     .replace(/[\u0000-\u0008\u000B-\u001F\u007F]/g, " ")
@@ -288,6 +470,27 @@ export const askQuranResearch = createServerFn({ method: "POST" })
       }
     }
 
+    // 2.5) Quran.ai MCP grounding (Quran.com-backed), merged with local retrieval.
+    const mcpVerses = await fetchQuranAiMcpEvidence(data.question, data.language, data.k);
+    if (mcpVerses.length > 0) {
+      const byKey = new Map(verses.map((v) => [`${v.surah}:${v.ayah}`, v]));
+      for (const mv of mcpVerses) {
+        const k = `${mv.surah}:${mv.ayah}`;
+        const existing = byKey.get(k);
+        if (!existing) {
+          byKey.set(k, mv);
+          continue;
+        }
+        if (!existing.arabic && mv.arabic) existing.arabic = mv.arabic;
+        if (!existing.hebrew && mv.hebrew) existing.hebrew = mv.hebrew;
+        if (!existing.translation_source && mv.translation_source) {
+          existing.translation_source = mv.translation_source;
+        }
+      }
+      verses.length = 0;
+      verses.push(...[...byKey.values()].slice(0, data.k));
+    }
+
     const tafsir: TafsirCitation[] = [];
     if (chunkTafsir.length > 0) {
       for (const row of chunkTafsir.slice(0, 12)) {
@@ -425,14 +628,6 @@ export const askQuranResearch = createServerFn({ method: "POST" })
 
     const gateway = createLovableAiGatewayProvider(apiKey);
     let answer = "";
-    const withTimeout = async <T>(promise: Promise<T>, timeoutMs: number): Promise<T> => {
-      return await Promise.race([
-        promise,
-        new Promise<never>((_, reject) =>
-          setTimeout(() => reject(new Error("generation_timeout")), timeoutMs),
-        ),
-      ]);
-    };
     try {
       const { text } = await withTimeout(
         generateText({
