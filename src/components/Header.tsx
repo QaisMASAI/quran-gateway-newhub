@@ -52,8 +52,6 @@ export function Header() {
           <NavLink to="/" label={t("nav.surahs")} icon={<BookOpen className="h-4 w-4" />} />
           <NavLink to="/research" label={t("nav.research")} icon={<Sparkles className="h-4 w-4" />} />
           <NavLink to="/learn" label={t("nav.learn")} icon={<BookMarked className="h-4 w-4" />} />
-          <NavLink to="/learn" hash="prophets-library" label={t("nav.prophets")} icon={<Compass className="h-4 w-4" />} />
-          <NavLink to="/learn" hash="topics-library" label={t("nav.topics")} icon={<Compass className="h-4 w-4" />} />
           <NavLink to="/hadith" label="Hadith" icon={<BookMarked className="h-4 w-4" />} />
           <NavLink to="/search" label={t("nav.search")} icon={<Search className="h-4 w-4" />} />
           {isAuthenticated && (
