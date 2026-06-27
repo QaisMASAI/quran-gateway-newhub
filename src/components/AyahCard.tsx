@@ -224,10 +224,6 @@ export function AyahCard({ surah, surahName, ayah, arabic, hebrew, highlight }: 
             {t("ui.ayah.related")}
           </span>
           {links.map((l) => {
-            const to =
-              l.kind === "emotion"
-                  ? "/emotions/$slug"
-                  : "/learn/$kind/$slug";
             const styles =
               l.kind === "prophet"
                 ? "border-gold/30 bg-gold/10 text-foreground/80 hover:border-gold hover:text-primary"
