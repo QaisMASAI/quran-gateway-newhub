@@ -126,7 +126,7 @@ function Home() {
               {t("home.subtitle")}
             </p>
             <div className="flex justify-center">
-              <TrustBadge size="md" className="border-gold/40 bg-background/90 text-foreground shadow-sm" />
+              <TrustBadge size="md" className="border-gold/60 bg-card text-foreground shadow-sm" />
             </div>
 
             <div className="flex flex-wrap justify-center gap-3 pt-3">
@@ -155,13 +155,6 @@ function Home() {
           </div>
         </div>
 
-        {/* ============== STATS ROW (overlapping) ============== */}
-        <div className="relative z-20 mx-auto -mt-14 grid max-w-6xl grid-cols-2 gap-4 px-4 sm:px-6 md:grid-cols-4">
-          <StatCard icon={<BookOpen className="h-5 w-5" />} label={t("home.stat1Label")} value={t("home.stat1Value")} />
-          <StatCard icon={<Sparkles className="h-5 w-5" />} label={t("home.stat2Label")} value={t("home.stat2Value")} />
-          <StatCard icon={<Volume2 className="h-5 w-5" />} label={t("home.stat3Label")} value={t("home.stat3Value")} />
-          <StatCard icon={<Star className="h-5 w-5" />} label={t("home.stat4Label")} value={t("home.stat4Value")} />
-        </div>
       </section>
 
       <ContinueReading />
@@ -196,40 +189,6 @@ function Home() {
               </Link>
             ))}
           </div>
-        </div>
-      </section>
-
-      <section className="mx-auto mt-8 max-w-6xl px-4 sm:px-6">
-        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-          <FeatureCard
-            to="/learn"
-            hash="topics-library"
-            title={t("home.featureTopicsTitle")}
-            body={t("home.featureTopicsBody")}
-            icon={<Compass className="h-5 w-5" />}
-            cta={t("home.featureExploreCta")}
-          />
-          <FeatureCard
-            to="/learn/journeys"
-            title={t("home.featureJourneysTitle")}
-            body={t("home.featureJourneysBody")}
-            icon={<BookOpen className="h-5 w-5" />}
-            cta={t("home.featureExploreCta")}
-          />
-          <FeatureCard
-            to="/learn"
-            title={t("home.featureThemesTitle")}
-            body={t("home.featureThemesBody")}
-            icon={<Star className="h-5 w-5" />}
-            cta={t("home.featureExploreCta")}
-          />
-          <FeatureCard
-            to="/research"
-            title={t("home.featureResearchTitle")}
-            body={t("home.featureResearchBody")}
-            icon={<Sparkles className="h-5 w-5" />}
-            cta={t("home.featureExploreCta")}
-          />
         </div>
       </section>
 
@@ -328,39 +287,6 @@ function Home() {
         <p className="relative mt-1 opacity-70">{t("home.footerReciter")}</p>
       </footer>
     </div>
-  );
-}
-
-function FeatureCard({
-  to,
-  hash,
-  title,
-  body,
-  icon,
-  cta,
-}: {
-  to: "/learn/journeys" | "/learn" | "/research";
-  hash?: string;
-  title: string;
-  body: string;
-  icon: React.ReactNode;
-  cta: string;
-}) {
-  return (
-    <Link
-      to={to}
-      hash={hash}
-      className="surface-card group block p-4 transition-all hover:border-primary/35 hover:shadow-soft"
-    >
-      <div className="mb-3 inline-flex h-10 w-10 items-center justify-center rounded-xl bg-primary-soft text-primary">
-        {icon}
-      </div>
-      <h3 className="text-sm font-semibold text-foreground">{title}</h3>
-      <p className="mt-1.5 text-xs leading-relaxed text-muted-foreground">{body}</p>
-      <div className="mt-3 inline-flex items-center gap-1 text-xs font-semibold text-primary">
-        {cta} <ArrowUpRight className="h-3.5 w-3.5 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
-      </div>
-    </Link>
   );
 }
 
