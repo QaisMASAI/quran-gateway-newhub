@@ -1,8 +1,12 @@
 import { createFileRoute } from "@tanstack/react-router";
 
 type TranslationVerse = {
-  verse_key: string;
+  verse_key?: string;
   text: string;
+};
+
+type ArabicVerse = {
+  verse_key: string;
 };
 
 type SourceSpec = {
@@ -74,6 +78,13 @@ export const Route = createFileRoute("/api/public/admin/backfill-verse-translati
         }
 
         let upserted = 0;
+        const arabicRes = await fetch("https://api.quran.com/api/v4/quran/verses/uthmani");
+        if (!arabicRes.ok) {
+          return Response.json({ ok: false, error: `Quran API failed for verse keys (${arabicRes.status})` }, { status: 502 });
+        }
+        const arabicJson = (await arabicRes.json()) as { verses?: ArabicVerse[] };
+        const verseKeys = (arabicJson.verses ?? []).map((v) => v.verse_key);
+
         for (const source of SOURCES) {
           const res = await fetch(`https://api.quran.com/api/v4/quran/translations/${source.resourceId}`);
           if (!res.ok) {
@@ -87,8 +98,9 @@ export const Route = createFileRoute("/api/public/admin/backfill-verse-translati
           }
 
           const rows = (json.translations ?? [])
-            .map((v) => {
-              const [surahRaw, ayahRaw] = (v.verse_key ?? "").split(":");
+            .map((v, idx) => {
+              const key = v.verse_key ?? verseKeys[idx] ?? "";
+              const [surahRaw, ayahRaw] = key.split(":");
               const surah = Number(surahRaw);
               const ayah = Number(ayahRaw);
               const text = cleanHtml(v.text ?? "");
