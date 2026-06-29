@@ -38,6 +38,72 @@ export type Database = {
         }
         Relationships: []
       }
+      admin_job_runs: {
+        Row: {
+          created_at: string
+          error_message: string | null
+          finished_at: string | null
+          id: string
+          job_key: string
+          payload: Json
+          requested_by: string
+          result: Json | null
+          started_at: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          error_message?: string | null
+          finished_at?: string | null
+          id?: string
+          job_key: string
+          payload?: Json
+          requested_by: string
+          result?: Json | null
+          started_at?: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          error_message?: string | null
+          finished_at?: string | null
+          id?: string
+          job_key?: string
+          payload?: Json
+          requested_by?: string
+          result?: Json | null
+          started_at?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      admin_runtime_settings: {
+        Row: {
+          created_at: string
+          key: string
+          updated_at: string
+          updated_by: string | null
+          value_json: Json
+        }
+        Insert: {
+          created_at?: string
+          key: string
+          updated_at?: string
+          updated_by?: string | null
+          value_json?: Json
+        }
+        Update: {
+          created_at?: string
+          key?: string
+          updated_at?: string
+          updated_by?: string | null
+          value_json?: Json
+        }
+        Relationships: []
+      }
       ai_research_queries: {
         Row: {
           answer: string | null
