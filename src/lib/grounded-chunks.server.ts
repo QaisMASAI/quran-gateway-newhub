@@ -401,3 +401,103 @@ ${r.body}`;
     model: data.model,
   };
 }
+
+const TranslateEnglishSchema = z.object({
+  batch: z.number().int().min(1).max(200).optional().default(80),
+  model: z.string().min(3).optional().default("google/gemini-2.5-flash"),
+});
+
+export async function generateEnglishTafsirJob(input: unknown) {
+  const data = TranslateEnglishSchema.parse(input);
+  const apiKey = process.env.LOVABLE_API_KEY;
+  if (!apiKey) return { ok: false, error: "ai_not_configured" as const };
+  const gateway = createLovableAiGatewayProvider(apiKey);
+  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+
+  const { data: rows, error } = await supabaseAdmin
+    .from("tafsir_passages")
+    .select("id, source_id, surah, ayah_start, ayah_end, body, source:tafsir_sources!inner(name_en,name_ar)")
+    .eq("lang", "ar")
+    .order("surah", { ascending: true })
+    .order("ayah_start", { ascending: true })
+    .limit(data.batch);
+
+  if (error) return { ok: false, error: error.message };
+
+  type UpsertRow = {
+    source_id: string;
+    surah: number;
+    ayah_start: number;
+    ayah_end: number;
+    lang: "en";
+    body: string;
+    citation: string | null;
+  };
+
+  const out: UpsertRow[] = [];
+
+  for (const r of (rows ?? []) as Array<{
+    source_id: string;
+    surah: number;
+    ayah_start: number;
+    ayah_end: number;
+    body: string;
+    source: { name_en?: string; name_ar?: string } | null;
+  }>) {
+    const prompt = `Translate the following Arabic tafsir passage into accurate English for a Quran learning platform.
+Rules:
+- Preserve meaning and scholarly tone.
+- Do not add claims not in the source.
+- Keep references explicit.
+- Return only the English translation text.
+
+Source tafsir: ${r.source?.name_en ?? r.source?.name_ar ?? "Tafsir"}
+Surah: ${r.surah}
+Ayah range: ${r.ayah_start}-${r.ayah_end}
+Arabic source:
+${r.body}`;
+
+    try {
+      const { text } = await withTimeout(
+        generateText({
+          model: gateway(data.model),
+          prompt,
+          temperature: 0,
+          maxOutputTokens: 1000,
+        }),
+        25_000,
+      );
+      const en = clip(text, 7000);
+      if (!en) continue;
+      out.push({
+        source_id: r.source_id,
+        surah: r.surah,
+        ayah_start: r.ayah_start,
+        ayah_end: r.ayah_end,
+        lang: "en",
+        body: en,
+        citation: `Translated from Arabic tafsir ${r.surah}:${r.ayah_start}-${r.ayah_end}`,
+      });
+    } catch {
+      // continue on item failure
+    }
+  }
+
+  if (out.length === 0) return { ok: false, error: "no_translations_generated" as const };
+
+  for (const row of out) {
+    await supabaseAdmin
+      .from("tafsir_passages")
+      .delete()
+      .eq("source_id", row.source_id)
+      .eq("surah", row.surah)
+      .eq("ayah_start", row.ayah_start)
+      .eq("ayah_end", row.ayah_end)
+      .eq("lang", "en");
+  }
+
+  const { error: insertErr } = await supabaseAdmin.from("tafsir_passages").insert(out);
+  if (insertErr) return { ok: false, error: insertErr.message };
+
+  return { ok: true, translated_rows: out.length, model: data.model };
+}
