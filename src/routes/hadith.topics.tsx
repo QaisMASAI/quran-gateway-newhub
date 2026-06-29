@@ -3,7 +3,9 @@ import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useTranslation } from "react-i18next";
 import { Header } from "@/components/Header";
-import { listHadithTopicBooks } from "@/lib/hadith.functions";
+import { listHadithTopicBooks, listHadithTopics } from "@/lib/hadith.functions";
+import { pickLocale } from "@/lib/knowledge";
+import { normalizeLocale } from "@/lib/i18n";
 
 export const Route = createFileRoute("/hadith/topics")({
   loader: async ({ context }) => {
@@ -17,12 +19,17 @@ export const Route = createFileRoute("/hadith/topics")({
 
 function HadithTopicsPage() {
   const { i18n } = useTranslation();
-  const locale = (i18n.language?.slice(0, 2) ?? "he") as "he" | "ar" | "en";
+  const locale = (normalizeLocale(i18n.language) ?? "he") as "he" | "ar" | "en";
   const isRtl = i18n.dir() === "rtl";
   const fn = useServerFn(listHadithTopicBooks);
+  const topicsFn = useServerFn(listHadithTopics);
   const { data = [] } = useQuery({
     queryKey: ["hadith", "topic-books"],
     queryFn: () => fn({ data: { limitPerCollection: 10 } }),
+  });
+  const { data: topics = [] } = useQuery({
+    queryKey: ["hadith", "topics"],
+    queryFn: () => topicsFn({ data: { limit: 24 } }),
   });
 
   return (
@@ -40,7 +47,33 @@ function HadithTopicsPage() {
               : "Browse the top hadith books in each collection as learning topics."}
         </p>
 
-        <div className="mt-6 grid gap-3 sm:grid-cols-2">
+        {topics.length > 0 && (
+          <div className="mt-6">
+            <h2 className="text-sm font-semibold text-foreground">
+              {locale === "he" ? "נושאים קשורים אמיתיים" : locale === "ar" ? "موضوعات مرتبطة فعلاً" : "Real related topics"}
+            </h2>
+            <div className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+              {topics.map((topic) => (
+                <Link
+                  key={topic.id}
+                  to="/learn/$kind/$slug"
+                  params={{ kind: "topic", slug: topic.slug }}
+                  className="surface-card block p-4 transition-colors hover:border-primary/40"
+                >
+                  <div className="text-sm font-semibold text-foreground">{pickLocale(topic.title_i18n, locale)}</div>
+                  <div className="mt-2 text-xs text-muted-foreground">
+                    {topic.hadith_count} hadith · {topic.collections.join(", ")}
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </div>
+        )}
+
+        <h2 className="mt-8 text-sm font-semibold text-foreground">
+          {locale === "he" ? "ספרים מובילים לפי אוספים" : locale === "ar" ? "أبرز الكتب حسب المجموعات" : "Top books by collection"}
+        </h2>
+        <div className="mt-3 grid gap-3 sm:grid-cols-2">
           {data.map((b) => (
             <Link
               key={`${b.collection_slug}-${b.book_id}`}

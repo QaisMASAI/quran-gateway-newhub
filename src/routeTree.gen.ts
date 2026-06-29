@@ -45,6 +45,7 @@ import { Route as LearnKindSlugRouteImport } from './routes/learn.$kind.$slug'
 import { Route as HadithCollectionBookRouteImport } from './routes/hadith.$collection.$book'
 import { Route as ApiPublicSurahNamesRouteImport } from './routes/api/public/surah-names'
 import { Route as ApiPublicSeedKnowledgeRouteImport } from './routes/api/public/seed-knowledge'
+import { Route as AuthenticatedAdminBackfillRouteImport } from './routes/_authenticated/admin.backfill'
 import { Route as HadithCollectionEntryNumRouteImport } from './routes/hadith.$collection.entry.$num'
 import { Route as ApiPublicAdminTranslateTafsirHebrewRouteImport } from './routes/api/public/admin/translate-tafsir-hebrew'
 import { Route as ApiPublicAdminTranslateHadithHebrewRouteImport } from './routes/api/public/admin/translate-hadith-hebrew'
@@ -236,6 +237,12 @@ const ApiPublicSeedKnowledgeRoute = ApiPublicSeedKnowledgeRouteImport.update({
   path: '/api/public/seed-knowledge',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedAdminBackfillRoute =
+  AuthenticatedAdminBackfillRouteImport.update({
+    id: '/admin/backfill',
+    path: '/admin/backfill',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const HadithCollectionEntryNumRoute =
   HadithCollectionEntryNumRouteImport.update({
     id: '/entry/$num',
@@ -326,6 +333,7 @@ export interface FileRoutesByFullPath {
   '/plans/': typeof PlansIndexRoute
   '/prophets/': typeof ProphetsIndexRoute
   '/topics/': typeof TopicsIndexRoute
+  '/admin/backfill': typeof AuthenticatedAdminBackfillRoute
   '/api/public/seed-knowledge': typeof ApiPublicSeedKnowledgeRoute
   '/api/public/surah-names': typeof ApiPublicSurahNamesRoute
   '/hadith/$collection/$book': typeof HadithCollectionBookRoute
@@ -372,6 +380,7 @@ export interface FileRoutesByTo {
   '/plans': typeof PlansIndexRoute
   '/prophets': typeof ProphetsIndexRoute
   '/topics': typeof TopicsIndexRoute
+  '/admin/backfill': typeof AuthenticatedAdminBackfillRoute
   '/api/public/seed-knowledge': typeof ApiPublicSeedKnowledgeRoute
   '/api/public/surah-names': typeof ApiPublicSurahNamesRoute
   '/hadith/$collection/$book': typeof HadithCollectionBookRoute
@@ -421,6 +430,7 @@ export interface FileRoutesById {
   '/plans/': typeof PlansIndexRoute
   '/prophets/': typeof ProphetsIndexRoute
   '/topics/': typeof TopicsIndexRoute
+  '/_authenticated/admin/backfill': typeof AuthenticatedAdminBackfillRoute
   '/api/public/seed-knowledge': typeof ApiPublicSeedKnowledgeRoute
   '/api/public/surah-names': typeof ApiPublicSurahNamesRoute
   '/hadith/$collection/$book': typeof HadithCollectionBookRoute
@@ -470,6 +480,7 @@ export interface FileRouteTypes {
     | '/plans/'
     | '/prophets/'
     | '/topics/'
+    | '/admin/backfill'
     | '/api/public/seed-knowledge'
     | '/api/public/surah-names'
     | '/hadith/$collection/$book'
@@ -516,6 +527,7 @@ export interface FileRouteTypes {
     | '/plans'
     | '/prophets'
     | '/topics'
+    | '/admin/backfill'
     | '/api/public/seed-knowledge'
     | '/api/public/surah-names'
     | '/hadith/$collection/$book'
@@ -564,6 +576,7 @@ export interface FileRouteTypes {
     | '/plans/'
     | '/prophets/'
     | '/topics/'
+    | '/_authenticated/admin/backfill'
     | '/api/public/seed-knowledge'
     | '/api/public/surah-names'
     | '/hadith/$collection/$book'
@@ -879,6 +892,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicSeedKnowledgeRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/admin/backfill': {
+      id: '/_authenticated/admin/backfill'
+      path: '/admin/backfill'
+      fullPath: '/admin/backfill'
+      preLoaderRoute: typeof AuthenticatedAdminBackfillRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/hadith/$collection/entry/$num': {
       id: '/hadith/$collection/entry/$num'
       path: '/entry/$num'
@@ -953,10 +973,12 @@ declare module '@tanstack/react-router' {
 }
 
 interface AuthenticatedRouteRouteChildren {
+  AuthenticatedAdminBackfillRoute: typeof AuthenticatedAdminBackfillRoute
   AuthenticatedCollectionsIndexRoute: typeof AuthenticatedCollectionsIndexRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedAdminBackfillRoute: AuthenticatedAdminBackfillRoute,
   AuthenticatedCollectionsIndexRoute: AuthenticatedCollectionsIndexRoute,
 }
 
