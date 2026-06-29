@@ -10,6 +10,16 @@ type SourceRow = {
   slug: string;
 };
 
+type AsbabInsertRow = {
+  source_id: string;
+  surah: number;
+  ayah_start: number;
+  ayah_end: number;
+  lang: string;
+  body: string;
+  citation: string;
+};
+
 function stripHtml(input: string): string {
   return input.replace(/<sup[^>]*>.*?<\/sup>/g, " ").replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
 }
@@ -85,7 +95,7 @@ export const Route = createFileRoute("/api/public/admin/backfill-asbab-nuzul")({
               citation: `Quran.com tafsir 14 ${s}:${a}`,
             };
           })
-          .filter((v): v is NonNullable<typeof v> => !!v);
+          .filter((v): v is AsbabInsertRow => !!v);
 
         if (upserts.length > 0) {
           const { error } = await supabaseAdmin.from("asbab_nuzul").upsert(upserts, {
