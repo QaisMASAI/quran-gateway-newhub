@@ -48,6 +48,7 @@ import { Route as ApiPublicSeedKnowledgeRouteImport } from './routes/api/public/
 import { Route as AuthenticatedAdminBackfillRouteImport } from './routes/_authenticated/admin.backfill'
 import { Route as HadithCollectionEntryNumRouteImport } from './routes/hadith.$collection.entry.$num'
 import { Route as ApiPublicAdminTranslateTafsirHebrewRouteImport } from './routes/api/public/admin/translate-tafsir-hebrew'
+import { Route as ApiPublicAdminTranslateTafsirEnglishRouteImport } from './routes/api/public/admin/translate-tafsir-english'
 import { Route as ApiPublicAdminTranslateHadithHebrewRouteImport } from './routes/api/public/admin/translate-hadith-hebrew'
 import { Route as ApiPublicAdminRebuildGroundedIndexRouteImport } from './routes/api/public/admin/rebuild-grounded-index'
 import { Route as ApiPublicAdminLinkHadithGraphRouteImport } from './routes/api/public/admin/link-hadith-graph'
@@ -255,6 +256,12 @@ const ApiPublicAdminTranslateTafsirHebrewRoute =
     path: '/api/public/admin/translate-tafsir-hebrew',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicAdminTranslateTafsirEnglishRoute =
+  ApiPublicAdminTranslateTafsirEnglishRouteImport.update({
+    id: '/api/public/admin/translate-tafsir-english',
+    path: '/api/public/admin/translate-tafsir-english',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPublicAdminTranslateHadithHebrewRoute =
   ApiPublicAdminTranslateHadithHebrewRouteImport.update({
     id: '/api/public/admin/translate-hadith-hebrew',
@@ -349,6 +356,7 @@ export interface FileRoutesByFullPath {
   '/api/public/admin/link-hadith-graph': typeof ApiPublicAdminLinkHadithGraphRoute
   '/api/public/admin/rebuild-grounded-index': typeof ApiPublicAdminRebuildGroundedIndexRoute
   '/api/public/admin/translate-hadith-hebrew': typeof ApiPublicAdminTranslateHadithHebrewRoute
+  '/api/public/admin/translate-tafsir-english': typeof ApiPublicAdminTranslateTafsirEnglishRoute
   '/api/public/admin/translate-tafsir-hebrew': typeof ApiPublicAdminTranslateTafsirHebrewRoute
   '/hadith/$collection/entry/$num': typeof HadithCollectionEntryNumRoute
 }
@@ -396,6 +404,7 @@ export interface FileRoutesByTo {
   '/api/public/admin/link-hadith-graph': typeof ApiPublicAdminLinkHadithGraphRoute
   '/api/public/admin/rebuild-grounded-index': typeof ApiPublicAdminRebuildGroundedIndexRoute
   '/api/public/admin/translate-hadith-hebrew': typeof ApiPublicAdminTranslateHadithHebrewRoute
+  '/api/public/admin/translate-tafsir-english': typeof ApiPublicAdminTranslateTafsirEnglishRoute
   '/api/public/admin/translate-tafsir-hebrew': typeof ApiPublicAdminTranslateTafsirHebrewRoute
   '/hadith/$collection/entry/$num': typeof HadithCollectionEntryNumRoute
 }
@@ -446,6 +455,7 @@ export interface FileRoutesById {
   '/api/public/admin/link-hadith-graph': typeof ApiPublicAdminLinkHadithGraphRoute
   '/api/public/admin/rebuild-grounded-index': typeof ApiPublicAdminRebuildGroundedIndexRoute
   '/api/public/admin/translate-hadith-hebrew': typeof ApiPublicAdminTranslateHadithHebrewRoute
+  '/api/public/admin/translate-tafsir-english': typeof ApiPublicAdminTranslateTafsirEnglishRoute
   '/api/public/admin/translate-tafsir-hebrew': typeof ApiPublicAdminTranslateTafsirHebrewRoute
   '/hadith/$collection/entry/$num': typeof HadithCollectionEntryNumRoute
 }
@@ -496,6 +506,7 @@ export interface FileRouteTypes {
     | '/api/public/admin/link-hadith-graph'
     | '/api/public/admin/rebuild-grounded-index'
     | '/api/public/admin/translate-hadith-hebrew'
+    | '/api/public/admin/translate-tafsir-english'
     | '/api/public/admin/translate-tafsir-hebrew'
     | '/hadith/$collection/entry/$num'
   fileRoutesByTo: FileRoutesByTo
@@ -543,6 +554,7 @@ export interface FileRouteTypes {
     | '/api/public/admin/link-hadith-graph'
     | '/api/public/admin/rebuild-grounded-index'
     | '/api/public/admin/translate-hadith-hebrew'
+    | '/api/public/admin/translate-tafsir-english'
     | '/api/public/admin/translate-tafsir-hebrew'
     | '/hadith/$collection/entry/$num'
   id:
@@ -592,6 +604,7 @@ export interface FileRouteTypes {
     | '/api/public/admin/link-hadith-graph'
     | '/api/public/admin/rebuild-grounded-index'
     | '/api/public/admin/translate-hadith-hebrew'
+    | '/api/public/admin/translate-tafsir-english'
     | '/api/public/admin/translate-tafsir-hebrew'
     | '/hadith/$collection/entry/$num'
   fileRoutesById: FileRoutesById
@@ -635,6 +648,7 @@ export interface RootRouteChildren {
   ApiPublicAdminLinkHadithGraphRoute: typeof ApiPublicAdminLinkHadithGraphRoute
   ApiPublicAdminRebuildGroundedIndexRoute: typeof ApiPublicAdminRebuildGroundedIndexRoute
   ApiPublicAdminTranslateHadithHebrewRoute: typeof ApiPublicAdminTranslateHadithHebrewRoute
+  ApiPublicAdminTranslateTafsirEnglishRoute: typeof ApiPublicAdminTranslateTafsirEnglishRoute
   ApiPublicAdminTranslateTafsirHebrewRoute: typeof ApiPublicAdminTranslateTafsirHebrewRoute
 }
 
@@ -913,6 +927,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicAdminTranslateTafsirHebrewRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/admin/translate-tafsir-english': {
+      id: '/api/public/admin/translate-tafsir-english'
+      path: '/api/public/admin/translate-tafsir-english'
+      fullPath: '/api/public/admin/translate-tafsir-english'
+      preLoaderRoute: typeof ApiPublicAdminTranslateTafsirEnglishRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/admin/translate-hadith-hebrew': {
       id: '/api/public/admin/translate-hadith-hebrew'
       path: '/api/public/admin/translate-hadith-hebrew'
@@ -1058,6 +1079,8 @@ const rootRouteChildren: RootRouteChildren = {
     ApiPublicAdminRebuildGroundedIndexRoute,
   ApiPublicAdminTranslateHadithHebrewRoute:
     ApiPublicAdminTranslateHadithHebrewRoute,
+  ApiPublicAdminTranslateTafsirEnglishRoute:
+    ApiPublicAdminTranslateTafsirEnglishRoute,
   ApiPublicAdminTranslateTafsirHebrewRoute:
     ApiPublicAdminTranslateTafsirHebrewRoute,
 }
