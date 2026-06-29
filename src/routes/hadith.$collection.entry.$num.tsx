@@ -9,9 +9,9 @@ export const Route = createFileRoute("/hadith/$collection/entry/$num")({
   head: ({ params }) => ({
     meta: [
       { title: `${params.collection === "bukhari" ? "Sahih al-Bukhari" : "Sahih Muslim"} — Hadith #${params.num}` },
-      { property: "og:url", content: `/hadith/${params.collection}/${params.num}` },
+      { property: "og:url", content: `/hadith/${params.collection}/entry/${params.num}` },
     ],
-    links: [{ rel: "canonical", href: `/hadith/${params.collection}/${params.num}` }],
+    links: [{ rel: "canonical", href: `/hadith/${params.collection}/entry/${params.num}` }],
   }),
   loader: async ({ context, params }) => {
     if (!["bukhari", "muslim"].includes(params.collection)) throw notFound();
