@@ -124,7 +124,6 @@ export async function getAsbabForVerse(
       .eq("surah", surah)
       .lte("ayah_start", ayah)
       .gte("ayah_end", ayah)
-      .eq("source.slug", JALALAYN_SLUG)
       .order("created_at", { ascending: false });
 
   const fallbackOrder: Locale[] = [lang, "he", "ar", "en"].filter(
@@ -148,7 +147,6 @@ export async function getAsbabForVerse(
       .lte("ayah_start", ayah)
       .gte("ayah_end", ayah)
       .eq("lang", candidate)
-      .eq("source.slug", JALALAYN_SLUG)
       .or("body.ilike.%سبب النزول%,body.ilike.%نزلت%")
       .order("created_at", { ascending: false })
       .limit(4);
