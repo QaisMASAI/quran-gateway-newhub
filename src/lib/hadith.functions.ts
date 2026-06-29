@@ -32,6 +32,14 @@ export type HadithTopicBook = {
   hadith_count: number;
 };
 
+export type HadithTopic = {
+  id: string;
+  slug: string;
+  title_i18n: { he?: string; ar?: string; en?: string };
+  hadith_count: number;
+  collections: string[];
+};
+
 export type HadithEntry = {
   id: number;
   collection_slug: string;
@@ -178,4 +186,70 @@ export const listHadithTopicBooks = createServerFn({ method: "GET" })
     }
 
     return out.sort((a, b) => b.hadith_count - a.hadith_count);
+  });
+
+export const listHadithTopics = createServerFn({ method: "GET" })
+  .inputValidator((input: unknown) =>
+    z
+      .object({
+        limit: z.number().int().min(1).max(60).optional().default(24),
+      })
+      .parse(input ?? {}),
+  )
+  .handler(async ({ data }): Promise<HadithTopic[]> => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: rows } = await supabaseAdmin
+      .from("hadith_entity_links" as never)
+      .select("entity_id, hadith_id, hadith_entries!inner(collection_slug), knowledge_entities!inner(id,slug,title_i18n,published,kind)")
+      .not("entity_id", "is", null)
+      .eq("knowledge_entities.published", true)
+      .eq("knowledge_entities.kind", "topic")
+      .limit(25000);
+
+    const byEntity = new Map<
+      string,
+      {
+        id: string;
+        slug: string;
+        title_i18n: { he?: string; ar?: string; en?: string };
+        hadithIds: Set<number>;
+        collections: Set<string>;
+      }
+    >();
+
+    for (const row of (rows ?? []) as Array<{
+      entity_id: string | null;
+      hadith_id: number;
+      hadith_entries: { collection_slug: string } | null;
+      knowledge_entities: {
+        id: string;
+        slug: string;
+        title_i18n: { he?: string; ar?: string; en?: string };
+      } | null;
+    }>) {
+      if (!row.entity_id || !row.knowledge_entities) continue;
+      const current =
+        byEntity.get(row.entity_id) ??
+        {
+          id: row.knowledge_entities.id,
+          slug: row.knowledge_entities.slug,
+          title_i18n: row.knowledge_entities.title_i18n ?? {},
+          hadithIds: new Set<number>(),
+          collections: new Set<string>(),
+        };
+      current.hadithIds.add(row.hadith_id);
+      if (row.hadith_entries?.collection_slug) current.collections.add(row.hadith_entries.collection_slug);
+      byEntity.set(row.entity_id, current);
+    }
+
+    return [...byEntity.values()]
+      .map((entry) => ({
+        id: entry.id,
+        slug: entry.slug,
+        title_i18n: entry.title_i18n,
+        hadith_count: entry.hadithIds.size,
+        collections: [...entry.collections],
+      }))
+      .sort((a, b) => b.hadith_count - a.hadith_count)
+      .slice(0, data.limit);
   });

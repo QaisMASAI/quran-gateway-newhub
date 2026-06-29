@@ -42,11 +42,13 @@ import { Route as LearnJourneysIndexRouteImport } from './routes/learn.journeys.
 import { Route as AuthenticatedCollectionsIndexRouteImport } from './routes/_authenticated/collections.index'
 import { Route as LearnJourneysSlugRouteImport } from './routes/learn.journeys.$slug'
 import { Route as LearnKindSlugRouteImport } from './routes/learn.$kind.$slug'
-import { Route as HadithCollectionNumRouteImport } from './routes/hadith.$collection.$num'
 import { Route as HadithCollectionBookRouteImport } from './routes/hadith.$collection.$book'
 import { Route as ApiPublicSurahNamesRouteImport } from './routes/api/public/surah-names'
 import { Route as ApiPublicSeedKnowledgeRouteImport } from './routes/api/public/seed-knowledge'
+import { Route as AuthenticatedAdminBackfillRouteImport } from './routes/_authenticated/admin.backfill'
+import { Route as HadithCollectionEntryNumRouteImport } from './routes/hadith.$collection.entry.$num'
 import { Route as ApiPublicAdminTranslateTafsirHebrewRouteImport } from './routes/api/public/admin/translate-tafsir-hebrew'
+import { Route as ApiPublicAdminTranslateTafsirEnglishRouteImport } from './routes/api/public/admin/translate-tafsir-english'
 import { Route as ApiPublicAdminTranslateHadithHebrewRouteImport } from './routes/api/public/admin/translate-hadith-hebrew'
 import { Route as ApiPublicAdminRebuildGroundedIndexRouteImport } from './routes/api/public/admin/rebuild-grounded-index'
 import { Route as ApiPublicAdminLinkHadithGraphRouteImport } from './routes/api/public/admin/link-hadith-graph'
@@ -221,11 +223,6 @@ const LearnKindSlugRoute = LearnKindSlugRouteImport.update({
   path: '/learn/$kind/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
-const HadithCollectionNumRoute = HadithCollectionNumRouteImport.update({
-  id: '/$num',
-  path: '/$num',
-  getParentRoute: () => HadithCollectionRoute,
-} as any)
 const HadithCollectionBookRoute = HadithCollectionBookRouteImport.update({
   id: '/$book',
   path: '/$book',
@@ -241,10 +238,28 @@ const ApiPublicSeedKnowledgeRoute = ApiPublicSeedKnowledgeRouteImport.update({
   path: '/api/public/seed-knowledge',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedAdminBackfillRoute =
+  AuthenticatedAdminBackfillRouteImport.update({
+    id: '/admin/backfill',
+    path: '/admin/backfill',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const HadithCollectionEntryNumRoute =
+  HadithCollectionEntryNumRouteImport.update({
+    id: '/entry/$num',
+    path: '/entry/$num',
+    getParentRoute: () => HadithCollectionRoute,
+  } as any)
 const ApiPublicAdminTranslateTafsirHebrewRoute =
   ApiPublicAdminTranslateTafsirHebrewRouteImport.update({
     id: '/api/public/admin/translate-tafsir-hebrew',
     path: '/api/public/admin/translate-tafsir-hebrew',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiPublicAdminTranslateTafsirEnglishRoute =
+  ApiPublicAdminTranslateTafsirEnglishRouteImport.update({
+    id: '/api/public/admin/translate-tafsir-english',
+    path: '/api/public/admin/translate-tafsir-english',
     getParentRoute: () => rootRouteImport,
   } as any)
 const ApiPublicAdminTranslateHadithHebrewRoute =
@@ -325,10 +340,10 @@ export interface FileRoutesByFullPath {
   '/plans/': typeof PlansIndexRoute
   '/prophets/': typeof ProphetsIndexRoute
   '/topics/': typeof TopicsIndexRoute
+  '/admin/backfill': typeof AuthenticatedAdminBackfillRoute
   '/api/public/seed-knowledge': typeof ApiPublicSeedKnowledgeRoute
   '/api/public/surah-names': typeof ApiPublicSurahNamesRoute
   '/hadith/$collection/$book': typeof HadithCollectionBookRoute
-  '/hadith/$collection/$num': typeof HadithCollectionNumRoute
   '/learn/$kind/$slug': typeof LearnKindSlugRoute
   '/learn/journeys/$slug': typeof LearnJourneysSlugRoute
   '/collections/': typeof AuthenticatedCollectionsIndexRoute
@@ -341,7 +356,9 @@ export interface FileRoutesByFullPath {
   '/api/public/admin/link-hadith-graph': typeof ApiPublicAdminLinkHadithGraphRoute
   '/api/public/admin/rebuild-grounded-index': typeof ApiPublicAdminRebuildGroundedIndexRoute
   '/api/public/admin/translate-hadith-hebrew': typeof ApiPublicAdminTranslateHadithHebrewRoute
+  '/api/public/admin/translate-tafsir-english': typeof ApiPublicAdminTranslateTafsirEnglishRoute
   '/api/public/admin/translate-tafsir-hebrew': typeof ApiPublicAdminTranslateTafsirHebrewRoute
+  '/hadith/$collection/entry/$num': typeof HadithCollectionEntryNumRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -371,10 +388,10 @@ export interface FileRoutesByTo {
   '/plans': typeof PlansIndexRoute
   '/prophets': typeof ProphetsIndexRoute
   '/topics': typeof TopicsIndexRoute
+  '/admin/backfill': typeof AuthenticatedAdminBackfillRoute
   '/api/public/seed-knowledge': typeof ApiPublicSeedKnowledgeRoute
   '/api/public/surah-names': typeof ApiPublicSurahNamesRoute
   '/hadith/$collection/$book': typeof HadithCollectionBookRoute
-  '/hadith/$collection/$num': typeof HadithCollectionNumRoute
   '/learn/$kind/$slug': typeof LearnKindSlugRoute
   '/learn/journeys/$slug': typeof LearnJourneysSlugRoute
   '/collections': typeof AuthenticatedCollectionsIndexRoute
@@ -387,7 +404,9 @@ export interface FileRoutesByTo {
   '/api/public/admin/link-hadith-graph': typeof ApiPublicAdminLinkHadithGraphRoute
   '/api/public/admin/rebuild-grounded-index': typeof ApiPublicAdminRebuildGroundedIndexRoute
   '/api/public/admin/translate-hadith-hebrew': typeof ApiPublicAdminTranslateHadithHebrewRoute
+  '/api/public/admin/translate-tafsir-english': typeof ApiPublicAdminTranslateTafsirEnglishRoute
   '/api/public/admin/translate-tafsir-hebrew': typeof ApiPublicAdminTranslateTafsirHebrewRoute
+  '/hadith/$collection/entry/$num': typeof HadithCollectionEntryNumRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -420,10 +439,10 @@ export interface FileRoutesById {
   '/plans/': typeof PlansIndexRoute
   '/prophets/': typeof ProphetsIndexRoute
   '/topics/': typeof TopicsIndexRoute
+  '/_authenticated/admin/backfill': typeof AuthenticatedAdminBackfillRoute
   '/api/public/seed-knowledge': typeof ApiPublicSeedKnowledgeRoute
   '/api/public/surah-names': typeof ApiPublicSurahNamesRoute
   '/hadith/$collection/$book': typeof HadithCollectionBookRoute
-  '/hadith/$collection/$num': typeof HadithCollectionNumRoute
   '/learn/$kind/$slug': typeof LearnKindSlugRoute
   '/learn/journeys/$slug': typeof LearnJourneysSlugRoute
   '/_authenticated/collections/': typeof AuthenticatedCollectionsIndexRoute
@@ -436,7 +455,9 @@ export interface FileRoutesById {
   '/api/public/admin/link-hadith-graph': typeof ApiPublicAdminLinkHadithGraphRoute
   '/api/public/admin/rebuild-grounded-index': typeof ApiPublicAdminRebuildGroundedIndexRoute
   '/api/public/admin/translate-hadith-hebrew': typeof ApiPublicAdminTranslateHadithHebrewRoute
+  '/api/public/admin/translate-tafsir-english': typeof ApiPublicAdminTranslateTafsirEnglishRoute
   '/api/public/admin/translate-tafsir-hebrew': typeof ApiPublicAdminTranslateTafsirHebrewRoute
+  '/hadith/$collection/entry/$num': typeof HadithCollectionEntryNumRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -469,10 +490,10 @@ export interface FileRouteTypes {
     | '/plans/'
     | '/prophets/'
     | '/topics/'
+    | '/admin/backfill'
     | '/api/public/seed-knowledge'
     | '/api/public/surah-names'
     | '/hadith/$collection/$book'
-    | '/hadith/$collection/$num'
     | '/learn/$kind/$slug'
     | '/learn/journeys/$slug'
     | '/collections/'
@@ -485,7 +506,9 @@ export interface FileRouteTypes {
     | '/api/public/admin/link-hadith-graph'
     | '/api/public/admin/rebuild-grounded-index'
     | '/api/public/admin/translate-hadith-hebrew'
+    | '/api/public/admin/translate-tafsir-english'
     | '/api/public/admin/translate-tafsir-hebrew'
+    | '/hadith/$collection/entry/$num'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -515,10 +538,10 @@ export interface FileRouteTypes {
     | '/plans'
     | '/prophets'
     | '/topics'
+    | '/admin/backfill'
     | '/api/public/seed-knowledge'
     | '/api/public/surah-names'
     | '/hadith/$collection/$book'
-    | '/hadith/$collection/$num'
     | '/learn/$kind/$slug'
     | '/learn/journeys/$slug'
     | '/collections'
@@ -531,7 +554,9 @@ export interface FileRouteTypes {
     | '/api/public/admin/link-hadith-graph'
     | '/api/public/admin/rebuild-grounded-index'
     | '/api/public/admin/translate-hadith-hebrew'
+    | '/api/public/admin/translate-tafsir-english'
     | '/api/public/admin/translate-tafsir-hebrew'
+    | '/hadith/$collection/entry/$num'
   id:
     | '__root__'
     | '/'
@@ -563,10 +588,10 @@ export interface FileRouteTypes {
     | '/plans/'
     | '/prophets/'
     | '/topics/'
+    | '/_authenticated/admin/backfill'
     | '/api/public/seed-knowledge'
     | '/api/public/surah-names'
     | '/hadith/$collection/$book'
-    | '/hadith/$collection/$num'
     | '/learn/$kind/$slug'
     | '/learn/journeys/$slug'
     | '/_authenticated/collections/'
@@ -579,7 +604,9 @@ export interface FileRouteTypes {
     | '/api/public/admin/link-hadith-graph'
     | '/api/public/admin/rebuild-grounded-index'
     | '/api/public/admin/translate-hadith-hebrew'
+    | '/api/public/admin/translate-tafsir-english'
     | '/api/public/admin/translate-tafsir-hebrew'
+    | '/hadith/$collection/entry/$num'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -621,6 +648,7 @@ export interface RootRouteChildren {
   ApiPublicAdminLinkHadithGraphRoute: typeof ApiPublicAdminLinkHadithGraphRoute
   ApiPublicAdminRebuildGroundedIndexRoute: typeof ApiPublicAdminRebuildGroundedIndexRoute
   ApiPublicAdminTranslateHadithHebrewRoute: typeof ApiPublicAdminTranslateHadithHebrewRoute
+  ApiPublicAdminTranslateTafsirEnglishRoute: typeof ApiPublicAdminTranslateTafsirEnglishRoute
   ApiPublicAdminTranslateTafsirHebrewRoute: typeof ApiPublicAdminTranslateTafsirHebrewRoute
 }
 
@@ -857,13 +885,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LearnKindSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/hadith/$collection/$num': {
-      id: '/hadith/$collection/$num'
-      path: '/$num'
-      fullPath: '/hadith/$collection/$num'
-      preLoaderRoute: typeof HadithCollectionNumRouteImport
-      parentRoute: typeof HadithCollectionRoute
-    }
     '/hadith/$collection/$book': {
       id: '/hadith/$collection/$book'
       path: '/$book'
@@ -885,11 +906,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicSeedKnowledgeRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/admin/backfill': {
+      id: '/_authenticated/admin/backfill'
+      path: '/admin/backfill'
+      fullPath: '/admin/backfill'
+      preLoaderRoute: typeof AuthenticatedAdminBackfillRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/hadith/$collection/entry/$num': {
+      id: '/hadith/$collection/entry/$num'
+      path: '/entry/$num'
+      fullPath: '/hadith/$collection/entry/$num'
+      preLoaderRoute: typeof HadithCollectionEntryNumRouteImport
+      parentRoute: typeof HadithCollectionRoute
+    }
     '/api/public/admin/translate-tafsir-hebrew': {
       id: '/api/public/admin/translate-tafsir-hebrew'
       path: '/api/public/admin/translate-tafsir-hebrew'
       fullPath: '/api/public/admin/translate-tafsir-hebrew'
       preLoaderRoute: typeof ApiPublicAdminTranslateTafsirHebrewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/admin/translate-tafsir-english': {
+      id: '/api/public/admin/translate-tafsir-english'
+      path: '/api/public/admin/translate-tafsir-english'
+      fullPath: '/api/public/admin/translate-tafsir-english'
+      preLoaderRoute: typeof ApiPublicAdminTranslateTafsirEnglishRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/public/admin/translate-hadith-hebrew': {
@@ -952,10 +994,12 @@ declare module '@tanstack/react-router' {
 }
 
 interface AuthenticatedRouteRouteChildren {
+  AuthenticatedAdminBackfillRoute: typeof AuthenticatedAdminBackfillRoute
   AuthenticatedCollectionsIndexRoute: typeof AuthenticatedCollectionsIndexRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedAdminBackfillRoute: AuthenticatedAdminBackfillRoute,
   AuthenticatedCollectionsIndexRoute: AuthenticatedCollectionsIndexRoute,
 }
 
@@ -964,12 +1008,12 @@ const AuthenticatedRouteRouteWithChildren =
 
 interface HadithCollectionRouteChildren {
   HadithCollectionBookRoute: typeof HadithCollectionBookRoute
-  HadithCollectionNumRoute: typeof HadithCollectionNumRoute
+  HadithCollectionEntryNumRoute: typeof HadithCollectionEntryNumRoute
 }
 
 const HadithCollectionRouteChildren: HadithCollectionRouteChildren = {
   HadithCollectionBookRoute: HadithCollectionBookRoute,
-  HadithCollectionNumRoute: HadithCollectionNumRoute,
+  HadithCollectionEntryNumRoute: HadithCollectionEntryNumRoute,
 }
 
 const HadithCollectionRouteWithChildren =
@@ -1035,6 +1079,8 @@ const rootRouteChildren: RootRouteChildren = {
     ApiPublicAdminRebuildGroundedIndexRoute,
   ApiPublicAdminTranslateHadithHebrewRoute:
     ApiPublicAdminTranslateHadithHebrewRoute,
+  ApiPublicAdminTranslateTafsirEnglishRoute:
+    ApiPublicAdminTranslateTafsirEnglishRoute,
   ApiPublicAdminTranslateTafsirHebrewRoute:
     ApiPublicAdminTranslateTafsirHebrewRoute,
 }

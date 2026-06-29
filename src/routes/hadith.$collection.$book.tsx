@@ -56,7 +56,7 @@ function HadithBookPage() {
               <div className="mb-1 flex items-center justify-between text-xs text-muted-foreground">
                 <span>#{h.id_in_book}</span>
                 <Link
-                  to="/hadith/$collection/$num"
+                  to="/hadith/$collection/entry/$num"
                   params={{ collection, num: String(h.global_id) }}
                   className="text-primary hover:underline"
                 >

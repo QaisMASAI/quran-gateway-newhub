@@ -57,6 +57,9 @@ export function Header() {
           {isAuthenticated && (
             <NavLink to="/collections" label={t("nav.collections")} icon={<Folder className="h-4 w-4" />} />
           )}
+          {isAuthenticated && (
+            <NavLink to="/admin/backfill" label="Admin" icon={<Sparkles className="h-4 w-4" />} />
+          )}
 
         </nav>
 

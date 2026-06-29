@@ -9,6 +9,7 @@ import { askQuranResearch, type ResearchResult } from "@/lib/ai-research.functio
 import { surahDisplayName } from "@/lib/surah-names-he";
 import { Header } from "@/components/Header";
 import { normalizeLocale } from "@/lib/i18n";
+import { getNextMcpRetryDelay } from "@/lib/mcp-outage.client";
 
 export const Route = createLazyFileRoute("/research")({
   component: ResearchPage,
@@ -18,6 +19,8 @@ function ResearchPage() {
   const { t, i18n } = useTranslation("pages");
   const lang = (normalizeLocale(i18n.language) ?? "he") as "he" | "en" | "ar";
   const [q, setQ] = useState("");
+  const [retryAttempt, setRetryAttempt] = useState(0);
+  const [retryEta, setRetryEta] = useState<number | null>(null);
   const [chatTurns, setChatTurns] = useState<Array<{ question: string; answer: string }>>([]);
   const historyPayload = useMemo(
     () =>
@@ -38,6 +41,10 @@ function ResearchPage() {
         },
       }),
     onSuccess: (res, question) => {
+      if (!res.mcpUnavailable) {
+        setRetryAttempt(0);
+        setRetryEta(null);
+      }
       if (res.answer) {
         setChatTurns((prev) => [...prev.slice(-5), { question, answer: res.answer }]);
       }
@@ -148,12 +155,26 @@ function ResearchPage() {
                   onClick={() => {
                     const nextQ = q.trim() || chatTurns.at(-1)?.question;
                     if (!nextQ) return;
-                    mutation.mutate(nextQ);
+                    const nextAttempt = retryAttempt + 1;
+                    const delayMs = getNextMcpRetryDelay(nextAttempt);
+                    setRetryAttempt(nextAttempt);
+                    setRetryEta(Date.now() + delayMs);
+                    window.setTimeout(() => {
+                      mutation.mutate(nextQ);
+                    }, delayMs);
                   }}
                   className="mt-3 inline-flex min-h-11 items-center rounded-lg border border-destructive/30 bg-background px-3 py-2 text-sm font-medium text-foreground hover:bg-secondary"
                 >
                   {t("research.retryMcp", "Retry verification")}
                 </button>
+                {retryEta && (
+                  <p className="mt-2 text-xs text-destructive/80">
+                    {t("research.retryingIn", {
+                      defaultValue: "Retry scheduled in {{seconds}}s.",
+                      seconds: Math.max(1, Math.ceil((retryEta - Date.now()) / 1000)),
+                    })}
+                  </p>
+                )}
               </div>
             )}
             <div className="rounded-2xl border border-border bg-card p-6">
@@ -248,7 +269,7 @@ function ResearchPage() {
                   {result.hadith.map((h, i) => (
                     <a
                       key={`${h.collection}-${h.global_id}-${i}`}
-                      href={`/hadith/${h.collection}/${h.global_id}`}
+                      href={`/hadith/${h.collection}/entry/${h.global_id}`}
                       className="block rounded-xl border border-border bg-card p-4 hover:border-primary/40"
                     >
                       <div className="mb-1 text-xs font-medium text-primary">
