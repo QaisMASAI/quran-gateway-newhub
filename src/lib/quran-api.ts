@@ -129,7 +129,7 @@ export async function fetchVerses(chapterId: number, lang: ApiLang = "he"): Prom
     text_uthmani: row.arabic,
     translations: [{
       id: translationIdFor(lang),
-      text: row.translation,
+      text: lang === "ar" ? "" : row.translation,
       resource_name: lang === "he" ? "Ben Shemesh" : lang === "en" ? "Sahih International" : "Arabic Original",
     }],
   }));
