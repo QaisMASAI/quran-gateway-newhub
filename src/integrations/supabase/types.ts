@@ -922,6 +922,45 @@ export type Database = {
         }
         Relationships: []
       }
+      quran_chapters: {
+        Row: {
+          chapter_number: number
+          created_at: string
+          id: string
+          name_ar: string
+          name_he: string | null
+          name_simple_en: string
+          name_translated_en: string | null
+          revelation_place: string | null
+          updated_at: string
+          verses_count: number
+        }
+        Insert: {
+          chapter_number: number
+          created_at?: string
+          id?: string
+          name_ar: string
+          name_he?: string | null
+          name_simple_en: string
+          name_translated_en?: string | null
+          revelation_place?: string | null
+          updated_at?: string
+          verses_count: number
+        }
+        Update: {
+          chapter_number?: number
+          created_at?: string
+          id?: string
+          name_ar?: string
+          name_he?: string | null
+          name_simple_en?: string
+          name_translated_en?: string | null
+          revelation_place?: string | null
+          updated_at?: string
+          verses_count?: number
+        }
+        Relationships: []
+      }
       reading_plan_progress: {
         Row: {
           completed_at: string
