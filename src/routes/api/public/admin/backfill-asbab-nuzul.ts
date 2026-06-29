@@ -98,9 +98,16 @@ export const Route = createFileRoute("/api/public/admin/backfill-asbab-nuzul")({
           .filter((v): v is AsbabInsertRow => !!v);
 
         if (upserts.length > 0) {
-          const { error } = await supabaseAdmin.from("asbab_nuzul").upsert(upserts, {
-            onConflict: "source_id,surah,ayah_start,ayah_end,lang",
-          });
+          const ayahStarts = [...new Set(upserts.map((r) => r.ayah_start))];
+          await supabaseAdmin
+            .from("asbab_nuzul")
+            .delete()
+            .eq("source_id", source.id)
+            .eq("surah", surah)
+            .eq("lang", "ar")
+            .in("ayah_start", ayahStarts);
+
+          const { error } = await supabaseAdmin.from("asbab_nuzul").insert(upserts);
           if (error) {
             return Response.json({ ok: false, error: error.message }, { status: 500 });
           }
