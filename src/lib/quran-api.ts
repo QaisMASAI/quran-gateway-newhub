@@ -13,6 +13,16 @@ export interface Chapter {
   revelation_place: string;
 }
 
+type ChapterRow = {
+  chapter_number: number;
+  name_ar: string;
+  name_simple_en: string;
+  name_translated_en: string | null;
+  name_he: string | null;
+  revelation_place: string | null;
+  verses_count: number;
+};
+
 export interface Verse {
   id: number;
   verse_key: string; // "2:255"
@@ -66,6 +76,30 @@ function translationIdFor(lang: ApiLang): number {
 }
 
 export async function fetchChapters(lang: ApiLang = "he"): Promise<Chapter[]> {
+  const { data: dbRows } = await supabase
+    .from("quran_chapters" as never)
+    .select("chapter_number,name_ar,name_simple_en,name_translated_en,name_he,revelation_place,verses_count")
+    .order("chapter_number", { ascending: true });
+
+  const rows = (dbRows as unknown as ChapterRow[] | null) ?? [];
+  if (rows.length === 114) {
+    return rows.map((r) => ({
+      id: r.chapter_number,
+      name_arabic: r.name_ar,
+      name_simple: r.name_simple_en,
+      translated_name: {
+        name:
+          lang === "he"
+            ? r.name_he ?? r.name_simple_en
+            : lang === "ar"
+              ? r.name_ar
+              : r.name_simple_en,
+      },
+      verses_count: r.verses_count,
+      revelation_place: r.revelation_place ?? "makkah",
+    }));
+  }
+
   return Array.from({ length: 114 }, (_, idx) => {
     const id = idx + 1;
     return {
