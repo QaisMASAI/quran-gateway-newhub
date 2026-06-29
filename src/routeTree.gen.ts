@@ -50,6 +50,7 @@ import { Route as ApiPublicAdminTranslateHadithHebrewRouteImport } from './route
 import { Route as ApiPublicAdminRebuildGroundedIndexRouteImport } from './routes/api/public/admin/rebuild-grounded-index'
 import { Route as ApiPublicAdminLinkHadithGraphRouteImport } from './routes/api/public/admin/link-hadith-graph'
 import { Route as ApiPublicAdminEmbedHadithRouteImport } from './routes/api/public/admin/embed-hadith'
+import { Route as ApiPublicAdminBackfillQuranChaptersRouteImport } from './routes/api/public/admin/backfill-quran-chapters'
 import { Route as ApiPublicAdminBackfillArabicAyatRouteImport } from './routes/api/public/admin/backfill-arabic-ayat'
 
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
@@ -262,6 +263,12 @@ const ApiPublicAdminEmbedHadithRoute =
     path: '/api/public/admin/embed-hadith',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicAdminBackfillQuranChaptersRoute =
+  ApiPublicAdminBackfillQuranChaptersRouteImport.update({
+    id: '/api/public/admin/backfill-quran-chapters',
+    path: '/api/public/admin/backfill-quran-chapters',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPublicAdminBackfillArabicAyatRoute =
   ApiPublicAdminBackfillArabicAyatRouteImport.update({
     id: '/api/public/admin/backfill-arabic-ayat',
@@ -306,6 +313,7 @@ export interface FileRoutesByFullPath {
   '/collections/': typeof AuthenticatedCollectionsIndexRoute
   '/learn/journeys/': typeof LearnJourneysIndexRoute
   '/api/public/admin/backfill-arabic-ayat': typeof ApiPublicAdminBackfillArabicAyatRoute
+  '/api/public/admin/backfill-quran-chapters': typeof ApiPublicAdminBackfillQuranChaptersRoute
   '/api/public/admin/embed-hadith': typeof ApiPublicAdminEmbedHadithRoute
   '/api/public/admin/link-hadith-graph': typeof ApiPublicAdminLinkHadithGraphRoute
   '/api/public/admin/rebuild-grounded-index': typeof ApiPublicAdminRebuildGroundedIndexRoute
@@ -348,6 +356,7 @@ export interface FileRoutesByTo {
   '/collections': typeof AuthenticatedCollectionsIndexRoute
   '/learn/journeys': typeof LearnJourneysIndexRoute
   '/api/public/admin/backfill-arabic-ayat': typeof ApiPublicAdminBackfillArabicAyatRoute
+  '/api/public/admin/backfill-quran-chapters': typeof ApiPublicAdminBackfillQuranChaptersRoute
   '/api/public/admin/embed-hadith': typeof ApiPublicAdminEmbedHadithRoute
   '/api/public/admin/link-hadith-graph': typeof ApiPublicAdminLinkHadithGraphRoute
   '/api/public/admin/rebuild-grounded-index': typeof ApiPublicAdminRebuildGroundedIndexRoute
@@ -393,6 +402,7 @@ export interface FileRoutesById {
   '/_authenticated/collections/': typeof AuthenticatedCollectionsIndexRoute
   '/learn/journeys/': typeof LearnJourneysIndexRoute
   '/api/public/admin/backfill-arabic-ayat': typeof ApiPublicAdminBackfillArabicAyatRoute
+  '/api/public/admin/backfill-quran-chapters': typeof ApiPublicAdminBackfillQuranChaptersRoute
   '/api/public/admin/embed-hadith': typeof ApiPublicAdminEmbedHadithRoute
   '/api/public/admin/link-hadith-graph': typeof ApiPublicAdminLinkHadithGraphRoute
   '/api/public/admin/rebuild-grounded-index': typeof ApiPublicAdminRebuildGroundedIndexRoute
@@ -438,6 +448,7 @@ export interface FileRouteTypes {
     | '/collections/'
     | '/learn/journeys/'
     | '/api/public/admin/backfill-arabic-ayat'
+    | '/api/public/admin/backfill-quran-chapters'
     | '/api/public/admin/embed-hadith'
     | '/api/public/admin/link-hadith-graph'
     | '/api/public/admin/rebuild-grounded-index'
@@ -480,6 +491,7 @@ export interface FileRouteTypes {
     | '/collections'
     | '/learn/journeys'
     | '/api/public/admin/backfill-arabic-ayat'
+    | '/api/public/admin/backfill-quran-chapters'
     | '/api/public/admin/embed-hadith'
     | '/api/public/admin/link-hadith-graph'
     | '/api/public/admin/rebuild-grounded-index'
@@ -524,6 +536,7 @@ export interface FileRouteTypes {
     | '/_authenticated/collections/'
     | '/learn/journeys/'
     | '/api/public/admin/backfill-arabic-ayat'
+    | '/api/public/admin/backfill-quran-chapters'
     | '/api/public/admin/embed-hadith'
     | '/api/public/admin/link-hadith-graph'
     | '/api/public/admin/rebuild-grounded-index'
@@ -562,6 +575,7 @@ export interface RootRouteChildren {
   LearnJourneysSlugRoute: typeof LearnJourneysSlugRoute
   LearnJourneysIndexRoute: typeof LearnJourneysIndexRoute
   ApiPublicAdminBackfillArabicAyatRoute: typeof ApiPublicAdminBackfillArabicAyatRoute
+  ApiPublicAdminBackfillQuranChaptersRoute: typeof ApiPublicAdminBackfillQuranChaptersRoute
   ApiPublicAdminEmbedHadithRoute: typeof ApiPublicAdminEmbedHadithRoute
   ApiPublicAdminLinkHadithGraphRoute: typeof ApiPublicAdminLinkHadithGraphRoute
   ApiPublicAdminRebuildGroundedIndexRoute: typeof ApiPublicAdminRebuildGroundedIndexRoute
@@ -858,6 +872,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicAdminEmbedHadithRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/admin/backfill-quran-chapters': {
+      id: '/api/public/admin/backfill-quran-chapters'
+      path: '/api/public/admin/backfill-quran-chapters'
+      fullPath: '/api/public/admin/backfill-quran-chapters'
+      preLoaderRoute: typeof ApiPublicAdminBackfillQuranChaptersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/admin/backfill-arabic-ayat': {
       id: '/api/public/admin/backfill-arabic-ayat'
       path: '/api/public/admin/backfill-arabic-ayat'
@@ -940,6 +961,8 @@ const rootRouteChildren: RootRouteChildren = {
   LearnJourneysSlugRoute: LearnJourneysSlugRoute,
   LearnJourneysIndexRoute: LearnJourneysIndexRoute,
   ApiPublicAdminBackfillArabicAyatRoute: ApiPublicAdminBackfillArabicAyatRoute,
+  ApiPublicAdminBackfillQuranChaptersRoute:
+    ApiPublicAdminBackfillQuranChaptersRoute,
   ApiPublicAdminEmbedHadithRoute: ApiPublicAdminEmbedHadithRoute,
   ApiPublicAdminLinkHadithGraphRoute: ApiPublicAdminLinkHadithGraphRoute,
   ApiPublicAdminRebuildGroundedIndexRoute:
