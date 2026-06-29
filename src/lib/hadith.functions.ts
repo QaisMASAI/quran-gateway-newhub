@@ -23,6 +23,15 @@ export type HadithBook = {
   hadith_count: number;
 };
 
+export type HadithTopicBook = {
+  collection_slug: string;
+  book_id: number;
+  name_ar: string;
+  name_en: string;
+  name_he: string | null;
+  hadith_count: number;
+};
+
 export type HadithEntry = {
   id: number;
   collection_slug: string;
@@ -144,3 +153,29 @@ export const listTopNarrators = createServerFn({ method: "GET" })
       }>;
     },
   );
+
+export const listHadithTopicBooks = createServerFn({ method: "GET" })
+  .inputValidator((input: unknown) =>
+    z
+      .object({
+        limitPerCollection: z.number().int().min(1).max(30).optional().default(10),
+      })
+      .parse(input ?? {}),
+  )
+  .handler(async ({ data }): Promise<HadithTopicBook[]> => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const collections = ["bukhari", "muslim"];
+    const out: HadithTopicBook[] = [];
+
+    for (const collection of collections) {
+      const { data: rows } = await supabaseAdmin
+        .from("hadith_books" as never)
+        .select("collection_slug,book_id,name_ar,name_en,name_he,hadith_count")
+        .eq("collection_slug", collection)
+        .order("hadith_count", { ascending: false })
+        .limit(data.limitPerCollection);
+      out.push(...(((rows ?? []) as unknown) as HadithTopicBook[]));
+    }
+
+    return out.sort((a, b) => b.hadith_count - a.hadith_count);
+  });

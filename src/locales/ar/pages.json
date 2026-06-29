@@ -290,7 +290,9 @@
     "translator": "المترجم: {{translator}}",
     "tafsirSource": "مصدر التفسير: {{source}}",
     "localQuranDb": "قاعدة بيانات القرآن المحلية",
-    "localAuthenticatedSource": "مصدر محلي موثّق"
+    "localAuthenticatedSource": "مصدر محلي موثّق",
+    "mcpUnavailable": "خدمة التحقق Quran.ai غير متاحة الآن. أعد المحاولة للحصول على إسناد موثّق بالكامل.",
+    "retryMcp": "إعادة المحاولة للتحقق"
   },
   "detail": {
     "backToEmotions": "كلّ المشاعر",

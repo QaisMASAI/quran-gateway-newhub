@@ -290,7 +290,9 @@
     "translator": "מתרגם: {{translator}}",
     "tafsirSource": "מקור התפסיר: {{source}}",
     "localQuranDb": "מסד נתוני קוראן מקומי",
-    "localAuthenticatedSource": "מקור מקומי מאומת"
+    "localAuthenticatedSource": "מקור מקומי מאומת",
+    "mcpUnavailable": "שירות האימות של Quran.ai אינו זמין כרגע. נסו שוב כדי לקבל עיגון מאומת מלא.",
+    "retryMcp": "נסה אימות מחדש"
   },
   "detail": {
     "backToEmotions": "כל הרגשות",

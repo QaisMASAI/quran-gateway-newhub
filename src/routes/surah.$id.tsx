@@ -3,7 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { fetchChapter, fetchVerses, surahAudioUrl, type ApiLang } from "@/lib/quran-api";
-import { surahDisplayName, surahNameHe } from "@/lib/surah-names-he";
+import { surahDisplayName, surahNameHe, loadSurahNamesFromDb } from "@/lib/surah-names-he";
 import { Header } from "@/components/Header";
 import { AyahCard } from "@/components/AyahCard";
 import { ReadingSettings } from "@/components/ReadingSettings";
@@ -81,6 +81,10 @@ function SurahPage() {
     queryFn: () => fetchVerses(surahId, lang),
     staleTime: 60 * 60 * 1000,
   });
+
+  useEffect(() => {
+    void loadSurahNamesFromDb(fetch);
+  }, []);
 
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const [playing, setPlaying] = useState(false);

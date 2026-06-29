@@ -176,7 +176,9 @@ async function fetchVerseFromEmbeddings(
     .maybeSingle();
   if (error || !data) return null;
   const arabic = data.arabic ?? "";
-  const translation = locale === "ar" ? arabic : data.hebrew ?? arabic;
+  const translation =
+    locale === "ar" ? arabic : locale === "he" ? data.hebrew ?? "" : "";
+  if (locale !== "ar" && !translation) return null;
   if (!arabic && !translation) return null;
   return { arabic, translation };
 }
@@ -210,7 +212,7 @@ export async function fetchVerseBilingual(
     resolveSourceId(TRANSLATION_SOURCE_CODE.ar),
     resolveSourceId(TRANSLATION_SOURCE_CODE[locale]),
   ]);
-  if (!arSid || !locSid) {
+  if (!arSid || (locale !== "ar" && !locSid)) {
     if (locale === "ar") {
       return (
         (await fetchVerseFromEmbeddings(surah, ayah, locale)) ??
@@ -219,15 +221,15 @@ export async function fetchVerseBilingual(
       );
     }
     return (
+      (await fetchVerseFromEmbeddings(surah, ayah, locale)) ??
       (await fetchQuranComVerse(surah, ayah, locale)) ??
-      (await fetchAltVerse(surah, ayah, locale)) ??
-      (await fetchVerseFromEmbeddings(surah, ayah, locale))
+      (await fetchAltVerse(surah, ayah, locale))
     );
   }
   const { data, error } = await supabase
     .from("ayah_translations")
     .select("source_id, text")
-    .in("source_id", Array.from(new Set([arSid, locSid])))
+    .in("source_id", Array.from(new Set([arSid, locSid].filter(Boolean) as string[])))
     .eq("surah", surah)
     .eq("ayah", ayah);
   if (error || !data || data.length === 0) {
@@ -240,9 +242,9 @@ export async function fetchVerseBilingual(
   const arRow = data.find((r) => r.source_id === arSid);
   const locRow = data.find((r) => r.source_id === locSid);
   const localArabic = arRow?.text ?? "";
-  const localTranslation = locRow?.text ?? arRow?.text ?? "";
+  const localTranslation = locale === "ar" ? arRow?.text ?? "" : locRow?.text ?? "";
 
-  if (localArabic && localTranslation) {
+  if (localArabic && (locale === "ar" || !!localTranslation)) {
     return {
       arabic: localArabic,
       translation: localTranslation,
@@ -339,7 +341,7 @@ export async function fetchSurahBilingual(
     .sort((a, b) => a.ayah - b.ayah)
     .map((v) => ({
       ...v,
-      translation: v.translation || v.arabic,
+      translation: locale === "ar" ? v.arabic : v.translation,
     }));
 
   if (locale === "ar") return localRows;

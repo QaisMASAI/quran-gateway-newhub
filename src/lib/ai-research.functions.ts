@@ -59,6 +59,7 @@ export interface ResearchResult {
   hadith: HadithCitation[];
   confidence: number; // 0..1
   language: string;
+  mcpUnavailable?: boolean;
   error?: string;
 }
 
@@ -131,8 +132,9 @@ async function fetchQuranAiMcpEvidence(
   question: string,
   language: "he" | "en" | "ar",
   k: number,
-): Promise<VerseCitation[]> {
+): Promise<{ verses: VerseCitation[]; unavailable: boolean }> {
   let client: { listTools: () => Promise<{ tools?: Array<{ name: string }> }>; callTool: (args: { name: string; arguments?: Record<string, unknown> }) => Promise<unknown>; close: () => Promise<void> } | null = null;
+  let unavailable = false;
   try {
     const { createMCPClient } = await import("@ai-sdk/mcp");
     client = await withTimeout(
@@ -226,13 +228,14 @@ async function fetchQuranAiMcpEvidence(
           }
         }
 
-        if (seen.size >= k) return [...seen.values()].slice(0, k);
+        if (seen.size >= k) return { verses: [...seen.values()].slice(0, k), unavailable };
       }
     }
 
-    return [...seen.values()].slice(0, k);
+    return { verses: [...seen.values()].slice(0, k), unavailable };
   } catch {
-    return [];
+    unavailable = true;
+    return { verses: [], unavailable };
   } finally {
     if (client) {
       try {
@@ -242,6 +245,91 @@ async function fetchQuranAiMcpEvidence(
       }
     }
   }
+}
+
+type CachedResearchPayload = {
+  answer: string;
+  verses: VerseCitation[];
+  tafsir: TafsirCitation[];
+  hadith: HadithCitation[];
+  confidence: number;
+  mcpUnavailable?: boolean;
+};
+
+function normalizeCacheQuestion(question: string): string {
+  return question.trim().toLowerCase().replace(/\s+/g, " ");
+}
+
+function isRecent(iso: string | null | undefined, ttlMs: number): boolean {
+  if (!iso) return false;
+  const parsed = Date.parse(iso);
+  if (Number.isNaN(parsed)) return false;
+  return Date.now() - parsed <= ttlMs;
+}
+
+async function readResearchCache(
+  supabaseAdmin: { from: (table: string) => any },
+  question: string,
+  language: "he" | "en" | "ar",
+): Promise<CachedResearchPayload | null> {
+  const CACHE_TTL_MS = 1000 * 60 * 60 * 6;
+  const normalized = normalizeCacheQuestion(question);
+  const { data } = await supabaseAdmin
+    .from("ai_research_queries")
+    .select("question,answer,confidence,citations,created_at,language")
+    .eq("language", language)
+    .order("created_at", { ascending: false })
+    .limit(20);
+
+  const match = (data ?? []).find(
+    (row: { question?: string | null; created_at?: string | null }) =>
+      normalizeCacheQuestion(row.question ?? "") === normalized && isRecent(row.created_at, CACHE_TTL_MS),
+  ) as
+    | {
+        answer?: string | null;
+        confidence?: number | null;
+        citations?: unknown;
+      }
+    | undefined;
+
+  if (!match?.answer) return null;
+
+  const citations = (match.citations ?? {}) as {
+    verses?: VerseCitation[];
+    tafsir?: TafsirCitation[];
+    hadith?: HadithCitation[];
+    mcpUnavailable?: boolean;
+  };
+
+  return {
+    answer: match.answer,
+    verses: Array.isArray(citations.verses) ? citations.verses : [],
+    tafsir: Array.isArray(citations.tafsir) ? citations.tafsir : [],
+    hadith: Array.isArray(citations.hadith) ? citations.hadith : [],
+    confidence: typeof match.confidence === "number" ? match.confidence : 0,
+    mcpUnavailable: citations.mcpUnavailable === true,
+  };
+}
+
+async function writeResearchCache(
+  supabaseAdmin: { from: (table: string) => any },
+  question: string,
+  language: "he" | "en" | "ar",
+  payload: CachedResearchPayload,
+): Promise<void> {
+  await supabaseAdmin.from("ai_research_queries").insert({
+    user_id: null,
+    question,
+    answer: payload.answer,
+    confidence: payload.confidence,
+    language,
+    citations: {
+      verses: payload.verses,
+      tafsir: payload.tafsir,
+      hadith: payload.hadith,
+      mcpUnavailable: payload.mcpUnavailable === true,
+    },
+  });
 }
 
 function sanitize(s: string, max = 600) {
@@ -363,6 +451,19 @@ export const askQuranResearch = createServerFn({ method: "POST" })
 
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
+    const cached = await readResearchCache(supabaseAdmin, data.question, data.language);
+    if (cached) {
+      return {
+        answer: cached.answer,
+        verses: cached.verses,
+        tafsir: cached.tafsir,
+        hadith: cached.hadith,
+        confidence: cached.confidence,
+        language: data.language,
+        mcpUnavailable: cached.mcpUnavailable,
+      };
+    }
+
     // 1) Embed the question
     let embedding: number[] | null = null;
     try {
@@ -471,7 +572,8 @@ export const askQuranResearch = createServerFn({ method: "POST" })
     }
 
     // 2.5) Quran.ai MCP grounding (Quran.com-backed), merged with local retrieval.
-    const mcpVerses = await fetchQuranAiMcpEvidence(data.question, data.language, data.k);
+    const mcpResult = await fetchQuranAiMcpEvidence(data.question, data.language, data.k);
+    const mcpVerses = mcpResult.verses;
     if (mcpVerses.length > 0) {
       const byKey = new Map(verses.map((v) => [`${v.surah}:${v.ayah}`, v]));
       for (const mv of mcpVerses) {
@@ -599,7 +701,16 @@ export const askQuranResearch = createServerFn({ method: "POST" })
     }
 
     if (verses.length === 0 && tafsir.length === 0 && hadithList.length === 0) {
-      return { ...base, answer: NO_SOURCE_MESSAGE };
+      const emptyResult = { ...base, answer: NO_SOURCE_MESSAGE, mcpUnavailable: mcpResult.unavailable };
+      await writeResearchCache(supabaseAdmin, data.question, data.language, {
+        answer: emptyResult.answer,
+        verses: emptyResult.verses,
+        tafsir: emptyResult.tafsir,
+        hadith: emptyResult.hadith,
+        confidence: emptyResult.confidence,
+        mcpUnavailable: emptyResult.mcpUnavailable,
+      });
+      return emptyResult;
     }
 
     // 4) Build grounded prompt
@@ -655,12 +766,24 @@ export const askQuranResearch = createServerFn({ method: "POST" })
     // Query logging disabled until user-bound auth context is attached to this
     // server function, to prevent anonymous/null-user privacy leakage.
 
-    return {
+    const result: ResearchResult = {
       answer: answer?.trim() || NO_SOURCE_MESSAGE,
       verses,
       tafsir,
       hadith: hadithList,
       confidence,
       language: data.language,
+      mcpUnavailable: mcpResult.unavailable,
     };
+
+    await writeResearchCache(supabaseAdmin, data.question, data.language, {
+      answer: result.answer,
+      verses: result.verses,
+      tafsir: result.tafsir,
+      hadith: result.hadith,
+      confidence: result.confidence,
+      mcpUnavailable: result.mcpUnavailable,
+    });
+
+    return result;
   });
