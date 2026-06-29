@@ -227,7 +227,7 @@ export async function fetchVerseBilingual(
   const { data, error } = await supabase
     .from("ayah_translations")
     .select("source_id, text")
-    .in("source_id", Array.from(new Set([arSid, locSid])))
+    .in("source_id", Array.from(new Set([arSid, locSid].filter(Boolean) as string[])))
     .eq("surah", surah)
     .eq("ayah", ayah);
   if (error || !data || data.length === 0) {
