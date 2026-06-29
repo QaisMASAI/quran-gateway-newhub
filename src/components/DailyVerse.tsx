@@ -113,7 +113,7 @@ export function DailyVerse() {
                   ayah={pick.ayah}
                   surahName={name}
                   arabic={q.data.arabic}
-                  hebrew={q.data.translation}
+                  hebrew={lang === "ar" ? q.data.arabic : q.data.translation}
                 />
               </div>
             </>
