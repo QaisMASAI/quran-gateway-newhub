@@ -290,7 +290,9 @@
     "translator": "Translator: {{translator}}",
     "tafsirSource": "Tafsir source: {{source}}",
     "localQuranDb": "Local Quran database",
-    "localAuthenticatedSource": "Local authenticated source"
+    "localAuthenticatedSource": "Local authenticated source",
+    "mcpUnavailable": "Quran.ai verification service is currently unavailable. Please retry for fully verified grounding.",
+    "retryMcp": "Retry verification"
   },
   "detail": {
     "backToEmotions": "All emotions",
