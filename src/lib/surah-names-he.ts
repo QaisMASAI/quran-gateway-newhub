@@ -350,7 +350,37 @@ export const SURAH_NAMES_AR: Record<number, string> = {
   114: "الناس",
 };
 
+const SURAH_DB_CACHE = new Map<number, { he: string; en: string; ar: string }>();
+let SURAH_DB_LOADED = false;
+
+export async function loadSurahNamesFromDb(fetcher: typeof fetch): Promise<void> {
+  if (SURAH_DB_LOADED) return;
+  try {
+    const res = await fetcher("/api/public/surah-names");
+    if (!res.ok) return;
+    const json = (await res.json()) as {
+      items?: Array<{ chapter_number: number; name_he: string | null; name_simple_en: string; name_ar: string }>;
+    };
+    for (const row of json.items ?? []) {
+      SURAH_DB_CACHE.set(row.chapter_number, {
+        he: row.name_he ?? SURAH_NAMES_HE[row.chapter_number] ?? `סורה ${row.chapter_number}`,
+        en: row.name_simple_en || SURAH_NAMES_EN[row.chapter_number] || `Surah ${row.chapter_number}`,
+        ar: row.name_ar || SURAH_NAMES_AR[row.chapter_number] || `سورة ${row.chapter_number}`,
+      });
+    }
+    if ((json.items ?? []).length > 0) SURAH_DB_LOADED = true;
+  } catch {
+    // fallback to static maps
+  }
+}
+
 export function surahDisplayName(id: number, locale: "he" | "ar" | "en"): string {
+  const cached = SURAH_DB_CACHE.get(id);
+  if (cached) {
+    if (locale === "ar") return cached.ar;
+    if (locale === "en") return cached.en;
+    return cached.he;
+  }
   if (locale === "ar") return SURAH_NAMES_AR[id] ?? `سورة ${id}`;
   if (locale === "en") return SURAH_NAMES_EN[id] ?? `Surah ${id}`;
   return SURAH_NAMES_HE[id] ?? `סורה ${id}`;
