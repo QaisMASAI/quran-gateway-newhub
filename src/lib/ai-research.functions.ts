@@ -254,6 +254,12 @@ type CachedResearchPayload = {
   hadith: HadithCitation[];
   confidence: number;
   mcpUnavailable?: boolean;
+  cacheVersion?: number;
+};
+
+type ResearchCacheConfig = {
+  ttlMs: number;
+  version: number;
 };
 
 function normalizeCacheQuestion(question: string): string {
@@ -271,8 +277,8 @@ async function readResearchCache(
   supabaseAdmin: { from: (table: string) => any },
   question: string,
   language: "he" | "en" | "ar",
+  config: ResearchCacheConfig,
 ): Promise<CachedResearchPayload | null> {
-  const CACHE_TTL_MS = 1000 * 60 * 60 * 6;
   const normalized = normalizeCacheQuestion(question);
   const { data } = await supabaseAdmin
     .from("ai_research_queries")
@@ -283,7 +289,7 @@ async function readResearchCache(
 
   const match = (data ?? []).find(
     (row: { question?: string | null; created_at?: string | null }) =>
-      normalizeCacheQuestion(row.question ?? "") === normalized && isRecent(row.created_at, CACHE_TTL_MS),
+      normalizeCacheQuestion(row.question ?? "") === normalized && isRecent(row.created_at, config.ttlMs),
   ) as
     | {
         answer?: string | null;
@@ -308,6 +314,7 @@ async function readResearchCache(
     hadith: Array.isArray(citations.hadith) ? citations.hadith : [],
     confidence: typeof match.confidence === "number" ? match.confidence : 0,
     mcpUnavailable: citations.mcpUnavailable === true,
+    cacheVersion: Number((citations as { cache_version?: unknown }).cache_version ?? 1),
   };
 }
 
@@ -316,6 +323,7 @@ async function writeResearchCache(
   question: string,
   language: "he" | "en" | "ar",
   payload: CachedResearchPayload,
+  config: ResearchCacheConfig,
 ): Promise<void> {
   await supabaseAdmin.from("ai_research_queries").insert({
     user_id: null,
@@ -328,8 +336,25 @@ async function writeResearchCache(
       tafsir: payload.tafsir,
       hadith: payload.hadith,
       mcpUnavailable: payload.mcpUnavailable === true,
+      cache_version: config.version,
     },
   });
+}
+
+async function getResearchCacheConfig(supabaseAdmin: { from: (table: string) => any }): Promise<ResearchCacheConfig> {
+  const DEFAULT: ResearchCacheConfig = { ttlMs: 1000 * 60 * 60 * 6, version: 1 };
+  const { data } = await supabaseAdmin
+    .from("admin_runtime_settings")
+    .select("value_json")
+    .eq("key", "research_cache")
+    .maybeSingle();
+  const valueJson = (data?.value_json ?? {}) as { ttl_minutes?: number; version?: number };
+  const ttlMinutes = Number(valueJson.ttl_minutes ?? 360);
+  const version = Number(valueJson.version ?? 1);
+  return {
+    ttlMs: Number.isFinite(ttlMinutes) && ttlMinutes >= 5 ? ttlMinutes * 60 * 1000 : DEFAULT.ttlMs,
+    version: Number.isFinite(version) && version >= 1 ? version : DEFAULT.version,
+  };
 }
 
 function sanitize(s: string, max = 600) {
@@ -450,9 +475,10 @@ export const askQuranResearch = createServerFn({ method: "POST" })
     if (!apiKey) return { ...base, error: "ai_not_configured" };
 
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const cacheConfig = await getResearchCacheConfig(supabaseAdmin);
 
-    const cached = await readResearchCache(supabaseAdmin, data.question, data.language);
-    if (cached) {
+    const cached = await readResearchCache(supabaseAdmin, data.question, data.language, cacheConfig);
+    if (cached && Number(cached.cacheVersion ?? 1) === cacheConfig.version) {
       return {
         answer: cached.answer,
         verses: cached.verses,
@@ -709,7 +735,7 @@ export const askQuranResearch = createServerFn({ method: "POST" })
         hadith: emptyResult.hadith,
         confidence: emptyResult.confidence,
         mcpUnavailable: emptyResult.mcpUnavailable,
-      });
+      }, cacheConfig);
       return emptyResult;
     }
 
@@ -783,7 +809,7 @@ export const askQuranResearch = createServerFn({ method: "POST" })
       hadith: result.hadith,
       confidence: result.confidence,
       mcpUnavailable: result.mcpUnavailable,
-    });
+    }, cacheConfig);
 
     return result;
   });
