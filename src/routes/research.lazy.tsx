@@ -45,6 +45,7 @@ function ResearchPage() {
   });
 
   const result = mutation.data;
+  const [retryTick, setRetryTick] = useState(0);
   const examples =
     lang === "he"
       ? [
@@ -89,7 +90,10 @@ function ResearchPage() {
         <form
           onSubmit={(e) => {
             e.preventDefault();
-            if (q.trim().length > 1) mutation.mutate(q.trim());
+            if (q.trim().length > 1) {
+              setRetryTick((v) => v + 1);
+              mutation.mutate(q.trim());
+            }
           }}
           className="mt-6 flex gap-2"
         >
@@ -118,6 +122,7 @@ function ResearchPage() {
                 key={ex}
                 onClick={() => {
                   setQ(ex);
+                  setRetryTick((v) => v + 1);
                   mutation.mutate(ex);
                 }}
                 className="rounded-full bg-muted px-3 py-1.5 text-sm text-foreground hover:bg-accent"
@@ -136,6 +141,25 @@ function ResearchPage() {
 
         {result && !result.error && (
           <div className="mt-8 space-y-6">
+            {result.mcpUnavailable && (
+              <div className="rounded-xl border border-destructive/20 bg-destructive/10 p-4">
+                <p className="text-sm text-destructive">
+                  {t("research.mcpUnavailable", "Quran.ai verification service is currently unavailable. Please retry for fully verified grounding.")}
+                </p>
+                <button
+                  type="button"
+                  onClick={() => {
+                    const nextQ = q.trim() || chatTurns.at(-1)?.question;
+                    if (!nextQ) return;
+                    setRetryTick((v) => v + 1);
+                    mutation.mutate(nextQ);
+                  }}
+                  className="mt-3 inline-flex min-h-11 items-center rounded-lg border border-destructive/30 bg-background px-3 py-2 text-sm font-medium text-foreground hover:bg-secondary"
+                >
+                  {t("research.retryMcp", "Retry verification")}
+                </button>
+              </div>
+            )}
             <div className="rounded-2xl border border-border bg-card p-6">
               <div className="mb-3 flex items-center justify-between">
                 <h2 className="flex items-center gap-2 text-lg font-semibold">

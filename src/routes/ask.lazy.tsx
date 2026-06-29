@@ -136,6 +136,25 @@ function AskPage() {
           </div>
         )}
 
+        {result?.mcpUnavailable && !loading && (
+          <div className="mt-4 rounded-xl border border-destructive/20 bg-destructive/10 p-4">
+            <p className="text-sm text-destructive">
+              {t("research.mcpUnavailable", "Quran.ai verification service is currently unavailable. Please retry for fully verified grounding.")}
+            </p>
+            <button
+              type="button"
+              onClick={() => {
+                const nextQ = question.trim() || chatTurns.at(-1)?.question;
+                if (!nextQ) return;
+                mutation.mutate(nextQ);
+              }}
+              className="mt-3 inline-flex min-h-11 items-center rounded-lg border border-destructive/30 bg-background px-3 py-2 text-sm font-medium text-foreground hover:bg-secondary"
+            >
+              {t("research.retryMcp", "Retry verification")}
+            </button>
+          </div>
+        )}
+
         {loading && (
           <div className="mt-6 surface-card flex items-center gap-2 p-5 text-sm text-muted-foreground" aria-live="polite">
             <Loader2 className="h-4 w-4 animate-spin" />
