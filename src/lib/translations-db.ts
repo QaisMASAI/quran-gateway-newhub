@@ -178,6 +178,7 @@ async function fetchVerseFromEmbeddings(
   const arabic = data.arabic ?? "";
   const translation =
     locale === "ar" ? arabic : locale === "he" ? data.hebrew ?? "" : "";
+  if (locale !== "ar" && !translation) return null;
   if (!arabic && !translation) return null;
   return { arabic, translation };
 }
