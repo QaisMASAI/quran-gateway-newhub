@@ -74,12 +74,21 @@ function HadithIndex() {
         </div>
 
         <div className="mt-8">
-          <Link
-            to="/hadith/narrators"
-            className="inline-flex items-center gap-2 rounded-lg border border-primary/20 bg-card px-4 py-2 text-sm font-medium text-primary hover:bg-primary/5"
-          >
-            <Users className="h-4 w-4" /> Narrators
-          </Link>
+          <div className="flex flex-wrap gap-2">
+            <Link
+              to="/hadith/topics"
+              className="inline-flex items-center gap-2 rounded-lg border border-primary/20 bg-card px-4 py-2 text-sm font-medium text-primary hover:bg-primary/5"
+            >
+              <BookMarked className="h-4 w-4" />
+              {locale === "he" ? "לפי נושאים" : locale === "ar" ? "حسب الموضوع" : "By topics"}
+            </Link>
+            <Link
+              to="/hadith/narrators"
+              className="inline-flex items-center gap-2 rounded-lg border border-primary/20 bg-card px-4 py-2 text-sm font-medium text-primary hover:bg-primary/5"
+            >
+              <Users className="h-4 w-4" /> Narrators
+            </Link>
+          </div>
         </div>
       </main>
     </div>
