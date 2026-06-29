@@ -5,7 +5,7 @@ import { useTranslation } from "react-i18next";
 import { Header } from "@/components/Header";
 import { getHadithEntry } from "@/lib/hadith.functions";
 
-export const Route = createFileRoute("/hadith/$collection/$num")({
+export const Route = createFileRoute("/hadith/$collection/entry/$num")({
   head: ({ params }) => ({
     meta: [
       { title: `${params.collection === "bukhari" ? "Sahih al-Bukhari" : "Sahih Muslim"} — Hadith #${params.num}` },
