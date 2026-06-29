@@ -237,7 +237,7 @@ function AskPage() {
               {result.hadith.map((h, i) => (
                 <a
                   key={`${h.collection}-${h.global_id}-${i}`}
-                  href={`/hadith/${h.collection}/${h.global_id}`}
+                  href={`/hadith/${h.collection}/entry/${h.global_id}`}
                   className="block rounded-lg border border-border bg-background px-3 py-2 hover:border-primary/40"
                 >
                   <div className="text-xs text-primary">

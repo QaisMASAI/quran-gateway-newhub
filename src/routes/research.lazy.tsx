@@ -248,7 +248,7 @@ function ResearchPage() {
                   {result.hadith.map((h, i) => (
                     <a
                       key={`${h.collection}-${h.global_id}-${i}`}
-                      href={`/hadith/${h.collection}/${h.global_id}`}
+                      href={`/hadith/${h.collection}/entry/${h.global_id}`}
                       className="block rounded-xl border border-border bg-card p-4 hover:border-primary/40"
                     >
                       <div className="mb-1 text-xs font-medium text-primary">
