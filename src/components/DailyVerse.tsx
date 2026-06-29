@@ -3,6 +3,7 @@ import { Link } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import { Sparkles, ChevronLeft } from "lucide-react";
 import { surahDisplayName } from "@/lib/surah-names-he";
+import { loadSurahNamesFromDb } from "@/lib/surah-names-he";
 import { fetchVerseBilingual, type LocaleCode } from "@/lib/translations-db";
 import { ShareButtons } from "./ShareButtons";
 import { normalizeLocale } from "@/lib/i18n";
@@ -48,6 +49,12 @@ export function DailyVerse() {
   });
 
   const name = surahDisplayName(pick.surah, lang === "ar" || lang === "en" ? lang : "he");
+
+  useQuery({
+    queryKey: ["surah-names-db"],
+    queryFn: () => loadSurahNamesFromDb(fetch),
+    staleTime: Infinity,
+  });
 
   return (
     <section className="mx-auto mt-10 max-w-3xl px-4 sm:px-6">

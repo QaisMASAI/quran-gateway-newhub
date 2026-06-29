@@ -44,6 +44,7 @@ import { Route as LearnJourneysSlugRouteImport } from './routes/learn.journeys.$
 import { Route as LearnKindSlugRouteImport } from './routes/learn.$kind.$slug'
 import { Route as HadithCollectionNumRouteImport } from './routes/hadith.$collection.$num'
 import { Route as HadithCollectionBookRouteImport } from './routes/hadith.$collection.$book'
+import { Route as ApiPublicSurahNamesRouteImport } from './routes/api/public/surah-names'
 import { Route as ApiPublicSeedKnowledgeRouteImport } from './routes/api/public/seed-knowledge'
 import { Route as ApiPublicAdminTranslateTafsirHebrewRouteImport } from './routes/api/public/admin/translate-tafsir-hebrew'
 import { Route as ApiPublicAdminTranslateHadithHebrewRouteImport } from './routes/api/public/admin/translate-hadith-hebrew'
@@ -229,6 +230,11 @@ const HadithCollectionBookRoute = HadithCollectionBookRouteImport.update({
   path: '/$book',
   getParentRoute: () => HadithCollectionRoute,
 } as any)
+const ApiPublicSurahNamesRoute = ApiPublicSurahNamesRouteImport.update({
+  id: '/api/public/surah-names',
+  path: '/api/public/surah-names',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicSeedKnowledgeRoute = ApiPublicSeedKnowledgeRouteImport.update({
   id: '/api/public/seed-knowledge',
   path: '/api/public/seed-knowledge',
@@ -313,6 +319,7 @@ export interface FileRoutesByFullPath {
   '/prophets/': typeof ProphetsIndexRoute
   '/topics/': typeof TopicsIndexRoute
   '/api/public/seed-knowledge': typeof ApiPublicSeedKnowledgeRoute
+  '/api/public/surah-names': typeof ApiPublicSurahNamesRoute
   '/hadith/$collection/$book': typeof HadithCollectionBookRoute
   '/hadith/$collection/$num': typeof HadithCollectionNumRoute
   '/learn/$kind/$slug': typeof LearnKindSlugRoute
@@ -357,6 +364,7 @@ export interface FileRoutesByTo {
   '/prophets': typeof ProphetsIndexRoute
   '/topics': typeof TopicsIndexRoute
   '/api/public/seed-knowledge': typeof ApiPublicSeedKnowledgeRoute
+  '/api/public/surah-names': typeof ApiPublicSurahNamesRoute
   '/hadith/$collection/$book': typeof HadithCollectionBookRoute
   '/hadith/$collection/$num': typeof HadithCollectionNumRoute
   '/learn/$kind/$slug': typeof LearnKindSlugRoute
@@ -404,6 +412,7 @@ export interface FileRoutesById {
   '/prophets/': typeof ProphetsIndexRoute
   '/topics/': typeof TopicsIndexRoute
   '/api/public/seed-knowledge': typeof ApiPublicSeedKnowledgeRoute
+  '/api/public/surah-names': typeof ApiPublicSurahNamesRoute
   '/hadith/$collection/$book': typeof HadithCollectionBookRoute
   '/hadith/$collection/$num': typeof HadithCollectionNumRoute
   '/learn/$kind/$slug': typeof LearnKindSlugRoute
@@ -451,6 +460,7 @@ export interface FileRouteTypes {
     | '/prophets/'
     | '/topics/'
     | '/api/public/seed-knowledge'
+    | '/api/public/surah-names'
     | '/hadith/$collection/$book'
     | '/hadith/$collection/$num'
     | '/learn/$kind/$slug'
@@ -495,6 +505,7 @@ export interface FileRouteTypes {
     | '/prophets'
     | '/topics'
     | '/api/public/seed-knowledge'
+    | '/api/public/surah-names'
     | '/hadith/$collection/$book'
     | '/hadith/$collection/$num'
     | '/learn/$kind/$slug'
@@ -541,6 +552,7 @@ export interface FileRouteTypes {
     | '/prophets/'
     | '/topics/'
     | '/api/public/seed-knowledge'
+    | '/api/public/surah-names'
     | '/hadith/$collection/$book'
     | '/hadith/$collection/$num'
     | '/learn/$kind/$slug'
@@ -584,6 +596,7 @@ export interface RootRouteChildren {
   ProphetsIndexRoute: typeof ProphetsIndexRoute
   TopicsIndexRoute: typeof TopicsIndexRoute
   ApiPublicSeedKnowledgeRoute: typeof ApiPublicSeedKnowledgeRoute
+  ApiPublicSurahNamesRoute: typeof ApiPublicSurahNamesRoute
   LearnKindSlugRoute: typeof LearnKindSlugRoute
   LearnJourneysSlugRoute: typeof LearnJourneysSlugRoute
   LearnJourneysIndexRoute: typeof LearnJourneysIndexRoute
@@ -844,6 +857,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof HadithCollectionBookRouteImport
       parentRoute: typeof HadithCollectionRoute
     }
+    '/api/public/surah-names': {
+      id: '/api/public/surah-names'
+      path: '/api/public/surah-names'
+      fullPath: '/api/public/surah-names'
+      preLoaderRoute: typeof ApiPublicSurahNamesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/seed-knowledge': {
       id: '/api/public/seed-knowledge'
       path: '/api/public/seed-knowledge'
@@ -978,6 +998,7 @@ const rootRouteChildren: RootRouteChildren = {
   ProphetsIndexRoute: ProphetsIndexRoute,
   TopicsIndexRoute: TopicsIndexRoute,
   ApiPublicSeedKnowledgeRoute: ApiPublicSeedKnowledgeRoute,
+  ApiPublicSurahNamesRoute: ApiPublicSurahNamesRoute,
   LearnKindSlugRoute: LearnKindSlugRoute,
   LearnJourneysSlugRoute: LearnJourneysSlugRoute,
   LearnJourneysIndexRoute: LearnJourneysIndexRoute,
