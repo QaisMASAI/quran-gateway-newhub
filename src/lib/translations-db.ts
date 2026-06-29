@@ -176,7 +176,8 @@ async function fetchVerseFromEmbeddings(
     .maybeSingle();
   if (error || !data) return null;
   const arabic = data.arabic ?? "";
-  const translation = locale === "ar" ? arabic : data.hebrew ?? arabic;
+  const translation =
+    locale === "ar" ? arabic : locale === "he" ? data.hebrew ?? "" : "";
   if (!arabic && !translation) return null;
   return { arabic, translation };
 }
