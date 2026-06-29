@@ -45,7 +45,6 @@ function ResearchPage() {
   });
 
   const result = mutation.data;
-  const [retryTick, setRetryTick] = useState(0);
   const examples =
     lang === "he"
       ? [
@@ -91,7 +90,6 @@ function ResearchPage() {
           onSubmit={(e) => {
             e.preventDefault();
             if (q.trim().length > 1) {
-              setRetryTick((v) => v + 1);
               mutation.mutate(q.trim());
             }
           }}
@@ -122,7 +120,6 @@ function ResearchPage() {
                 key={ex}
                 onClick={() => {
                   setQ(ex);
-                  setRetryTick((v) => v + 1);
                   mutation.mutate(ex);
                 }}
                 className="rounded-full bg-muted px-3 py-1.5 text-sm text-foreground hover:bg-accent"
@@ -151,7 +148,6 @@ function ResearchPage() {
                   onClick={() => {
                     const nextQ = q.trim() || chatTurns.at(-1)?.question;
                     if (!nextQ) return;
-                    setRetryTick((v) => v + 1);
                     mutation.mutate(nextQ);
                   }}
                   className="mt-3 inline-flex min-h-11 items-center rounded-lg border border-destructive/30 bg-background px-3 py-2 text-sm font-medium text-foreground hover:bg-secondary"
