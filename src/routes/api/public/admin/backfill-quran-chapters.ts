@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { SURAH_NAMES_HE } from "@/lib/surah-names-he";
 
 type QuranChapter = {
   id: number;
@@ -39,7 +40,7 @@ export const Route = createFileRoute("/api/public/admin/backfill-quran-chapters"
           name_ar: c.name_arabic,
           name_simple_en: c.name_simple,
           name_translated_en: c.translated_name?.name ?? null,
-          name_he: null,
+          name_he: SURAH_NAMES_HE[c.id] ?? null,
           revelation_place: c.revelation_place,
           verses_count: c.verses_count,
         }));
