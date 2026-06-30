@@ -7,7 +7,7 @@ import { surahDisplayName, SURAH_NAMES_HE, SURAH_NAMES_EN, SURAH_NAMES_AR } from
 import { Header } from "@/components/Header";
 import { Logo } from "@/components/Logo";
 import { DailyVerse } from "@/components/DailyVerse";
-import { ContinueReading } from "@/components/ContinueReading";
+// ContinueReading hidden per product decision
 import { TrustBadge } from "@/components/TrustBadge";
 import {
   BookOpen,
@@ -152,8 +152,6 @@ function Home() {
         </div>
 
       </section>
-
-      <ContinueReading />
 
       <div className="mt-16">
         <DailyVerse />

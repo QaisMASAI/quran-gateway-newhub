@@ -53,39 +53,6 @@ export function ShareButtons(props: Props) {
   const text = buildText(props);
   const shareMsg = `${text}\n\n${url}`;
 
-  const fbWebUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}&quote=${encodeURIComponent(shareMsg)}`;
-
-  const shareToFacebook = async () => {
-    setBusy("facebook");
-    try {
-      const file = await buildImageFile(props, format);
-      const nav: any = typeof navigator !== "undefined" ? navigator : null;
-      // Prefer native share sheet with the image file (mobile: lets user pick Facebook app)
-      if (nav?.canShare?.({ files: [file] }) && nav.share) {
-        try {
-          await nav.share({
-            files: [file],
-            title: `${props.surahName} ${props.surah}:${props.ayah}`,
-            text: shareMsg,
-          });
-          return;
-        } catch {
-          /* user cancelled — fall through to desktop flow */
-        }
-      }
-      // Desktop fallback: download the image, copy caption, open FB sharer
-      downloadBlob(file);
-      try {
-        await navigator.clipboard.writeText(shareMsg);
-      } catch {
-        /* ignore */
-      }
-      window.open(fbWebUrl, "_blank", "noopener,noreferrer");
-    } finally {
-      setBusy(null);
-    }
-  };
-
   const copy = async (what: "link" | "text") => {
     try {
       await navigator.clipboard.writeText(what === "link" ? url : shareMsg);
@@ -187,15 +154,6 @@ export function ShareButtons(props: Props) {
         {t("common.save")}
       </button>
 
-      <button
-        type="button"
-        onClick={shareToFacebook}
-        disabled={busy !== null}
-        className="inline-flex items-center gap-1 rounded-full border border-border bg-background px-2.5 py-1 text-[11px] font-medium text-foreground/80 hover:border-primary/40 hover:text-primary disabled:opacity-60"
-      >
-        {busy === "facebook" ? <Loader2 className="h-3 w-3 animate-spin" /> : <ImageDown className="h-3 w-3" />}
-        {t("ui.share.facebook")}
-      </button>
       <button
         type="button"
         onClick={() => copy("link")}
