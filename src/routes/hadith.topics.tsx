@@ -47,7 +47,7 @@ function HadithTopicsPage() {
               : "Browse the top hadith books in each collection as learning topics."}
         </p>
 
-        {topics.length > 0 && (
+        {topics.length > 0 ? (
           <div className="mt-6">
             <h2 className="text-sm font-semibold text-foreground">
               {locale === "he" ? "נושאים קשורים אמיתיים" : locale === "ar" ? "موضوعات مرتبطة فعلاً" : "Real related topics"}
@@ -67,6 +67,14 @@ function HadithTopicsPage() {
                 </Link>
               ))}
             </div>
+          </div>
+        ) : (
+          <div className="mt-6 rounded-lg border border-border bg-card p-4 text-sm text-muted-foreground">
+            {locale === "he"
+              ? "עדיין אין קישורי נושאים ב־DB. הפעילו תחילה את קישור נושאי החדית׳ מלוח הניהול."
+              : locale === "ar"
+                ? "لا توجد روابط موضوعات في قاعدة البيانات حتى الآن. شغّل ربط موضوعات الحديث أولاً من لوحة الإدارة."
+                : "No DB topic links are available yet. Run Hadith topic linking from the admin dashboard first."}
           </div>
         )}
 
