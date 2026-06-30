@@ -6,6 +6,7 @@ import { generateText } from "ai";
 import { z } from "zod";
 import { createLovableAiGatewayProvider } from "./ai-gateway.server";
 import { embedTexts } from "./embeddings.server";
+import { isRecentByTtl, normalizeCacheQuestion } from "./research-cache-utils";
 
 const ResearchSchema = z.object({
   question: z.string().min(2).max(500),
@@ -299,17 +300,6 @@ type ResearchCacheConfig = {
   version: number;
 };
 
-function normalizeCacheQuestion(question: string): string {
-  return question.trim().toLowerCase().replace(/\s+/g, " ");
-}
-
-function isRecent(iso: string | null | undefined, ttlMs: number): boolean {
-  if (!iso) return false;
-  const parsed = Date.parse(iso);
-  if (Number.isNaN(parsed)) return false;
-  return Date.now() - parsed <= ttlMs;
-}
-
 async function readResearchCache(
   supabaseAdmin: { from: (table: string) => any },
   question: string,
@@ -326,7 +316,7 @@ async function readResearchCache(
 
   const match = (data ?? []).find(
     (row: { question?: string | null; created_at?: string | null }) =>
-      normalizeCacheQuestion(row.question ?? "") === normalized && isRecent(row.created_at, config.ttlMs),
+      normalizeCacheQuestion(row.question ?? "") === normalized && isRecentByTtl(row.created_at, config.ttlMs),
   ) as
     | {
         answer?: string | null;
