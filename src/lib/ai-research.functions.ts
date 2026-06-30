@@ -133,23 +133,63 @@ async function fetchQuranAiMcpEvidence(
   language: "he" | "en" | "ar",
   k: number,
 ): Promise<{ verses: VerseCitation[]; unavailable: boolean }> {
-  let client: { listTools: () => Promise<{ tools?: Array<{ name: string }> }>; callTool: (args: { name: string; arguments?: Record<string, unknown> }) => Promise<unknown>; close: () => Promise<void> } | null = null;
+  async function mcpRpcCall(
+    method: string,
+    params: Record<string, unknown>,
+    sessionId?: string,
+  ): Promise<{ result: unknown; sessionId?: string }> {
+    const response = await fetch(QURAN_AI_MCP_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json, text/event-stream",
+        ...(sessionId ? { "Mcp-Session-Id": sessionId } : {}),
+      },
+      body: JSON.stringify({
+        jsonrpc: "2.0",
+        id: `quran-ai-${Date.now()}-${Math.random().toString(36).slice(2)}`,
+        method,
+        params,
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error(`mcp_http_${response.status}`);
+    }
+
+    const payload = (await response.json().catch(() => ({}))) as {
+      result?: unknown;
+      error?: { message?: string };
+    };
+
+    if (payload?.error) {
+      throw new Error(payload.error.message ?? "mcp_rpc_error");
+    }
+
+    return {
+      result: payload?.result,
+      sessionId: response.headers.get("mcp-session-id") ?? response.headers.get("Mcp-Session-Id") ?? sessionId,
+    };
+  }
+
+  let sessionId: string | undefined;
   let unavailable = false;
   try {
-    const { createMCPClient } = await import("@ai-sdk/mcp");
-    client = await withTimeout(
-      createMCPClient({
-        transport: {
-          type: "http",
-          url: QURAN_AI_MCP_URL,
-          redirect: "error",
-        },
+    const init = await withTimeout(
+      mcpRpcCall("initialize", {
+        protocolVersion: "2024-11-05",
+        capabilities: {},
+        clientInfo: { name: "quran-research-assistant", version: "1.0.0" },
       }),
       7000,
     );
+    sessionId = init.sessionId;
 
-    const toolList = await withTimeout(client.listTools(), 5000);
-    const candidateTools = (toolList.tools ?? [])
+    const toolList = await withTimeout(mcpRpcCall("tools/list", {}, sessionId), 5000);
+    sessionId = toolList.sessionId ?? sessionId;
+
+    const tools = ((toolList.result as { tools?: Array<{ name: string }> })?.tools ?? []);
+    const candidateTools = tools
       .map((t) => t.name)
       .filter((name) => /quran|search|verse|ayah|query/i.test(name))
       .slice(0, 8);
@@ -167,7 +207,12 @@ async function fetchQuranAiMcpEvidence(
       for (const args of attempts) {
         let result: unknown;
         try {
-          result = await withTimeout(client.callTool({ name: toolName, arguments: args }), 7000);
+          const toolCall = await withTimeout(
+            mcpRpcCall("tools/call", { name: toolName, arguments: args }, sessionId),
+            7000,
+          );
+          sessionId = toolCall.sessionId ?? sessionId;
+          result = toolCall.result;
         } catch {
           continue;
         }
@@ -236,14 +281,6 @@ async function fetchQuranAiMcpEvidence(
   } catch {
     unavailable = true;
     return { verses: [], unavailable };
-  } finally {
-    if (client) {
-      try {
-        await client.close();
-      } catch {
-        // ignore close failures
-      }
-    }
   }
 }
 
