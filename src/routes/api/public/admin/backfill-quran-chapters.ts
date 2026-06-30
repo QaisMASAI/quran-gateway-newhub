@@ -1,5 +1,13 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { SURAH_NAMES_HE } from "@/lib/surah-names-he";
+import { authorizeAdminRouteRequest } from "@/lib/admin-route-auth";
+
+const BodySchema = {
+  parse(input: unknown) {
+    if (!input || typeof input !== "object") return {} as { token?: string; adminUserId?: string };
+    return input as { token?: string; adminUserId?: string };
+  },
+};
 
 type QuranChapter = {
   id: number;
@@ -14,13 +22,9 @@ export const Route = createFileRoute("/api/public/admin/backfill-quran-chapters"
   server: {
     handlers: {
       POST: async ({ request }) => {
-        const token = process.env.QURAN_ADMIN_TOKEN;
-        const auth = request.headers.get("authorization");
-        const bearer = auth?.startsWith("Bearer ") ? auth.slice(7).trim() : null;
-        const body = await request.json().catch(() => ({} as { token?: string }));
-        if (!token || (bearer !== token && body.token !== token)) {
-          return new Response("Unauthorized", { status: 401 });
-        }
+        const body = BodySchema.parse(await request.json().catch(() => ({})));
+        const authResult = await authorizeAdminRouteRequest(request, body);
+        if (!authResult.ok) return authResult.response;
 
         const chaptersRes = await fetch("https://api.quran.com/api/v4/chapters?language=en");
         if (!chaptersRes.ok) {
