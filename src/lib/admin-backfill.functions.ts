@@ -125,12 +125,7 @@ async function invokeAdminRoute(path: string, payload: Record<string, unknown>) 
   return body;
 }
 
-async function requireAdminUser(context: {
-  supabase: {
-    rpc: (fn: string, params: Record<string, unknown>) => Promise<{ data: unknown; error: { message: string } | null }>;
-  };
-  userId: string;
-}) {
+async function requireAdminUser(context: { supabase: any; userId: string }) {
   const { data, error } = await context.supabase.rpc("has_role", {
     _user_id: context.userId,
     _role: "admin",
