@@ -197,6 +197,9 @@ export async function renderVerseImage(input: VerseImageInput): Promise<Blob> {
   const arabicStart = Math.round(Math.min(W, H) * (landscape ? 0.08 : 0.085));
   const arabicMin = Math.round(arabicStart * 0.45);
   ctx.direction = "rtl" as CanvasDirection;
+  // Arabic diacritics stack above/below the baseline — give generous line-height
+  // so combining marks (fatha/damma/kasra/shadda/sukun) don't clip into the next line.
+  const arLineRatio = 2.0;
   const arabicFit = fitFont(
     ctx,
     input.arabic,
@@ -206,13 +209,13 @@ export async function renderVerseImage(input: VerseImageInput): Promise<Blob> {
     "700",
     arabicStart,
     arabicMin,
-    1.55,
+    arLineRatio,
   );
   ctx.fillStyle = "#1F2937";
   ctx.textAlign = "center";
   ctx.textBaseline = "alphabetic";
   ctx.font = `700 ${arabicFit.size}px "Amiri Quran", "Amiri", serif`;
-  const arLh = arabicFit.size * 1.55;
+  const arLh = arabicFit.size * arLineRatio;
   const arabicBlockH = arabicFit.size + (arabicFit.lines.length - 1) * arLh;
   const arabicTop = contentTop + (arabicMaxH - arabicBlockH) / 2;
   arabicFit.lines.forEach((ln, i) => {
