@@ -675,7 +675,7 @@ export const askQuranResearch = createServerFn({ method: "POST" })
       const surahs = [...new Set(verses.map((v) => v.surah))];
       const { data: tafRows } = await supabaseAdmin
         .from("tafsir_passages")
-        .select("surah,ayah_start,ayah_end,lang,body,source_id,tafsir_sources!inner(slug,name_en,author)")
+        .select("surah,ayah_start,ayah_end,lang,body,source_id,tafsir_sources!inner(slug,name_en,name_ar,name_he,author)")
         .in("surah", surahs)
         .eq("lang", data.language)
         .eq("tafsir_sources.slug", "al_jalalayn")
@@ -687,11 +687,12 @@ export const askQuranResearch = createServerFn({ method: "POST" })
             v.surah === t.surah && v.ayah >= (t.ayah_start ?? 0) && v.ayah <= (t.ayah_end ?? 9999),
         );
         if (!matchVerse) continue;
+        const src = (t as { tafsir_sources?: { name_en?: string; name_ar?: string; name_he?: string; author?: string | null } }).tafsir_sources;
+        const localizedName =
+          data.language === "ar" ? src?.name_ar : data.language === "he" ? src?.name_he : src?.name_en;
         tafsir.push({
-          source:
-            (t as { tafsir_sources?: { name_en?: string } }).tafsir_sources?.name_en ?? "Tafsir",
-          translator:
-            (t as { tafsir_sources?: { author?: string | null } }).tafsir_sources?.author ?? null,
+          source: localizedName || src?.name_en || "Tafsir",
+          translator: src?.author ?? null,
           surah: t.surah as number,
           ayah: matchVerse.ayah,
           text: (t.body ?? "").slice(0, 600),
@@ -705,7 +706,7 @@ export const askQuranResearch = createServerFn({ method: "POST" })
         const surahs = [...new Set(fallbackVerses.map((v) => v.surah))];
         const { data: tafRows } = await supabaseAdmin
           .from("tafsir_passages")
-          .select("surah,ayah_start,ayah_end,lang,body,source_id,tafsir_sources!inner(slug,name_en,author)")
+          .select("surah,ayah_start,ayah_end,lang,body,source_id,tafsir_sources!inner(slug,name_en,name_ar,name_he,author)")
           .in("surah", surahs)
           .eq("tafsir_sources.slug", "al_jalalayn")
           .limit(10);
@@ -715,11 +716,12 @@ export const askQuranResearch = createServerFn({ method: "POST" })
               v.surah === t.surah && v.ayah >= (t.ayah_start ?? 0) && v.ayah <= (t.ayah_end ?? 9999),
           );
           if (!matchVerse) continue;
+          const src = (t as { tafsir_sources?: { name_en?: string; name_ar?: string; name_he?: string; author?: string | null } }).tafsir_sources;
+          const localizedName =
+            data.language === "ar" ? src?.name_ar : data.language === "he" ? src?.name_he : src?.name_en;
           tafsir.push({
-            source:
-              (t as { tafsir_sources?: { name_en?: string } }).tafsir_sources?.name_en ?? "Tafsir",
-            translator:
-              (t as { tafsir_sources?: { author?: string | null } }).tafsir_sources?.author ?? null,
+            source: localizedName || src?.name_en || "Tafsir",
+            translator: src?.author ?? null,
             surah: t.surah as number,
             ayah: matchVerse.ayah,
             text: (t.body ?? "").slice(0, 600),
