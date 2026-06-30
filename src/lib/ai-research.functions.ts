@@ -6,7 +6,11 @@ import { generateText } from "ai";
 import { z } from "zod";
 import { createLovableAiGatewayProvider } from "./ai-gateway.server";
 import { embedTexts } from "./embeddings.server";
-import { isRecentByTtl, normalizeCacheQuestion } from "./research-cache-utils";
+import {
+  isRecentByTtl,
+  normalizeCacheQuestion,
+  shouldServeCachedResult,
+} from "./research-cache-utils";
 
 const ResearchSchema = z.object({
   question: z.string().min(2).max(500),
@@ -505,7 +509,15 @@ export const askQuranResearch = createServerFn({ method: "POST" })
     const cacheConfig = await getResearchCacheConfig(supabaseAdmin);
 
     const cached = await readResearchCache(supabaseAdmin, data.question, data.language, cacheConfig);
-    if (cached && Number(cached.cacheVersion ?? 1) === cacheConfig.version) {
+    if (
+      cached &&
+      shouldServeCachedResult({
+        cacheVersion: cached.cacheVersion,
+        currentVersion: cacheConfig.version,
+        createdAt: new Date().toISOString(),
+        ttlMs: Number.MAX_SAFE_INTEGER,
+      })
+    ) {
       return {
         answer: cached.answer,
         verses: cached.verses,

@@ -5,6 +5,7 @@
 
 import { supabase } from "@/integrations/supabase/client";
 import type { Locale } from "@/lib/i18n";
+import { getTafsirFallbackOrder } from "@/lib/tafsir-fallback";
 
 export interface TafsirSourceRow {
   id: string;
@@ -67,9 +68,7 @@ export async function getTafsirForVerse(
       .eq("source.slug", JALALAYN_SLUG)
       .order("created_at", { ascending: false });
 
-  const fallbackOrder: Locale[] = [lang, "he", "ar", "en"].filter(
-    (v, i, arr): v is Locale => arr.indexOf(v) === i,
-  );
+  const fallbackOrder = getTafsirFallbackOrder(lang);
 
   for (const candidate of fallbackOrder) {
     const { data } = await base().eq("lang", candidate);
@@ -100,9 +99,7 @@ export async function getTafsirForVerseBySource(
     return q;
   };
 
-  const fallbackOrder: Locale[] = [lang, "he", "ar", "en"].filter(
-    (v, i, arr): v is Locale => arr.indexOf(v) === i,
-  );
+  const fallbackOrder = getTafsirFallbackOrder(lang);
 
   for (const candidate of fallbackOrder) {
     const { data } = await base().eq("lang", candidate);

@@ -1,13 +1,12 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { SURAH_NAMES_HE } from "@/lib/surah-names-he";
 import { authorizeAdminRouteRequest } from "@/lib/admin-route-auth";
+import { z } from "zod";
 
-const BodySchema = {
-  parse(input: unknown) {
-    if (!input || typeof input !== "object") return {} as { token?: string; adminUserId?: string };
-    return input as { token?: string; adminUserId?: string };
-  },
-};
+const BodySchema = z.object({
+  token: z.string().min(8).optional(),
+  adminUserId: z.string().uuid().optional(),
+});
 
 type QuranChapter = {
   id: number;
@@ -22,8 +21,10 @@ export const Route = createFileRoute("/api/public/admin/backfill-quran-chapters"
   server: {
     handlers: {
       POST: async ({ request }) => {
-        const body = BodySchema.parse(await request.json().catch(() => ({})));
-        const authResult = await authorizeAdminRouteRequest(request, body);
+        const bodyRaw = await request.json().catch(() => ({}));
+        const body = BodySchema.safeParse(bodyRaw);
+        if (!body.success) return new Response("Bad request", { status: 400 });
+        const authResult = await authorizeAdminRouteRequest(request, body.data);
         if (!authResult.ok) return authResult.response;
 
         const chaptersRes = await fetch("https://api.quran.com/api/v4/chapters?language=en");
