@@ -115,7 +115,7 @@ async function invokeAdminRoute(path: string, payload: Record<string, unknown>) 
       "Content-Type": "application/json",
       Authorization: `Bearer ${token}`,
     },
-    body: JSON.stringify({ ...payload, token }),
+    body: JSON.stringify({ ...payload, token, adminUserId: req?.ctx?.userId ?? null }),
   });
 
   const body = await res.json().catch(() => ({ ok: false, error: `http_${res.status}` }));
