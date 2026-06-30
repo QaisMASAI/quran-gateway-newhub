@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { authorizeAdminRouteRequest } from "@/lib/admin-route-auth";
 
 type TranslationVerse = {
   verse_key?: string;
@@ -42,13 +43,9 @@ export const Route = createFileRoute("/api/public/admin/backfill-verse-translati
   server: {
     handlers: {
       POST: async ({ request }) => {
-        const token = process.env.QURAN_ADMIN_TOKEN;
-        const auth = request.headers.get("authorization");
-        const bearer = auth?.startsWith("Bearer ") ? auth.slice(7).trim() : null;
-        const body = await request.json().catch(() => ({} as { token?: string }));
-        if (!token || (bearer !== token && body.token !== token)) {
-          return new Response("Unauthorized", { status: 401 });
-        }
+        const body = await request.json().catch(() => ({} as { token?: string; adminUserId?: string }));
+        const authResult = await authorizeAdminRouteRequest(request, body);
+        if (!authResult.ok) return authResult.response;
 
         const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
