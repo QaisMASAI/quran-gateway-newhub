@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { authorizeAdminRouteRequest } from "@/lib/admin-route-auth";
 
 type TRow = {
   verse_key: string;
@@ -38,13 +39,9 @@ export const Route = createFileRoute("/api/public/admin/backfill-asbab-nuzul")({
   server: {
     handlers: {
       POST: async ({ request }) => {
-        const token = process.env.QURAN_ADMIN_TOKEN;
-        const auth = request.headers.get("authorization");
-        const bearer = auth?.startsWith("Bearer ") ? auth.slice(7).trim() : null;
-        const body = await request.json().catch(() => ({} as { token?: string; surah?: number; page?: number; perPage?: number }));
-        if (!token || (bearer !== token && body.token !== token)) {
-          return new Response("Unauthorized", { status: 401 });
-        }
+        const body = await request.json().catch(() => ({} as { token?: string; adminUserId?: string; surah?: number; page?: number; perPage?: number }));
+        const authResult = await authorizeAdminRouteRequest(request, body);
+        if (!authResult.ok) return authResult.response;
 
         const surah = Number(body.surah ?? 2);
         const page = Number(body.page ?? 1);

@@ -1,28 +1,25 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { z } from "zod";
 import { generateEnglishTafsirJob } from "@/lib/grounded-chunks.server";
+import { authorizeAdminRouteRequest } from "@/lib/admin-route-auth";
 
 const BodySchema = z.object({
   batch: z.number().int().min(1).max(200).optional(),
   model: z.string().min(3).max(120).optional(),
   token: z.string().min(8).optional(),
+  adminUserId: z.string().uuid().optional(),
 });
 
 export const Route = createFileRoute("/api/public/admin/translate-tafsir-english")({
   server: {
     handlers: {
       POST: async ({ request }) => {
-        const token = process.env.QURAN_ADMIN_TOKEN;
         const bodyRaw = await request.json().catch(() => ({}));
         const parsed = BodySchema.safeParse(bodyRaw);
         if (!parsed.success) return new Response("Bad request", { status: 400 });
 
-        const authHeader = request.headers.get("authorization");
-        const bearerToken = authHeader?.startsWith("Bearer ") ? authHeader.slice(7).trim() : null;
-        const bodyToken = parsed.data.token ?? null;
-        if (!token || (bearerToken !== token && bodyToken !== token)) {
-          return new Response("Unauthorized", { status: 401 });
-        }
+        const authResult = await authorizeAdminRouteRequest(request, parsed.data);
+        if (!authResult.ok) return authResult.response;
 
         const result = await generateEnglishTafsirJob({
           batch: parsed.data.batch,
