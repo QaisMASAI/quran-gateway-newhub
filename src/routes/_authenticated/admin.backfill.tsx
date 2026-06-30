@@ -149,7 +149,7 @@ function AdminBackfillPage() {
                     </button>
                     <button
                       type="button"
-                      onClick={() => runJobM.mutate({ jobKey: job.key, payload: { ...job.defaultPayload, force: true } })}
+                      onClick={() => runJobM.mutate({ jobKey: job.key, payload: job.defaultPayload })}
                       className="inline-flex min-h-11 items-center gap-1 rounded-md border border-border px-2.5 py-2 text-xs font-medium hover:bg-secondary"
                     >
                       <RotateCcw className="h-3.5 w-3.5" /> Re-run
