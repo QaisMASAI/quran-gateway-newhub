@@ -9,7 +9,7 @@ import { surahDisplayName } from "@/lib/surah-names-he";
 import { askQuranResearch, type ResearchResult } from "@/lib/ai-research.functions";
 import { Header } from "@/components/Header";
 import { normalizeLocale } from "@/lib/i18n";
-import { getNextMcpRetryDelay } from "@/lib/mcp-outage.client";
+import { getNextMcpRetryDelay } from "@/lib/mcp-outage";
 
 export const Route = createLazyFileRoute("/ask")({
   component: AskPage,
