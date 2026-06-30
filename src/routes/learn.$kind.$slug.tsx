@@ -2,7 +2,7 @@ import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { Header } from "@/components/Header";
-import { ChevronLeft, Loader2, BookOpen, Sparkles, Quote, ScrollText, Compass, Info } from "lucide-react";
+import { ChevronLeft, Loader2, BookOpen, Quote, ScrollText, Compass } from "lucide-react";
 import {
   getEntityBySlug, getEntityVerses, getRelatedEntities, pickLocale,
   type EntityKind,
@@ -10,7 +10,7 @@ import {
 import { EntityCard } from "@/components/discovery/EntityCard";
 import { PassageCard } from "@/components/discovery/PassageCard";
 import {
-  getLessonsForEntity, getTafsirForVerse, getAsbabForVerse, sourceName,
+  getTafsirForVerse, sourceName,
   type TafsirPassageRow,
 } from "@/lib/tafsir-content";
 import { normalizeLocale, type Locale } from "@/lib/i18n";
@@ -52,16 +52,8 @@ function EntityPage() {
     staleTime: 5 * 60_000,
   });
 
-  const lessonsQ = useQuery({
-    queryKey: ["entity-lessons", entity?.id, locale],
-    queryFn: () => getLessonsForEntity(entity!.id, locale),
-    enabled: !!entity,
-    staleTime: 5 * 60_000,
-  });
-
-  // Pull Tafsir + Asbab for the first 3 linked verses to make the
-  // "Authentic Tafsir" + "Asbab Al-Nuzul" sections meaningful even without
-  // explicit pinning.
+  // Pull Tafsir for the first 3 linked verses to make the
+  // "Authentic Tafsir" section meaningful even without explicit pinning.
   const anchorVerses = useMemo(() => (versesQ.data ?? []).slice(0, 3), [versesQ.data]);
   const tafsirQ = useQuery({
     queryKey: ["entity-tafsir", entity?.id, locale, anchorVerses.map(v => `${v.surah}:${v.ayah_start}`).join(",")],
@@ -69,20 +61,6 @@ function EntityPage() {
       const out: TafsirPassageRow[] = [];
       for (const v of anchorVerses) {
         const rows = await getTafsirForVerse(v.surah, v.ayah_start, locale);
-        out.push(...rows);
-      }
-      return out;
-    },
-    enabled: !!entity && anchorVerses.length > 0,
-    staleTime: 5 * 60_000,
-  });
-
-  const asbabQ = useQuery({
-    queryKey: ["entity-asbab", entity?.id, locale, anchorVerses.map(v => `${v.surah}:${v.ayah_start}`).join(",")],
-    queryFn: async () => {
-      const out: TafsirPassageRow[] = [];
-      for (const v of anchorVerses) {
-        const rows = await getAsbabForVerse(v.surah, v.ayah_start, locale);
         out.push(...rows);
       }
       return out;
