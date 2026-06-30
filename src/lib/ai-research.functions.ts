@@ -297,6 +297,7 @@ type CachedResearchPayload = {
   confidence: number;
   mcpUnavailable?: boolean;
   cacheVersion?: number;
+  createdAt?: string | null;
 };
 
 type ResearchCacheConfig = {
@@ -346,6 +347,7 @@ async function readResearchCache(
     confidence: typeof match.confidence === "number" ? match.confidence : 0,
     mcpUnavailable: citations.mcpUnavailable === true,
     cacheVersion: Number((citations as { cache_version?: unknown }).cache_version ?? 1),
+    createdAt: (match as { created_at?: string | null }).created_at ?? null,
   };
 }
 
@@ -514,8 +516,8 @@ export const askQuranResearch = createServerFn({ method: "POST" })
       shouldServeCachedResult({
         cacheVersion: cached.cacheVersion,
         currentVersion: cacheConfig.version,
-        createdAt: new Date().toISOString(),
-        ttlMs: Number.MAX_SAFE_INTEGER,
+        createdAt: cached.createdAt,
+        ttlMs: cacheConfig.ttlMs,
       })
     ) {
       return {
