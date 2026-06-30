@@ -102,8 +102,6 @@ function EntityPage() {
       { id: "overview", label: t("learn.toc.overview"), show: true },
       { id: "verses", label: t("learn.toc.verses"), show: (versesQ.data?.length ?? 0) > 0 },
       { id: "tafsir", label: t("learn.toc.tafsir"), show: true },
-      { id: "asbab", label: t("learn.toc.asbab"), show: true },
-      { id: "lessons", label: t("learn.toc.lessons"), show: true },
       { id: "related", label: t("learn.toc.related"), show: (relatedQ.data?.length ?? 0) > 0 },
     ];
     return list.filter((s) => s.show);
@@ -210,56 +208,6 @@ function EntityPage() {
                 ) : (
                   <NoAuthSource t={t} />
                 )}
-              </Section>
-
-              {/* Asbab al-Nuzul */}
-              <Section id="asbab" icon={<Info className="h-4 w-4" />} title={t("learn.asbabTitle")} subtitle={t("learn.asbabSubtitle")}>
-                {asbabQ.isLoading ? (
-                  <Loader />
-                ) : asbabQ.data && asbabQ.data.length > 0 ? (
-                  <div className="space-y-4">
-                    {asbabQ.data.map((p) => (
-                      <PassageBlock key={p.id} body={p.body} sourceLabel={sourceName(p.source, locale)} citation={p.citation} locale={locale} />
-                    ))}
-                  </div>
-                ) : (
-                  <NoAuthSource t={t} />
-                )}
-              </Section>
-
-              {/* Lessons & Reflections */}
-              <Section id="lessons" icon={<Sparkles className="h-4 w-4" />} title={t("learn.lessonsTitle")} subtitle={t("learn.lessonsSubtitle")}>
-                {lessonsQ.isLoading ? (
-                  <Loader />
-                ) : lessonsQ.data && lessonsQ.data.length > 0 ? (
-                  <div className="space-y-4">
-                    {lessonsQ.data.map((l) => (
-                      <PassageBlock key={l.id} body={l.body} sourceLabel={sourceName(l.source, locale)} citation={l.citation} locale={locale} />
-                    ))}
-                  </div>
-                ) : (
-                  <NoAuthSource t={t} />
-                )}
-              </Section>
-
-              <Section id="ask" icon={<Sparkles className="h-4 w-4" />} title={t("learn.askSectionTitle")}>
-                <div className="rounded-2xl border border-primary/10 bg-card p-5">
-                  <p className="text-sm text-muted-foreground">{t("learn.askSectionBody")}</p>
-                  <div className="mt-3 flex flex-wrap gap-2">
-                    <Link
-                      to="/ask"
-                      className="inline-flex items-center rounded-full border border-primary/25 bg-primary/10 px-3 py-1.5 text-xs font-semibold text-primary hover:border-primary/40"
-                    >
-                      {t("learn.askNow")}
-                    </Link>
-                    <Link
-                      to="/research"
-                      className="inline-flex items-center rounded-full border border-border bg-background px-3 py-1.5 text-xs font-semibold text-foreground hover:border-primary/30"
-                    >
-                      {t("learn.researchMore")}
-                    </Link>
-                  </div>
-                </div>
               </Section>
 
               {/* Prophet timeline placeholder section */}
