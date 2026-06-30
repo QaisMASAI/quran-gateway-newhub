@@ -102,7 +102,7 @@ function routePathForJob(jobKey: JobKey) {
   }
 }
 
-async function invokeAdminRoute(path: string, payload: Record<string, unknown>) {
+async function invokeAdminRoute(path: string, payload: Record<string, unknown>, adminUserId: string) {
   const token = process.env.QURAN_ADMIN_TOKEN;
   const req = getRequest();
   if (!token) throw new Error("Missing QURAN_ADMIN_TOKEN");
@@ -115,7 +115,7 @@ async function invokeAdminRoute(path: string, payload: Record<string, unknown>) 
       "Content-Type": "application/json",
       Authorization: `Bearer ${token}`,
     },
-    body: JSON.stringify({ ...payload, token, adminUserId: req?.ctx?.userId ?? null }),
+    body: JSON.stringify({ ...payload, token, adminUserId }),
   });
 
   const body = await res.json().catch(() => ({ ok: false, error: `http_${res.status}` }));
@@ -231,7 +231,7 @@ export const runAdminBackfillJob = createServerFn({ method: "POST" })
     if (createErr || !runRow?.id) throw new Error(createErr?.message ?? "Failed to start job run");
 
     try {
-      const result = await invokeAdminRoute(routePathForJob(data.jobKey), payload);
+      const result = await invokeAdminRoute(routePathForJob(data.jobKey), payload, context.userId);
       await context.supabase
         .from("admin_job_runs")
         .update({
