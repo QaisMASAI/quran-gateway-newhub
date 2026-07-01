@@ -4,6 +4,7 @@ import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
 type JobKey =
+  | "backfill-arabic-ayat"
   | "backfill-quran-chapters"
   | "backfill-asbab-nuzul"
   | "backfill-verse-translations"
@@ -15,6 +16,7 @@ type JobKey =
 
 const JobInputSchema = z.object({
   jobKey: z.enum([
+    "backfill-arabic-ayat",
     "backfill-quran-chapters",
     "backfill-asbab-nuzul",
     "backfill-verse-translations",
@@ -28,6 +30,7 @@ const JobInputSchema = z.object({
 });
 
 const JobPayloadSchemaMap: Record<JobKey, z.ZodType<Record<string, unknown>>> = {
+  "backfill-arabic-ayat": z.object({}).strict(),
   "backfill-quran-chapters": z.object({}).strict(),
   "backfill-asbab-nuzul": z
     .object({
@@ -83,6 +86,8 @@ const RegressionSchema = z.object({
 
 function routePathForJob(jobKey: JobKey) {
   switch (jobKey) {
+    case "backfill-arabic-ayat":
+      return "/api/public/admin/backfill-arabic-ayat";
     case "backfill-quran-chapters":
       return "/api/public/admin/backfill-quran-chapters";
     case "backfill-asbab-nuzul":
@@ -100,6 +105,41 @@ function routePathForJob(jobKey: JobKey) {
     case "translate-tafsir-hebrew":
       return "/api/public/admin/translate-tafsir-hebrew";
   }
+}
+
+type BackfillCounts = {
+  tafsir: { ar: number; en: number; he: number };
+  asbab: { ar: number; en: number; he: number };
+  hadithEntityLinks: number;
+};
+
+async function readBackfillCounts(context: { supabase: any }): Promise<BackfillCounts> {
+  const [tafsirAr, tafsirEn, tafsirHe, asbabAr, asbabEn, asbabHe, hadithLinks] = await Promise.all([
+    context.supabase.from("tafsir_passages").select("id", { count: "exact", head: true }).eq("lang", "ar"),
+    context.supabase.from("tafsir_passages").select("id", { count: "exact", head: true }).eq("lang", "en"),
+    context.supabase.from("tafsir_passages").select("id", { count: "exact", head: true }).eq("lang", "he"),
+    context.supabase.from("asbab_nuzul").select("id", { count: "exact", head: true }).eq("lang", "ar"),
+    context.supabase.from("asbab_nuzul").select("id", { count: "exact", head: true }).eq("lang", "en"),
+    context.supabase.from("asbab_nuzul").select("id", { count: "exact", head: true }).eq("lang", "he"),
+    context.supabase
+      .from("hadith_entity_links")
+      .select("id", { count: "exact", head: true })
+      .not("entity_id", "is", null),
+  ]);
+
+  return {
+    tafsir: {
+      ar: tafsirAr.count ?? 0,
+      en: tafsirEn.count ?? 0,
+      he: tafsirHe.count ?? 0,
+    },
+    asbab: {
+      ar: asbabAr.count ?? 0,
+      en: asbabEn.count ?? 0,
+      he: asbabHe.count ?? 0,
+    },
+    hadithEntityLinks: hadithLinks.count ?? 0,
+  };
 }
 
 async function invokeAdminRoute(path: string, payload: Record<string, unknown>, adminUserId: string) {
