@@ -9,15 +9,7 @@ import { Logo } from "@/components/Logo";
 import { DailyVerse } from "@/components/DailyVerse";
 // ContinueReading hidden per product decision
 import { TrustBadge } from "@/components/TrustBadge";
-import {
-  BookOpen,
-  Sparkles,
-  Search as SearchIcon,
-  ChevronRight,
-  ChevronLeft,
-  Loader2,
-  MapPin,
-} from "lucide-react";
+import { BookOpen, Sparkles, Search as SearchIcon, ChevronRight, ChevronLeft, Loader2, MapPin } from "lucide-react";
 import i18n, { normalizeLocale } from "@/lib/i18n";
 
 export const Route = createFileRoute("/")({
@@ -91,8 +83,12 @@ function Home() {
           <div
             className={`pointer-events-none absolute -bottom-24 ${isRtl ? "-right-10" : "-left-10"} h-72 w-72 rounded-full bg-primary-foreground/10 blur-3xl`}
           />
-          <span className="arabesque-corner" style={{ top: 0, [isRtl ? 'left' : 'right']: 0 }} aria-hidden />
-          <span className="arabesque-corner" style={{ bottom: 0, [isRtl ? 'right' : 'left']: 0, transform: "rotate(180deg)" }} aria-hidden />
+          <span className="arabesque-corner" style={{ top: 0, [isRtl ? "left" : "right"]: 0 }} aria-hidden />
+          <span
+            className="arabesque-corner"
+            style={{ bottom: 0, [isRtl ? "right" : "left"]: 0, transform: "rotate(180deg)" }}
+            aria-hidden
+          />
 
           <div className="relative z-10 mx-auto max-w-4xl space-y-6">
             <div className="mx-auto inline-flex items-center justify-center rounded-2xl border border-white/20 bg-white/10 p-3 shadow-inner backdrop-blur-sm">
@@ -111,10 +107,10 @@ function Home() {
               {t("home.badge")}
             </span>
 
-            <h1 className="font-display text-4xl font-bold leading-tight text-primary-foreground sm:text-6xl md:text-7xl">
+            <h1 className="font-display text-4xl font-bold leading-tight text-primary-foreground sm:text-4xl md:text-7xl">
               {t("home.h1")}
-              <span className="mt-3 block font-arabic text-3xl text-gold sm:text-5xl" dir="rtl">
-                ٱلْقُرْآنُ ٱلْكَرِيمُ
+              <span className="mt-3 block font-arabic text-3xl text-gold sm:text-4xl" dir="rtl">
+                القُرْآنُ الكَرِيمُ
               </span>
             </h1>
 
@@ -150,7 +146,6 @@ function Home() {
             </div>
           </div>
         </div>
-
       </section>
 
       <div className="mt-16">
@@ -158,7 +153,9 @@ function Home() {
       </div>
 
       <main id="main" className="mx-auto max-w-6xl px-4 py-16 sm:px-6 scroll-mt-20">
-        <div className={`mb-10 flex flex-col gap-5 md:flex-row md:items-end md:justify-between ${isRtl ? "md:flex-row-reverse" : ""}`}>
+        <div
+          className={`mb-10 flex flex-col gap-5 md:flex-row md:items-end md:justify-between ${isRtl ? "md:flex-row-reverse" : ""}`}
+        >
           <div className="space-y-1.5">
             <h2 className="font-display text-3xl font-bold text-primary sm:text-4xl">{t("home.chaptersTitle")}</h2>
             <p className="text-sm text-muted-foreground">{t("home.chaptersSubtitle")}</p>
@@ -168,9 +165,11 @@ function Home() {
               value={filter}
               onChange={(e) => setFilter(e.target.value)}
               placeholder={t("home.filterPlaceholder")}
-              className={`w-full rounded-2xl border border-primary/10 bg-card py-3.5 ${isRtl ? 'ps-12 pe-4' : 'pe-12 ps-4'} text-sm shadow-sm outline-none transition-all focus:ring-2 focus:ring-gold/50 placeholder:text-muted-foreground`}
+              className={`w-full rounded-2xl border border-primary/10 bg-card py-3.5 ${isRtl ? "ps-12 pe-4" : "pe-12 ps-4"} text-sm shadow-sm outline-none transition-all focus:ring-2 focus:ring-gold/50 placeholder:text-muted-foreground`}
             />
-            <SearchIcon className={`absolute top-1/2 ${isRtl ? 'start-4' : 'end-4'} h-5 w-5 -translate-y-1/2 text-muted-foreground`} />
+            <SearchIcon
+              className={`absolute top-1/2 ${isRtl ? "start-4" : "end-4"} h-5 w-5 -translate-y-1/2 text-muted-foreground`}
+            />
           </div>
         </div>
 
@@ -193,7 +192,7 @@ function Home() {
                 key={c.id}
                 to="/surah/$id"
                 params={{ id: String(c.id) }}
-                className={`group flex items-center gap-5 rounded-2xl border border-primary/5 bg-card p-5 transition-all hover:-translate-y-0.5 hover:border-gold hover:shadow-xl ${isRtl ? 'flex-row-reverse' : ''}`}
+                className={`group flex items-center gap-5 rounded-2xl border border-primary/5 bg-card p-5 transition-all hover:-translate-y-0.5 hover:border-gold hover:shadow-xl ${isRtl ? "flex-row-reverse" : ""}`}
               >
                 <div className="relative flex h-12 w-12 shrink-0 items-center justify-center">
                   <div className="absolute inset-0 rotate-45 rounded-lg bg-primary/5 transition-colors group-hover:bg-gold/20" />
@@ -204,7 +203,9 @@ function Home() {
 
                 <div className="min-w-0 flex-1">
                   <h4 className="truncate text-base font-bold text-primary">{surahDisplayName(c.id, lang)}</h4>
-                  <div className={`mt-1 flex flex-wrap items-center gap-1.5 text-[11px] text-muted-foreground ${isRtl ? 'flex-row-reverse' : ''}`}>
+                  <div
+                    className={`mt-1 flex flex-wrap items-center gap-1.5 text-[11px] text-muted-foreground ${isRtl ? "flex-row-reverse" : ""}`}
+                  >
                     <span
                       className="inline-flex items-center gap-1 rounded-full px-1.5 py-0.5 font-medium"
                       style={{
@@ -245,8 +246,12 @@ function Home() {
 
       <div className="mosque-arch mt-12" aria-hidden />
       <footer className="relative border-t border-border py-10 text-center text-xs text-muted-foreground">
-        <span className="arabesque-corner" style={{ top: 0, [isRtl ? 'left' : 'right']: 0 }} aria-hidden />
-        <span className="arabesque-corner" style={{ top: 0, [isRtl ? 'right' : 'left']: 0, transform: isRtl ? "scaleX(1)" : "scaleX(-1)" }} aria-hidden />
+        <span className="arabesque-corner" style={{ top: 0, [isRtl ? "left" : "right"]: 0 }} aria-hidden />
+        <span
+          className="arabesque-corner"
+          style={{ top: 0, [isRtl ? "right" : "left"]: 0, transform: isRtl ? "scaleX(1)" : "scaleX(-1)" }}
+          aria-hidden
+        />
         <p className="relative">{t("home.footerTagline")}</p>
         <p className="relative mt-1 opacity-70">{t("home.footerOwner")}</p>
         <p className="relative mt-1 opacity-70">{t("home.footerReciter")}</p>
@@ -254,4 +259,3 @@ function Home() {
     </div>
   );
 }
-
