@@ -117,6 +117,15 @@ type BackfillCounts = {
   hadithEntityLinks: number;
 };
 
+type JsonValue = string | number | boolean | null | JsonValue[] | { [key: string]: JsonValue };
+
+type JobRunReport = {
+  countsBefore: BackfillCounts;
+  countsAfter: BackfillCounts;
+  durationMs: number;
+  failedBatches: string[];
+};
+
 async function readBackfillCounts(context: { supabase: any }): Promise<BackfillCounts> {
   const [tafsirAr, tafsirEn, tafsirHe, asbabAr, asbabEn, asbabHe, hadithLinks] = await Promise.all([
     context.supabase.from("tafsir_passages").select("id", { count: "exact", head: true }).eq("lang", "ar"),
@@ -192,6 +201,23 @@ function normalizeFailedBatches(result: unknown): unknown[] {
   return [value];
 }
 
+function toSafeString(value: unknown): string {
+  if (typeof value === "string") return value;
+  try {
+    return JSON.stringify(value);
+  } catch {
+    return String(value);
+  }
+}
+
+function toSerializableJson(value: unknown): JsonValue {
+  try {
+    return JSON.parse(JSON.stringify(value)) as JsonValue;
+  } catch {
+    return { error: "unserializable_result" };
+  }
+}
+
 const RUN_ALL_JOB_ORDER: JobKey[] = [
   "translate-tafsir-english",
   "translate-tafsir-hebrew",
@@ -252,13 +278,16 @@ async function executeJobRun(args: {
 
   const countsAfter = await readBackfillCounts(args.context);
   const durationMs = Date.now() - startedAtMs;
-  const failedBatches = normalizeFailedBatches(result);
-  const enrichedResult = {
-    ...(typeof result === "object" && result ? result : {}),
+  const failedBatches = normalizeFailedBatches(result).map((item) => toSafeString(item));
+  const report: JobRunReport = {
     countsBefore,
     countsAfter,
     durationMs,
     failedBatches,
+  };
+  const enrichedResult = {
+    raw: toSerializableJson(result),
+    report,
   };
 
   await args.context.supabase
@@ -273,10 +302,10 @@ async function executeJobRun(args: {
     .eq("requested_by", args.context.userId);
 
   if (status === "failed") {
-    return { ok: false as const, runId: runRow.id, error: errorMessage ?? "Job failed", result: enrichedResult };
+    return { ok: false as const, runId: runRow.id, error: errorMessage ?? "Job failed", report };
   }
 
-  return { ok: true as const, runId: runRow.id, result: enrichedResult };
+  return { ok: true as const, runId: runRow.id, report };
 }
 
 export const getAdminBackfillStatus = createServerFn({ method: "GET" })
@@ -396,7 +425,7 @@ export const runAllAdminBackfills = createServerFn({ method: "POST" })
       ok: boolean;
       skipped?: boolean;
       error?: string;
-      result?: unknown;
+      report?: JobRunReport;
     }> = [];
 
     for (const jobKey of RUN_ALL_JOB_ORDER) {
@@ -418,7 +447,7 @@ export const runAllAdminBackfills = createServerFn({ method: "POST" })
       }
 
       const step = await executeJobRun({ context, jobKey, payload });
-      steps.push({ jobKey, runId: step.runId, ok: step.ok, error: step.ok ? undefined : step.error, result: step.result });
+      steps.push({ jobKey, runId: step.runId, ok: step.ok, error: step.ok ? undefined : step.error, report: step.report });
       if (!step.ok) {
         return { ok: false as const, steps, stoppedAt: jobKey };
       }
