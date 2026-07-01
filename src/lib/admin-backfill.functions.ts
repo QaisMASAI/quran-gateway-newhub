@@ -84,6 +84,10 @@ const RegressionSchema = z.object({
   sampleSurahs: z.array(z.number().int().min(1).max(114)).min(1).max(8).optional().default([1, 2, 18, 36]),
 });
 
+const RunAllSchema = z.object({
+  resumeFromFailed: z.boolean().optional().default(true),
+});
+
 function routePathForJob(jobKey: JobKey) {
   switch (jobKey) {
     case "backfill-arabic-ayat":
@@ -111,6 +115,15 @@ type BackfillCounts = {
   tafsir: { ar: number; en: number; he: number };
   asbab: { ar: number; en: number; he: number };
   hadithEntityLinks: number;
+};
+
+type JsonValue = string | number | boolean | null | JsonValue[] | { [key: string]: JsonValue };
+
+type JobRunReport = {
+  countsBefore: BackfillCounts;
+  countsAfter: BackfillCounts;
+  durationMs: number;
+  failedBatches: string[];
 };
 
 async function readBackfillCounts(context: { supabase: any }): Promise<BackfillCounts> {
@@ -158,11 +171,16 @@ async function invokeAdminRoute(path: string, payload: Record<string, unknown>, 
     body: JSON.stringify({ ...payload, token, adminUserId }),
   });
 
-  const body = await res.json().catch(() => ({ ok: false, error: `http_${res.status}` }));
-  if (!res.ok || body?.ok === false) {
-    throw new Error(body?.error ?? `request_failed_${res.status}`);
+  const body = await res.json().catch(() => ({ ok: false, error: `request_failed_${res.status}` }));
+  if (!res.ok) {
+    return {
+      ok: false,
+      error: body?.error ?? `request_failed_${res.status}`,
+      status: res.status,
+      result: body,
+    } as const;
   }
-  return body;
+  return body as { ok?: boolean; error?: string; [key: string]: unknown };
 }
 
 async function requireAdminUser(context: { supabase: any; userId: string }) {
@@ -174,11 +192,137 @@ async function requireAdminUser(context: { supabase: any; userId: string }) {
   if (data !== true) throw new Error("Forbidden: admin access required");
 }
 
+function normalizeFailedBatches(result: unknown): unknown[] {
+  if (!result || typeof result !== "object") return [];
+  const row = result as Record<string, unknown>;
+  const value = row.failedBatches;
+  if (!value) return [];
+  if (Array.isArray(value)) return value;
+  return [value];
+}
+
+function toSafeString(value: unknown): string {
+  if (typeof value === "string") return value;
+  try {
+    return JSON.stringify(value);
+  } catch {
+    return String(value);
+  }
+}
+
+function toSerializableJson(value: unknown): JsonValue {
+  try {
+    return JSON.parse(JSON.stringify(value)) as JsonValue;
+  } catch {
+    return { error: "unserializable_result" };
+  }
+}
+
+const RUN_ALL_JOB_ORDER: JobKey[] = [
+  "translate-tafsir-english",
+  "translate-tafsir-hebrew",
+  "link-hadith-graph",
+];
+
+const RUN_ALL_DEFAULT_PAYLOADS: Record<JobKey, Record<string, unknown>> = {
+  "backfill-arabic-ayat": {},
+  "backfill-quran-chapters": {},
+  "backfill-asbab-nuzul": { surah: 2, page: 1, perPage: 50 },
+  "backfill-verse-translations": {},
+  "embed-hadith": { batch: 200, untilDone: false, maxRuns: 1 },
+  "translate-hadith-hebrew": { batch: 20 },
+  "translate-tafsir-english": { batch: 80 },
+  "link-hadith-graph": { batch: 150 },
+  "translate-tafsir-hebrew": { batch: 80 },
+};
+
+async function executeJobRun(args: {
+  context: { supabase: any; userId: string };
+  jobKey: JobKey;
+  payload: Record<string, unknown>;
+}) {
+  const startedAtMs = Date.now();
+  const countsBefore = await readBackfillCounts(args.context);
+
+  const { data: runRow, error: createErr } = await args.context.supabase
+    .from("admin_job_runs")
+    .insert({
+      job_key: args.jobKey,
+      status: "running",
+      requested_by: args.context.userId,
+      payload: args.payload as unknown as never,
+    })
+    .select("id")
+    .single();
+
+  if (createErr || !runRow?.id) throw new Error(createErr?.message ?? "Failed to start job run");
+
+  let result: unknown = null;
+  let status: "succeeded" | "failed" = "succeeded";
+  let errorMessage: string | null = null;
+
+  try {
+    const routeResult = await invokeAdminRoute(routePathForJob(args.jobKey), args.payload, args.context.userId);
+    if (routeResult?.ok === false) {
+      status = "failed";
+      errorMessage = routeResult.error ?? "Job failed";
+      result = routeResult;
+    } else {
+      result = routeResult;
+    }
+  } catch (err) {
+    status = "failed";
+    errorMessage = err instanceof Error ? err.message : String(err);
+    result = { ok: false, error: errorMessage };
+  }
+
+  const countsAfter = await readBackfillCounts(args.context);
+  const durationMs = Date.now() - startedAtMs;
+  const failedBatches = normalizeFailedBatches(result).map((item) => toSafeString(item));
+  const report: JobRunReport = {
+    countsBefore,
+    countsAfter,
+    durationMs,
+    failedBatches,
+  };
+  const enrichedResult = {
+    raw: toSerializableJson(result),
+    report,
+  };
+
+  await args.context.supabase
+    .from("admin_job_runs")
+    .update({
+      status,
+      result: enrichedResult,
+      finished_at: new Date().toISOString(),
+      error_message: errorMessage,
+    })
+    .eq("id", runRow.id)
+    .eq("requested_by", args.context.userId);
+
+  if (status === "failed") {
+    return { ok: false as const, runId: runRow.id, error: errorMessage ?? "Job failed", report };
+  }
+
+  return { ok: true as const, runId: runRow.id, report };
+}
+
 export const getAdminBackfillStatus = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
     await requireAdminUser(context);
-    const [{ count: chapterCount }, { count: asbabCount }, { count: ayahCount }, { count: hadithTopicLinkCount }, { data: failedJobs }, { data: settingsRow }, { data: tafsirAuditRows }] =
+    const [
+      { count: chapterCount },
+      { count: asbabCount },
+      { count: ayahCount },
+      { count: hadithTopicLinkCount },
+      { data: failedJobs },
+      { data: settingsRow },
+      { data: tafsirAuditRows },
+      backfillCounts,
+      { data: activeRuns },
+    ] =
       await Promise.all([
         context.supabase.from("quran_chapters").select("id", { count: "exact", head: true }),
         context.supabase.from("asbab_nuzul").select("id", { count: "exact", head: true }),
@@ -204,6 +348,14 @@ export const getAdminBackfillStatus = createServerFn({ method: "GET" })
           .select("lang,source_id,source:tafsir_sources!inner(name_en)")
           .order("lang", { ascending: true })
           .limit(20000),
+        readBackfillCounts(context),
+        context.supabase
+          .from("admin_job_runs")
+          .select("id,job_key,status,started_at")
+          .eq("requested_by", context.userId)
+          .eq("status", "running")
+          .order("started_at", { ascending: false })
+          .limit(10),
       ]);
 
     const valueJson = (settingsRow?.value_json ?? {}) as { ttl_minutes?: number; version?: number };
@@ -232,6 +384,8 @@ export const getAdminBackfillStatus = createServerFn({ method: "GET" })
         version: Number(valueJson.version ?? 1),
         updatedAt: settingsRow?.updated_at ?? null,
       },
+      counts: backfillCounts,
+      activeRuns: activeRuns ?? [],
       tafsirAudit: [...tafsirAudit.values()].sort((a, b) => a.sourceName.localeCompare(b.sourceName)),
     };
   });
@@ -256,46 +410,50 @@ export const runAdminBackfillJob = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     await requireAdminUser(context);
     const payload = JobPayloadSchemaMap[data.jobKey].parse(data.payload ?? {});
+    return executeJobRun({ context, jobKey: data.jobKey, payload });
+  });
 
-    const { data: runRow, error: createErr } = await context.supabase
-      .from("admin_job_runs")
-      .insert({
-        job_key: data.jobKey,
-        status: "running",
-        requested_by: context.userId,
-        payload: payload as unknown as never,
-      })
-      .select("id")
-      .single();
+export const runAllAdminBackfills = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) => RunAllSchema.parse(input ?? {}))
+  .handler(async ({ data, context }) => {
+    await requireAdminUser(context);
 
-    if (createErr || !runRow?.id) throw new Error(createErr?.message ?? "Failed to start job run");
+    const steps: Array<{
+      jobKey: JobKey;
+      runId?: string;
+      ok: boolean;
+      skipped?: boolean;
+      error?: string;
+      report?: JobRunReport;
+    }> = [];
 
-    try {
-      const result = await invokeAdminRoute(routePathForJob(data.jobKey), payload, context.userId);
-      await context.supabase
-        .from("admin_job_runs")
-        .update({
-          status: "succeeded",
-          result,
-          finished_at: new Date().toISOString(),
-          error_message: null,
-        })
-        .eq("id", runRow.id)
-        .eq("requested_by", context.userId);
-      return { ok: true, runId: runRow.id, result };
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : String(err);
-      await context.supabase
-        .from("admin_job_runs")
-        .update({
-          status: "failed",
-          error_message: errorMessage,
-          finished_at: new Date().toISOString(),
-        })
-        .eq("id", runRow.id)
-        .eq("requested_by", context.userId);
-      return { ok: false, runId: runRow.id, error: errorMessage };
+    for (const jobKey of RUN_ALL_JOB_ORDER) {
+      let payload = RUN_ALL_DEFAULT_PAYLOADS[jobKey] ?? {};
+
+      if (data.resumeFromFailed) {
+        const { data: latestFailed } = await context.supabase
+          .from("admin_job_runs")
+          .select("payload,status")
+          .eq("requested_by", context.userId)
+          .eq("job_key", jobKey)
+          .order("started_at", { ascending: false })
+          .limit(1)
+          .maybeSingle();
+
+        if (latestFailed?.status === "failed" && latestFailed.payload && typeof latestFailed.payload === "object") {
+          payload = { ...payload, ...(latestFailed.payload as Record<string, unknown>) };
+        }
+      }
+
+      const step = await executeJobRun({ context, jobKey, payload });
+      steps.push({ jobKey, runId: step.runId, ok: step.ok, error: step.ok ? undefined : step.error, report: step.report });
+      if (!step.ok) {
+        return { ok: false as const, steps, stoppedAt: jobKey };
+      }
     }
+
+    return { ok: true as const, steps };
   });
 
 export const updateResearchCacheSettings = createServerFn({ method: "POST" })
