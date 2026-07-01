@@ -305,9 +305,243 @@ export async function rebuildGroundedChunksJob(input: unknown) {
 }
 
 const TranslateSchema = z.object({
-  batch: z.number().int().min(1).max(200).optional().default(60),
+  batch: z.number().int().min(1).max(1200).optional().default(600),
   model: z.string().min(3).optional().default("google/gemini-2.5-flash"),
 });
+
+type QuranTafsirApiRow = {
+  verse_key?: string;
+  text?: string;
+};
+
+type QuranTafsirResource = {
+  id: number;
+  slug?: string;
+  name?: string;
+};
+
+function stripHtml(input: string): string {
+  return input
+    .replace(/<sup[^>]*>.*?<\/sup>/g, " ")
+    .replace(/<[^>]+>/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function extractAsbabSnippetEnglish(input: string): string | null {
+  const clean = stripHtml(input);
+  if (!clean) return null;
+  const match = clean.match(
+    /(occasion of revelation|reason for revelation|this verse was revealed|revealed concerning)([\s\S]{0,900})/i,
+  );
+  if (!match) return null;
+  const body = `${match[1]} ${match[2]}`.trim();
+  return body.length >= 60 ? body.slice(0, 1200) : null;
+}
+
+async function resolveTafsirResourceIds() {
+  const [enRes, allRes] = await Promise.all([
+    fetch("https://api.quran.com/api/v4/resources/tafsirs?language=en"),
+    fetch("https://api.quran.com/api/v4/resources/tafsirs"),
+  ]);
+
+  const enJson = (await enRes.json().catch(() => ({}))) as { tafsirs?: QuranTafsirResource[] };
+  const allJson = (await allRes.json().catch(() => ({}))) as { tafsirs?: QuranTafsirResource[] };
+  const enRows = enJson.tafsirs ?? [];
+  const allRows = allJson.tafsirs ?? [];
+
+  const byName = (rows: QuranTafsirResource[], re: RegExp) =>
+    rows.find((r) => re.test(`${r.slug ?? ""} ${r.name ?? ""}`));
+
+  const tafsirEn = byName(enRows, /jalal|ibn\s*kathir|qurtubi|muyassar|saadi/i) ?? enRows[0] ?? null;
+  const asbabEn =
+    byName(allRows, /asbab|nuzul|occasion/i) ?? byName(enRows, /asbab|nuzul|occasion/i) ?? null;
+
+  return {
+    tafsirEnId: tafsirEn?.id ?? null,
+    asbabEnId: asbabEn?.id ?? null,
+  };
+}
+
+async function fetchQuranTafsirByChapter(tafsirId: number, surah: number, perPage = 50) {
+  const out: QuranTafsirApiRow[] = [];
+  let page = 1;
+
+  while (page <= 20) {
+    const res = await fetch(
+      `https://api.quran.com/api/v4/tafsirs/${tafsirId}/by_chapter/${surah}?page=${page}&per_page=${perPage}`,
+    );
+    if (!res.ok) break;
+    const json = (await res.json()) as {
+      tafsirs?: QuranTafsirApiRow[];
+      pagination?: { next_page?: number | null };
+    };
+    const rows = json.tafsirs ?? [];
+    if (rows.length === 0) break;
+    out.push(...rows);
+    if (!json.pagination?.next_page) break;
+    page = json.pagination.next_page;
+  }
+
+  return out;
+}
+
+export async function generateEnglishTafsirJob(input: unknown) {
+  const data = TranslateSchema.parse(input);
+  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+
+  const [{ data: sourceRows, error: sourceError }, resourceIds] = await Promise.all([
+    supabaseAdmin.from("tafsir_sources").select("id,slug"),
+    resolveTafsirResourceIds(),
+  ]);
+
+  if (sourceError) return { ok: false, error: sourceError.message };
+  if (!resourceIds.tafsirEnId) {
+    return { ok: false, error: "No authenticated English tafsir source found in Quran API" };
+  }
+
+  const jalalaynSource =
+    ((sourceRows ?? []) as Array<{ id: string; slug: string }>).find((s) => s.slug === "al_jalalayn") ??
+    ((sourceRows ?? []) as Array<{ id: string; slug: string }>)[0] ??
+    null;
+  if (!jalalaynSource) return { ok: false, error: "No tafsir source configured" };
+
+  type TafsirInsertRow = {
+    source_id: string;
+    surah: number;
+    ayah_start: number;
+    ayah_end: number;
+    lang: "en";
+    body: string;
+    citation: string | null;
+  };
+
+  type AsbabInsertRow = {
+    source_id: string;
+    surah: number;
+    ayah_start: number;
+    ayah_end: number;
+    lang: "en";
+    body: string;
+    citation: string | null;
+  };
+
+  const tafsirOut: TafsirInsertRow[] = [];
+  const asbabOut: AsbabInsertRow[] = [];
+  const failedBatches: string[] = [];
+  let remaining = data.batch;
+
+  for (let surah = 1; surah <= 114 && remaining > 0; surah += 1) {
+    const rows = await fetchQuranTafsirByChapter(resourceIds.tafsirEnId, surah, 50);
+    for (const r of rows) {
+      const [sRaw, aRaw] = String(r.verse_key ?? "").split(":");
+      const s = Number(sRaw);
+      const a = Number(aRaw);
+      const body = stripHtml(r.text ?? "");
+      if (!s || !a || !body) {
+        failedBatches.push(`tafsir:${surah}:${String(r.verse_key ?? "?")}`);
+        continue;
+      }
+
+      tafsirOut.push({
+        source_id: jalalaynSource.id,
+        surah: s,
+        ayah_start: a,
+        ayah_end: a,
+        lang: "en",
+        body,
+        citation: `Quran.com authenticated tafsir ${resourceIds.tafsirEnId} ${s}:${a}`,
+      });
+
+      const asbabFromTafsir = extractAsbabSnippetEnglish(body);
+      if (asbabFromTafsir) {
+        asbabOut.push({
+          source_id: jalalaynSource.id,
+          surah: s,
+          ayah_start: a,
+          ayah_end: a,
+          lang: "en",
+          body: asbabFromTafsir,
+          citation: `Quran.com tafsir-derived asbab ${resourceIds.tafsirEnId} ${s}:${a}`,
+        });
+      }
+
+      remaining -= 1;
+      if (remaining <= 0) break;
+    }
+  }
+
+  if (resourceIds.asbabEnId) {
+    let left = Math.max(1, Math.floor(data.batch / 2));
+    for (let surah = 1; surah <= 114 && left > 0; surah += 1) {
+      const rows = await fetchQuranTafsirByChapter(resourceIds.asbabEnId, surah, 50);
+      for (const r of rows) {
+        const [sRaw, aRaw] = String(r.verse_key ?? "").split(":");
+        const s = Number(sRaw);
+        const a = Number(aRaw);
+        const body = stripHtml(r.text ?? "");
+        if (!s || !a || !body) continue;
+        asbabOut.push({
+          source_id: jalalaynSource.id,
+          surah: s,
+          ayah_start: a,
+          ayah_end: a,
+          lang: "en",
+          body: clip(body, 1500),
+          citation: `Quran.com authenticated asbab ${resourceIds.asbabEnId} ${s}:${a}`,
+        });
+        left -= 1;
+        if (left <= 0) break;
+      }
+    }
+  }
+
+  if (tafsirOut.length === 0 && asbabOut.length === 0) {
+    return { ok: false, error: "no_rows_fetched_from_authenticated_api" as const, failedBatches };
+  }
+
+  for (const row of tafsirOut) {
+    await supabaseAdmin
+      .from("tafsir_passages")
+      .delete()
+      .eq("source_id", row.source_id)
+      .eq("surah", row.surah)
+      .eq("ayah_start", row.ayah_start)
+      .eq("ayah_end", row.ayah_end)
+      .eq("lang", "en");
+  }
+
+  for (const row of asbabOut) {
+    await supabaseAdmin
+      .from("asbab_nuzul")
+      .delete()
+      .eq("source_id", row.source_id)
+      .eq("surah", row.surah)
+      .eq("ayah_start", row.ayah_start)
+      .eq("ayah_end", row.ayah_end)
+      .eq("lang", "en");
+  }
+
+  if (tafsirOut.length > 0) {
+    const { error: tafErr } = await supabaseAdmin.from("tafsir_passages").insert(tafsirOut);
+    if (tafErr) return { ok: false, error: tafErr.message };
+  }
+
+  if (asbabOut.length > 0) {
+    const { error: asbErr } = await supabaseAdmin.from("asbab_nuzul").insert(asbabOut);
+    if (asbErr) return { ok: false, error: asbErr.message };
+  }
+
+  return {
+    ok: true,
+    translated_rows: tafsirOut.length,
+    asbab_rows: asbabOut.length,
+    failedBatches,
+    source: "Quran.com authenticated API",
+    tafsirResourceId: resourceIds.tafsirEnId,
+    asbabResourceId: resourceIds.asbabEnId,
+  };
+}
 
 export async function generateHebrewTafsirJob(input: unknown) {
   const data = TranslateSchema.parse(input);
@@ -316,47 +550,124 @@ export async function generateHebrewTafsirJob(input: unknown) {
   const gateway = createLovableAiGatewayProvider(apiKey);
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
-  const { data: rows, error } = await supabaseAdmin
-    .from("tafsir_passages")
-    .select("id, source_id, surah, ayah_start, ayah_end, body, source:tafsir_sources!inner(name_en,name_ar)")
-    .eq("lang", "ar")
-    .order("surah", { ascending: true })
-    .order("ayah_start", { ascending: true })
-    .limit(data.batch);
+  const [heTafsirKeysRes, enTafsirRes, arTafsirRes, heAsbabKeysRes, enAsbabRes, arAsbabRes] = await Promise.all([
+    supabaseAdmin.from("tafsir_passages").select("source_id,surah,ayah_start,ayah_end").eq("lang", "he"),
+    supabaseAdmin
+      .from("tafsir_passages")
+      .select("source_id,surah,ayah_start,ayah_end,body")
+      .eq("lang", "en")
+      .order("surah", { ascending: true })
+      .order("ayah_start", { ascending: true })
+      .limit(data.batch * 3),
+    supabaseAdmin
+      .from("tafsir_passages")
+      .select("source_id,surah,ayah_start,ayah_end,body")
+      .eq("lang", "ar")
+      .order("surah", { ascending: true })
+      .order("ayah_start", { ascending: true })
+      .limit(data.batch * 3),
+    supabaseAdmin.from("asbab_nuzul").select("source_id,surah,ayah_start,ayah_end").eq("lang", "he"),
+    supabaseAdmin
+      .from("asbab_nuzul")
+      .select("source_id,surah,ayah_start,ayah_end,body")
+      .eq("lang", "en")
+      .order("surah", { ascending: true })
+      .order("ayah_start", { ascending: true })
+      .limit(data.batch * 2),
+    supabaseAdmin
+      .from("asbab_nuzul")
+      .select("source_id,surah,ayah_start,ayah_end,body")
+      .eq("lang", "ar")
+      .order("surah", { ascending: true })
+      .order("ayah_start", { ascending: true })
+      .limit(data.batch * 2),
+  ]);
 
+  const error =
+    heTafsirKeysRes.error ?? enTafsirRes.error ?? arTafsirRes.error ?? heAsbabKeysRes.error ?? enAsbabRes.error ?? arAsbabRes.error;
   if (error) return { ok: false, error: error.message };
 
-  const out: Array<{
-    original_tafsir_id: string;
-    surah_id: number;
-    ayah_number: number;
-    source_tafsir_name: string;
-    original_arabic_text: string;
-    hebrew_translation: string;
-    translation_model: string;
-    quality_score: number;
-  }> = [];
+  const existingTafsirKeys = new Set(
+    ((heTafsirKeysRes.data ?? []) as Array<{ source_id: string; surah: number; ayah_start: number; ayah_end: number }>).map(
+      (r) => `${r.source_id}:${r.surah}:${r.ayah_start}:${r.ayah_end}`,
+    ),
+  );
+  const existingAsbabKeys = new Set(
+    ((heAsbabKeysRes.data ?? []) as Array<{ source_id: string; surah: number; ayah_start: number; ayah_end: number }>).map(
+      (r) => `${r.source_id}:${r.surah}:${r.ayah_start}:${r.ayah_end}`,
+    ),
+  );
 
-  for (const r of (rows ?? []) as Array<{
-    id: string;
+  const tafsirRows = [
+    ...((enTafsirRes.data ?? []) as Array<{
+      source_id: string;
+      surah: number;
+      ayah_start: number;
+      ayah_end: number;
+      body: string;
+    }>),
+    ...((arTafsirRes.data ?? []) as Array<{
+      source_id: string;
+      surah: number;
+      ayah_start: number;
+      ayah_end: number;
+      body: string;
+    }>),
+  ]
+    .filter((r) => !existingTafsirKeys.has(`${r.source_id}:${r.surah}:${r.ayah_start}:${r.ayah_end}`))
+    .slice(0, data.batch);
+
+  const asbabRows = [
+    ...((enAsbabRes.data ?? []) as Array<{
+      source_id: string;
+      surah: number;
+      ayah_start: number;
+      ayah_end: number;
+      body: string;
+    }>),
+    ...((arAsbabRes.data ?? []) as Array<{
+      source_id: string;
+      surah: number;
+      ayah_start: number;
+      ayah_end: number;
+      body: string;
+    }>),
+  ]
+    .filter((r) => !existingAsbabKeys.has(`${r.source_id}:${r.surah}:${r.ayah_start}:${r.ayah_end}`))
+    .slice(0, data.batch);
+
+  const tafsirOut: Array<{
     source_id: string;
     surah: number;
     ayah_start: number;
     ayah_end: number;
+    lang: "he";
     body: string;
-    source: { name_en?: string; name_ar?: string } | null;
-  }>) {
-    const prompt = `Translate the following Arabic tafsir passage into high-quality Hebrew for a Quran learning platform.
+    citation: string | null;
+  }> = [];
+
+  const asbabOut: Array<{
+    source_id: string;
+    surah: number;
+    ayah_start: number;
+    ayah_end: number;
+    lang: "he";
+    body: string;
+    citation: string | null;
+  }> = [];
+
+  const failedBatches: string[] = [];
+
+  for (const r of tafsirRows) {
+    const prompt = `Translate the following tafsir passage into high-quality Hebrew for a Quran learning platform.
 Rules:
 - Preserve Islamic meaning, scholarly tone, and verse context.
 - Do not add or remove claims.
-- Keep references explicit.
 - Return only Hebrew translation text.
 
-Source tafsir: ${r.source?.name_en ?? r.source?.name_ar ?? "Tafsir"}
 Surah: ${r.surah}
 Ayah range: ${r.ayah_start}-${r.ayah_end}
-Arabic source:
+Source text:
 ${r.body}`;
 
     try {
@@ -369,92 +680,35 @@ ${r.body}`;
         }),
         25_000,
       );
-      const heb = clip(text, 5000);
-      if (!heb) continue;
-      for (let ay = r.ayah_start; ay <= r.ayah_end; ay += 1) {
-        out.push({
-          original_tafsir_id: r.id,
-          surah_id: r.surah,
-          ayah_number: ay,
-          source_tafsir_name: r.source?.name_en ?? "Tafsir",
-          original_arabic_text: clip(r.body, 5000),
-          hebrew_translation: heb,
-          translation_model: data.model,
-          quality_score: 0.85,
-        });
+      const heb = clip(text, 6000);
+      if (!heb) {
+        failedBatches.push(`tafsir:${r.surah}:${r.ayah_start}`);
+        continue;
       }
+      tafsirOut.push({
+        source_id: r.source_id,
+        surah: r.surah,
+        ayah_start: r.ayah_start,
+        ayah_end: r.ayah_end,
+        lang: "he",
+        body: heb,
+        citation: `HE translation from authenticated tafsir ${r.surah}:${r.ayah_start}-${r.ayah_end}`,
+      });
     } catch {
-      // Skip failed row to preserve batch progress.
+      failedBatches.push(`tafsir:${r.surah}:${r.ayah_start}`);
     }
   }
 
-  if (out.length === 0) return { ok: false, error: "no_translations_generated" as const };
-
-  const { error: upsertErr } = await supabaseAdmin
-    .from("tafsir_hebrew")
-    .upsert(out, { onConflict: "original_tafsir_id,ayah_number" });
-  if (upsertErr) return { ok: false, error: upsertErr.message };
-
-  return {
-    ok: true,
-    translated_rows: out.length,
-    model: data.model,
-  };
-}
-
-const TranslateEnglishSchema = z.object({
-  batch: z.number().int().min(1).max(200).optional().default(80),
-  model: z.string().min(3).optional().default("google/gemini-2.5-flash"),
-});
-
-export async function generateEnglishTafsirJob(input: unknown) {
-  const data = TranslateEnglishSchema.parse(input);
-  const apiKey = process.env.LOVABLE_API_KEY;
-  if (!apiKey) return { ok: false, error: "ai_not_configured" as const };
-  const gateway = createLovableAiGatewayProvider(apiKey);
-  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-
-  const { data: rows, error } = await supabaseAdmin
-    .from("tafsir_passages")
-    .select("id, source_id, surah, ayah_start, ayah_end, body, source:tafsir_sources!inner(name_en,name_ar)")
-    .eq("lang", "ar")
-    .order("surah", { ascending: true })
-    .order("ayah_start", { ascending: true })
-    .limit(data.batch);
-
-  if (error) return { ok: false, error: error.message };
-
-  type UpsertRow = {
-    source_id: string;
-    surah: number;
-    ayah_start: number;
-    ayah_end: number;
-    lang: "en";
-    body: string;
-    citation: string | null;
-  };
-
-  const out: UpsertRow[] = [];
-
-  for (const r of (rows ?? []) as Array<{
-    source_id: string;
-    surah: number;
-    ayah_start: number;
-    ayah_end: number;
-    body: string;
-    source: { name_en?: string; name_ar?: string } | null;
-  }>) {
-    const prompt = `Translate the following Arabic tafsir passage into accurate English for a Quran learning platform.
+  for (const r of asbabRows) {
+    const prompt = `Translate the following Asbab al-Nuzul passage into accurate Hebrew.
 Rules:
-- Preserve meaning and scholarly tone.
-- Do not add claims not in the source.
-- Keep references explicit.
-- Return only the English translation text.
+- Preserve context and historical wording.
+- Do not add commentary.
+- Return only Hebrew text.
 
-Source tafsir: ${r.source?.name_en ?? r.source?.name_ar ?? "Tafsir"}
 Surah: ${r.surah}
 Ayah range: ${r.ayah_start}-${r.ayah_end}
-Arabic source:
+Source text:
 ${r.body}`;
 
     try {
@@ -463,29 +717,34 @@ ${r.body}`;
           model: gateway(data.model),
           prompt,
           temperature: 0,
-          maxOutputTokens: 1000,
+          maxOutputTokens: 800,
         }),
         25_000,
       );
-      const en = clip(text, 7000);
-      if (!en) continue;
-      out.push({
+      const heb = clip(text, 4000);
+      if (!heb) {
+        failedBatches.push(`asbab:${r.surah}:${r.ayah_start}`);
+        continue;
+      }
+      asbabOut.push({
         source_id: r.source_id,
         surah: r.surah,
         ayah_start: r.ayah_start,
         ayah_end: r.ayah_end,
-        lang: "en",
-        body: en,
-        citation: `Translated from Arabic tafsir ${r.surah}:${r.ayah_start}-${r.ayah_end}`,
+        lang: "he",
+        body: heb,
+        citation: `HE translation from authenticated asbab ${r.surah}:${r.ayah_start}-${r.ayah_end}`,
       });
     } catch {
-      // continue on item failure
+      failedBatches.push(`asbab:${r.surah}:${r.ayah_start}`);
     }
   }
 
-  if (out.length === 0) return { ok: false, error: "no_translations_generated" as const };
+  if (tafsirOut.length === 0 && asbabOut.length === 0) {
+    return { ok: false, error: "no_translations_generated" as const, failedBatches };
+  }
 
-  for (const row of out) {
+  for (const row of tafsirOut) {
     await supabaseAdmin
       .from("tafsir_passages")
       .delete()
@@ -493,11 +752,36 @@ ${r.body}`;
       .eq("surah", row.surah)
       .eq("ayah_start", row.ayah_start)
       .eq("ayah_end", row.ayah_end)
-      .eq("lang", "en");
+      .eq("lang", "he");
   }
 
-  const { error: insertErr } = await supabaseAdmin.from("tafsir_passages").insert(out);
-  if (insertErr) return { ok: false, error: insertErr.message };
+  for (const row of asbabOut) {
+    await supabaseAdmin
+      .from("asbab_nuzul")
+      .delete()
+      .eq("source_id", row.source_id)
+      .eq("surah", row.surah)
+      .eq("ayah_start", row.ayah_start)
+      .eq("ayah_end", row.ayah_end)
+      .eq("lang", "he");
+  }
 
-  return { ok: true, translated_rows: out.length, model: data.model };
+  if (tafsirOut.length > 0) {
+    const { error: tafErr } = await supabaseAdmin.from("tafsir_passages").insert(tafsirOut);
+    if (tafErr) return { ok: false, error: tafErr.message };
+  }
+
+  if (asbabOut.length > 0) {
+    const { error: asbErr } = await supabaseAdmin.from("asbab_nuzul").insert(asbabOut);
+    if (asbErr) return { ok: false, error: asbErr.message };
+  }
+
+  return {
+    ok: true,
+    translated_rows: tafsirOut.length + asbabOut.length,
+    tafsir_translated_rows: tafsirOut.length,
+    asbab_translated_rows: asbabOut.length,
+    failedBatches,
+    model: data.model,
+  };
 }
