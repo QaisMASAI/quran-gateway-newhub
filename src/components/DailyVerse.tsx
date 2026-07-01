@@ -1,12 +1,12 @@
 import { useQuery } from "@tanstack/react-query";
-import { Link } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
-import { Sparkles, ChevronLeft } from "lucide-react";
+import { Sparkles } from "lucide-react";
 import { surahDisplayName } from "@/lib/surah-names-he";
 import { loadSurahNamesFromDb } from "@/lib/surah-names-he";
-import { fetchVerseBilingual, type LocaleCode } from "@/lib/translations-db";
-import { ShareButtons } from "./ShareButtons";
+import { fetchSurahBilingualFromDb } from "@/services/api";
 import { normalizeLocale } from "@/lib/i18n";
+import type { LocaleCode } from "@/lib/translations-db";
+import { DailyVerseContent } from "./DailyVerse/DailyVerseContent";
 
 const ROTATION: { surah: number; ayah: number }[] = [
   { surah: 1, ayah: 1 },
@@ -42,13 +42,12 @@ export function DailyVerse() {
   const { t, i18n } = useTranslation("pages");
   const lang = (normalizeLocale(i18n.language) ?? "he") as LocaleCode;
   const pick = pickToday();
+
   const q = useQuery({
     queryKey: ["daily-verse-db", pick.surah, pick.ayah, lang],
-    queryFn: () => fetchVerseBilingual(pick.surah, pick.ayah, lang),
+    queryFn: () => fetchSurahBilingualFromDb(pick.surah, lang),
     staleTime: 12 * 60 * 60 * 1000,
   });
-
-  const name = surahDisplayName(pick.surah, lang === "ar" || lang === "en" ? lang : "he");
 
   useQuery({
     queryKey: ["surah-names-db"],
@@ -56,68 +55,42 @@ export function DailyVerse() {
     staleTime: Infinity,
   });
 
+  const name = surahDisplayName(
+    pick.surah,
+    lang === "ar" || lang === "en" ? lang : "he"
+  );
+
+  const verse = q.data?.find((v) => v.ayah === pick.ayah);
+
   return (
     <section className="mx-auto mt-10 max-w-3xl px-4 sm:px-6">
       <div className="surface-card relative overflow-hidden p-5 sm:p-7">
-        <span className="arabesque-corner" style={{ top: 0, left: 0 }} aria-hidden />
-        <span className="arabesque-corner" style={{ bottom: 0, right: 0, transform: "rotate(180deg)" }} aria-hidden />
+        <span
+          className="arabesque-corner"
+          style={{ top: 0, left: 0 }}
+          aria-hidden
+        />
+        <span
+          className="arabesque-corner"
+          style={{ bottom: 0, right: 0, transform: "rotate(180deg)" }}
+          aria-hidden
+        />
 
         <div className="relative">
           <div className="mb-3 inline-flex items-center gap-1.5 rounded-full bg-primary-soft px-3 py-1 text-[11px] font-semibold uppercase tracking-wider text-primary">
             <Sparkles className="h-3 w-3" /> {t("dailyVerse.badge")}
           </div>
 
-          {q.isLoading && (
-            <p className="py-6 text-center text-sm text-muted-foreground">{t("dailyVerse.loading")}</p>
-          )}
-
-          {(q.error || (q.data && !q.data.arabic)) && !q.isLoading && (
-            <p className="py-6 text-center text-sm text-destructive">{t("dailyVerse.error")}</p>
-          )}
-
-          {q.data && q.data.arabic && (
-            <>
-              <p
-                className="font-arabic text-right text-2xl leading-loose text-foreground sm:text-3xl"
-                dir="rtl"
-              >
-                {q.data.arabic}
-              </p>
-              {lang !== "ar" && q.data.translation && q.data.translation !== q.data.arabic && (
-                <p
-                  className="mt-4 text-[15px] text-foreground/85"
-                  dir={lang === "he" ? "rtl" : "ltr"}
-                >
-                  {q.data.translation}
-                </p>
-              )}
-
-              <div className="mt-5 flex flex-wrap items-center justify-between gap-3 border-t border-border pt-4">
-                <div className="text-xs">
-                  <span className="font-semibold text-primary">{name}</span>
-                  <span className="text-muted-foreground"> · {pick.surah}:{pick.ayah}</span>
-                </div>
-                <Link
-                  to="/surah/$id"
-                  params={{ id: String(pick.surah) }}
-                  hash={`v-${pick.ayah}`}
-                  className="inline-flex items-center gap-1 text-xs font-semibold text-primary hover:underline"
-                >
-                  {t("dailyVerse.openInSurah")} <ChevronLeft className="h-3 w-3" />
-                </Link>
-              </div>
-
-              <div className="mt-3">
-                <ShareButtons
-                  surah={pick.surah}
-                  ayah={pick.ayah}
-                  surahName={name}
-                  arabic={q.data.arabic}
-                  hebrew={lang === "ar" ? q.data.arabic : q.data.translation}
-                />
-              </div>
-            </>
-          )}
+          <DailyVerseContent
+            isLoading={q.isLoading}
+            error={!!q.error}
+            surah={pick.surah}
+            ayah={pick.ayah}
+            name={name}
+            arabic={verse?.arabic ?? ""}
+            translation={verse?.translation ?? ""}
+            lang={lang}
+          />
         </div>
       </div>
     </section>
