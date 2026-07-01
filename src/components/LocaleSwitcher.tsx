@@ -1,18 +1,20 @@
 import { useEffect, useRef, useState } from "react";
 import { Globe, Check } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { SUPPORTED_LOCALES, LOCALE_LABEL, setLocale, type Locale, normalizeLocale, DEFAULT_LOCALE } from "@/lib/i18n";
+import { SUPPORTED_LOCALES, LOCALE_LABEL } from "@/lib/i18n";
+import { useLocale } from "@/hooks/useLocale";
 
 export function LocaleSwitcher() {
-  const { t, i18n } = useTranslation("common");
+  const { t } = useTranslation("common");
+  const { current, changeLocale } = useLocale();
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement | null>(null);
-  const current: Locale = normalizeLocale(i18n.resolvedLanguage) ?? DEFAULT_LOCALE;
 
   useEffect(() => {
     if (!open) return;
     const onClick = (e: MouseEvent) => {
-      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+      if (ref.current && !ref.current.contains(e.target as Node))
+        setOpen(false);
     };
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") setOpen(false);
@@ -54,13 +56,15 @@ export function LocaleSwitcher() {
                   role="option"
                   aria-selected={active}
                   onClick={() => {
-                    setLocale(loc);
+                    changeLocale(loc);
                     setOpen(false);
                   }}
                   className="flex w-full items-center justify-between gap-2 rounded-lg px-3 py-2 text-sm text-foreground hover:bg-secondary"
                 >
                   <span>{LOCALE_LABEL[loc]}</span>
-                  {active && <Check className="h-4 w-4 text-primary" aria-hidden="true" />}
+                  {active && (
+                    <Check className="h-4 w-4 text-primary" aria-hidden="true" />
+                  )}
                 </button>
               </li>
             );

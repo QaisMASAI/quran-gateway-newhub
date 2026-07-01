@@ -1,39 +1,18 @@
 import { Moon, Sun } from "lucide-react";
-import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-
-type Theme = "light" | "dark";
-
-function getInitialTheme(): Theme {
-  if (typeof document === "undefined") return "light";
-  return document.documentElement.classList.contains("dark") ? "dark" : "light";
-}
+import { useTheme } from "@/hooks/useTheme";
 
 export function ThemeToggle() {
-  const [theme, setTheme] = useState<Theme>("light");
-  const [mounted, setMounted] = useState(false);
+  const { isDark, toggle, mounted } = useTheme();
   const { t } = useTranslation("common");
 
-  useEffect(() => {
-    setTheme(getInitialTheme());
-    setMounted(true);
-  }, []);
-
-  const toggle = () => {
-    const next: Theme = theme === "dark" ? "light" : "dark";
-    setTheme(next);
-    const root = document.documentElement;
-    if (next === "dark") root.classList.add("dark");
-    else root.classList.remove("dark");
-    try {
-      localStorage.setItem("qc:theme", next);
-    } catch {
-      /* noop */
-    }
-  };
-
-  const isDark = mounted && theme === "dark";
   const label = isDark ? t("ui.theme.light") : t("ui.theme.dark");
+
+  if (!mounted) {
+    return (
+      <div className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-border bg-background" />
+    );
+  }
 
   return (
     <button

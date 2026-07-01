@@ -1,5 +1,5 @@
 import { Share2, Copy, Check, ImageDown, Loader2, ChevronDown } from "lucide-react";
-import { useState } from "react";
+import { useState, useCallback, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { renderVerseImage, type VerseImageFormat } from "@/lib/verse-image";
 
@@ -11,8 +11,12 @@ interface Props {
   hebrew: string;
 }
 
+const FORMATS: VerseImageFormat[] = ["square", "story", "landscape", "portrait"];
+
 function buildText(p: Props): string {
-  return [p.arabic, "", p.hebrew, "", `— ${p.surahName} (${p.surah}:${p.ayah})`].join("\n");
+  return [p.arabic, "", p.hebrew, "", `— ${p.surahName} (${p.surah}:${p.ayah})`].join(
+    "\n"
+  );
 }
 
 function buildUrl(p: Props): string {
@@ -20,14 +24,34 @@ function buildUrl(p: Props): string {
   return `${window.location.origin}/surah/${p.surah}#v-${p.ayah}`;
 }
 
-async function buildImageFile(props: Props, format: VerseImageFormat): Promise<File> {
-  const blob = await renderVerseImage({ ...props, url: buildUrl(props), format });
-  return new File([blob], `quran-${props.surah}-${props.ayah}-${format}.png`, {
-    type: "image/png",
+async function buildImageFile(
+  props: Props,
+  format: VerseImageFormat
+): Promise<File> {
+  const blob = await renderVerseImage({
+    ...props,
+    url: buildUrl(props),
+    format,
   });
+  return new File(
+    [blob],
+    `quran-${props.surah}-${props.ayah}-${format}.png`,
+    {
+      type: "image/png",
+    }
+  );
 }
 
-const FORMATS: VerseImageFormat[] = ["square", "story", "landscape", "portrait"];
+function downloadBlob(file: File) {
+  const url = URL.createObjectURL(file);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = file.name;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
 
 export function ShareButtons(props: Props) {
   const [copied, setCopied] = useState<"link" | "text" | null>(null);
@@ -36,34 +60,39 @@ export function ShareButtons(props: Props) {
   const [open, setOpen] = useState(false);
   const { t } = useTranslation("common");
 
-  const formatLabel = (f: VerseImageFormat) =>
-    t(`ui.share.formats.${f}` as const, {
-      defaultValue:
-        f === "square"
-          ? "Square · Instagram / General"
-          : f === "story"
-            ? "Story · 9:16"
-            : f === "landscape"
-              ? "Landscape · Facebook / X"
-              : "Portrait · Instagram 4:5",
-    });
+  const { url, text, shareMsg } = useMemo(
+    () => ({
+      url: buildUrl(props),
+      text: buildText(props),
+      shareMsg: `${buildText(props)}\n\n${buildUrl(props)}`,
+    }),
+    [props]
+  );
 
+  const formatLabel = useCallback(
+    (f: VerseImageFormat) =>
+      t(`ui.share.formats.${f}` as const, {
+        defaultValue:
+          f === "square"
+            ? "Square · Instagram / General"
+            : f === "story"
+              ? "Story · 9:16"
+              : f === "landscape"
+                ? "Landscape · Facebook / X"
+                : "Portrait · Instagram 4:5",
+      }),
+    [t]
+  );
 
-  const url = buildUrl(props);
-  const text = buildText(props);
-  const shareMsg = `${text}\n\n${url}`;
-
-  const copy = async (what: "link" | "text") => {
+  const copy = useCallback(async (what: "link" | "text") => {
     try {
       await navigator.clipboard.writeText(what === "link" ? url : shareMsg);
       setCopied(what);
       setTimeout(() => setCopied(null), 1800);
-    } catch {
-      /* noop */
-    }
-  };
+    } catch {}
+  }, [url, shareMsg]);
 
-  const shareImage = async () => {
+  const shareImage = useCallback(async () => {
     setBusy("share");
     try {
       const file = await buildImageFile(props, format);
@@ -73,19 +102,20 @@ export function ShareButtons(props: Props) {
         title: `${props.surahName} ${props.surah}:${props.ayah}`,
         text: shareMsg,
       };
-      if (nav?.canShare?.({ files: [file] }) && nav.share) {
+      if (nav?.canShare?.({
+ files: [file],
+      }) && nav.share) {
         await nav.share(data);
       } else {
         downloadBlob(file);
       }
     } catch {
-      /* cancelled */
     } finally {
       setBusy(null);
     }
-  };
+  }, [props, format, shareMsg]);
 
-  const downloadImage = async () => {
+  const downloadImage = useCallback(async () => {
     setBusy("download");
     try {
       const file = await buildImageFile(props, format);
@@ -93,7 +123,7 @@ export function ShareButtons(props: Props) {
     } finally {
       setBusy(null);
     }
-  };
+  }, [props, format]);
 
   return (
     <div className="flex flex-wrap items-center gap-1.5">
@@ -139,18 +169,26 @@ export function ShareButtons(props: Props) {
         type="button"
         onClick={shareImage}
         disabled={busy !== null}
-        className="inline-flex items-center gap-1 rounded-full border border-primary/40 bg-primary px-3 py-1 text-[11px] font-semibold text-primary-foreground hover:bg-primary/90 disabled:opacity-60"
+        className="inline-flex items-center gap-1 rounded-full border border-primary/40 bg-primary px-3 py-1 text-[11px] font-semibold text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
       >
-        {busy === "share" ? <Loader2 className="h-3 w-3 animate-spin" /> : <ImageDown className="h-3 w-3" />}
+        {busy === "share" ? (
+          <Loader2 className="h-3 w-3 animate-spin" />
+        ) : (
+          <ImageDown className="h-3 w-3" />
+        )}
         {t("a11y.share")}
       </button>
       <button
         type="button"
         onClick={downloadImage}
         disabled={busy !== null}
-        className="inline-flex items-center gap-1 rounded-full border border-border bg-background px-2.5 py-1 text-[11px] font-medium text-foreground/80 hover:border-primary/40 hover:text-primary disabled:opacity-60"
+        className="inline-flex items-center gap-1 rounded-full border border-border bg-background px-2.5 py-1 text-[11px] font-medium text-foreground/80 hover:border-primary/40 hover:text-primary disabled:opacity-50"
       >
-        {busy === "download" ? <Loader2 className="h-3 w-3 animate-spin" /> : <ImageDown className="h-3 w-3" />}
+        {busy === "download" ? (
+          <Loader2 className="h-3 w-3 animate-spin" />
+        ) : (
+          <ImageDown className="h-3 w-3" />
+        )}
         {t("common.save")}
       </button>
 
@@ -159,7 +197,11 @@ export function ShareButtons(props: Props) {
         onClick={() => copy("link")}
         className="inline-flex items-center gap-1 rounded-full border border-border bg-background px-2.5 py-1 text-[11px] font-medium text-foreground/80 hover:border-primary/40 hover:text-primary"
       >
-        {copied === "link" ? <Check className="h-3 w-3" /> : <Copy className="h-3 w-3" />}
+        {copied === "link" ? (
+          <Check className="h-3 w-3" />
+        ) : (
+          <Copy className="h-3 w-3" />
+        )}
         {copied === "link" ? t("ui.share.copied") : t("ui.share.copyLink")}
       </button>
       <button
@@ -172,15 +214,4 @@ export function ShareButtons(props: Props) {
       </button>
     </div>
   );
-}
-
-function downloadBlob(file: File) {
-  const url = URL.createObjectURL(file);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = file.name;
-  document.body.appendChild(a);
-  a.click();
-  a.remove();
-  setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
