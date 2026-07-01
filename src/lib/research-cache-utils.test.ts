@@ -1,5 +1,4 @@
-import { describe, it } from "node:test";
-import assert from "node:assert/strict";
+import { describe, it, expect } from "vitest";
 import {
   normalizeCacheQuestion,
   isRecentByTtl,
@@ -8,23 +7,25 @@ import {
 
 describe("research cache utils", () => {
   it("normalizes cache questions", () => {
-    assert.equal(normalizeCacheQuestion("  Patience   in Islam  "), "patience in islam");
+    expect(normalizeCacheQuestion("  Patience   in Islam  ")).toBe("patience in islam");
   });
 
   it("respects TTL boundaries", () => {
     const now = Date.now();
-    assert.equal(isRecentByTtl(new Date(now - 30_000).toISOString(), 60_000), true);
-    assert.equal(isRecentByTtl(new Date(now - 120_000).toISOString(), 60_000), false);
+    expect(isRecentByTtl(new Date(now - 30_000).toISOString(), 60_000)).toBe(true);
+    expect(isRecentByTtl(new Date(now - 120_000).toISOString(), 60_000)).toBe(false);
   });
 
   it("requires matching cache version and TTL validity", () => {
     const createdAt = new Date(Date.now() - 10_000).toISOString();
-    assert.equal(
+    expect(
       shouldServeCachedResult({ cacheVersion: 2, currentVersion: 2, createdAt, ttlMs: 60_000 }),
+    ).toBe(
       true,
     );
-    assert.equal(
+    expect(
       shouldServeCachedResult({ cacheVersion: 1, currentVersion: 2, createdAt, ttlMs: 60_000 }),
+    ).toBe(
       false,
     );
   });
