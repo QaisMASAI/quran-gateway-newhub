@@ -1,8 +1,8 @@
 {
   "home": {
-    "metaTitle": "Noor Quran & Hadith | Jalalayn Knowledge Hub",
+    "metaTitle": "Noor Al-Quran & Hadith | Discover the Islam",
     "metaDescription": "Explore Quran and Sahih Hadith with grounded citations, Jalalayn-only tafsir, and multilingual AI research.",
-    "ogTitle": "Noor Quran & Hadith | Jalalayn Knowledge Hub",
+    "ogTitle": "Noor Al-Quran & Hadith | Discover the Islam",
     "ogDescription": "Grounded Quran + Hadith learning with Jalalayn-only tafsir and citation-first AI research.",
     "badge": "Multilingual learning platform",
     "h1": "Quran & Hadith Knowledge Hub",
@@ -40,7 +40,7 @@
     "verseShort": "v.",
     "makkah": "Makkan",
     "madinah": "Madinan",
-    "footerTagline": "Noor Quran & Hadith — Jalalayn Knowledge Hub",
+    "footerTagline": "Noor Al-Quran & Hadith - Discover the Islam",
     "footerOwner": "A multilingual educational platform",
     "footerReciter": "Recitation: Yasser Al-Dosari"
   },
@@ -92,16 +92,7 @@
     "loadingIndex": "Loading local search index...",
     "indexError": "Failed to load the search index.",
     "suggestionsLabel": "Search suggestions",
-    "suggestions": [
-      "mercy",
-      "Abraham",
-      "prayer",
-      "charity",
-      "patience",
-      "faith",
-      "الرحمن",
-      "Moses"
-    ],
+    "suggestions": ["mercy", "Abraham", "prayer", "charity", "patience", "faith", "الرحمن", "Moses"],
     "chapterMatches": "Matching surahs",
     "noResultsFor": "No results for \"{{q}}\".",
     "foundVersesInSurahs": "Found {{total}} verses across {{groups}} surahs",
@@ -121,7 +112,7 @@
     "kindTheme": "Theme"
   },
   "learn": {
-    "metaTitle": "Noor Quran & Hadith | Discovery Journey",
+    "metaTitle": "Noor Al-Quran & Hadith | Discovery Journey",
     "metaDescription": "Explore the Quran through topics, stories and prophets — a guided journey of knowledge discovery.",
     "title": "Quran Discovery Journey",
     "subtitle": "Explore the Quran through interconnected topics, prophets and stories — not just isolated verses.",
