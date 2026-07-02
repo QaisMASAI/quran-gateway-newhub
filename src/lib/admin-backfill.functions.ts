@@ -35,8 +35,11 @@ const JobPayloadSchemaMap: Record<JobKey, z.ZodType<Record<string, unknown>>> = 
   "backfill-asbab-nuzul": z
     .object({
       surah: z.number().int().min(1).max(114).optional(),
+      startSurah: z.number().int().min(1).max(114).optional(),
       page: z.number().int().min(1).max(1000).optional(),
       perPage: z.number().int().min(1).max(100).optional(),
+      batch: z.number().int().min(1).max(5000).optional(),
+      resourceId: z.number().int().min(1).optional(),
     })
     .strict(),
   "backfill-verse-translations": z.object({}).strict(),
@@ -219,6 +222,7 @@ function toSerializableJson(value: unknown): JsonValue {
 }
 
 const RUN_ALL_JOB_ORDER: JobKey[] = [
+  "backfill-asbab-nuzul",
   "translate-tafsir-english",
   "translate-tafsir-hebrew",
   "link-hadith-graph",
@@ -227,7 +231,7 @@ const RUN_ALL_JOB_ORDER: JobKey[] = [
 const RUN_ALL_DEFAULT_PAYLOADS: Record<JobKey, Record<string, unknown>> = {
   "backfill-arabic-ayat": {},
   "backfill-quran-chapters": {},
-  "backfill-asbab-nuzul": { surah: 2, page: 1, perPage: 50 },
+  "backfill-asbab-nuzul": { startSurah: 1, page: 1, perPage: 50, batch: 1200 },
   "backfill-verse-translations": {},
   "embed-hadith": { batch: 200, untilDone: false, maxRuns: 1 },
   "translate-hadith-hebrew": { batch: 20 },

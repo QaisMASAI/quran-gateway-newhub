@@ -73,7 +73,7 @@ type RunRow = {
 
 const JOBS: Array<{ key: AdminJobKey; title: string; defaultPayload: Record<string, unknown> }> = [
   { key: "backfill-quran-chapters", title: "Surah names backfill", defaultPayload: {} },
-  { key: "backfill-asbab-nuzul", title: "Asbab al-Nuzul backfill", defaultPayload: { surah: 2, page: 1, perPage: 50 } },
+  { key: "backfill-asbab-nuzul", title: "Asbab al-Nuzul backfill", defaultPayload: { startSurah: 1, page: 1, perPage: 50, batch: 1200 } },
   { key: "backfill-verse-translations", title: "Verse translations backfill", defaultPayload: {} },
   { key: "embed-hadith", title: "Hadith embedding batches", defaultPayload: { batch: 200, untilDone: false, maxRuns: 1 } },
   { key: "translate-hadith-hebrew", title: "Hadith Hebrew translation", defaultPayload: { batch: 20 } },

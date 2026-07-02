@@ -10,7 +10,10 @@ import {
 import { EntityCard } from "@/components/discovery/EntityCard";
 import { PassageCard } from "@/components/discovery/PassageCard";
 import {
-  getTafsirForVerse, sourceName,
+  getAsbabForVerse,
+  getTafsirForVerse,
+  sourceName,
+  type AsbabRow,
   type TafsirPassageRow,
 } from "@/lib/tafsir-content";
 import { normalizeLocale, type Locale } from "@/lib/i18n";
@@ -69,6 +72,20 @@ function EntityPage() {
     staleTime: 5 * 60_000,
   });
 
+  const asbabQ = useQuery({
+    queryKey: ["entity-asbab", entity?.id, locale, anchorVerses.map((v) => `${v.surah}:${v.ayah_start}`).join(",")],
+    queryFn: async () => {
+      const out: AsbabRow[] = [];
+      for (const v of anchorVerses) {
+        const rows = await getAsbabForVerse(v.surah, v.ayah_start, locale);
+        out.push(...rows);
+      }
+      return out;
+    },
+    enabled: !!entity && anchorVerses.length > 0,
+    staleTime: 5 * 60_000,
+  });
+
   const kindLabel = (k: EntityKind) =>
     t(`search.kind${k.charAt(0).toUpperCase()}${k.slice(1)}` as const);
 
@@ -80,6 +97,7 @@ function EntityPage() {
       { id: "overview", label: t("learn.toc.overview"), show: true },
       { id: "verses", label: t("learn.toc.verses"), show: (versesQ.data?.length ?? 0) > 0 },
       { id: "tafsir", label: t("learn.toc.tafsir"), show: true },
+      { id: "asbab", label: t("learn.toc.asbab"), show: true },
       { id: "related", label: t("learn.toc.related"), show: (relatedQ.data?.length ?? 0) > 0 },
     ];
     return list.filter((s) => s.show);
@@ -180,6 +198,20 @@ function EntityPage() {
                 ) : tafsirQ.data && tafsirQ.data.length > 0 ? (
                   <div className="space-y-4">
                     {tafsirQ.data.map((p) => (
+                      <PassageBlock key={p.id} body={p.body} sourceLabel={sourceName(p.source, locale)} citation={p.citation} locale={locale} />
+                    ))}
+                  </div>
+                ) : (
+                  <NoAuthSource t={t} />
+                )}
+              </Section>
+
+              <Section id="asbab" icon={<BookOpen className="h-4 w-4" />} title={t("learn.asbabTitle")} subtitle={t("learn.asbabSubtitle")}>
+                {asbabQ.isLoading ? (
+                  <Loader />
+                ) : asbabQ.data && asbabQ.data.length > 0 ? (
+                  <div className="space-y-4">
+                    {asbabQ.data.map((p) => (
                       <PassageBlock key={p.id} body={p.body} sourceLabel={sourceName(p.source, locale)} citation={p.citation} locale={locale} />
                     ))}
                   </div>

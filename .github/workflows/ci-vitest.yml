@@ -1,56 +1,29 @@
 name: CI
 
 on:
-  push:
-    branches: [ main ]
   pull_request:
-    branches: [ main ]
+    branches: [main]
 
 jobs:
-  build-and-check:
+  test-type-build:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        node-version: [18.x]
     steps:
-      - name: Checkout repository
+      - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v4
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
         with:
-          node-version: ${{ matrix.node-version }}
-          cache: 'npm'
+          bun-version: latest
 
       - name: Install dependencies
-        run: npm ci
+        run: bun install --frozen-lockfile
 
-      - name: Build (production)
-        run: npm run build
+      - name: Run Vitest
+        run: bunx vitest run
 
-      - name: Run ESLint
-        run: npm run lint
+      - name: Typecheck
+        run: bunx tsc --noEmit
 
-      - name: Type check
-        run: npx tsc --noEmit
-
-      - name: Run tests
-        if: always()
-        run: |
-          if npm run | grep -q "test"; then
-            npm test --silent || true
-          else
-            echo "No test script defined"
-          fi
-
-      - name: Security audit (npm audit)
-        continue-on-error: true
-        run: |
-          npm audit --production --audit-level=moderate || true
-
-      - name: Upload build artifacts
-        if: success()
-        uses: actions/upload-artifact@v4
-        with:
-          name: build-dist
-          path: dist
+      - name: Build
+        run: bun run build

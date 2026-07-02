@@ -353,7 +353,11 @@ async function resolveTafsirResourceIds() {
   const byName = (rows: QuranTafsirResource[], re: RegExp) =>
     rows.find((r) => re.test(`${r.slug ?? ""} ${r.name ?? ""}`));
 
-  const tafsirEn = byName(enRows, /jalal|ibn\s*kathir|qurtubi|muyassar|saadi/i) ?? enRows[0] ?? null;
+  const tafsirEn =
+    byName(enRows, /jalalayn|jalal/i) ??
+    byName(enRows, /ibn\s*kathir|qurtubi|muyassar|saadi/i) ??
+    enRows[0] ??
+    null;
   const asbabEn =
     byName(allRows, /asbab|nuzul|occasion/i) ?? byName(enRows, /asbab|nuzul|occasion/i) ?? null;
 
@@ -550,12 +554,28 @@ export async function generateHebrewTafsirJob(input: unknown) {
   const gateway = createLovableAiGatewayProvider(apiKey);
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
+  const { data: jalalaynSource, error: jalalaynErr } = await supabaseAdmin
+    .from("tafsir_sources")
+    .select("id")
+    .eq("slug", "al_jalalayn")
+    .maybeSingle();
+
+  if (jalalaynErr) return { ok: false, error: jalalaynErr.message };
+  if (!jalalaynSource?.id) {
+    return { ok: false, error: "Al-Jalalayn source is not configured" as const };
+  }
+
   const [heTafsirKeysRes, enTafsirRes, arTafsirRes, heAsbabKeysRes, enAsbabRes, arAsbabRes] = await Promise.all([
-    supabaseAdmin.from("tafsir_passages").select("source_id,surah,ayah_start,ayah_end").eq("lang", "he"),
+    supabaseAdmin
+      .from("tafsir_passages")
+      .select("source_id,surah,ayah_start,ayah_end")
+      .eq("lang", "he")
+      .eq("source_id", jalalaynSource.id),
     supabaseAdmin
       .from("tafsir_passages")
       .select("source_id,surah,ayah_start,ayah_end,body")
       .eq("lang", "en")
+      .eq("source_id", jalalaynSource.id)
       .order("surah", { ascending: true })
       .order("ayah_start", { ascending: true })
       .limit(data.batch * 3),
@@ -563,6 +583,7 @@ export async function generateHebrewTafsirJob(input: unknown) {
       .from("tafsir_passages")
       .select("source_id,surah,ayah_start,ayah_end,body")
       .eq("lang", "ar")
+      .eq("source_id", jalalaynSource.id)
       .order("surah", { ascending: true })
       .order("ayah_start", { ascending: true })
       .limit(data.batch * 3),
@@ -598,23 +619,30 @@ export async function generateHebrewTafsirJob(input: unknown) {
     ),
   );
 
-  const tafsirRows = [
-    ...((enTafsirRes.data ?? []) as Array<{
-      source_id: string;
-      surah: number;
-      ayah_start: number;
-      ayah_end: number;
-      body: string;
-    }>),
-    ...((arTafsirRes.data ?? []) as Array<{
-      source_id: string;
-      surah: number;
-      ayah_start: number;
-      ayah_end: number;
-      body: string;
-    }>),
-  ]
-    .filter((r) => !existingTafsirKeys.has(`${r.source_id}:${r.surah}:${r.ayah_start}:${r.ayah_end}`))
+  const enTafsirRows = (enTafsirRes.data ?? []) as Array<{
+    source_id: string;
+    surah: number;
+    ayah_start: number;
+    ayah_end: number;
+    body: string;
+  }>;
+  const arTafsirRows = (arTafsirRes.data ?? []) as Array<{
+    source_id: string;
+    surah: number;
+    ayah_start: number;
+    ayah_end: number;
+    body: string;
+  }>;
+
+  const enByKey = new Map<string, string>(
+    enTafsirRows.map((r) => [`${r.source_id}:${r.surah}:${r.ayah_start}:${r.ayah_end}`, r.body]),
+  );
+  const arByKey = new Map<string, string>(
+    arTafsirRows.map((r) => [`${r.source_id}:${r.surah}:${r.ayah_start}:${r.ayah_end}`, r.body]),
+  );
+
+  const tafsirKeysToTranslate = [...new Set([...enByKey.keys(), ...arByKey.keys()])]
+    .filter((key) => !existingTafsirKeys.has(key))
     .slice(0, data.batch);
 
   const asbabRows = [
@@ -658,17 +686,34 @@ export async function generateHebrewTafsirJob(input: unknown) {
 
   const failedBatches: string[] = [];
 
-  for (const r of tafsirRows) {
-    const prompt = `Translate the following tafsir passage into high-quality Hebrew for a Quran learning platform.
+  for (const key of tafsirKeysToTranslate) {
+    const [sourceId, surahRaw, ayahStartRaw, ayahEndRaw] = key.split(":");
+    const surah = Number(surahRaw);
+    const ayahStart = Number(ayahStartRaw);
+    const ayahEnd = Number(ayahEndRaw);
+    const arabicBody = arByKey.get(key) ?? "";
+    const englishBody = enByKey.get(key) ?? "";
+
+    if (!sourceId || !surah || !ayahStart || !ayahEnd || (!arabicBody && !englishBody)) {
+      failedBatches.push(`tafsir:${surahRaw ?? "?"}:${ayahStartRaw ?? "?"}`);
+      continue;
+    }
+
+    const prompt = `Translate the following Al-Jalalayn tafsir passage into high-quality Hebrew for a Quran learning platform.
 Rules:
 - Preserve Islamic meaning, scholarly tone, and verse context.
 - Do not add or remove claims.
+- If Arabic and English differ, prioritize Arabic meaning while using English to resolve phrasing.
 - Return only Hebrew translation text.
 
-Surah: ${r.surah}
-Ayah range: ${r.ayah_start}-${r.ayah_end}
-Source text:
-${r.body}`;
+Surah: ${surah}
+Ayah range: ${ayahStart}-${ayahEnd}
+
+Arabic source:
+${arabicBody || "(not available)"}
+
+English source:
+${englishBody || "(not available)"}`;
 
     try {
       const { text } = await withTimeout(
@@ -682,20 +727,20 @@ ${r.body}`;
       );
       const heb = clip(text, 6000);
       if (!heb) {
-        failedBatches.push(`tafsir:${r.surah}:${r.ayah_start}`);
+        failedBatches.push(`tafsir:${surah}:${ayahStart}`);
         continue;
       }
       tafsirOut.push({
-        source_id: r.source_id,
-        surah: r.surah,
-        ayah_start: r.ayah_start,
-        ayah_end: r.ayah_end,
+        source_id: sourceId,
+        surah,
+        ayah_start: ayahStart,
+        ayah_end: ayahEnd,
         lang: "he",
         body: heb,
-        citation: `HE translation from authenticated tafsir ${r.surah}:${r.ayah_start}-${r.ayah_end}`,
+        citation: `HE translation from authenticated Al-Jalalayn tafsir ${surah}:${ayahStart}-${ayahEnd}`,
       });
     } catch {
-      failedBatches.push(`tafsir:${r.surah}:${r.ayah_start}`);
+      failedBatches.push(`tafsir:${surah}:${ayahStart}`);
     }
   }
 
