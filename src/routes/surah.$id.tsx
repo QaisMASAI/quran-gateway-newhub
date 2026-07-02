@@ -121,9 +121,11 @@ function SurahPage() {
   const lastRecordedRef = useRef<number>(0);
   useEffect(() => {
     if (!verses || verses.length === 0) return;
-    // Record the first ayah immediately on load so the surah itself is tracked.
-    record(surahId, 1);
-    lastRecordedRef.current = 1;
+    // Do NOT record the first ayah on mount — that would overwrite the user's
+    // existing reading progress the moment they open a different surah for a
+    // quick look. Progress is only advanced once the IntersectionObserver
+    // detects the reader has actually paused on a verse below.
+    lastRecordedRef.current = 0;
 
     const cards = Array.from(document.querySelectorAll<HTMLElement>("article[id^='v-']"));
     if (cards.length === 0) return;

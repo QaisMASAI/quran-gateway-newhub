@@ -51,7 +51,10 @@ export function DailyVerse() {
 
   useQuery({
     queryKey: ["surah-names-db"],
-    queryFn: () => loadSurahNamesFromDb(fetch),
+    queryFn: async () => {
+      await loadSurahNamesFromDb(fetch);
+      return null;
+    },
     staleTime: Infinity,
   });
 
