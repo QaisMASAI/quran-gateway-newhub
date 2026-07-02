@@ -144,7 +144,18 @@ export async function getAsbabForVerse(
       .lte("ayah_start", ayah)
       .gte("ayah_end", ayah)
       .eq("lang", candidate)
-      .or("body.ilike.%سبب النزول%,body.ilike.%نزلت%")
+      .or(
+        [
+          "body.ilike.%سبب النزول%",
+          "body.ilike.%أسباب النزول%",
+          "body.ilike.%نزلت%",
+          "body.ilike.%occasion of revelation%",
+          "body.ilike.%reason for revelation%",
+          "body.ilike.%revealed concerning%",
+          "body.ilike.%سبب הירידה%",
+          "body.ilike.%אסבאב%",
+        ].join(","),
+      )
       .order("created_at", { ascending: false })
       .limit(4);
 
