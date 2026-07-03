@@ -55,13 +55,16 @@ export const claimFirstAdminRole = createServerFn({ method: "POST" })
     }
 
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { error } = await supabaseAdmin.from("user_roles").insert({
-      user_id: context.userId,
-      role: "admin",
+    const { data: claimed, error } = await supabaseAdmin.rpc("claim_first_admin", {
+      _user_id: context.userId,
     });
 
-    if (error) {
-      return { ok: false as const, error: error.message, status };
+    if (error || claimed !== true) {
+      return {
+        ok: false as const,
+        error: error?.message ?? "Failed to claim the first admin role.",
+        status,
+      };
     }
 
     const updatedStatus = await readAdminSetupStatus(context);
