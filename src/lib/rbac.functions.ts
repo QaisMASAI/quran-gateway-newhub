@@ -6,6 +6,8 @@ import type { AdminUserRow, AppRole, AuditLogRow, AuthzSnapshot, RoleRecord, Use
 
 const ROLE_ORDER: AppRole[] = ["super_admin", "admin", "moderator", "editor", "user"];
 
+type JsonValue = string | number | boolean | null | JsonValue[] | { [key: string]: JsonValue };
+
 const UpdateUserRoleSchema = z.object({
   targetUserId: z.string().uuid(),
   role: z.enum(["super_admin", "admin", "moderator", "editor", "user"]),
@@ -44,9 +46,9 @@ async function logAudit(args: {
   actorUserId: string;
   targetUserId?: string | null;
   action: string;
-  oldValue?: Record<string, unknown> | null;
-  newValue?: Record<string, unknown> | null;
-  metadata?: Record<string, unknown>;
+  oldValue?: JsonValue | null;
+  newValue?: JsonValue | null;
+  metadata?: JsonValue;
 }) {
   const req = getRequest();
   const ipAddress = req?.headers.get("x-forwarded-for") ?? req?.headers.get("cf-connecting-ip") ?? null;
@@ -202,13 +204,13 @@ export const getAdminManagementData = createServerFn({ method: "GET" })
       status: statusByUser.get(p.id) ? "suspended" : "active",
     }));
 
-    const audit: AuditLogRow[] = ((auditRes.data ?? []) as Array<any>).map((a) => ({
+    const audit: Array<Omit<AuditLogRow, "oldValue" | "newValue"> & { oldValue: JsonValue | null; newValue: JsonValue | null }> = ((auditRes.data ?? []) as Array<any>).map((a) => ({
       id: a.id,
       actorUserId: a.actor_user_id,
       targetUserId: a.target_user_id,
       action: a.action,
-      oldValue: (a.old_value ?? null) as Record<string, unknown> | null,
-      newValue: (a.new_value ?? null) as Record<string, unknown> | null,
+      oldValue: (a.old_value ?? null) as JsonValue | null,
+      newValue: (a.new_value ?? null) as JsonValue | null,
       ipAddress: a.ip_address,
       userAgent: a.user_agent,
       createdAt: a.created_at,
@@ -357,7 +359,7 @@ export const deleteRole = createServerFn({ method: "POST" })
     const { count: usageCount, error: usageErr } = await supabaseAdmin
       .from("user_roles")
       .select("id", { count: "exact", head: true })
-      .eq("role", role.slug);
+      .eq("role", normalizeAppRole(role.slug));
     if (usageErr) throw new Error(usageErr.message);
     if ((usageCount ?? 0) > 0) throw new Error("Cannot delete a role that is currently assigned to users.");
 
@@ -368,7 +370,7 @@ export const deleteRole = createServerFn({ method: "POST" })
       supabaseAdmin,
       actorUserId: context.userId,
       action: "role.deleted",
-      oldValue: role as Record<string, unknown>,
+      oldValue: { id: role.id, slug: role.slug, name: role.name, is_system: role.is_system },
       newValue: null,
       metadata: { roleId: data.roleId },
     });
@@ -444,11 +446,9 @@ export const getPermissionHelpers = createServerFn({ method: "GET" })
       ...snapshot,
       isSuperAdmin: snapshot.role === "super_admin",
       isAdmin: ROLE_ORDER.indexOf(snapshot.role) <= ROLE_ORDER.indexOf("admin"),
-      hasRole: (role: AppRole) => ROLE_ORDER.indexOf(snapshot.role) <= ROLE_ORDER.indexOf(role),
-      hasPermission: (permission: string) => snapshot.permissions.includes(permission),
-      can: (permission: string) => snapshot.permissions.includes(permission),
-      getCurrentUserRole: () => snapshot.role,
-      syncRoles: () => null,
+      canManageUsers: snapshot.permissions.includes("users.write"),
+      canManageSettings: snapshot.permissions.includes("settings.manage"),
+      canViewLogs: snapshot.permissions.includes("logs.view"),
     };
   });
 
