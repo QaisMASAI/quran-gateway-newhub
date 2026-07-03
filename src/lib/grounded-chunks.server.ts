@@ -435,6 +435,7 @@ export async function generateEnglishTafsirJob(input: unknown) {
   const asbabOut: AsbabInsertRow[] = [];
   const failedBatches: string[] = [];
   let validationSkipped = 0;
+  let validationSkipped = 0;
   let remaining = data.batch;
 
   for (let surah = 1; surah <= 114 && remaining > 0; surah += 1) {

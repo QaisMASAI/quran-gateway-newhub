@@ -326,6 +326,7 @@ export const getAdminBackfillStatus = createServerFn({ method: "GET" })
       { data: tafsirAuditRows },
       backfillCounts,
       { data: activeRuns },
+      { data: jobHistoryRows },
     ] =
       await Promise.all([
         context.supabase.from("quran_chapters").select("id", { count: "exact", head: true }),
@@ -382,10 +383,8 @@ export const getAdminBackfillStatus = createServerFn({ method: "GET" })
       tafsirAudit.set(key, current);
     }
 
-    const jobHistory = arguments[0];
-
     const latestByJob = new Map<string, { started_at: string; finished_at: string | null; status: string }>();
-    for (const row of ((jobHistory as { data?: Array<{ job_key: string; started_at: string; finished_at: string | null; status: string }> } | undefined)?.data ?? [])) {
+    for (const row of ((jobHistoryRows ?? []) as Array<{ job_key: string; started_at: string; finished_at: string | null; status: string }>)) {
       if (!latestByJob.has(row.job_key)) {
         latestByJob.set(row.job_key, {
           started_at: row.started_at,
