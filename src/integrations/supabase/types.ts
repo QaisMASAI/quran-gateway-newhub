@@ -104,6 +104,72 @@ export type Database = {
         }
         Relationships: []
       }
+      admin_feature_flags: {
+        Row: {
+          created_at: string
+          description: string | null
+          enabled: boolean
+          flag_key: string
+          id: string
+          metadata: Json
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          enabled?: boolean
+          flag_key: string
+          id?: string
+          metadata?: Json
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          enabled?: boolean
+          flag_key?: string
+          id?: string
+          metadata?: Json
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: []
+      }
+      admin_integrations: {
+        Row: {
+          created_at: string
+          id: string
+          integration_key: string
+          masked_value: string | null
+          metadata: Json
+          status: string
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          integration_key: string
+          masked_value?: string | null
+          metadata?: Json
+          status?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          integration_key?: string
+          masked_value?: string | null
+          metadata?: Json
+          status?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: []
+      }
       admin_job_runs: {
         Row: {
           created_at: string
@@ -315,6 +381,119 @@ export type Database = {
         }
         Relationships: []
       }
+      cms_page_versions: {
+        Row: {
+          change_note: string | null
+          content: Json
+          created_at: string
+          editor_user_id: string | null
+          id: string
+          page_id: string
+          version_no: number
+        }
+        Insert: {
+          change_note?: string | null
+          content?: Json
+          created_at?: string
+          editor_user_id?: string | null
+          id?: string
+          page_id: string
+          version_no: number
+        }
+        Update: {
+          change_note?: string | null
+          content?: Json
+          created_at?: string
+          editor_user_id?: string | null
+          id?: string
+          page_id?: string
+          version_no?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "cms_page_versions_page_id_fkey"
+            columns: ["page_id"]
+            isOneToOne: false
+            referencedRelation: "cms_pages"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      cms_pages: {
+        Row: {
+          archived_at: string | null
+          body_i18n: Json
+          breadcrumbs: Json
+          canonical_url: string | null
+          created_at: string
+          id: string
+          jsonld: Json
+          language_visibility: string[]
+          last_editor: string | null
+          menu_visible: boolean
+          og_i18n: Json
+          published_at: string | null
+          scheduled_at: string | null
+          search_visible: boolean
+          seo_description_i18n: Json
+          seo_title_i18n: Json
+          slug: string
+          status: Database["public"]["Enums"]["knowledge_publication_status"]
+          template_key: string | null
+          title_i18n: Json
+          twitter_i18n: Json
+          updated_at: string
+        }
+        Insert: {
+          archived_at?: string | null
+          body_i18n?: Json
+          breadcrumbs?: Json
+          canonical_url?: string | null
+          created_at?: string
+          id?: string
+          jsonld?: Json
+          language_visibility?: string[]
+          last_editor?: string | null
+          menu_visible?: boolean
+          og_i18n?: Json
+          published_at?: string | null
+          scheduled_at?: string | null
+          search_visible?: boolean
+          seo_description_i18n?: Json
+          seo_title_i18n?: Json
+          slug: string
+          status?: Database["public"]["Enums"]["knowledge_publication_status"]
+          template_key?: string | null
+          title_i18n?: Json
+          twitter_i18n?: Json
+          updated_at?: string
+        }
+        Update: {
+          archived_at?: string | null
+          body_i18n?: Json
+          breadcrumbs?: Json
+          canonical_url?: string | null
+          created_at?: string
+          id?: string
+          jsonld?: Json
+          language_visibility?: string[]
+          last_editor?: string | null
+          menu_visible?: boolean
+          og_i18n?: Json
+          published_at?: string | null
+          scheduled_at?: string | null
+          search_visible?: boolean
+          seo_description_i18n?: Json
+          seo_title_i18n?: Json
+          slug?: string
+          status?: Database["public"]["Enums"]["knowledge_publication_status"]
+          template_key?: string | null
+          title_i18n?: Json
+          twitter_i18n?: Json
+          updated_at?: string
+        }
+        Relationships: []
+      }
       collection_items: {
         Row: {
           ayah_end: number | null
@@ -442,6 +621,68 @@ export type Database = {
             columns: ["entity_id"]
             isOneToOne: false
             referencedRelation: "knowledge_entities"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      embedding_jobs: {
+        Row: {
+          created_at: string
+          duration_ms: number | null
+          embedding_model: string
+          entry_id: string
+          failed_reason: string | null
+          finished_at: string | null
+          id: string
+          language_code: string
+          max_retries: number
+          requested_by: string | null
+          retry_count: number
+          started_at: string | null
+          status: Database["public"]["Enums"]["knowledge_job_status"]
+          updated_at: string
+          worker_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          duration_ms?: number | null
+          embedding_model?: string
+          entry_id: string
+          failed_reason?: string | null
+          finished_at?: string | null
+          id?: string
+          language_code: string
+          max_retries?: number
+          requested_by?: string | null
+          retry_count?: number
+          started_at?: string | null
+          status?: Database["public"]["Enums"]["knowledge_job_status"]
+          updated_at?: string
+          worker_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          duration_ms?: number | null
+          embedding_model?: string
+          entry_id?: string
+          failed_reason?: string | null
+          finished_at?: string | null
+          id?: string
+          language_code?: string
+          max_retries?: number
+          requested_by?: string | null
+          retry_count?: number
+          started_at?: string | null
+          status?: Database["public"]["Enums"]["knowledge_job_status"]
+          updated_at?: string
+          worker_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "embedding_jobs_entry_id_fkey"
+            columns: ["entry_id"]
+            isOneToOne: false
+            referencedRelation: "knowledge_entries"
             referencedColumns: ["id"]
           },
         ]
@@ -684,6 +925,137 @@ export type Database = {
           },
         ]
       }
+      import_jobs: {
+        Row: {
+          cancelled_at: string | null
+          checkpoint: Json
+          checksum: string | null
+          created_at: string
+          error_message: string | null
+          failed_batches: Json
+          finished_at: string | null
+          id: string
+          job_name: string
+          max_retries: number
+          paused_at: string | null
+          requested_by: string | null
+          retry_count: number
+          source_id: string | null
+          started_at: string | null
+          stats: Json
+          status: Database["public"]["Enums"]["knowledge_job_status"]
+          updated_at: string
+          worker_id: string | null
+        }
+        Insert: {
+          cancelled_at?: string | null
+          checkpoint?: Json
+          checksum?: string | null
+          created_at?: string
+          error_message?: string | null
+          failed_batches?: Json
+          finished_at?: string | null
+          id?: string
+          job_name: string
+          max_retries?: number
+          paused_at?: string | null
+          requested_by?: string | null
+          retry_count?: number
+          source_id?: string | null
+          started_at?: string | null
+          stats?: Json
+          status?: Database["public"]["Enums"]["knowledge_job_status"]
+          updated_at?: string
+          worker_id?: string | null
+        }
+        Update: {
+          cancelled_at?: string | null
+          checkpoint?: Json
+          checksum?: string | null
+          created_at?: string
+          error_message?: string | null
+          failed_batches?: Json
+          finished_at?: string | null
+          id?: string
+          job_name?: string
+          max_retries?: number
+          paused_at?: string | null
+          requested_by?: string | null
+          retry_count?: number
+          source_id?: string | null
+          started_at?: string | null
+          stats?: Json
+          status?: Database["public"]["Enums"]["knowledge_job_status"]
+          updated_at?: string
+          worker_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "import_jobs_source_id_fkey"
+            columns: ["source_id"]
+            isOneToOne: false
+            referencedRelation: "knowledge_sources"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      knowledge_embeddings: {
+        Row: {
+          checksum: string | null
+          created_at: string
+          dimensions: number
+          embedding: string | null
+          embedding_model: string
+          entry_id: string
+          id: string
+          language_code: string
+          metadata: Json
+          translation_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          checksum?: string | null
+          created_at?: string
+          dimensions?: number
+          embedding?: string | null
+          embedding_model?: string
+          entry_id: string
+          id?: string
+          language_code: string
+          metadata?: Json
+          translation_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          checksum?: string | null
+          created_at?: string
+          dimensions?: number
+          embedding?: string | null
+          embedding_model?: string
+          entry_id?: string
+          id?: string
+          language_code?: string
+          metadata?: Json
+          translation_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "knowledge_embeddings_entry_id_fkey"
+            columns: ["entry_id"]
+            isOneToOne: false
+            referencedRelation: "knowledge_entries"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "knowledge_embeddings_translation_id_fkey"
+            columns: ["translation_id"]
+            isOneToOne: false
+            referencedRelation: "knowledge_translations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       knowledge_entities: {
         Row: {
           alt_names_i18n: Json
@@ -828,6 +1200,101 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      knowledge_entries: {
+        Row: {
+          ayah_end: number | null
+          ayah_start: number | null
+          canonical_ref: string | null
+          checksum: string | null
+          content_kind: string
+          created_at: string
+          external_key: string
+          id: string
+          metadata: Json
+          publication_status: Database["public"]["Enums"]["knowledge_publication_status"]
+          published_at: string | null
+          source_id: string
+          surah: number | null
+          updated_at: string
+        }
+        Insert: {
+          ayah_end?: number | null
+          ayah_start?: number | null
+          canonical_ref?: string | null
+          checksum?: string | null
+          content_kind: string
+          created_at?: string
+          external_key: string
+          id?: string
+          metadata?: Json
+          publication_status?: Database["public"]["Enums"]["knowledge_publication_status"]
+          published_at?: string | null
+          source_id: string
+          surah?: number | null
+          updated_at?: string
+        }
+        Update: {
+          ayah_end?: number | null
+          ayah_start?: number | null
+          canonical_ref?: string | null
+          checksum?: string | null
+          content_kind?: string
+          created_at?: string
+          external_key?: string
+          id?: string
+          metadata?: Json
+          publication_status?: Database["public"]["Enums"]["knowledge_publication_status"]
+          published_at?: string | null
+          source_id?: string
+          surah?: number | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "knowledge_entries_source_id_fkey"
+            columns: ["source_id"]
+            isOneToOne: false
+            referencedRelation: "knowledge_sources"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      knowledge_job_logs: {
+        Row: {
+          actor_user_id: string | null
+          created_at: string
+          details: Json
+          id: string
+          job_id: string
+          job_type: string
+          level: string
+          message: string
+          status: Database["public"]["Enums"]["knowledge_job_status"] | null
+        }
+        Insert: {
+          actor_user_id?: string | null
+          created_at?: string
+          details?: Json
+          id?: string
+          job_id: string
+          job_type: string
+          level?: string
+          message: string
+          status?: Database["public"]["Enums"]["knowledge_job_status"] | null
+        }
+        Update: {
+          actor_user_id?: string | null
+          created_at?: string
+          details?: Json
+          id?: string
+          job_id?: string
+          job_type?: string
+          level?: string
+          message?: string
+          status?: Database["public"]["Enums"]["knowledge_job_status"] | null
+        }
+        Relationships: []
       }
       knowledge_journey_progress: {
         Row: {
@@ -996,6 +1463,182 @@ export type Database = {
             columns: ["to_id"]
             isOneToOne: false
             referencedRelation: "knowledge_entities"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      knowledge_relationships: {
+        Row: {
+          created_at: string
+          from_entry_id: string
+          id: string
+          metadata: Json
+          relation_type: string
+          to_entry_id: string
+          weight: number
+        }
+        Insert: {
+          created_at?: string
+          from_entry_id: string
+          id?: string
+          metadata?: Json
+          relation_type: string
+          to_entry_id: string
+          weight?: number
+        }
+        Update: {
+          created_at?: string
+          from_entry_id?: string
+          id?: string
+          metadata?: Json
+          relation_type?: string
+          to_entry_id?: string
+          weight?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "knowledge_relationships_from_entry_id_fkey"
+            columns: ["from_entry_id"]
+            isOneToOne: false
+            referencedRelation: "knowledge_entries"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "knowledge_relationships_to_entry_id_fkey"
+            columns: ["to_entry_id"]
+            isOneToOne: false
+            referencedRelation: "knowledge_entries"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      knowledge_sources: {
+        Row: {
+          code: string | null
+          created_at: string
+          description_i18n: Json
+          id: string
+          is_active: boolean
+          last_import_at: string | null
+          metadata: Json
+          name_i18n: Json
+          slug: string
+          source_type: string
+          updated_at: string
+        }
+        Insert: {
+          code?: string | null
+          created_at?: string
+          description_i18n?: Json
+          id?: string
+          is_active?: boolean
+          last_import_at?: string | null
+          metadata?: Json
+          name_i18n?: Json
+          slug: string
+          source_type: string
+          updated_at?: string
+        }
+        Update: {
+          code?: string | null
+          created_at?: string
+          description_i18n?: Json
+          id?: string
+          is_active?: boolean
+          last_import_at?: string | null
+          metadata?: Json
+          name_i18n?: Json
+          slug?: string
+          source_type?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      knowledge_translations: {
+        Row: {
+          ai_model: string | null
+          ai_provider: string | null
+          body: string
+          checksum: string | null
+          created_at: string
+          duration_ms: number | null
+          entry_id: string
+          estimated_cost_usd: number
+          id: string
+          is_manual_edit: boolean
+          language_code: string
+          manual_locked: boolean
+          metadata: Json
+          prompt_version: string | null
+          quality_score: number | null
+          review_status: Database["public"]["Enums"]["translation_review_status"]
+          source_kind: string
+          source_language_code: string | null
+          summary: string | null
+          title: string | null
+          token_count: number
+          translation_status: Database["public"]["Enums"]["knowledge_job_status"]
+          translation_version: string
+          updated_at: string
+        }
+        Insert: {
+          ai_model?: string | null
+          ai_provider?: string | null
+          body: string
+          checksum?: string | null
+          created_at?: string
+          duration_ms?: number | null
+          entry_id: string
+          estimated_cost_usd?: number
+          id?: string
+          is_manual_edit?: boolean
+          language_code: string
+          manual_locked?: boolean
+          metadata?: Json
+          prompt_version?: string | null
+          quality_score?: number | null
+          review_status?: Database["public"]["Enums"]["translation_review_status"]
+          source_kind?: string
+          source_language_code?: string | null
+          summary?: string | null
+          title?: string | null
+          token_count?: number
+          translation_status?: Database["public"]["Enums"]["knowledge_job_status"]
+          translation_version?: string
+          updated_at?: string
+        }
+        Update: {
+          ai_model?: string | null
+          ai_provider?: string | null
+          body?: string
+          checksum?: string | null
+          created_at?: string
+          duration_ms?: number | null
+          entry_id?: string
+          estimated_cost_usd?: number
+          id?: string
+          is_manual_edit?: boolean
+          language_code?: string
+          manual_locked?: boolean
+          metadata?: Json
+          prompt_version?: string | null
+          quality_score?: number | null
+          review_status?: Database["public"]["Enums"]["translation_review_status"]
+          source_kind?: string
+          source_language_code?: string | null
+          summary?: string | null
+          title?: string | null
+          token_count?: number
+          translation_status?: Database["public"]["Enums"]["knowledge_job_status"]
+          translation_version?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "knowledge_translations_entry_id_fkey"
+            columns: ["entry_id"]
+            isOneToOne: false
+            referencedRelation: "knowledge_entries"
             referencedColumns: ["id"]
           },
         ]
@@ -1400,6 +2043,86 @@ export type Database = {
           },
         ]
       }
+      translation_jobs: {
+        Row: {
+          created_at: string
+          duration_ms: number | null
+          entry_id: string
+          estimated_cost_usd: number
+          failed_reason: string | null
+          finished_at: string | null
+          id: string
+          max_retries: number
+          model: string | null
+          prompt_version: string | null
+          provider: string | null
+          quality_score: number | null
+          requested_by: string | null
+          retry_count: number
+          source_language_code: string
+          started_at: string | null
+          status: Database["public"]["Enums"]["knowledge_job_status"]
+          target_language_code: string
+          token_count: number
+          updated_at: string
+          worker_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          duration_ms?: number | null
+          entry_id: string
+          estimated_cost_usd?: number
+          failed_reason?: string | null
+          finished_at?: string | null
+          id?: string
+          max_retries?: number
+          model?: string | null
+          prompt_version?: string | null
+          provider?: string | null
+          quality_score?: number | null
+          requested_by?: string | null
+          retry_count?: number
+          source_language_code: string
+          started_at?: string | null
+          status?: Database["public"]["Enums"]["knowledge_job_status"]
+          target_language_code: string
+          token_count?: number
+          updated_at?: string
+          worker_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          duration_ms?: number | null
+          entry_id?: string
+          estimated_cost_usd?: number
+          failed_reason?: string | null
+          finished_at?: string | null
+          id?: string
+          max_retries?: number
+          model?: string | null
+          prompt_version?: string | null
+          provider?: string | null
+          quality_score?: number | null
+          requested_by?: string | null
+          retry_count?: number
+          source_language_code?: string
+          started_at?: string | null
+          status?: Database["public"]["Enums"]["knowledge_job_status"]
+          target_language_code?: string
+          token_count?: number
+          updated_at?: string
+          worker_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "translation_jobs_entry_id_fkey"
+            columns: ["entry_id"]
+            isOneToOne: false
+            referencedRelation: "knowledge_entries"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       translation_sources: {
         Row: {
           author: string | null
@@ -1543,6 +2266,14 @@ export type Database = {
         Returns: boolean
       }
       claim_first_admin: { Args: { _user_id: string }; Returns: boolean }
+      claim_next_embedding_job: {
+        Args: { _worker_id: string }
+        Returns: string
+      }
+      claim_next_translation_job: {
+        Args: { _worker_id: string }
+        Returns: string
+      }
       claim_or_sync_super_admin_by_email: {
         Args: { _email: string; _user_id: string }
         Returns: boolean
@@ -1561,6 +2292,18 @@ export type Database = {
           _user_id: string
         }
         Returns: boolean
+      }
+      log_knowledge_job_event: {
+        Args: {
+          _actor_user_id: string
+          _details: Json
+          _job_id: string
+          _job_type: string
+          _level: string
+          _message: string
+          _status: Database["public"]["Enums"]["knowledge_job_status"]
+        }
+        Returns: string
       }
       match_grounded_chunks: {
         Args: {
@@ -1678,6 +2421,14 @@ export type Database = {
     }
     Enums: {
       app_role: "admin" | "moderator" | "user" | "editor" | "super_admin"
+      knowledge_job_status:
+        | "queued"
+        | "running"
+        | "succeeded"
+        | "failed"
+        | "retrying"
+        | "paused"
+        | "cancelled"
       knowledge_kind:
         | "topic"
         | "prophet"
@@ -1688,6 +2439,11 @@ export type Database = {
         | "concept"
         | "theme"
         | "person"
+      knowledge_publication_status:
+        | "draft"
+        | "published"
+        | "scheduled"
+        | "archived"
       knowledge_relation:
         | "related"
         | "child_of"
@@ -1696,6 +2452,11 @@ export type Database = {
         | "teaches"
         | "mentions"
         | "part_of"
+      translation_review_status:
+        | "pending"
+        | "reviewed"
+        | "approved"
+        | "rejected"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -1824,6 +2585,15 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["admin", "moderator", "user", "editor", "super_admin"],
+      knowledge_job_status: [
+        "queued",
+        "running",
+        "succeeded",
+        "failed",
+        "retrying",
+        "paused",
+        "cancelled",
+      ],
       knowledge_kind: [
         "topic",
         "prophet",
@@ -1835,6 +2605,12 @@ export const Constants = {
         "theme",
         "person",
       ],
+      knowledge_publication_status: [
+        "draft",
+        "published",
+        "scheduled",
+        "archived",
+      ],
       knowledge_relation: [
         "related",
         "child_of",
@@ -1843,6 +2619,12 @@ export const Constants = {
         "teaches",
         "mentions",
         "part_of",
+      ],
+      translation_review_status: [
+        "pending",
+        "reviewed",
+        "approved",
+        "rejected",
       ],
     },
   },
