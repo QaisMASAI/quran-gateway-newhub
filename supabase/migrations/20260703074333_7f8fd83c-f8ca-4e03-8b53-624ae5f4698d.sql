@@ -1,0 +1,1 @@
+REVOKE EXECUTE ON FUNCTION public.claim_or_sync_super_admin_by_email(uuid, text) FROM anon;
