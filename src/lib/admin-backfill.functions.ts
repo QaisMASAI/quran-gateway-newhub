@@ -360,6 +360,13 @@ export const getAdminBackfillStatus = createServerFn({ method: "GET" })
           .eq("status", "running")
           .order("started_at", { ascending: false })
           .limit(10),
+        context.supabase
+          .from("admin_job_runs")
+          .select("job_key,started_at,finished_at,status")
+          .eq("requested_by", context.userId)
+          .in("job_key", ["backfill-asbab-nuzul", "translate-tafsir-english", "translate-tafsir-hebrew"])
+          .order("started_at", { ascending: false })
+          .limit(100),
       ]);
 
     const valueJson = (settingsRow?.value_json ?? {}) as { ttl_minutes?: number; version?: number };
@@ -373,6 +380,19 @@ export const getAdminBackfillStatus = createServerFn({ method: "GET" })
       if (row.lang === "he") current.he += 1;
       if (row.lang === "en") current.en += 1;
       tafsirAudit.set(key, current);
+    }
+
+    const jobHistory = arguments[0];
+
+    const latestByJob = new Map<string, { started_at: string; finished_at: string | null; status: string }>();
+    for (const row of ((jobHistory as { data?: Array<{ job_key: string; started_at: string; finished_at: string | null; status: string }> } | undefined)?.data ?? [])) {
+      if (!latestByJob.has(row.job_key)) {
+        latestByJob.set(row.job_key, {
+          started_at: row.started_at,
+          finished_at: row.finished_at,
+          status: row.status,
+        });
+      }
     }
 
     return {
@@ -390,6 +410,11 @@ export const getAdminBackfillStatus = createServerFn({ method: "GET" })
       },
       counts: backfillCounts,
       activeRuns: activeRuns ?? [],
+      lastRuns: {
+        asbab: latestByJob.get("backfill-asbab-nuzul") ?? null,
+        jalalaynEnglish: latestByJob.get("translate-tafsir-english") ?? null,
+        jalalaynHebrew: latestByJob.get("translate-tafsir-hebrew") ?? null,
+      },
       tafsirAudit: [...tafsirAudit.values()].sort((a, b) => a.sourceName.localeCompare(b.sourceName)),
     };
   });
