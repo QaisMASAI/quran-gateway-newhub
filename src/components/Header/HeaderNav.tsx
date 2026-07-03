@@ -43,6 +43,9 @@ export function HeaderNav({ isAuthenticated }: HeaderNavProps) {
         <NavLink to="/collections" label={t("nav.collections")} icon={<Folder className="h-4 w-4" />} />
       )}
       {isAuthenticated && (
+        <NavLink to="/admin/setup" label="Admin setup" icon={<Compass className="h-4 w-4" />} />
+      )}
+      {isAuthenticated && (
         <NavLink to="/admin/backfill" label="Admin" icon={<Sparkles className="h-4 w-4" />} />
       )}
     </nav>
