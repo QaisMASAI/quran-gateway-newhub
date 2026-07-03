@@ -2,6 +2,7 @@ import { z } from "zod";
 import { embedTexts } from "./embeddings.server";
 import { createLovableAiGatewayProvider } from "./ai-gateway.server";
 import { generateText } from "ai";
+import { validateHebrewTranslationTriplet } from "@/lib/hebrew-translation-guards";
 
 async function withTimeout<T>(promise: Promise<T>, timeoutMs: number): Promise<T> {
   return await Promise.race([
@@ -685,6 +686,7 @@ export async function generateHebrewTafsirJob(input: unknown) {
   }> = [];
 
   const failedBatches: string[] = [];
+  let validationSkipped = 0;
 
   for (const key of tafsirKeysToTranslate) {
     const [sourceId, surahRaw, ayahStartRaw, ayahEndRaw] = key.split(":");
@@ -726,8 +728,14 @@ ${englishBody || "(not available)"}`;
         25_000,
       );
       const heb = clip(text, 6000);
-      if (!heb) {
-        failedBatches.push(`tafsir:${surah}:${ayahStart}`);
+      const qualityGate = validateHebrewTranslationTriplet({
+        arabic: arabicBody,
+        english: englishBody,
+        hebrew: heb,
+      });
+      if (!qualityGate.ok) {
+        validationSkipped += 1;
+        failedBatches.push(`tafsir:${surah}:${ayahStart}:${qualityGate.reason}`);
         continue;
       }
       tafsirOut.push({
@@ -826,6 +834,7 @@ ${r.body}`;
     translated_rows: tafsirOut.length + asbabOut.length,
     tafsir_translated_rows: tafsirOut.length,
     asbab_translated_rows: asbabOut.length,
+    validation_skipped_rows: validationSkipped,
     failedBatches,
     model: data.model,
   };
