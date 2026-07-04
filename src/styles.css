@@ -41,12 +41,15 @@
 
   --font-hebrew: "Heebo", "Arial Hebrew", system-ui, sans-serif;
   --font-ui-he: "Heebo", "Arial Hebrew", system-ui, sans-serif;
-  --font-ui-en: "Inter", system-ui, sans-serif;
-  --font-ui-ar: "IBM Plex Sans Arabic", "Noto Naskh Arabic", sans-serif;
-  --font-reading-en: "Merriweather", serif;
-  --font-reading-he: "Heebo", "Arial Hebrew", system-ui, sans-serif;
-  --font-reading-ar: "Noto Naskh Arabic", "IBM Plex Sans Arabic", serif;
-  --font-quran: "KFGQPC Uthmanic Script HAFS", "Noto Naskh Arabic", serif;
+  --font-ui-en: "Inter", "Segoe UI", "Helvetica Neue", Arial, system-ui, sans-serif;
+  --font-ui-ar: "IBM Plex Sans Arabic", "Noto Sans Arabic", "Noto Naskh Arabic", "Geeza Pro", Tahoma, sans-serif;
+  --font-reading-en: "Merriweather", "Times New Roman", Georgia, "Noto Serif", serif;
+  --font-reading-he: "Heebo", "Arial Hebrew", "Noto Sans Hebrew", "Segoe UI", sans-serif;
+  --font-reading-ar: "Noto Naskh Arabic", "Amiri", "Scheherazade New", "IBM Plex Sans Arabic", "Geeza Pro", serif;
+  --font-quran: "KFGQPC Uthmanic Script HAFS", "UthmanicHafs", "Noto Naskh Arabic", "Amiri Quran", "Scheherazade New", serif;
+  --font-tafsir-hadith-ar: var(--font-reading-ar);
+  --font-tafsir-hadith-he: var(--font-reading-he);
+  --font-tafsir-hadith-en: var(--font-reading-en);
   --font-display: var(--font-ui-en);
 
   --gradient-hero: linear-gradient(180deg,
@@ -221,8 +224,13 @@
   .font-arabic {
     font-family: var(--font-reading-ar);
     direction: rtl;
-    line-height: 2.4;
+    line-height: 2.2;
+    letter-spacing: 0;
   }
+
+  .font-ui-en { font-family: var(--font-ui-en); }
+  .font-ui-he { font-family: var(--font-ui-he); direction: rtl; letter-spacing: 0; }
+  .font-ui-ar { font-family: var(--font-ui-ar); direction: rtl; letter-spacing: 0; }
 
   .font-arabic-ui {
     font-family: var(--font-ui-ar);
@@ -230,13 +238,19 @@
   }
 
   .font-reading-en { font-family: var(--font-reading-en); }
-  .font-reading-he { font-family: var(--font-reading-he); direction: rtl; }
-  .font-reading-ar { font-family: var(--font-reading-ar); direction: rtl; }
+  .font-reading-he { font-family: var(--font-reading-he); direction: rtl; line-height: 1.9; letter-spacing: 0; }
+  .font-reading-ar { font-family: var(--font-reading-ar); direction: rtl; line-height: 2.1; letter-spacing: 0; }
+
+  .font-tafsir-hadith-en { font-family: var(--font-tafsir-hadith-en); }
+  .font-tafsir-hadith-he { font-family: var(--font-tafsir-hadith-he); direction: rtl; line-height: 1.95; letter-spacing: 0; }
+  .font-tafsir-hadith-ar { font-family: var(--font-tafsir-hadith-ar); direction: rtl; line-height: 2.1; letter-spacing: 0; }
 
   .font-quran {
     font-family: var(--font-quran);
     direction: rtl;
-    line-height: 2.4;
+    line-height: 2.45;
+    letter-spacing: 0;
+    font-feature-settings: "liga" 1, "calt" 1;
   }
 
   .font-display {
@@ -247,15 +261,33 @@
   .ayah-text {
     font-family: var(--font-quran);
     font-size: 1.85rem;
-    line-height: 2.6;
+    line-height: 2.45;
     color: var(--color-foreground);
     direction: rtl;
+    text-align: right;
+    letter-spacing: 0;
   }
 
   .hebrew-text {
     font-family: var(--font-reading-he);
     direction: rtl;
-    line-height: 1.8;
+    line-height: 1.9;
+    text-align: right;
+    letter-spacing: 0;
+  }
+
+  .ai-explanation-block {
+    letter-spacing: 0;
+  }
+
+  .ai-explanation-block[dir="rtl"] {
+    text-align: right;
+    line-height: 1.95;
+  }
+
+  .ai-explanation-block[dir="ltr"] {
+    text-align: left;
+    line-height: 1.75;
   }
 
   .prose {
