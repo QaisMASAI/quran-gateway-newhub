@@ -130,7 +130,7 @@ function SearchPage() {
                     {row.kind.toUpperCase()} · {row.source_name}
                     {row.surah && row.ayah_start ? ` · ${row.surah}:${row.ayah_start}${row.ayah_end && row.ayah_end !== row.ayah_start ? `-${row.ayah_end}` : ""}` : ""}
                   </p>
-                  <p className="mt-1 text-sm leading-relaxed text-foreground/90">{row.text.slice(0, 220)}{row.text.length > 220 ? "…" : ""}</p>
+                  <p className={`mt-1 text-sm leading-relaxed text-foreground/90 ${locale === "ar" ? "font-tafsir-hadith-ar" : locale === "en" ? "font-tafsir-hadith-en" : "font-tafsir-hadith-he"}`} dir={locale === "en" ? "ltr" : "rtl"}>{row.text.slice(0, 220)}{row.text.length > 220 ? "…" : ""}</p>
                 </article>
               ))}
             </div>
