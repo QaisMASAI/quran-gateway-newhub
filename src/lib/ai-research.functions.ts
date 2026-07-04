@@ -2,6 +2,7 @@
 // Returns answer + verse citations + tafsir refs + confidence score.
 // Logs each query to ai_research_queries for history/analytics.
 import { createServerFn } from "@tanstack/react-start";
+import { getRequest } from "@tanstack/react-start/server";
 import { generateText } from "ai";
 import { z } from "zod";
 import { createLovableAiGatewayProvider } from "./ai-gateway.server";
@@ -309,12 +310,14 @@ async function readResearchCache(
   supabaseAdmin: { from: (table: string) => any },
   question: string,
   language: "he" | "en" | "ar",
+  userId: string,
   config: ResearchCacheConfig,
 ): Promise<CachedResearchPayload | null> {
   const normalized = normalizeCacheQuestion(question);
   const { data } = await supabaseAdmin
     .from("ai_research_queries")
     .select("question,answer,confidence,citations,created_at,language")
+    .eq("user_id", userId)
     .eq("language", language)
     .order("created_at", { ascending: false })
     .limit(20);
@@ -355,11 +358,12 @@ async function writeResearchCache(
   supabaseAdmin: { from: (table: string) => any },
   question: string,
   language: "he" | "en" | "ar",
+  userId: string,
   payload: CachedResearchPayload,
   config: ResearchCacheConfig,
 ): Promise<void> {
   await supabaseAdmin.from("ai_research_queries").insert({
-    user_id: null,
+    user_id: userId,
     question,
     answer: payload.answer,
     confidence: payload.confidence,
@@ -372,6 +376,18 @@ async function writeResearchCache(
       cache_version: config.version,
     },
   });
+}
+
+async function resolveCallerUserId(supabaseAdmin: { auth: { getUser: (token: string) => Promise<{ data: { user: { id: string } | null }; error: unknown }> } }): Promise<string | null> {
+  const req = getRequest();
+  const authHeader = req?.headers.get("authorization") ?? "";
+  if (!authHeader.startsWith("Bearer ")) return null;
+  const token = authHeader.slice(7).trim();
+  if (token.split(".").length !== 3) return null;
+
+  const { data, error } = await supabaseAdmin.auth.getUser(token);
+  if (error || !data?.user?.id) return null;
+  return data.user.id;
 }
 
 async function getResearchCacheConfig(supabaseAdmin: { from: (table: string) => any }): Promise<ResearchCacheConfig> {
@@ -508,9 +524,12 @@ export const askQuranResearch = createServerFn({ method: "POST" })
     if (!apiKey) return { ...base, error: "ai_not_configured" };
 
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const callerUserId = await resolveCallerUserId(supabaseAdmin);
     const cacheConfig = await getResearchCacheConfig(supabaseAdmin);
 
-    const cached = await readResearchCache(supabaseAdmin, data.question, data.language, cacheConfig);
+    const cached = callerUserId
+      ? await readResearchCache(supabaseAdmin, data.question, data.language, callerUserId, cacheConfig)
+      : null;
     if (
       cached &&
       shouldServeCachedResult({
@@ -771,14 +790,23 @@ export const askQuranResearch = createServerFn({ method: "POST" })
 
     if (verses.length === 0 && tafsir.length === 0 && hadithList.length === 0) {
       const emptyResult = { ...base, answer: NO_SOURCE_MESSAGE, mcpUnavailable: mcpResult.unavailable };
-      await writeResearchCache(supabaseAdmin, data.question, data.language, {
-        answer: emptyResult.answer,
-        verses: emptyResult.verses,
-        tafsir: emptyResult.tafsir,
-        hadith: emptyResult.hadith,
-        confidence: emptyResult.confidence,
-        mcpUnavailable: emptyResult.mcpUnavailable,
-      }, cacheConfig);
+      if (callerUserId) {
+        await writeResearchCache(
+          supabaseAdmin,
+          data.question,
+          data.language,
+          callerUserId,
+          {
+            answer: emptyResult.answer,
+            verses: emptyResult.verses,
+            tafsir: emptyResult.tafsir,
+            hadith: emptyResult.hadith,
+            confidence: emptyResult.confidence,
+            mcpUnavailable: emptyResult.mcpUnavailable,
+          },
+          cacheConfig,
+        );
+      }
       return emptyResult;
     }
 
@@ -845,14 +873,23 @@ export const askQuranResearch = createServerFn({ method: "POST" })
       mcpUnavailable: mcpResult.unavailable,
     };
 
-    await writeResearchCache(supabaseAdmin, data.question, data.language, {
-      answer: result.answer,
-      verses: result.verses,
-      tafsir: result.tafsir,
-      hadith: result.hadith,
-      confidence: result.confidence,
-      mcpUnavailable: result.mcpUnavailable,
-    }, cacheConfig);
+    if (callerUserId) {
+      await writeResearchCache(
+        supabaseAdmin,
+        data.question,
+        data.language,
+        callerUserId,
+        {
+          answer: result.answer,
+          verses: result.verses,
+          tafsir: result.tafsir,
+          hadith: result.hadith,
+          confidence: result.confidence,
+          mcpUnavailable: result.mcpUnavailable,
+        },
+        cacheConfig,
+      );
+    }
 
     return result;
   });
