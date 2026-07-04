@@ -44,7 +44,7 @@ export function DailyVerseContent({
 
   return (
     <>
-      <p className="font-arabic text-right text-2xl leading-loose text-foreground sm:text-3xl" dir="rtl">
+      <p className="font-quran text-right text-2xl leading-loose text-foreground sm:text-3xl" dir="rtl">
         {arabic}
       </p>
       {lang !== "ar" && translation && translation !== arabic && (

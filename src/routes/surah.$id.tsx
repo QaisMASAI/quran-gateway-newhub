@@ -191,7 +191,7 @@ function SurahPage() {
                 <div className="inline-flex items-center gap-2 rounded-full border border-white/25 bg-white/10 px-3 py-1 text-[11px] font-medium backdrop-blur-sm">
                   {`#${chapter.id}`}
                 </div>
-                <h1 className="font-arabic text-5xl font-semibold leading-none" dir="rtl">
+                <h1 className="font-quran text-5xl font-semibold leading-none" dir="rtl">
                   {chapter.name_arabic}
                 </h1>
                 <div className="text-lg font-semibold text-white/95" dir={lang === "en" ? "ltr" : "rtl"}>
@@ -217,7 +217,7 @@ function SurahPage() {
 
         {/* Bismillah (except Tawbah=9; and Fatihah=1 includes it as ayah 1) */}
         {chapter && chapter.id !== 1 && chapter.id !== 9 && (
-          <p className="my-6 text-center font-arabic text-2xl text-foreground/80">
+          <p className="my-6 text-center font-quran text-2xl text-foreground/80">
             بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ
           </p>
         )}
