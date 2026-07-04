@@ -22,10 +22,16 @@ export const Route = createFileRoute("/api/public/admin/rebuild-grounded-index")
         if (!authResult.ok) return authResult.response;
 
         const result = await rebuildGroundedChunksJob({ limit: parsed.data.limit, offset: parsed.data.offset });
-        if (!result.ok) {
-          return Response.json(result, { status: 500 });
+        const securedResult = await rebuildGroundedChunksJob({
+          limit: parsed.data.limit,
+          offset: parsed.data.offset,
+          token: parsed.data.token,
+          adminUserId: parsed.data.adminUserId,
+        });
+        if (!securedResult.ok) {
+          return Response.json(securedResult, { status: 500 });
         }
-        return Response.json(result);
+        return Response.json(securedResult);
       },
     },
   },
