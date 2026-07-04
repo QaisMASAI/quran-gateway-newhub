@@ -204,10 +204,10 @@ function AskPage() {
                     </span>
                     <ChevronLeft className="h-3.5 w-3.5 text-muted-foreground group-hover:text-primary ltr:rotate-180" />
                   </div>
-                  <p className="font-arabic mt-1.5 text-right text-lg leading-loose text-foreground" dir="rtl">
+                  <p className="font-quran mt-1.5 text-right text-lg leading-loose text-foreground" dir="rtl">
                     {v.arabic}
                   </p>
-                  <p className="mt-1.5 text-[13.5px] text-foreground/80" dir={locale === "en" ? "ltr" : "rtl"}>
+                  <p className={`mt-1.5 text-[13.5px] text-foreground/80 ${locale === "en" ? "font-reading-en" : "font-reading-he"}`} dir={locale === "en" ? "ltr" : "rtl"}>
                     {v.hebrew}
                   </p>
                   {(v.translation_source || v.translator) && (
@@ -265,8 +265,8 @@ function AskPage() {
                     {h.collection_label} · #{h.id_in_book}
                   </div>
                   {h.narrator && <div className="text-[11px] italic text-muted-foreground">{h.narrator}</div>}
-                  {h.english && <p className="mt-1 text-xs text-muted-foreground">{h.english}</p>}
-                  <p className="font-arabic mt-1 text-right text-xs text-foreground" dir="rtl" lang="ar">
+                  {h.english && <p className="font-reading-en mt-1 text-xs text-muted-foreground">{h.english}</p>}
+                  <p className="font-reading-ar mt-1 text-right text-xs text-foreground" dir="rtl" lang="ar">
                     {h.arabic}
                   </p>
                 </a>

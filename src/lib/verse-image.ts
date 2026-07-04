@@ -33,9 +33,9 @@ async function ensureFonts() {
   const hebrewSample = "בשם אללה";
   try {
     await Promise.all([
-      fonts.load('700 96px "Amiri Quran"', arabicSample),
-      fonts.load('400 96px "Amiri Quran"', arabicSample),
-      fonts.load('700 96px "Amiri"', arabicSample),
+      fonts.load('700 96px "KFGQPC Uthmanic Script HAFS"', arabicSample),
+      fonts.load('400 96px "KFGQPC Uthmanic Script HAFS"', arabicSample),
+      fonts.load('700 96px "Noto Naskh Arabic"', arabicSample),
       fonts.load('500 40px "Heebo"', hebrewSample),
       fonts.load('600 28px "Heebo"', hebrewSample),
       fonts.load('700 32px "Heebo"', hebrewSample),
@@ -205,7 +205,7 @@ export async function renderVerseImage(input: VerseImageInput): Promise<Blob> {
     input.arabic,
     innerW,
     arabicMaxH,
-    '"Amiri Quran", "Amiri", serif',
+    '"KFGQPC Uthmanic Script HAFS", "Noto Naskh Arabic", serif',
     "700",
     arabicStart,
     arabicMin,
@@ -214,7 +214,7 @@ export async function renderVerseImage(input: VerseImageInput): Promise<Blob> {
   ctx.fillStyle = "#1F2937";
   ctx.textAlign = "center";
   ctx.textBaseline = "alphabetic";
-  ctx.font = `700 ${arabicFit.size}px "Amiri Quran", "Amiri", serif`;
+  ctx.font = `700 ${arabicFit.size}px "KFGQPC Uthmanic Script HAFS", "Noto Naskh Arabic", serif`;
   const arLh = arabicFit.size * arLineRatio;
   const arabicBlockH = arabicFit.size + (arabicFit.lines.length - 1) * arLh;
   const arabicTop = contentTop + (arabicMaxH - arabicBlockH) / 2;

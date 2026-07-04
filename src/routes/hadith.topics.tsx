@@ -92,7 +92,7 @@ function HadithTopicsPage() {
               <div className="text-xs font-semibold uppercase text-primary">
                 {b.collection_slug === "bukhari" ? "Sahih al-Bukhari" : "Sahih Muslim"}
               </div>
-              <div className="mt-1 font-arabic text-lg" dir="rtl">{b.name_ar}</div>
+              <div className="mt-1 font-arabic-ui text-lg" dir="rtl">{b.name_ar}</div>
               <div className="text-sm text-foreground/90">{b.name_en}</div>
               <div className="mt-2 text-xs text-muted-foreground">{b.hadith_count} hadith</div>
             </Link>

@@ -209,9 +209,30 @@ function AdminBackfillPage() {
             <MetricCard title="Tafsir (AR)" value={String(status?.counts.tafsir.ar ?? 0)} ok={(status?.counts.tafsir.ar ?? 0) > 0} />
             <MetricCard title="Tafsir (EN)" value={String(status?.counts.tafsir.en ?? 0)} ok={(status?.counts.tafsir.en ?? 0) > 0} />
             <MetricCard title="Tafsir (HE)" value={String(status?.counts.tafsir.he ?? 0)} ok={(status?.counts.tafsir.he ?? 0) > 0} />
+            <MetricCard title="Asbab (AR)" value={String(status?.counts.asbab.ar ?? 0)} ok={(status?.counts.asbab.ar ?? 0) > 0} />
+            <MetricCard title="Asbab (EN)" value={String(status?.counts.asbab.en ?? 0)} ok={(status?.counts.asbab.en ?? 0) > 0} />
+            <MetricCard title="Asbab (HE)" value={String(status?.counts.asbab.he ?? 0)} ok={(status?.counts.asbab.he ?? 0) > 0} />
             <MetricCard title="hadith_entity_links" value={String(status?.counts.hadithEntityLinks ?? 0)} ok={(status?.counts.hadithEntityLinks ?? 0) > 0} />
           </div>
           <p className="mt-2 text-xs text-muted-foreground">Counts refresh automatically every 10 seconds after each backfill run.</p>
+        </section>
+
+        <section className="mt-6 rounded-xl border border-border bg-card p-4">
+          <h2 className="text-lg font-semibold">Latest run timestamps</h2>
+          <div className="mt-3 grid gap-3 md:grid-cols-3">
+            <article className="rounded-lg border border-border bg-background p-3">
+              <p className="text-xs text-muted-foreground">Asbab al-Nuzul backfill</p>
+              <p className="mt-1 text-sm text-foreground">{formatLastRun(status?.lastRuns?.asbab)}</p>
+            </article>
+            <article className="rounded-lg border border-border bg-background p-3">
+              <p className="text-xs text-muted-foreground">Jalalayn English translation</p>
+              <p className="mt-1 text-sm text-foreground">{formatLastRun(status?.lastRuns?.jalalaynEnglish)}</p>
+            </article>
+            <article className="rounded-lg border border-border bg-background p-3">
+              <p className="text-xs text-muted-foreground">Jalalayn Hebrew translation</p>
+              <p className="mt-1 text-sm text-foreground">{formatLastRun(status?.lastRuns?.jalalaynHebrew)}</p>
+            </article>
+          </div>
         </section>
 
         <section className="mt-8 rounded-xl border border-border bg-card p-4">
@@ -460,7 +481,12 @@ function AdminBackfillPage() {
                 </p>
                 {report && (
                   <p className="mt-1 text-xs text-muted-foreground">
-                    Duration: {formatDuration(report.durationMs)} · Tafsir EN {report.countsBefore.tafsir.en}→{report.countsAfter.tafsir.en} · Tafsir HE {report.countsBefore.tafsir.he}→{report.countsAfter.tafsir.he} · Tafsir AR {report.countsBefore.tafsir.ar}→{report.countsAfter.tafsir.ar} · hadith_entity_links {report.countsBefore.hadithEntityLinks}→{report.countsAfter.hadithEntityLinks}
+                    Duration: {formatDuration(report.durationMs)} · Tafsir EN {report.countsBefore.tafsir.en}→{report.countsAfter.tafsir.en} · Tafsir HE {report.countsBefore.tafsir.he}→{report.countsAfter.tafsir.he} · Tafsir AR {report.countsBefore.tafsir.ar}→{report.countsAfter.tafsir.ar} · Asbab EN {report.countsBefore.asbab.en}→{report.countsAfter.asbab.en} · Asbab HE {report.countsBefore.asbab.he}→{report.countsAfter.asbab.he} · Asbab AR {report.countsBefore.asbab.ar}→{report.countsAfter.asbab.ar} · hadith_entity_links {report.countsBefore.hadithEntityLinks}→{report.countsAfter.hadithEntityLinks}
+                  </p>
+                )}
+                {readRunValidationSkipped(run) !== null && (
+                  <p className="mt-1 text-xs text-muted-foreground">
+                    Hebrew quality-gate skipped rows: {readRunValidationSkipped(run)}
                   </p>
                 )}
                 {report && report.failedBatches.length > 0 && (
@@ -504,6 +530,24 @@ function readRunReport(run: RunRow): RunReport | null {
   const data = run.result as { report?: RunReport };
   if (!data.report) return null;
   return data.report;
+}
+
+function readRunValidationSkipped(run: RunRow): number | null {
+  if (!run.result || typeof run.result !== "object") return null;
+  const maybeRaw = run.result as { raw?: { validation_skipped_rows?: unknown } };
+  const value = maybeRaw.raw?.validation_skipped_rows;
+  return typeof value === "number" ? value : null;
+}
+
+function formatLastRun(
+  run:
+    | { started_at: string; finished_at: string | null; status: string }
+    | null
+    | undefined,
+) {
+  if (!run) return "No run yet";
+  const end = run.finished_at ? new Date(run.finished_at).toLocaleString() : "still running";
+  return `${run.status} · ${end}`;
 }
 
 function formatDuration(ms: number) {

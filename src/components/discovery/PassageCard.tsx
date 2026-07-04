@@ -44,7 +44,7 @@ export function PassageCard({ surah, ayahStart, ayahEnd, locale, title }: Passag
         )}
         {q.data?.map((v) => (
           <div key={v.ayah} className="space-y-1.5">
-            <p className="font-arabic text-right text-lg leading-loose text-foreground" dir="rtl">
+            <p className="font-quran text-right text-lg leading-loose text-foreground" dir="rtl">
               <span className="me-1 inline-flex h-5 w-5 items-center justify-center rounded-full bg-primary-soft text-[10px] font-bold text-primary">
                 {v.ayah}
               </span>

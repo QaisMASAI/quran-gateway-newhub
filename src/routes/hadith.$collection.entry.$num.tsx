@@ -62,11 +62,11 @@ function HadithDetailPage() {
         {h.narrator && <p className="mt-1 text-sm italic text-muted-foreground">{h.narrator}</p>}
 
         <article className="mt-6 space-y-5 rounded-2xl border border-border bg-card p-5">
-          <p className="font-arabic text-right text-xl leading-loose text-foreground" dir="rtl" lang="ar">
+          <p className="font-reading-ar text-right text-xl leading-loose text-foreground" dir="rtl" lang="ar">
             {h.arabic_text}
           </p>
           {h.english_text && (
-            <p className="border-t border-border pt-4 text-base leading-relaxed text-foreground/90" dir="ltr">
+            <p className="font-reading-en border-t border-border pt-4 text-base leading-relaxed text-foreground/90" dir="ltr">
               {h.english_text}
             </p>
           )}

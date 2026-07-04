@@ -169,7 +169,7 @@ export function AyahCard({ surah, surahName, ayah, arabic, hebrew, highlight }: 
             const isHe = locale === "he";
             const translationClass = isHe
               ? "hebrew-text text-[15px] text-foreground/85"
-              : "text-[15px] leading-relaxed text-foreground/85 text-start";
+              : "font-reading-en text-[15px] leading-relaxed text-foreground/85 text-start";
             const translationDir = isHe ? "rtl" : "ltr";
             return heHighlight ? (
               <p className={translationClass} dir={translationDir}>{heHighlight}</p>

@@ -62,7 +62,7 @@ function HadithIndex() {
             >
               <div className="flex items-center gap-3">
                 <BookMarked className="h-5 w-5 text-primary" aria-hidden />
-                <div className="font-arabic text-xl" dir="rtl">{c.title_ar}</div>
+                <div className="font-arabic-ui text-xl" dir="rtl">{c.title_ar}</div>
               </div>
               <div className="mt-1 text-sm font-semibold text-foreground">{c.title_en}</div>
               {c.author_en && <div className="text-xs text-muted-foreground">{c.author_en}</div>}

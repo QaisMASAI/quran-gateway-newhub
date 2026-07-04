@@ -40,8 +40,14 @@
   --color-rose: var(--rose);
 
   --font-hebrew: "Heebo", "Arial Hebrew", system-ui, sans-serif;
-  --font-arabic: "Amiri Quran", "Amiri", "Noto Naskh Arabic", serif;
-  --font-display: "Heebo", "Arial Hebrew", system-ui, sans-serif;
+  --font-ui-he: "Heebo", "Arial Hebrew", system-ui, sans-serif;
+  --font-ui-en: "Inter", system-ui, sans-serif;
+  --font-ui-ar: "IBM Plex Sans Arabic", "Noto Naskh Arabic", sans-serif;
+  --font-reading-en: "Merriweather", serif;
+  --font-reading-he: "Heebo", "Arial Hebrew", system-ui, sans-serif;
+  --font-reading-ar: "Noto Naskh Arabic", "IBM Plex Sans Arabic", serif;
+  --font-quran: "KFGQPC Uthmanic Script HAFS", "Noto Naskh Arabic", serif;
+  --font-display: var(--font-ui-en);
 
   --gradient-hero: linear-gradient(180deg,
       oklch(0.32 0.07 160) 0%,
@@ -156,17 +162,14 @@
   body {
     background-color: var(--color-background);
     color: var(--color-foreground);
-    font-family: var(--font-display);
+    font-family: var(--font-ui-en);
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
     position: relative;
   }
 
-  /* If the document is RTL, apply the Arabic/Hebrew font family as default.
-     Components that need specific fonts should still use .font-arabic / .font-display. */
-  html:dir(rtl) body {
-    font-family: var(--font-arabic);
-  }
+  html[lang="he"] body { font-family: var(--font-ui-he); }
+  html[lang="ar"] body { font-family: var(--font-ui-ar); }
 
   /* Islamic Khatam watermark — 8-pointed star (two overlapping squares)
      with octagons and interlocking circles. Strictly NO 6-pointed star
@@ -216,7 +219,22 @@
   body > * { position: relative; z-index: 1; }
 
   .font-arabic {
-    font-family: var(--font-arabic);
+    font-family: var(--font-reading-ar);
+    direction: rtl;
+    line-height: 2.4;
+  }
+
+  .font-arabic-ui {
+    font-family: var(--font-ui-ar);
+    direction: rtl;
+  }
+
+  .font-reading-en { font-family: var(--font-reading-en); }
+  .font-reading-he { font-family: var(--font-reading-he); direction: rtl; }
+  .font-reading-ar { font-family: var(--font-reading-ar); direction: rtl; }
+
+  .font-quran {
+    font-family: var(--font-quran);
     direction: rtl;
     line-height: 2.4;
   }
@@ -227,7 +245,7 @@
   }
 
   .ayah-text {
-    font-family: var(--font-arabic);
+    font-family: var(--font-quran);
     font-size: 1.85rem;
     line-height: 2.6;
     color: var(--color-foreground);
@@ -235,10 +253,17 @@
   }
 
   .hebrew-text {
-    font-family: var(--font-hebrew);
+    font-family: var(--font-reading-he);
     direction: rtl;
     line-height: 1.8;
   }
+
+  .prose {
+    font-family: var(--font-reading-en);
+  }
+
+  html[lang="he"] .prose { font-family: var(--font-reading-he); }
+  html[lang="ar"] .prose { font-family: var(--font-reading-ar); }
 
   mark.search-hit {
     background: oklch(0.95 0.13 85);
@@ -250,6 +275,15 @@
   ::-webkit-scrollbar { width: 10px; height: 10px; }
   ::-webkit-scrollbar-thumb { background: var(--color-border); border-radius: 8px; }
   ::-webkit-scrollbar-thumb:hover { background: var(--color-muted-foreground); }
+}
+
+@font-face {
+  font-family: "KFGQPC Uthmanic Script HAFS";
+  src: local("KFGQPC Uthmanic Script HAFS"),
+    url("https://cdn.jsdelivr.net/gh/mustafa0x/qpc-fonts@f93bf5f3/various-woff2/UthmanicHafs1%20Ver09.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
 }
 
 @utility surface-card {
