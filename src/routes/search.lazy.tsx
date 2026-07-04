@@ -151,7 +151,7 @@ function SearchPage() {
                       className={`surface-card flex items-center justify-between gap-3 px-4 py-3 hover:border-primary/40 ${isRtl ? "flex-row-reverse" : ""}`}
                     >
                       <div className={`flex items-center gap-3 ${isRtl ? "flex-row-reverse" : ""}`}>
-                        <span className="font-arabic text-lg" dir="rtl">
+                        <span className="font-arabic-ui text-lg" dir="rtl">
                           {c.name_arabic}
                         </span>
                         <span className="text-sm text-muted-foreground">{chapterDisplayName(c, locale)}</span>
@@ -262,7 +262,7 @@ function SurahGroupCard({ group, query, locale }: { group: SurahGroup; query: st
                     <p className="text-start text-sm text-foreground/90" dir="ltr">
                       {truncate(h.verse.english, 180)}
                     </p>
-                    <p className="font-arabic mt-1.5 text-right text-base text-muted-foreground/80" dir="rtl" lang="ar">
+                    <p className="font-quran mt-1.5 text-right text-base text-muted-foreground/80" dir="rtl" lang="ar">
                       {truncateArabic(h.verse.arabic)}
                     </p>
                   </>
@@ -277,7 +277,7 @@ function SurahGroupCard({ group, query, locale }: { group: SurahGroup; query: st
                     >
                       {stripSnippetHtml(h.snippet)}
                     </p>
-                    <p className="font-arabic mt-1.5 text-right text-base text-muted-foreground/80" dir="rtl" lang="ar">
+                    <p className="font-quran mt-1.5 text-right text-base text-muted-foreground/80" dir="rtl" lang="ar">
                       {truncateArabic(h.verse.arabic)}
                     </p>
                   </>
@@ -285,7 +285,7 @@ function SurahGroupCard({ group, query, locale }: { group: SurahGroup; query: st
               }
               return (
                 <>
-                  <p className="font-arabic text-right text-lg text-foreground" dir="rtl" lang="ar">
+                  <p className="font-quran text-right text-lg text-foreground" dir="rtl" lang="ar">
                     {stripSnippetHtml(h.snippet)}
                   </p>
                   {locale === "he" && h.verse.hebrew && (
