@@ -123,7 +123,7 @@ function EntityPage() {
               {pickLocale(entity.title_i18n, locale)}
             </h1>
             {pickLocale(entity.summary_i18n, locale) && (
-              <p className="mt-3 max-w-2xl text-base leading-relaxed text-white/80 sm:text-lg">
+              <p className={`mt-3 max-w-2xl text-base leading-relaxed text-white/80 sm:text-lg ${locale === "ar" ? "font-reading-ar" : locale === "en" ? "font-reading-en" : "font-reading-he"}`} dir={locale === "en" ? "ltr" : "rtl"}>
                 {pickLocale(entity.summary_i18n, locale)}
               </p>
             )}
@@ -166,7 +166,7 @@ function EntityPage() {
               {/* Overview */}
               <Section id="overview" icon={<BookOpen className="h-4 w-4" />} title={t("learn.overview")}>
                 {pickLocale(entity.description_i18n, locale) ? (
-                  <p className="whitespace-pre-line text-base leading-relaxed text-foreground/90">
+                  <p className={`whitespace-pre-line text-base leading-relaxed text-foreground/90 ${locale === "ar" ? "font-tafsir-hadith-ar" : locale === "en" ? "font-tafsir-hadith-en" : "font-tafsir-hadith-he"}`} dir={locale === "en" ? "ltr" : "rtl"}>
                     {pickLocale(entity.description_i18n, locale)}
                   </p>
                 ) : (
@@ -271,7 +271,7 @@ function PassageBlock({
   return (
     <article className="rounded-2xl border border-primary/10 bg-card p-5 shadow-sm">
       <p
-        className={`whitespace-pre-line text-base leading-relaxed text-foreground/90 ${locale === "en" ? "font-reading-en" : locale === "ar" ? "font-reading-ar" : "font-reading-he"} ${isRtl ? "text-start" : "text-start"}`}
+        className={`ai-explanation-block whitespace-pre-line text-base leading-relaxed text-foreground/90 ${locale === "en" ? "font-tafsir-hadith-en" : locale === "ar" ? "font-tafsir-hadith-ar" : "font-tafsir-hadith-he"}`}
         dir={isRtl ? "rtl" : "ltr"}
       >
         {body}

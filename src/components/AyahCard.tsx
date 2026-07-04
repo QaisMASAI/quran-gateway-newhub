@@ -297,6 +297,11 @@ export function AyahCard({ surah, surahName, ayah, arabic, hebrew, highlight }: 
                     locale,
                   )}
                 </span>
+                {(tafsirQ.data ?? []).some((row) => row.lang === "en") && (
+                  <span className="rounded-full border border-gold/40 bg-gold/10 px-3 py-1 text-[11.5px] font-medium text-gold">
+                    EN
+                  </span>
+                )}
               </div>
             )}
 
@@ -320,7 +325,12 @@ export function AyahCard({ surah, surahName, ayah, arabic, hebrew, highlight }: 
                 {tafsirQ.data.slice(0, 3).map((row) => (
                   <div key={row.id} className="rounded-lg border border-border/70 bg-background/60 p-3">
                     <div className="prose prose-sm max-w-none text-[14.5px] text-foreground/90 [&>p]:my-1.5 [&>h1]:text-base [&>h2]:text-base [&>h3]:text-sm [&>ul]:my-1 [&>ol]:my-1">
-                      <ReactMarkdown skipHtml>{row.body}</ReactMarkdown>
+                      <div
+                        className={`ai-explanation-block ${row.lang === "ar" ? "font-tafsir-hadith-ar" : row.lang === "en" ? "font-tafsir-hadith-en" : "font-tafsir-hadith-he"}`}
+                        dir={row.lang === "en" ? "ltr" : "rtl"}
+                      >
+                        <ReactMarkdown skipHtml>{row.body}</ReactMarkdown>
+                      </div>
                     </div>
                     <div className="mt-2 flex items-center gap-1.5 border-t border-border pt-2 text-[11px] text-muted-foreground">
                       <BookText className="h-3 w-3" />
@@ -337,7 +347,12 @@ export function AyahCard({ surah, surahName, ayah, arabic, hebrew, highlight }: 
                 {asbabQ.data.slice(0, 2).map((row) => (
                   <div key={row.id} className="rounded-lg border border-border/70 bg-background/60 p-3">
                     <div className="prose prose-sm max-w-none text-[14.5px] text-foreground/90 [&>p]:my-1.5 [&>h1]:text-base [&>h2]:text-base [&>h3]:text-sm [&>ul]:my-1 [&>ol]:my-1">
-                      <ReactMarkdown skipHtml>{row.body}</ReactMarkdown>
+                      <div
+                        className={`ai-explanation-block ${row.lang === "ar" ? "font-tafsir-hadith-ar" : row.lang === "en" ? "font-tafsir-hadith-en" : "font-tafsir-hadith-he"}`}
+                        dir={row.lang === "en" ? "ltr" : "rtl"}
+                      >
+                        <ReactMarkdown skipHtml>{row.body}</ReactMarkdown>
+                      </div>
                     </div>
                     <div className="mt-2 flex items-center gap-1.5 border-t border-border pt-2 text-[11px] text-muted-foreground">
                       <BookText className="h-3 w-3" />

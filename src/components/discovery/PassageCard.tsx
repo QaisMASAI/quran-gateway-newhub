@@ -51,7 +51,7 @@ export function PassageCard({ surah, ayahStart, ayahEnd, locale, title }: Passag
               {v.arabic}
             </p>
             {v.translation && v.translation !== v.arabic && (
-              <p className="text-sm text-muted-foreground" dir="auto">
+              <p className={`text-sm text-muted-foreground ${locale === "ar" ? "font-reading-ar" : locale === "en" ? "font-reading-en" : "font-reading-he"}`} dir={locale === "en" ? "ltr" : "rtl"}>
                 {v.translation}
               </p>
             )}
