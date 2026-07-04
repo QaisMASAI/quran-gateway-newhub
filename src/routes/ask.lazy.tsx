@@ -58,7 +58,7 @@ function AskPage() {
   const loading = mutation.isPending;
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className={`min-h-screen bg-background ${locale === "ar" ? "font-ui-ar" : locale === "en" ? "font-ui-en" : "font-ui-he"}`}>
       <Header />
 
       <section
@@ -235,7 +235,7 @@ function AskPage() {
               {result.tafsir.map((tf, i) => (
                 <div key={`${tf.source}-${tf.surah}-${tf.ayah}-${i}`} className="rounded-lg border border-border bg-background px-3 py-2">
                   <div className="text-xs text-primary">
-                    {tf.source} · {tf.surah}:{tf.ayah}
+                    {tf.kind === "asbab" ? "Asbab al-Nuzul" : tf.source} · {tf.surah}:{tf.ayah}
                     {tf.translator ? ` · ${tf.translator}` : ""}
                   </div>
                   <p className={`ai-explanation-block mt-1 text-xs text-muted-foreground ${locale === "ar" ? "font-tafsir-hadith-ar" : locale === "en" ? "font-tafsir-hadith-en" : "font-tafsir-hadith-he"}`} dir={locale === "en" ? "ltr" : "rtl"}>{tf.text}</p>

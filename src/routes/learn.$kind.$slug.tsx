@@ -104,7 +104,7 @@ function EntityPage() {
   }, [t, versesQ.data, relatedQ.data]);
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className={`min-h-screen bg-background ${locale === "ar" ? "font-ui-ar" : locale === "en" ? "font-ui-en" : "font-ui-he"}`}>
       <Header />
 
       {entity && (

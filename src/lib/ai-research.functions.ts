@@ -40,6 +40,7 @@ export interface VerseCitation {
 }
 
 export interface TafsirCitation {
+  kind?: "tafsir" | "asbab";
   source: string;
   translator?: string | null;
   surah: number;
@@ -683,6 +684,7 @@ export const askQuranResearch = createServerFn({ method: "POST" })
     if (chunkTafsir.length > 0) {
       for (const row of chunkTafsir.slice(0, 12)) {
         tafsir.push({
+          kind: row.content_type === "asbab" ? "asbab" : "tafsir",
           source: row.source_name ?? "Tafsir",
           translator: row.translator_name,
           surah: Number(row.surah ?? 0),
@@ -710,6 +712,7 @@ export const askQuranResearch = createServerFn({ method: "POST" })
         const localizedName =
           data.language === "ar" ? src?.name_ar : data.language === "he" ? src?.name_he : src?.name_en;
         tafsir.push({
+          kind: "tafsir",
           source: localizedName || src?.name_en || "Tafsir",
           translator: src?.author ?? null,
           surah: t.surah as number,
@@ -739,6 +742,7 @@ export const askQuranResearch = createServerFn({ method: "POST" })
           const localizedName =
             data.language === "ar" ? src?.name_ar : data.language === "he" ? src?.name_he : src?.name_en;
           tafsir.push({
+            kind: "tafsir",
             source: localizedName || src?.name_en || "Tafsir",
             translator: src?.author ?? null,
             surah: t.surah as number,

@@ -83,6 +83,8 @@ const JOBS: Array<{ key: AdminJobKey; title: string; defaultPayload: Record<stri
 ];
 
 function AdminBackfillPage() {
+  const htmlLang = typeof document !== "undefined" ? document.documentElement.lang : "en";
+  const uiFontClass = htmlLang.startsWith("ar") ? "font-ui-ar" : htmlLang.startsWith("he") ? "font-ui-he" : "font-ui-en";
   const qc = useQueryClient();
   const [ttlInput, setTtlInput] = useState(360);
   const [resumeFromFailed, setResumeFromFailed] = useState(true);
@@ -182,7 +184,7 @@ function AdminBackfillPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className={`min-h-screen bg-background ${uiFontClass}`}>
       <Header />
       <main className="mx-auto max-w-6xl px-4 py-8 sm:px-6">
         <h1 className="text-2xl font-bold text-foreground">Admin backfill dashboard</h1>
