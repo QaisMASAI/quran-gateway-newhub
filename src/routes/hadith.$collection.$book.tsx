@@ -65,12 +65,12 @@ function HadithBookPage() {
               </div>
               {h.narrator && <p className="text-xs italic text-muted-foreground">{h.narrator}</p>}
               {h.english_text && (
-                <p className="mt-1 text-sm text-foreground/90">
+                <p className="font-reading-en mt-1 text-sm text-foreground/90">
                   {h.english_text.slice(0, 320)}
                   {h.english_text.length > 320 ? "…" : ""}
                 </p>
               )}
-              <p className="font-arabic mt-2 text-right text-base text-foreground" dir="rtl" lang="ar">
+              <p className="font-reading-ar mt-2 text-right text-base text-foreground" dir="rtl" lang="ar">
                 {h.arabic_text.slice(0, 300)}
                 {h.arabic_text.length > 300 ? "…" : ""}
               </p>
