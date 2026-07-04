@@ -696,8 +696,17 @@ export async function generateHebrewTafsirJob(input: unknown) {
     const arabicBody = arByKey.get(key) ?? "";
     const englishBody = enByKey.get(key) ?? "";
 
-    if (!sourceId || !surah || !ayahStart || !ayahEnd || (!arabicBody && !englishBody)) {
+    if (!sourceId || !surah || !ayahStart || !ayahEnd) {
       failedBatches.push(`tafsir:${surahRaw ?? "?"}:${ayahStartRaw ?? "?"}`);
+      continue;
+    }
+
+    // Hard gate: Hebrew Al-Jalalayn is only generated when BOTH Arabic and
+    // English source passages exist for the exact same verse range.
+    if (!arabicBody || !englishBody) {
+      const reason = !arabicBody ? "missing_arabic" : "missing_english";
+      validationSkipped += 1;
+      failedBatches.push(`tafsir:${surah}:${ayahStart}:${reason}`);
       continue;
     }
 
