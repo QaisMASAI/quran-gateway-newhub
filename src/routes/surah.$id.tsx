@@ -165,7 +165,7 @@ function SurahPage() {
   }, [surahId, verses?.length]);
 
   return (
-    <div className="min-h-screen bg-background" dir={isRtl ? "rtl" : "ltr"}>
+    <div className={`min-h-screen bg-background ${lang === "ar" ? "font-ui-ar" : lang === "en" ? "font-ui-en" : "font-ui-he"}`} dir={isRtl ? "rtl" : "ltr"}>
       <Header />
 
       <div className="mx-auto max-w-3xl px-4 py-6 sm:px-6">

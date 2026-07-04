@@ -133,6 +133,9 @@ export async function getAsbabForVerse(
     if (rows.length > 0) return rows;
   }
 
+  const englishRows = (await base().eq("lang", "en")).data as AsbabRow[] | null;
+  if ((englishRows ?? []).length > 0) return englishRows ?? [];
+
   // Fallback: when dedicated asbab rows are missing, extract passages from
   // authenticated tafsir entries for the same verse that explicitly mention
   // sabab al-nuzul markers.
@@ -163,6 +166,26 @@ export async function getAsbabForVerse(
     if (rows.length > 0) {
       return rows.map((r) => ({ ...r }));
     }
+  }
+
+  const englishTafsirRows = (await supabase
+    .from("tafsir_passages")
+    .select("id,source_id,surah,ayah_start,ayah_end,lang,body,citation,source:tafsir_sources!inner(*)")
+    .eq("surah", surah)
+    .lte("ayah_start", ayah)
+    .gte("ayah_end", ayah)
+    .eq("lang", "en")
+    .or(
+      [
+        "body.ilike.%occasion of revelation%",
+        "body.ilike.%reason for revelation%",
+        "body.ilike.%revealed concerning%",
+      ].join(","),
+    )
+    .order("created_at", { ascending: false })
+    .limit(4)).data as TafsirPassageRow[] | null;
+  if ((englishTafsirRows ?? []).length > 0) {
+    return (englishTafsirRows ?? []).map((r) => ({ ...r }));
   }
 
   return [];

@@ -68,7 +68,7 @@ function ResearchPage() {
           ];
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className={`min-h-screen bg-background ${lang === "ar" ? "font-ui-ar" : lang === "en" ? "font-ui-en" : "font-ui-he"}`}>
       <Header />
       <div className="container mx-auto max-w-4xl px-4 py-8">
         <Link
@@ -185,7 +185,7 @@ function ResearchPage() {
                 </h2>
                 <ConfidenceBadge confidence={result.confidence} />
               </div>
-              <div className="prose prose-sm max-w-none dark:prose-invert">
+              <div className={`ai-explanation-block prose prose-sm max-w-none dark:prose-invert ${lang === "ar" ? "font-tafsir-hadith-ar" : lang === "en" ? "font-tafsir-hadith-en" : "font-tafsir-hadith-he"}`} dir={lang === "en" ? "ltr" : "rtl"}>
                 <ReactMarkdown skipHtml>{result.answer}</ReactMarkdown>
               </div>
             </div>
@@ -245,11 +245,11 @@ function ResearchPage() {
                 <div className="space-y-3">
                   {result.tafsir.map((tf, i) => (
                     <div key={`${tf.source}-${tf.surah}-${tf.ayah}-${i}`} className="rounded-xl border border-border bg-card p-4">
-                      <div className="mb-1 text-xs font-medium text-primary">
-                        {tf.source} · {tf.surah}:{tf.ayah}
+                        <div className="mb-1 text-xs font-medium text-primary">
+                          {tf.kind === "asbab" ? "Asbab al-Nuzul" : tf.source} · {tf.surah}:{tf.ayah}
                         {tf.translator ? ` · ${tf.translator}` : ""}
                       </div>
-                      <p className="text-sm text-foreground/90">{tf.text}</p>
+                      <p className={`ai-explanation-block text-sm text-foreground/90 ${lang === "ar" ? "font-tafsir-hadith-ar" : lang === "en" ? "font-tafsir-hadith-en" : "font-tafsir-hadith-he"}`} dir={lang === "en" ? "ltr" : "rtl"}>{tf.text}</p>
                       <div className="mt-2 rounded-md border border-border bg-background px-2 py-1 text-[11px] text-muted-foreground">
                         {t("research.tafsirSource", { source: tf.source })}
                         {tf.translator ? ` · ${t("research.translator", { translator: tf.translator })}` : ""}

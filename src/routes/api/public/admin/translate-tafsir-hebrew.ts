@@ -24,6 +24,8 @@ export const Route = createFileRoute("/api/public/admin/translate-tafsir-hebrew"
         const result = await generateHebrewTafsirJob({
           batch: parsed.data.batch,
           model: parsed.data.model,
+          token: parsed.data.token,
+          adminUserId: parsed.data.adminUserId,
         });
         if (!result.ok) {
           return Response.json(result, { status: 500 });

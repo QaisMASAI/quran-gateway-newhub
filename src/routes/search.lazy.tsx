@@ -54,7 +54,7 @@ function SearchPage() {
   const kindLabel = (k: EntityKind) => t(`search.kind${k.charAt(0).toUpperCase()}${k.slice(1)}` as const);
 
   return (
-    <div className="min-h-screen bg-background" dir={isRtl ? "rtl" : "ltr"}>
+    <div className={`min-h-screen bg-background ${locale === "ar" ? "font-ui-ar" : locale === "en" ? "font-ui-en" : "font-ui-he"}`} dir={isRtl ? "rtl" : "ltr"}>
       <Header />
 
       <div className="border-b border-border bg-gradient-to-b from-primary-soft/40 to-transparent">
@@ -130,7 +130,7 @@ function SearchPage() {
                     {row.kind.toUpperCase()} · {row.source_name}
                     {row.surah && row.ayah_start ? ` · ${row.surah}:${row.ayah_start}${row.ayah_end && row.ayah_end !== row.ayah_start ? `-${row.ayah_end}` : ""}` : ""}
                   </p>
-                  <p className="mt-1 text-sm leading-relaxed text-foreground/90">{row.text.slice(0, 220)}{row.text.length > 220 ? "…" : ""}</p>
+                  <p className={`mt-1 text-sm leading-relaxed text-foreground/90 ${locale === "ar" ? "font-tafsir-hadith-ar" : locale === "en" ? "font-tafsir-hadith-en" : "font-tafsir-hadith-he"}`} dir={locale === "en" ? "ltr" : "rtl"}>{row.text.slice(0, 220)}{row.text.length > 220 ? "…" : ""}</p>
                 </article>
               ))}
             </div>

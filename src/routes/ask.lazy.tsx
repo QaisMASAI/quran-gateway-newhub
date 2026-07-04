@@ -58,7 +58,7 @@ function AskPage() {
   const loading = mutation.isPending;
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className={`min-h-screen bg-background ${locale === "ar" ? "font-ui-ar" : locale === "en" ? "font-ui-en" : "font-ui-he"}`}>
       <Header />
 
       <section
@@ -136,7 +136,7 @@ function AskPage() {
             {result.error ? (
               <p className="text-sm text-destructive">{result.error}</p>
             ) : (
-              <div className="prose prose-sm max-w-none text-[15px] text-foreground/90 [&>p]:my-2">
+              <div className={`ai-explanation-block prose prose-sm max-w-none text-[15px] text-foreground/90 [&>p]:my-2 ${locale === "ar" ? "font-tafsir-hadith-ar" : locale === "en" ? "font-tafsir-hadith-en" : "font-tafsir-hadith-he"}`} dir={locale === "en" ? "ltr" : "rtl"}>
                 <ReactMarkdown skipHtml>{result.answer}</ReactMarkdown>
               </div>
             )}
@@ -235,10 +235,10 @@ function AskPage() {
               {result.tafsir.map((tf, i) => (
                 <div key={`${tf.source}-${tf.surah}-${tf.ayah}-${i}`} className="rounded-lg border border-border bg-background px-3 py-2">
                   <div className="text-xs text-primary">
-                    {tf.source} · {tf.surah}:{tf.ayah}
+                    {tf.kind === "asbab" ? "Asbab al-Nuzul" : tf.source} · {tf.surah}:{tf.ayah}
                     {tf.translator ? ` · ${tf.translator}` : ""}
                   </div>
-                  <p className="mt-1 text-xs text-muted-foreground">{tf.text}</p>
+                  <p className={`ai-explanation-block mt-1 text-xs text-muted-foreground ${locale === "ar" ? "font-tafsir-hadith-ar" : locale === "en" ? "font-tafsir-hadith-en" : "font-tafsir-hadith-he"}`} dir={locale === "en" ? "ltr" : "rtl"}>{tf.text}</p>
                   <div className="mt-2 rounded-md border border-border bg-card px-2 py-1 text-[11px] text-muted-foreground">
                       {t("research.tafsirSource", { source: tf.source })}
                       {tf.translator ? ` · ${t("research.translator", { translator: tf.translator })}` : ""}
