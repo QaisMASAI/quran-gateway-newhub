@@ -271,7 +271,7 @@ function PassageBlock({
   return (
     <article className="rounded-2xl border border-primary/10 bg-card p-5 shadow-sm">
       <p
-        className={`whitespace-pre-line text-base leading-relaxed text-foreground/90 ${isRtl ? "text-start" : "text-start"}`}
+        className={`whitespace-pre-line text-base leading-relaxed text-foreground/90 ${locale === "en" ? "font-reading-en" : locale === "ar" ? "font-reading-ar" : "font-reading-he"} ${isRtl ? "text-start" : "text-start"}`}
         dir={isRtl ? "rtl" : "ltr"}
       >
         {body}
