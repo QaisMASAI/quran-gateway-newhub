@@ -21,7 +21,6 @@ export const Route = createFileRoute("/api/public/admin/rebuild-grounded-index")
         const authResult = await authorizeAdminRouteRequest(request, parsed.data);
         if (!authResult.ok) return authResult.response;
 
-        const result = await rebuildGroundedChunksJob({ limit: parsed.data.limit, offset: parsed.data.offset });
         const securedResult = await rebuildGroundedChunksJob({
           limit: parsed.data.limit,
           offset: parsed.data.offset,
