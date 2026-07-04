@@ -16,7 +16,28 @@ const RETRIEVAL_MODEL = "openai/text-embedding-3-large";
 const IngestSchema = z.object({
   limit: z.number().int().min(1).max(10000).optional().default(2000),
   offset: z.number().int().min(0).optional().default(0),
+  token: z.string().min(8).optional(),
+  adminUserId: z.string().uuid().optional(),
 });
+
+async function ensureAdminJobAuthorization(input: { token?: string; adminUserId?: string }) {
+  const token = process.env.QURAN_ADMIN_TOKEN;
+  if (!token) return { ok: false as const, error: "admin_token_not_configured" as const };
+  if (!input.token || input.token !== token || !input.adminUserId) {
+    return { ok: false as const, error: "unauthorized" as const };
+  }
+
+  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+  const { data: isAdmin, error } = await supabaseAdmin.rpc("has_role" as never, {
+    _user_id: input.adminUserId,
+    _role: "admin",
+  } as never);
+
+  if (error) return { ok: false as const, error: error.message };
+  if (isAdmin !== true) return { ok: false as const, error: "forbidden" as const };
+
+  return { ok: true as const };
+}
 
 type UpsertChunk = {
   source_key: string;
@@ -61,6 +82,8 @@ function toVectorLiteral(vec: number[]) {
 
 export async function rebuildGroundedChunksJob(input: unknown) {
   const data = IngestSchema.parse(input);
+  const auth = await ensureAdminJobAuthorization(data);
+  if (!auth.ok) return { ok: false, error: auth.error };
   const apiKey = process.env.LOVABLE_API_KEY;
   if (!apiKey) return { ok: false, error: "ai_not_configured" as const };
 
@@ -308,6 +331,8 @@ export async function rebuildGroundedChunksJob(input: unknown) {
 const TranslateSchema = z.object({
   batch: z.number().int().min(1).max(1200).optional().default(600),
   model: z.string().min(3).optional().default("google/gemini-2.5-flash"),
+  token: z.string().min(8).optional(),
+  adminUserId: z.string().uuid().optional(),
 });
 
 type QuranTafsirApiRow = {
@@ -393,6 +418,8 @@ async function fetchQuranTafsirByChapter(tafsirId: number, surah: number, perPag
 
 export async function generateEnglishTafsirJob(input: unknown) {
   const data = TranslateSchema.parse(input);
+  const auth = await ensureAdminJobAuthorization(data);
+  if (!auth.ok) return { ok: false, error: auth.error };
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
   const [{ data: sourceRows, error: sourceError }, resourceIds] = await Promise.all([
@@ -550,6 +577,8 @@ export async function generateEnglishTafsirJob(input: unknown) {
 
 export async function generateHebrewTafsirJob(input: unknown) {
   const data = TranslateSchema.parse(input);
+  const auth = await ensureAdminJobAuthorization(data);
+  if (!auth.ok) return { ok: false, error: auth.error };
   const apiKey = process.env.LOVABLE_API_KEY;
   if (!apiKey) return { ok: false, error: "ai_not_configured" as const };
   const gateway = createLovableAiGatewayProvider(apiKey);
