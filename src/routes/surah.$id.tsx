@@ -171,7 +171,10 @@ function SurahPage() {
       <Header />
 
       <div className="mx-auto max-w-3xl px-4 py-6 sm:px-6">
-        <Link to="/" className={`inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-primary ${isRtl ? 'flex-row-reverse' : ''}`}>
+        <Link
+          to="/"
+          className={`inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-primary ${isRtl ? "flex-row-reverse" : ""}`}
+        >
           {isRtl ? (
             <ChevronLeft className="h-3.5 w-3.5" />
           ) : (
@@ -186,8 +189,12 @@ function SurahPage() {
               className="arabesque-bg relative px-6 py-9 text-center text-white"
               style={{ background: "var(--gradient-hero)" }}
             >
-              <div className={`pointer-events-none absolute -top-16 ${isRtl ? '-left-10' : '-right-10'} h-48 w-48 rounded-full bg-white/10 blur-3xl`} />
-              <div className={`pointer-events-none absolute -bottom-16 ${isRtl ? '-right-10' : '-left-10'} h-48 w-48 rounded-full bg-olive/30 blur-3xl`} />
+              <div
+                className={`pointer-events-none absolute -top-16 ${isRtl ? "-left-10" : "-right-10"} h-48 w-48 rounded-full bg-white/10 blur-3xl`}
+              />
+              <div
+                className={`pointer-events-none absolute -bottom-16 ${isRtl ? "-right-10" : "-left-10"} h-48 w-48 rounded-full bg-olive/30 blur-3xl`}
+              />
 
               <div className="relative space-y-5">
                 <div className="inline-flex items-center gap-2 rounded-full border border-white/25 bg-white/10 px-3 py-1 text-[11px] font-medium backdrop-blur-sm">
@@ -196,12 +203,17 @@ function SurahPage() {
                 <h1 className="font-quran text-5xl font-semibold leading-none" dir="rtl">
                   {chapter.name_arabic}
                 </h1>
-                <div className="text-lg font-semibold text-white/95" dir={lang === "en" ? "ltr" : "rtl"}>
+                <div
+                  className="text-lg font-semibold text-white/95"
+                  dir={lang === "en" ? "ltr" : "rtl"}
+                >
                   {surahDisplayName(chapter.id, lang)}
                 </div>
                 <div className="text-sm text-white/80">
                   {chapter.verses_count} •{" "}
-                  {chapter.revelation_place === "makkah" ? t("ui.surah.makkah") : t("ui.surah.madinah")}
+                  {chapter.revelation_place === "makkah"
+                    ? t("ui.surah.makkah")
+                    : t("ui.surah.madinah")}
                 </div>
 
                 <button
@@ -230,7 +242,7 @@ function SurahPage() {
           </div>
         )}
 
-        <div className={`mt-4 flex items-center ${isRtl ? 'justify-start' : 'justify-end'}`}>
+        <div className={`mt-4 flex items-center ${isRtl ? "justify-start" : "justify-end"}`}>
           <ReadingSettings />
         </div>
 
@@ -250,12 +262,14 @@ function SurahPage() {
 
         {/* Bottom nav */}
         {chapter && (
-          <div className={`mt-8 flex items-center justify-between gap-2 ${isRtl ? 'flex-row-reverse' : ''}`}>
+          <div
+            className={`mt-8 flex items-center justify-between gap-2 ${isRtl ? "flex-row-reverse" : ""}`}
+          >
             {surahId > 1 ? (
               <Link
                 to="/surah/$id"
                 params={{ id: String(surahId - 1) }}
-                className={`surface-card inline-flex flex-1 items-center gap-2 px-4 py-3 text-sm hover:border-primary/40 ${isRtl ? 'flex-row-reverse' : ''}`}
+                className={`surface-card inline-flex flex-1 items-center gap-2 px-4 py-3 text-sm hover:border-primary/40 ${isRtl ? "flex-row-reverse" : ""}`}
               >
                 {isRtl ? (
                   <ChevronLeft className="h-4 w-4 text-primary" />
@@ -271,7 +285,7 @@ function SurahPage() {
               <Link
                 to="/surah/$id"
                 params={{ id: String(surahId + 1) }}
-                className={`surface-card inline-flex flex-1 items-center justify-end gap-2 px-4 py-3 text-sm hover:border-primary/40 ${isRtl ? 'flex-row-reverse' : ''}`}
+                className={`surface-card inline-flex flex-1 items-center justify-end gap-2 px-4 py-3 text-sm hover:border-primary/40 ${isRtl ? "flex-row-reverse" : ""}`}
               >
                 <span className="text-muted-foreground">{t("common.next")}</span>
                 <ChevronRight className="h-4 w-4 text-primary" />

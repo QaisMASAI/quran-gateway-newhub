@@ -4,7 +4,10 @@ import { useTranslation } from "react-i18next";
 import { Header } from "@/components/Header";
 import { ChevronLeft, Loader2, BookOpen, Quote, ScrollText, Compass } from "lucide-react";
 import {
-  getEntityBySlug, getEntityVerses, getRelatedEntities, pickLocale,
+  getEntityBySlug,
+  getEntityVerses,
+  getRelatedEntities,
+  pickLocale,
   type EntityKind,
 } from "@/lib/knowledge";
 import { EntityCard } from "@/components/discovery/EntityCard";
@@ -22,7 +25,14 @@ import { localeTextDir, readingFontClass, tafsirFontClass, uiFontClass } from "@
 import type { ReactNode } from "react";
 
 const VALID: EntityKind[] = [
-  "topic", "prophet", "story", "event", "place", "nation", "concept", "theme",
+  "topic",
+  "prophet",
+  "story",
+  "event",
+  "place",
+  "nation",
+  "concept",
+  "theme",
 ];
 
 export const Route = createFileRoute("/learn/$kind/$slug")({
@@ -65,7 +75,12 @@ function EntityPage() {
   // "Authentic Tafsir" section meaningful even without explicit pinning.
   const anchorVerses = useMemo(() => (versesQ.data ?? []).slice(0, 3), [versesQ.data]);
   const tafsirQ = useQuery({
-    queryKey: ["entity-tafsir", entity?.id, locale, anchorVerses.map(v => `${v.surah}:${v.ayah_start}`).join(",")],
+    queryKey: [
+      "entity-tafsir",
+      entity?.id,
+      locale,
+      anchorVerses.map((v) => `${v.surah}:${v.ayah_start}`).join(","),
+    ],
     queryFn: async () => {
       const out: TafsirPassageRow[] = [];
       for (const v of anchorVerses) {
@@ -79,7 +94,12 @@ function EntityPage() {
   });
 
   const asbabQ = useQuery({
-    queryKey: ["entity-asbab", entity?.id, locale, anchorVerses.map((v) => `${v.surah}:${v.ayah_start}`).join(",")],
+    queryKey: [
+      "entity-asbab",
+      entity?.id,
+      locale,
+      anchorVerses.map((v) => `${v.surah}:${v.ayah_start}`).join(","),
+    ],
     queryFn: async () => {
       const out: AsbabRow[] = [];
       for (const v of anchorVerses) {
@@ -114,11 +134,21 @@ function EntityPage() {
       <Header />
 
       {entity && (
-        <section className="relative overflow-hidden border-b border-border" style={{ background: "var(--gradient-hero)" }}>
+        <section
+          className="relative overflow-hidden border-b border-border"
+          style={{ background: "var(--gradient-hero)" }}
+        >
           <span className="arabesque-corner" style={{ top: 0, right: 0 }} aria-hidden />
-          <span className="arabesque-corner" style={{ bottom: 0, left: 0, transform: "rotate(180deg)" }} aria-hidden />
+          <span
+            className="arabesque-corner"
+            style={{ bottom: 0, left: 0, transform: "rotate(180deg)" }}
+            aria-hidden
+          />
           <div className="relative z-10 mx-auto max-w-4xl px-4 py-12 sm:px-6 sm:py-16">
-            <Link to="/learn" className="inline-flex items-center gap-1 text-xs text-white/70 hover:text-white">
+            <Link
+              to="/learn"
+              className="inline-flex items-center gap-1 text-xs text-white/70 hover:text-white"
+            >
               <ChevronLeft className="h-3 w-3 ltr:rotate-180" />
               {t("learn.backToDiscovery")}
             </Link>
@@ -129,7 +159,10 @@ function EntityPage() {
               {pickLocale(entity.title_i18n, locale)}
             </h1>
             {pickLocale(entity.summary_i18n, locale) && (
-              <p className={`mt-3 max-w-2xl text-base leading-relaxed text-white/80 sm:text-lg ${readingClass}`} dir={textDir}>
+              <p
+                className={`mt-3 max-w-2xl text-base leading-relaxed text-white/80 sm:text-lg ${readingClass}`}
+                dir={textDir}
+              >
                 {pickLocale(entity.summary_i18n, locale)}
               </p>
             )}
@@ -137,7 +170,10 @@ function EntityPage() {
         </section>
       )}
 
-      <main id="main" className="mx-auto grid max-w-5xl gap-10 px-4 py-10 sm:px-6 md:grid-cols-[220px_1fr]">
+      <main
+        id="main"
+        className="mx-auto grid max-w-5xl gap-10 px-4 py-10 sm:px-6 md:grid-cols-[220px_1fr]"
+      >
         {/* Sticky TOC (desktop) */}
         {entity && (
           <aside className="hidden md:block">
@@ -146,7 +182,11 @@ function EntityPage() {
                 {t("learn.toc.title")}
               </div>
               {sections.map((s) => (
-                <a key={s.id} href={`#${s.id}`} className="block rounded-md px-2 py-1.5 text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground">
+                <a
+                  key={s.id}
+                  href={`#${s.id}`}
+                  className="block rounded-md px-2 py-1.5 text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
+                >
                   {s.label}
                 </a>
               ))}
@@ -170,19 +210,32 @@ function EntityPage() {
           {entity && (
             <>
               {/* Overview */}
-              <Section id="overview" icon={<BookOpen className="h-4 w-4" />} title={t("learn.overview")}>
+              <Section
+                id="overview"
+                icon={<BookOpen className="h-4 w-4" />}
+                title={t("learn.overview")}
+              >
                 {pickLocale(entity.description_i18n, locale) ? (
-                  <p className={`whitespace-pre-line text-base leading-relaxed text-foreground/90 ${tafsirClass}`} dir={textDir}>
+                  <p
+                    className={`whitespace-pre-line text-base leading-relaxed text-foreground/90 ${tafsirClass}`}
+                    dir={textDir}
+                  >
                     {pickLocale(entity.description_i18n, locale)}
                   </p>
                 ) : (
-                  <p className="text-sm text-muted-foreground">{pickLocale(entity.summary_i18n, locale)}</p>
+                  <p className="text-sm text-muted-foreground">
+                    {pickLocale(entity.summary_i18n, locale)}
+                  </p>
                 )}
               </Section>
 
               {/* Quranic Perspective + Verses */}
               {versesQ.data && versesQ.data.length > 0 && (
-                <Section id="verses" icon={<Quote className="h-4 w-4" />} title={t("learn.relatedVerses")}>
+                <Section
+                  id="verses"
+                  icon={<Quote className="h-4 w-4" />}
+                  title={t("learn.relatedVerses")}
+                >
                   <div className="space-y-3">
                     {versesQ.data.map((v) => (
                       <PassageCard
@@ -198,13 +251,24 @@ function EntityPage() {
               )}
 
               {/* Authentic Tafsir */}
-              <Section id="tafsir" icon={<ScrollText className="h-4 w-4" />} title={t("learn.tafsirTitle")} subtitle={t("learn.tafsirSubtitle")}>
+              <Section
+                id="tafsir"
+                icon={<ScrollText className="h-4 w-4" />}
+                title={t("learn.tafsirTitle")}
+                subtitle={t("learn.tafsirSubtitle")}
+              >
                 {tafsirQ.isLoading ? (
                   <Loader />
                 ) : tafsirQ.data && tafsirQ.data.length > 0 ? (
                   <div className="space-y-4">
                     {tafsirQ.data.map((p) => (
-                      <PassageBlock key={p.id} body={p.body} sourceLabel={sourceName(p.source, locale)} citation={p.citation} locale={locale} />
+                      <PassageBlock
+                        key={p.id}
+                        body={p.body}
+                        sourceLabel={sourceName(p.source, locale)}
+                        citation={p.citation}
+                        locale={locale}
+                      />
                     ))}
                   </div>
                 ) : (
@@ -212,13 +276,24 @@ function EntityPage() {
                 )}
               </Section>
 
-              <Section id="asbab" icon={<BookOpen className="h-4 w-4" />} title={t("learn.asbabTitle")} subtitle={t("learn.asbabSubtitle")}>
+              <Section
+                id="asbab"
+                icon={<BookOpen className="h-4 w-4" />}
+                title={t("learn.asbabTitle")}
+                subtitle={t("learn.asbabSubtitle")}
+              >
                 {asbabQ.isLoading ? (
                   <Loader />
                 ) : asbabQ.data && asbabQ.data.length > 0 ? (
                   <div className="space-y-4">
                     {asbabQ.data.map((p) => (
-                      <PassageBlock key={p.id} body={p.body} sourceLabel={sourceName(p.source, locale)} citation={p.citation} locale={locale} />
+                      <PassageBlock
+                        key={p.id}
+                        body={p.body}
+                        sourceLabel={sourceName(p.source, locale)}
+                        citation={p.citation}
+                        locale={locale}
+                      />
                     ))}
                   </div>
                 ) : (
@@ -228,17 +303,30 @@ function EntityPage() {
 
               {/* Prophet timeline placeholder section */}
               {isProphet && (
-                <Section id="prophet-extras" icon={<Compass className="h-4 w-4" />} title={t("learn.prophetExtras")}>
+                <Section
+                  id="prophet-extras"
+                  icon={<Compass className="h-4 w-4" />}
+                  title={t("learn.prophetExtras")}
+                >
                   <p className="text-sm text-muted-foreground">{t("learn.prophetExtrasBody")}</p>
                 </Section>
               )}
 
               {/* Related */}
               {relatedQ.data && relatedQ.data.length > 0 && (
-                <Section id="related" icon={<Compass className="h-4 w-4" />} title={t("learn.continueExploring")}>
+                <Section
+                  id="related"
+                  icon={<Compass className="h-4 w-4" />}
+                  title={t("learn.continueExploring")}
+                >
                   <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
                     {relatedQ.data.map((e) => (
-                      <EntityCard key={e.id} entity={e} locale={locale} kindLabel={kindLabel(e.kind)} />
+                      <EntityCard
+                        key={e.id}
+                        entity={e}
+                        locale={locale}
+                        kindLabel={kindLabel(e.kind)}
+                      />
                     ))}
                   </div>
                 </Section>
@@ -252,8 +340,18 @@ function EntityPage() {
 }
 
 function Section({
-  id, icon, title, subtitle, children,
-}: { id: string; icon: ReactNode; title: string; subtitle?: string; children: ReactNode }) {
+  id,
+  icon,
+  title,
+  subtitle,
+  children,
+}: {
+  id: string;
+  icon: ReactNode;
+  title: string;
+  subtitle?: string;
+  children: ReactNode;
+}) {
   return (
     <section id={id} className="scroll-mt-24">
       <header className="mb-4 flex items-start gap-3">
@@ -271,8 +369,16 @@ function Section({
 }
 
 function PassageBlock({
-  body, sourceLabel, citation, locale,
-}: { body: string; sourceLabel: string; citation?: string | null; locale: Locale }) {
+  body,
+  sourceLabel,
+  citation,
+  locale,
+}: {
+  body: string;
+  sourceLabel: string;
+  citation?: string | null;
+  locale: Locale;
+}) {
   const textDir = localeTextDir(locale);
   const tafsirClass = tafsirFontClass(locale);
   return (
