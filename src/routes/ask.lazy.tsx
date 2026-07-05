@@ -8,8 +8,9 @@ import { Sparkles, Loader2, Send, BookOpen, ShieldCheck, ChevronLeft } from "luc
 import { surahDisplayName } from "@/lib/surah-names-he";
 import { askQuranResearch, type ResearchResult } from "@/lib/ai-research.functions";
 import { Header } from "@/components/Header";
-import { normalizeLocale } from "@/lib/i18n";
+import { normalizeLocale, type Locale } from "@/lib/i18n";
 import { getNextMcpRetryDelay } from "@/lib/mcp-outage";
+import { localeTextDir, readingFontClass, tafsirFontClass, uiFontClass } from "@/lib/locale-ui";
 
 export const Route = createLazyFileRoute("/ask")({
   component: AskPage,
@@ -17,8 +18,12 @@ export const Route = createLazyFileRoute("/ask")({
 
 function AskPage() {
   const { t, i18n } = useTranslation("pages");
-  const locale = (normalizeLocale(i18n.language) ?? "he") as "he" | "en" | "ar";
+  const locale = (normalizeLocale(i18n.language) ?? "he") as Locale;
   const examples = t("ask.examples", { returnObjects: true }) as string[];
+  const uiClass = uiFontClass(locale);
+  const tafsirClass = tafsirFontClass(locale);
+  const readingClass = readingFontClass(locale);
+  const textDir = localeTextDir(locale);
 
   const ask = useServerFn(askQuranResearch);
   const [question, setQuestion] = useState("");
@@ -58,7 +63,7 @@ function AskPage() {
   const loading = mutation.isPending;
 
   return (
-    <div className={`min-h-screen bg-background ${locale === "ar" ? "font-ui-ar" : locale === "en" ? "font-ui-en" : "font-ui-he"}`}>
+    <div className={`min-h-screen bg-background ${uiClass}`}>
       <Header />
 
       <section
@@ -136,7 +141,7 @@ function AskPage() {
             {result.error ? (
               <p className="text-sm text-destructive">{result.error}</p>
             ) : (
-              <div className={`ai-explanation-block prose prose-sm max-w-none text-[15px] text-foreground/90 [&>p]:my-2 ${locale === "ar" ? "font-tafsir-hadith-ar" : locale === "en" ? "font-tafsir-hadith-en" : "font-tafsir-hadith-he"}`} dir={locale === "en" ? "ltr" : "rtl"}>
+              <div className={`ai-explanation-block prose prose-sm max-w-none text-[15px] text-foreground/90 [&>p]:my-2 ${tafsirClass}`} dir={textDir}>
                 <ReactMarkdown skipHtml>{result.answer}</ReactMarkdown>
               </div>
             )}
@@ -207,7 +212,7 @@ function AskPage() {
                   <p className="font-quran mt-1.5 text-right text-lg leading-loose text-foreground" dir="rtl">
                     {v.arabic}
                   </p>
-                  <p className={`mt-1.5 text-[13.5px] text-foreground/80 ${locale === "en" ? "font-reading-en" : "font-reading-he"}`} dir={locale === "en" ? "ltr" : "rtl"}>
+                  <p className={`mt-1.5 text-[13.5px] text-foreground/80 ${readingClass}`} dir={textDir}>
                     {v.hebrew}
                   </p>
                   {(v.translation_source || v.translator) && (
@@ -238,7 +243,7 @@ function AskPage() {
                     {tf.kind === "asbab" ? "Asbab al-Nuzul" : tf.source} · {tf.surah}:{tf.ayah}
                     {tf.translator ? ` · ${tf.translator}` : ""}
                   </div>
-                  <p className={`ai-explanation-block mt-1 text-xs text-muted-foreground ${locale === "ar" ? "font-tafsir-hadith-ar" : locale === "en" ? "font-tafsir-hadith-en" : "font-tafsir-hadith-he"}`} dir={locale === "en" ? "ltr" : "rtl"}>{tf.text}</p>
+                  <p className={`ai-explanation-block mt-1 text-xs text-muted-foreground ${tafsirClass}`} dir={textDir}>{tf.text}</p>
                   <div className="mt-2 rounded-md border border-border bg-card px-2 py-1 text-[11px] text-muted-foreground">
                       {t("research.tafsirSource", { source: tf.source })}
                       {tf.translator ? ` · ${t("research.translator", { translator: tf.translator })}` : ""}
