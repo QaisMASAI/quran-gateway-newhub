@@ -76,8 +76,12 @@ function JourneysIndex() {
                 </div>
                 <Compass className="h-4 w-4 text-muted-foreground group-hover:text-primary" />
               </div>
-              <h2 className="text-lg font-semibold text-foreground">{pickLocale(j.title_i18n, locale)}</h2>
-              <p className="mt-1 text-sm text-muted-foreground">{pickLocale(j.summary_i18n, locale)}</p>
+              <h2 className="text-lg font-semibold text-foreground">
+                {pickLocale(j.title_i18n, locale)}
+              </h2>
+              <p className="mt-1 text-sm text-muted-foreground">
+                {pickLocale(j.summary_i18n, locale)}
+              </p>
             </Link>
           ))}
         </div>

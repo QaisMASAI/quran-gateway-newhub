@@ -77,15 +77,28 @@ const NOT_FOUND_MESSAGES = {
     tafsir: "لم يُعثر على تفسير متاح في المصادر المعتمدة. جرّب آية أخرى.",
   },
   en: {
-    sabab: "No documented occasion of revelation was found for this verse in the approved tafsir sources.",
+    sabab:
+      "No documented occasion of revelation was found for this verse in the approved tafsir sources.",
     tafsir: "No tafsir is available in the approved sources for this verse. Try another verse.",
   },
 } as const;
 
 const ERROR_MESSAGES = {
-  he: { rate: "יותר מדי בקשות. נסה שוב בעוד רגע.", credits: "נגמרו הקרדיטים של ה-AI.", generic: "אירעה שגיאה. נסה שוב." },
-  ar: { rate: "طلبات كثيرة جداً. حاول مرة أخرى بعد قليل.", credits: "نفدت أرصدة الذكاء الاصطناعي.", generic: "حدث خطأ. حاول مرة أخرى." },
-  en: { rate: "Too many requests. Try again shortly.", credits: "AI credits are exhausted.", generic: "An error occurred. Please try again." },
+  he: {
+    rate: "יותר מדי בקשות. נסה שוב בעוד רגע.",
+    credits: "נגמרו הקרדיטים של ה-AI.",
+    generic: "אירעה שגיאה. נסה שוב.",
+  },
+  ar: {
+    rate: "طلبات كثيرة جداً. حاول مرة أخرى بعد قليل.",
+    credits: "نفدت أرصدة الذكاء الاصطناعي.",
+    generic: "حدث خطأ. حاول مرة أخرى.",
+  },
+  en: {
+    rate: "Too many requests. Try again shortly.",
+    credits: "AI credits are exhausted.",
+    generic: "An error occurred. Please try again.",
+  },
 } as const;
 
 function systemPrompts(lang: "he" | "ar" | "en") {
@@ -210,9 +223,12 @@ export const explainAyah = createServerFn({ method: "POST" })
         (rows ?? [])[0];
       if (preferred?.body) {
         sourceText = preferred.body;
-        const s = preferred.source as
-          | { slug?: string; name_he?: string; name_ar?: string; name_en?: string }
-          | null;
+        const s = preferred.source as {
+          slug?: string;
+          name_he?: string;
+          name_ar?: string;
+          name_en?: string;
+        } | null;
         sourceMeta = {
           name_he: s?.name_he ?? "תפסיר",
           name_ar: s?.name_ar ?? "تفسير",
@@ -235,7 +251,11 @@ export const explainAyah = createServerFn({ method: "POST" })
         (rows ?? [])[0];
       if (preferred?.body) {
         sourceText = preferred.body;
-        const s = preferred.source as { name_he?: string; name_ar?: string; name_en?: string } | null;
+        const s = preferred.source as {
+          name_he?: string;
+          name_ar?: string;
+          name_en?: string;
+        } | null;
         sourceMeta = {
           name_he: s?.name_he ?? "אסבאב",
           name_ar: s?.name_ar ?? "أسباب النزول",
@@ -255,7 +275,15 @@ export const explainAyah = createServerFn({ method: "POST" })
     const systems = systemPrompts(lang);
     const safeSurahName = sanitizeUntrusted(data.surahName, 120);
     const safeSource = sanitizeUntrusted(sourceText, 4000);
-    const userPrompt = userPromptFor(lang, data.mode, safeSurahName, data.surah, data.ayah, sourceMeta, safeSource);
+    const userPrompt = userPromptFor(
+      lang,
+      data.mode,
+      safeSurahName,
+      data.surah,
+      data.ayah,
+      sourceMeta,
+      safeSource,
+    );
 
     try {
       const { text } = await withTimeout(
@@ -338,9 +366,16 @@ export const askQuran = createServerFn({ method: "POST" })
     };
 
     const merged = new Map<string, V>();
-    for (const v of data.verses) merged.set(`${v.surah}:${v.ayah}`, { ...v, score: 1, from: "lexical" });
+    for (const v of data.verses)
+      merged.set(`${v.surah}:${v.ayah}`, { ...v, score: 1, from: "lexical" });
 
-    const evidenceTafsir: Array<{ source: string; translator: string | null; surah: number; ayah: number; text: string }> = [];
+    const evidenceTafsir: Array<{
+      source: string;
+      translator: string | null;
+      surah: number;
+      ayah: number;
+      text: string;
+    }> = [];
 
     try {
       const [vec] = await embedTexts({ apiKey: key, input: data.question });
@@ -354,7 +389,9 @@ export const askQuran = createServerFn({ method: "POST" })
           surah_filter: undefined,
         });
 
-        for (const r of ((chunkRows ?? []) as ChunkRow[]).filter((row) => row.content_type === "quran_ayah")) {
+        for (const r of ((chunkRows ?? []) as ChunkRow[]).filter(
+          (row) => row.content_type === "quran_ayah",
+        )) {
           if (!r.surah || !r.ayah_start) continue;
           const k = `${r.surah}:${r.ayah_start}`;
           const existing = merged.get(k);
@@ -411,7 +448,10 @@ export const askQuran = createServerFn({ method: "POST" })
     };
     let entities: EntityHit[] = [];
     try {
-      const safe = data.question.replace(/[%_,*()]/g, " ").trim().slice(0, 120);
+      const safe = data.question
+        .replace(/[%_,*()]/g, " ")
+        .trim()
+        .slice(0, 120);
       if (safe.length >= 2) {
         const pat = `%${safe}%`;
         const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
@@ -503,14 +543,20 @@ Strict rules:
     const safeQuestion = sanitizeUntrusted(data.question, 500);
     const versesBlock = ranked
       .map((v, i) => {
-        const tl = lang === "he" ? `\n${lang === "he" ? "עברית" : ""}: ${sanitizeUntrusted(v.hebrew, 4000)}` : "";
+        const tl =
+          lang === "he"
+            ? `\n${lang === "he" ? "עברית" : ""}: ${sanitizeUntrusted(v.hebrew, 4000)}`
+            : "";
         return `[${i + 1}] ${sanitizeUntrusted(v.surahNameHe, 120)} ${v.surah}:${v.ayah}\nArabic: ${sanitizeUntrusted(v.arabic, 2000)}\nTranslation: ${sanitizeUntrusted(v.hebrew, 4000)}${tl ? "" : ""}`;
       })
       .join("\n\n");
 
     const tafsirBlock = evidenceTafsir.length
       ? `\n\nAuthenticated tafsir evidence:\n${evidenceTafsir
-          .map((e) => `- (${e.source}${e.translator ? ` | ${e.translator}` : ""}) ${e.surah}:${e.ayah} ${e.text}`)
+          .map(
+            (e) =>
+              `- (${e.source}${e.translator ? ` | ${e.translator}` : ""}) ${e.surah}:${e.ayah} ${e.text}`,
+          )
           .join("\n")}`
       : "";
 
@@ -577,9 +623,21 @@ Strict rules:
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : String(err);
       const e = {
-        he: { rate: "יותר מדי בקשות. נסה שוב בעוד רגע.", credits: "נגמרו הקרדיטים של ה-AI.", generic: "אירעה שגיאה. נסה שוב." },
-        ar: { rate: "طلبات كثيرة جداً. حاول مرة أخرى بعد قليل.", credits: "نفدت أرصدة الذكاء الاصطناعي.", generic: "حدث خطأ. حاول مرة أخرى." },
-        en: { rate: "Too many requests. Try again shortly.", credits: "AI credits are exhausted.", generic: "An error occurred. Please try again." },
+        he: {
+          rate: "יותר מדי בקשות. נסה שוב בעוד רגע.",
+          credits: "נגמרו הקרדיטים של ה-AI.",
+          generic: "אירעה שגיאה. נסה שוב.",
+        },
+        ar: {
+          rate: "طلبات كثيرة جداً. حاول مرة أخرى بعد قليل.",
+          credits: "نفدت أرصدة الذكاء الاصطناعي.",
+          generic: "حدث خطأ. حاول مرة أخرى.",
+        },
+        en: {
+          rate: "Too many requests. Try again shortly.",
+          credits: "AI credits are exhausted.",
+          generic: "An error occurred. Please try again.",
+        },
       }[lang];
       if (message.includes("429")) return { text: "", entities, error: e.rate };
       if (message.includes("402")) return { text: "", entities, error: e.credits };

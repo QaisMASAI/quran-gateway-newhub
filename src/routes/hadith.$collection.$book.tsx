@@ -9,7 +9,9 @@ import { listHadithEntries } from "@/lib/hadith.functions";
 export const Route = createFileRoute("/hadith/$collection/$book")({
   head: ({ params }) => ({
     meta: [
-      { title: `${params.collection === "bukhari" ? "Sahih al-Bukhari" : "Sahih Muslim"} — Book ${params.book}` },
+      {
+        title: `${params.collection === "bukhari" ? "Sahih al-Bukhari" : "Sahih Muslim"} — Book ${params.book}`,
+      },
       { property: "og:url", content: `/hadith/${params.collection}/${params.book}` },
     ],
     links: [{ rel: "canonical", href: `/hadith/${params.collection}/${params.book}` }],
@@ -45,10 +47,16 @@ function HadithBookPage() {
     <div className="min-h-screen bg-background" dir={isRtl ? "rtl" : "ltr"}>
       <Header />
       <main id="main" className="mx-auto max-w-3xl px-4 py-8 sm:px-6">
-        <Link to="/hadith/$collection" params={{ collection }} className="text-sm text-muted-foreground hover:text-foreground">
+        <Link
+          to="/hadith/$collection"
+          params={{ collection }}
+          className="text-sm text-muted-foreground hover:text-foreground"
+        >
           ← Books
         </Link>
-        <h1 className="mt-2 text-lg font-bold text-foreground">Book {bookNum} · {total} hadith</h1>
+        <h1 className="mt-2 text-lg font-bold text-foreground">
+          Book {bookNum} · {total} hadith
+        </h1>
 
         <ol className="mt-4 space-y-3">
           {items.map((h) => (
@@ -70,7 +78,11 @@ function HadithBookPage() {
                   {h.english_text.length > 320 ? "…" : ""}
                 </p>
               )}
-              <p className="font-reading-ar mt-2 text-right text-base text-foreground" dir="rtl" lang="ar">
+              <p
+                className="font-reading-ar mt-2 text-right text-base text-foreground"
+                dir="rtl"
+                lang="ar"
+              >
                 {h.arabic_text.slice(0, 300)}
                 {h.arabic_text.length > 300 ? "…" : ""}
               </p>
@@ -87,7 +99,9 @@ function HadithBookPage() {
           >
             ← Prev
           </button>
-          <span className="text-muted-foreground">Page {page + 1} / {Math.max(1, Math.ceil(total / 40))}</span>
+          <span className="text-muted-foreground">
+            Page {page + 1} / {Math.max(1, Math.ceil(total / 40))}
+          </span>
           <button
             type="button"
             disabled={(page + 1) * 40 >= total}

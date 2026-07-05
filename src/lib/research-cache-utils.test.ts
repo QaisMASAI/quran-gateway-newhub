@@ -20,13 +20,9 @@ describe("research cache utils", () => {
     const createdAt = new Date(Date.now() - 10_000).toISOString();
     expect(
       shouldServeCachedResult({ cacheVersion: 2, currentVersion: 2, createdAt, ttlMs: 60_000 }),
-    ).toBe(
-      true,
-    );
+    ).toBe(true);
     expect(
       shouldServeCachedResult({ cacheVersion: 1, currentVersion: 2, createdAt, ttlMs: 60_000 }),
-    ).toBe(
-      false,
-    );
+    ).toBe(false);
   });
 });

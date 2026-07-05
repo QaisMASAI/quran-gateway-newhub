@@ -7,8 +7,8 @@ import type { AyahRef } from "./topics";
 
 export type Emotion = {
   slug: string;
-  title: string;       // Hebrew
-  subtitle?: string;   // short emotional context
+  title: string; // Hebrew
+  subtitle?: string; // short emotional context
   description: string; // factual framing, no interpretation
   icon:
     | "heart"

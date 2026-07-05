@@ -28,23 +28,20 @@ export function DailyVerseContent({
 
   if (isLoading) {
     return (
-      <p className="py-6 text-center text-sm text-muted-foreground">
-        {t("dailyVerse.loading")}
-      </p>
+      <p className="py-6 text-center text-sm text-muted-foreground">{t("dailyVerse.loading")}</p>
     );
   }
 
   if (error || !arabic) {
-    return (
-      <p className="py-6 text-center text-sm text-destructive">
-        {t("dailyVerse.error")}
-      </p>
-    );
+    return <p className="py-6 text-center text-sm text-destructive">{t("dailyVerse.error")}</p>;
   }
 
   return (
     <>
-      <p className="font-quran text-right text-2xl leading-loose text-foreground sm:text-3xl" dir="rtl">
+      <p
+        className="font-quran text-right text-2xl leading-loose text-foreground sm:text-3xl"
+        dir="rtl"
+      >
         {arabic}
       </p>
       {lang !== "ar" && translation && translation !== arabic && (
@@ -56,7 +53,10 @@ export function DailyVerseContent({
       <div className="mt-5 flex flex-wrap items-center justify-between gap-3 border-t border-border pt-4">
         <div className="text-xs">
           <span className="font-semibold text-primary">{name}</span>
-          <span className="text-muted-foreground"> · {surah}:{ayah}</span>
+          <span className="text-muted-foreground">
+            {" "}
+            · {surah}:{ayah}
+          </span>
         </div>
         <Link
           to="/surah/$id"

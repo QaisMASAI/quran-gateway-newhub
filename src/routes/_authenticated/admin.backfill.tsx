@@ -30,7 +30,8 @@ export const Route = createFileRoute("/_authenticated/admin/backfill")({
       { title: "Admin Backfill Dashboard" },
       {
         name: "description",
-        content: "Track and safely re-run data backfill jobs, manage cache controls, and run locale regressions.",
+        content:
+          "Track and safely re-run data backfill jobs, manage cache controls, and run locale regressions.",
       },
     ],
   }),
@@ -73,18 +74,42 @@ type RunRow = {
 
 const JOBS: Array<{ key: AdminJobKey; title: string; defaultPayload: Record<string, unknown> }> = [
   { key: "backfill-quran-chapters", title: "Surah names backfill", defaultPayload: {} },
-  { key: "backfill-asbab-nuzul", title: "Asbab al-Nuzul backfill", defaultPayload: { startSurah: 1, page: 1, perPage: 50, batch: 1200 } },
+  {
+    key: "backfill-asbab-nuzul",
+    title: "Asbab al-Nuzul backfill",
+    defaultPayload: { startSurah: 1, page: 1, perPage: 50, batch: 1200 },
+  },
   { key: "backfill-verse-translations", title: "Verse translations backfill", defaultPayload: {} },
-  { key: "embed-hadith", title: "Hadith embedding batches", defaultPayload: { batch: 200, untilDone: false, maxRuns: 1 } },
-  { key: "translate-hadith-hebrew", title: "Hadith Hebrew translation", defaultPayload: { batch: 20 } },
-  { key: "translate-tafsir-english", title: "Tafsir English translation", defaultPayload: { batch: 80 } },
-  { key: "translate-tafsir-hebrew", title: "Tafsir Hebrew translation", defaultPayload: { batch: 80 } },
+  {
+    key: "embed-hadith",
+    title: "Hadith embedding batches",
+    defaultPayload: { batch: 200, untilDone: false, maxRuns: 1 },
+  },
+  {
+    key: "translate-hadith-hebrew",
+    title: "Hadith Hebrew translation",
+    defaultPayload: { batch: 20 },
+  },
+  {
+    key: "translate-tafsir-english",
+    title: "Tafsir English translation",
+    defaultPayload: { batch: 80 },
+  },
+  {
+    key: "translate-tafsir-hebrew",
+    title: "Tafsir Hebrew translation",
+    defaultPayload: { batch: 80 },
+  },
   { key: "link-hadith-graph", title: "Hadith topics linking", defaultPayload: { batch: 150 } },
 ];
 
 function AdminBackfillPage() {
   const htmlLang = typeof document !== "undefined" ? document.documentElement.lang : "en";
-  const uiFontClass = htmlLang.startsWith("ar") ? "font-ui-ar" : htmlLang.startsWith("he") ? "font-ui-he" : "font-ui-en";
+  const uiFontClass = htmlLang.startsWith("ar")
+    ? "font-ui-ar"
+    : htmlLang.startsWith("he")
+      ? "font-ui-he"
+      : "font-ui-en";
   const qc = useQueryClient();
   const [ttlInput, setTtlInput] = useState(360);
   const [resumeFromFailed, setResumeFromFailed] = useState(true);
@@ -156,7 +181,10 @@ function AdminBackfillPage() {
     }, {});
 
   const avgDurationByJob = Object.fromEntries(
-    Object.entries(successfulDurationsByJob).map(([jobKey, values]) => [jobKey, Math.round(values.reduce((a, b) => a + b, 0) / values.length)]),
+    Object.entries(successfulDurationsByJob).map(([jobKey, values]) => [
+      jobKey,
+      Math.round(values.reduce((a, b) => a + b, 0) / values.length),
+    ]),
   ) as Record<string, number>;
 
   function exportRunReport(run: RunRow) {
@@ -198,25 +226,71 @@ function AdminBackfillPage() {
           </div>
         ) : (
           <div className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-            <MetricCard title="Surah names" value={`${status?.jobs.quranChapters.count ?? 0}/114`} ok={Boolean(status?.jobs.quranChapters.complete)} />
-            <MetricCard title="Asbab entries" value={String(status?.jobs.asbabNuzul.count ?? 0)} ok={Boolean(status?.jobs.asbabNuzul.complete)} />
-            <MetricCard title="Verse translations" value={String(status?.jobs.verseTranslations.count ?? 0)} ok={Boolean(status?.jobs.verseTranslations.complete)} />
-            <MetricCard title="Hadith topic links" value={String(status?.jobs.hadithTopics.count ?? 0)} ok={Boolean(status?.jobs.hadithTopics.complete)} />
+            <MetricCard
+              title="Surah names"
+              value={`${status?.jobs.quranChapters.count ?? 0}/114`}
+              ok={Boolean(status?.jobs.quranChapters.complete)}
+            />
+            <MetricCard
+              title="Asbab entries"
+              value={String(status?.jobs.asbabNuzul.count ?? 0)}
+              ok={Boolean(status?.jobs.asbabNuzul.complete)}
+            />
+            <MetricCard
+              title="Verse translations"
+              value={String(status?.jobs.verseTranslations.count ?? 0)}
+              ok={Boolean(status?.jobs.verseTranslations.complete)}
+            />
+            <MetricCard
+              title="Hadith topic links"
+              value={String(status?.jobs.hadithTopics.count ?? 0)}
+              ok={Boolean(status?.jobs.hadithTopics.complete)}
+            />
           </div>
         )}
 
         <section className="mt-6 rounded-xl border border-border bg-card p-4">
           <h2 className="text-lg font-semibold">Backfill data counts</h2>
           <div className="mt-3 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
-            <MetricCard title="Tafsir (AR)" value={String(status?.counts.tafsir.ar ?? 0)} ok={(status?.counts.tafsir.ar ?? 0) > 0} />
-            <MetricCard title="Tafsir (EN)" value={String(status?.counts.tafsir.en ?? 0)} ok={(status?.counts.tafsir.en ?? 0) > 0} />
-            <MetricCard title="Tafsir (HE)" value={String(status?.counts.tafsir.he ?? 0)} ok={(status?.counts.tafsir.he ?? 0) > 0} />
-            <MetricCard title="Asbab (AR)" value={String(status?.counts.asbab.ar ?? 0)} ok={(status?.counts.asbab.ar ?? 0) > 0} />
-            <MetricCard title="Asbab (EN)" value={String(status?.counts.asbab.en ?? 0)} ok={(status?.counts.asbab.en ?? 0) > 0} />
-            <MetricCard title="Asbab (HE)" value={String(status?.counts.asbab.he ?? 0)} ok={(status?.counts.asbab.he ?? 0) > 0} />
-            <MetricCard title="hadith_entity_links" value={String(status?.counts.hadithEntityLinks ?? 0)} ok={(status?.counts.hadithEntityLinks ?? 0) > 0} />
+            <MetricCard
+              title="Tafsir (AR)"
+              value={String(status?.counts.tafsir.ar ?? 0)}
+              ok={(status?.counts.tafsir.ar ?? 0) > 0}
+            />
+            <MetricCard
+              title="Tafsir (EN)"
+              value={String(status?.counts.tafsir.en ?? 0)}
+              ok={(status?.counts.tafsir.en ?? 0) > 0}
+            />
+            <MetricCard
+              title="Tafsir (HE)"
+              value={String(status?.counts.tafsir.he ?? 0)}
+              ok={(status?.counts.tafsir.he ?? 0) > 0}
+            />
+            <MetricCard
+              title="Asbab (AR)"
+              value={String(status?.counts.asbab.ar ?? 0)}
+              ok={(status?.counts.asbab.ar ?? 0) > 0}
+            />
+            <MetricCard
+              title="Asbab (EN)"
+              value={String(status?.counts.asbab.en ?? 0)}
+              ok={(status?.counts.asbab.en ?? 0) > 0}
+            />
+            <MetricCard
+              title="Asbab (HE)"
+              value={String(status?.counts.asbab.he ?? 0)}
+              ok={(status?.counts.asbab.he ?? 0) > 0}
+            />
+            <MetricCard
+              title="hadith_entity_links"
+              value={String(status?.counts.hadithEntityLinks ?? 0)}
+              ok={(status?.counts.hadithEntityLinks ?? 0) > 0}
+            />
           </div>
-          <p className="mt-2 text-xs text-muted-foreground">Counts refresh automatically every 10 seconds after each backfill run.</p>
+          <p className="mt-2 text-xs text-muted-foreground">
+            Counts refresh automatically every 10 seconds after each backfill run.
+          </p>
         </section>
 
         <section className="mt-6 rounded-xl border border-border bg-card p-4">
@@ -224,15 +298,21 @@ function AdminBackfillPage() {
           <div className="mt-3 grid gap-3 md:grid-cols-3">
             <article className="rounded-lg border border-border bg-background p-3">
               <p className="text-xs text-muted-foreground">Asbab al-Nuzul backfill</p>
-              <p className="mt-1 text-sm text-foreground">{formatLastRun(status?.lastRuns?.asbab)}</p>
+              <p className="mt-1 text-sm text-foreground">
+                {formatLastRun(status?.lastRuns?.asbab)}
+              </p>
             </article>
             <article className="rounded-lg border border-border bg-background p-3">
               <p className="text-xs text-muted-foreground">Jalalayn English translation</p>
-              <p className="mt-1 text-sm text-foreground">{formatLastRun(status?.lastRuns?.jalalaynEnglish)}</p>
+              <p className="mt-1 text-sm text-foreground">
+                {formatLastRun(status?.lastRuns?.jalalaynEnglish)}
+              </p>
             </article>
             <article className="rounded-lg border border-border bg-background p-3">
               <p className="text-xs text-muted-foreground">Jalalayn Hebrew translation</p>
-              <p className="mt-1 text-sm text-foreground">{formatLastRun(status?.lastRuns?.jalalaynHebrew)}</p>
+              <p className="mt-1 text-sm text-foreground">
+                {formatLastRun(status?.lastRuns?.jalalaynHebrew)}
+              </p>
             </article>
           </div>
         </section>
@@ -256,7 +336,11 @@ function AdminBackfillPage() {
                 disabled={runAllM.isPending}
                 className="inline-flex min-h-11 items-center gap-2 rounded-lg bg-primary px-3 py-2 text-sm font-medium text-primary-foreground disabled:opacity-60"
               >
-                {runAllM.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <PlayCircle className="h-4 w-4" />}
+                {runAllM.isPending ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <PlayCircle className="h-4 w-4" />
+                )}
                 Run All Backfills
               </button>
               <button
@@ -283,7 +367,9 @@ function AdminBackfillPage() {
                   <div className="flex items-center gap-2">
                     <button
                       type="button"
-                      onClick={() => runJobM.mutate({ jobKey: job.key, payload: job.defaultPayload })}
+                      onClick={() =>
+                        runJobM.mutate({ jobKey: job.key, payload: job.defaultPayload })
+                      }
                       disabled={runJobM.isPending || runAllM.isPending}
                       className="inline-flex min-h-11 items-center gap-1 rounded-md border border-border px-2.5 py-2 text-xs font-medium hover:bg-secondary"
                     >
@@ -291,7 +377,9 @@ function AdminBackfillPage() {
                     </button>
                     <button
                       type="button"
-                      onClick={() => runJobM.mutate({ jobKey: job.key, payload: job.defaultPayload })}
+                      onClick={() =>
+                        runJobM.mutate({ jobKey: job.key, payload: job.defaultPayload })
+                      }
                       disabled={runJobM.isPending || runAllM.isPending}
                       className="inline-flex min-h-11 items-center gap-1 rounded-md border border-border px-2.5 py-2 text-xs font-medium hover:bg-secondary"
                     >
@@ -305,19 +393,30 @@ function AdminBackfillPage() {
           {runAllM.data && (
             <div className="mt-3 rounded-lg border border-border bg-background p-3 text-sm">
               {runAllM.data.ok ? (
-                <p className="inline-flex items-center gap-1 text-emerald-600"><CheckCircle2 className="h-4 w-4" />Run All completed successfully.</p>
+                <p className="inline-flex items-center gap-1 text-emerald-600">
+                  <CheckCircle2 className="h-4 w-4" />
+                  Run All completed successfully.
+                </p>
               ) : (
-                <p className="inline-flex items-center gap-1 text-destructive"><TriangleAlert className="h-4 w-4" />Run All stopped at {runAllM.data.stoppedAt}.</p>
+                <p className="inline-flex items-center gap-1 text-destructive">
+                  <TriangleAlert className="h-4 w-4" />
+                  Run All stopped at {runAllM.data.stoppedAt}.
+                </p>
               )}
             </div>
           )}
-          {runAllM.error && <p className="mt-2 text-sm text-destructive">{runAllM.error.message}</p>}
+          {runAllM.error && (
+            <p className="mt-2 text-sm text-destructive">{runAllM.error.message}</p>
+          )}
         </section>
 
         <section className="mt-6 rounded-xl border border-border bg-card p-4">
           <div className="flex flex-wrap items-center justify-between gap-2">
             <h2 className="text-lg font-semibold">Progress + logs</h2>
-            <p className="text-xs text-muted-foreground">Streaming by polling every 10s {statusQ.isFetching || runsQ.isFetching ? "· updating now" : ""}</p>
+            <p className="text-xs text-muted-foreground">
+              Streaming by polling every 10s{" "}
+              {statusQ.isFetching || runsQ.isFetching ? "· updating now" : ""}
+            </p>
           </div>
 
           <div className="mt-3 space-y-2">
@@ -329,7 +428,10 @@ function AdminBackfillPage() {
                 const expectedMs = avgDurationByJob[run.job_key] ?? 0;
                 const etaMs = expectedMs > elapsedMs ? expectedMs - elapsedMs : 0;
                 return (
-                  <article key={run.id} className="rounded-lg border border-border bg-background p-3">
+                  <article
+                    key={run.id}
+                    className="rounded-lg border border-border bg-background p-3"
+                  >
                     <div className="flex flex-wrap items-center justify-between gap-2">
                       <p className="text-sm font-medium">{run.job_key}</p>
                       <span className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2 py-0.5 text-xs text-primary">
@@ -337,7 +439,8 @@ function AdminBackfillPage() {
                       </span>
                     </div>
                     <p className="mt-1 inline-flex items-center gap-1 text-xs text-muted-foreground">
-                      <Clock3 className="h-3 w-3" /> Elapsed {formatDuration(elapsedMs)} · ETA {expectedMs ? formatDuration(etaMs) : "learning"}
+                      <Clock3 className="h-3 w-3" /> Elapsed {formatDuration(elapsedMs)} · ETA{" "}
+                      {expectedMs ? formatDuration(etaMs) : "learning"}
                     </p>
                   </article>
                 );
@@ -350,7 +453,10 @@ function AdminBackfillPage() {
             <ul className="mt-2 space-y-1 text-xs text-muted-foreground">
               {runs.slice(0, 12).map((run) => {
                 const report = readRunReport(run);
-                const failedSuffix = report && report.failedBatches.length > 0 ? ` · failed batches: ${report.failedBatches.length}` : "";
+                const failedSuffix =
+                  report && report.failedBatches.length > 0
+                    ? ` · failed batches: ${report.failedBatches.length}`
+                    : "";
                 return (
                   <li key={`log-${run.id}`}>
                     {new Date(run.updated_at).toLocaleTimeString()} · {run.job_key} · {run.status}
@@ -366,14 +472,18 @@ function AdminBackfillPage() {
         <section className="mt-6 rounded-xl border border-border bg-card p-4">
           <h2 className="text-lg font-semibold">Quran.ai MCP cache controls</h2>
           <div className="mt-3 flex flex-wrap items-center gap-2">
-            <label className="text-sm text-muted-foreground" htmlFor="cache-ttl">TTL (minutes)</label>
+            <label className="text-sm text-muted-foreground" htmlFor="cache-ttl">
+              TTL (minutes)
+            </label>
             <input
               id="cache-ttl"
               type="number"
               min={5}
               max={1440}
               value={ttlInput}
-              onChange={(e) => setTtlInput(Math.max(5, Math.min(1440, Number(e.target.value || 360))))}
+              onChange={(e) =>
+                setTtlInput(Math.max(5, Math.min(1440, Number(e.target.value || 360))))
+              }
               className="h-11 w-28 rounded-md border border-border bg-background px-2 text-sm"
             />
             <button
@@ -419,7 +529,9 @@ function AdminBackfillPage() {
                 ))}
                 {(status?.tafsirAudit ?? []).length === 0 && (
                   <tr>
-                    <td colSpan={4} className="py-3 text-muted-foreground">No tafsir rows found.</td>
+                    <td colSpan={4} className="py-3 text-muted-foreground">
+                      No tafsir rows found.
+                    </td>
                   </tr>
                 )}
               </tbody>
@@ -441,12 +553,20 @@ function AdminBackfillPage() {
           {regressionM.data && (
             <div className="mt-3 rounded-lg border border-border bg-background p-3 text-sm">
               {regressionM.data.ok ? (
-                <p className="inline-flex items-center gap-1 text-emerald-600"><CheckCircle2 className="h-4 w-4" />All locale rendering checks passed.</p>
+                <p className="inline-flex items-center gap-1 text-emerald-600">
+                  <CheckCircle2 className="h-4 w-4" />
+                  All locale rendering checks passed.
+                </p>
               ) : (
                 <div>
-                  <p className="inline-flex items-center gap-1 text-destructive"><TriangleAlert className="h-4 w-4" />Regression found issues:</p>
+                  <p className="inline-flex items-center gap-1 text-destructive">
+                    <TriangleAlert className="h-4 w-4" />
+                    Regression found issues:
+                  </p>
                   <ul className="mt-2 list-disc space-y-1 pl-5 text-muted-foreground">
-                    {regressionM.data.errors.map((e) => <li key={e}>{e}</li>)}
+                    {regressionM.data.errors.map((e) => (
+                      <li key={e}>{e}</li>
+                    ))}
                   </ul>
                 </div>
               )}
@@ -460,47 +580,66 @@ function AdminBackfillPage() {
             {runs.map((run) => {
               const report = readRunReport(run);
               return (
-              <article key={run.id} className="rounded-lg border border-border bg-background p-3">
-                <div className="flex flex-wrap items-center justify-between gap-2">
-                  <p className="text-sm font-medium text-foreground">{run.job_key}</p>
-                  <div className="flex items-center gap-2">
-                    {report && (
-                      <button
-                        type="button"
-                        onClick={() => exportRunReport(run)}
-                        className="inline-flex min-h-11 items-center gap-1 rounded-md border border-border px-2.5 py-2 text-xs font-medium hover:bg-secondary"
+                <article key={run.id} className="rounded-lg border border-border bg-background p-3">
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <p className="text-sm font-medium text-foreground">{run.job_key}</p>
+                    <div className="flex items-center gap-2">
+                      {report && (
+                        <button
+                          type="button"
+                          onClick={() => exportRunReport(run)}
+                          className="inline-flex min-h-11 items-center gap-1 rounded-md border border-border px-2.5 py-2 text-xs font-medium hover:bg-secondary"
+                        >
+                          <Download className="h-3.5 w-3.5" /> Export report
+                        </button>
+                      )}
+                      <span
+                        className={`rounded-full px-2 py-0.5 text-xs ${run.status === "succeeded" ? "bg-emerald-500/10 text-emerald-700" : run.status === "failed" ? "bg-destructive/10 text-destructive" : "bg-primary/10 text-primary"}`}
                       >
-                        <Download className="h-3.5 w-3.5" /> Export report
-                      </button>
-                    )}
-                    <span className={`rounded-full px-2 py-0.5 text-xs ${run.status === "succeeded" ? "bg-emerald-500/10 text-emerald-700" : run.status === "failed" ? "bg-destructive/10 text-destructive" : "bg-primary/10 text-primary"}`}>
-                      {run.status}
-                    </span>
+                        {run.status}
+                      </span>
+                    </div>
                   </div>
-                </div>
-                <p className="mt-1 text-xs text-muted-foreground">
-                  Started: {new Date(run.started_at).toLocaleString()} {run.finished_at ? `· Finished: ${new Date(run.finished_at).toLocaleString()}` : ""}
-                </p>
-                {report && (
                   <p className="mt-1 text-xs text-muted-foreground">
-                    Duration: {formatDuration(report.durationMs)} · Tafsir EN {report.countsBefore.tafsir.en}→{report.countsAfter.tafsir.en} · Tafsir HE {report.countsBefore.tafsir.he}→{report.countsAfter.tafsir.he} · Tafsir AR {report.countsBefore.tafsir.ar}→{report.countsAfter.tafsir.ar} · Asbab EN {report.countsBefore.asbab.en}→{report.countsAfter.asbab.en} · Asbab HE {report.countsBefore.asbab.he}→{report.countsAfter.asbab.he} · Asbab AR {report.countsBefore.asbab.ar}→{report.countsAfter.asbab.ar} · hadith_entity_links {report.countsBefore.hadithEntityLinks}→{report.countsAfter.hadithEntityLinks}
+                    Started: {new Date(run.started_at).toLocaleString()}{" "}
+                    {run.finished_at
+                      ? `· Finished: ${new Date(run.finished_at).toLocaleString()}`
+                      : ""}
                   </p>
-                )}
-                {readRunValidationSkipped(run) !== null && (
-                  <p className="mt-1 text-xs text-muted-foreground">
-                    Hebrew quality-gate skipped rows: {readRunValidationSkipped(run)}
-                  </p>
-                )}
-                {report && report.failedBatches.length > 0 && (
-                  <p className="mt-1 text-xs text-destructive">Failed batches: {report.failedBatches.join(" | ")}</p>
-                )}
-                {run.error_message && <p className="mt-1 text-xs text-destructive">{run.error_message}</p>}
-              </article>
+                  {report && (
+                    <p className="mt-1 text-xs text-muted-foreground">
+                      Duration: {formatDuration(report.durationMs)} · Tafsir EN{" "}
+                      {report.countsBefore.tafsir.en}→{report.countsAfter.tafsir.en} · Tafsir HE{" "}
+                      {report.countsBefore.tafsir.he}→{report.countsAfter.tafsir.he} · Tafsir AR{" "}
+                      {report.countsBefore.tafsir.ar}→{report.countsAfter.tafsir.ar} · Asbab EN{" "}
+                      {report.countsBefore.asbab.en}→{report.countsAfter.asbab.en} · Asbab HE{" "}
+                      {report.countsBefore.asbab.he}→{report.countsAfter.asbab.he} · Asbab AR{" "}
+                      {report.countsBefore.asbab.ar}→{report.countsAfter.asbab.ar} ·
+                      hadith_entity_links {report.countsBefore.hadithEntityLinks}→
+                      {report.countsAfter.hadithEntityLinks}
+                    </p>
+                  )}
+                  {readRunValidationSkipped(run) !== null && (
+                    <p className="mt-1 text-xs text-muted-foreground">
+                      Hebrew quality-gate skipped rows: {readRunValidationSkipped(run)}
+                    </p>
+                  )}
+                  {report && report.failedBatches.length > 0 && (
+                    <p className="mt-1 text-xs text-destructive">
+                      Failed batches: {report.failedBatches.join(" | ")}
+                    </p>
+                  )}
+                  {run.error_message && (
+                    <p className="mt-1 text-xs text-destructive">{run.error_message}</p>
+                  )}
+                </article>
               );
             })}
             {runs.length === 0 && <p className="text-sm text-muted-foreground">No runs yet.</p>}
           </div>
-          {runJobM.error && <p className="mt-2 text-sm text-destructive">{runJobM.error.message}</p>}
+          {runJobM.error && (
+            <p className="mt-2 text-sm text-destructive">{runJobM.error.message}</p>
+          )}
         </section>
       </main>
     </div>
@@ -512,7 +651,11 @@ function MetricCard({ title, value, ok }: { title: string; value: string; ok: bo
     <article className="rounded-xl border border-border bg-card p-4">
       <div className="flex items-center justify-between gap-3">
         <p className="text-sm text-muted-foreground">{title}</p>
-        {ok ? <CheckCircle2 className="h-4 w-4 text-emerald-600" /> : <TriangleAlert className="h-4 w-4 text-amber-600" />}
+        {ok ? (
+          <CheckCircle2 className="h-4 w-4 text-emerald-600" />
+        ) : (
+          <TriangleAlert className="h-4 w-4 text-amber-600" />
+        )}
       </div>
       <p className="mt-2 text-2xl font-semibold text-foreground">{value}</p>
     </article>
@@ -542,10 +685,7 @@ function readRunValidationSkipped(run: RunRow): number | null {
 }
 
 function formatLastRun(
-  run:
-    | { started_at: string; finished_at: string | null; status: string }
-    | null
-    | undefined,
+  run: { started_at: string; finished_at: string | null; status: string } | null | undefined,
 ) {
   if (!run) return "No run yet";
   const end = run.finished_at ? new Date(run.finished_at).toLocaleString() : "still running";

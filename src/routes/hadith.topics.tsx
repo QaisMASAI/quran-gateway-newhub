@@ -37,7 +37,11 @@ function HadithTopicsPage() {
       <Header />
       <main id="main" className="mx-auto max-w-4xl px-4 py-8 sm:px-6">
         <h1 className="text-2xl font-bold text-foreground">
-          {locale === "he" ? "חדית' לפי נושאים" : locale === "ar" ? "الحديث حسب الموضوع" : "Hadith by Topics"}
+          {locale === "he"
+            ? "חדית' לפי נושאים"
+            : locale === "ar"
+              ? "الحديث حسب الموضوع"
+              : "Hadith by Topics"}
         </h1>
         <p className="mt-1 text-sm text-muted-foreground">
           {locale === "he"
@@ -50,7 +54,11 @@ function HadithTopicsPage() {
         {topics.length > 0 ? (
           <div className="mt-6">
             <h2 className="text-sm font-semibold text-foreground">
-              {locale === "he" ? "נושאים קשורים אמיתיים" : locale === "ar" ? "موضوعات مرتبطة فعلاً" : "Real related topics"}
+              {locale === "he"
+                ? "נושאים קשורים אמיתיים"
+                : locale === "ar"
+                  ? "موضوعات مرتبطة فعلاً"
+                  : "Real related topics"}
             </h2>
             <div className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
               {topics.map((topic) => (
@@ -60,7 +68,9 @@ function HadithTopicsPage() {
                   params={{ kind: "topic", slug: topic.slug }}
                   className="surface-card block p-4 transition-colors hover:border-primary/40"
                 >
-                  <div className="text-sm font-semibold text-foreground">{pickLocale(topic.title_i18n, locale)}</div>
+                  <div className="text-sm font-semibold text-foreground">
+                    {pickLocale(topic.title_i18n, locale)}
+                  </div>
                   <div className="mt-2 text-xs text-muted-foreground">
                     {topic.hadith_count} hadith · {topic.collections.join(", ")}
                   </div>
@@ -79,7 +89,11 @@ function HadithTopicsPage() {
         )}
 
         <h2 className="mt-8 text-sm font-semibold text-foreground">
-          {locale === "he" ? "ספרים מובילים לפי אוספים" : locale === "ar" ? "أبرز الكتب حسب المجموعات" : "Top books by collection"}
+          {locale === "he"
+            ? "ספרים מובילים לפי אוספים"
+            : locale === "ar"
+              ? "أبرز الكتب حسب المجموعات"
+              : "Top books by collection"}
         </h2>
         <div className="mt-3 grid gap-3 sm:grid-cols-2">
           {data.map((b) => (
@@ -92,7 +106,9 @@ function HadithTopicsPage() {
               <div className="text-xs font-semibold uppercase text-primary">
                 {b.collection_slug === "bukhari" ? "Sahih al-Bukhari" : "Sahih Muslim"}
               </div>
-              <div className="mt-1 font-arabic-ui text-lg" dir="rtl">{b.name_ar}</div>
+              <div className="mt-1 font-arabic-ui text-lg" dir="rtl">
+                {b.name_ar}
+              </div>
               <div className="text-sm text-foreground/90">{b.name_en}</div>
               <div className="mt-2 text-xs text-muted-foreground">{b.hadith_count} hadith</div>
             </Link>

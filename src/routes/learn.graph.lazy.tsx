@@ -4,7 +4,13 @@ import { useTranslation } from "react-i18next";
 import { useMemo, useRef, useState } from "react";
 import { Header } from "@/components/Header";
 import { ChevronLeft, Loader2, Network } from "lucide-react";
-import { listAllEntities, listRelations, pickLocale, type KnowledgeEntity, type EntityKind } from "@/lib/knowledge";
+import {
+  listAllEntities,
+  listRelations,
+  pickLocale,
+  type KnowledgeEntity,
+  type EntityKind,
+} from "@/lib/knowledge";
 import { normalizeLocale, type Locale } from "@/lib/i18n";
 
 export const Route = createLazyFileRoute("/learn/graph")({
@@ -110,7 +116,10 @@ function GraphPage() {
     <div className="min-h-screen bg-background">
       <Header />
       <main id="main" className="mx-auto max-w-6xl px-4 py-6 sm:px-6">
-        <Link to="/learn" className="mb-4 inline-flex min-h-11 items-center gap-1 text-xs text-muted-foreground hover:text-primary">
+        <Link
+          to="/learn"
+          className="mb-4 inline-flex min-h-11 items-center gap-1 text-xs text-muted-foreground hover:text-primary"
+        >
           <ChevronLeft className="h-3 w-3" />
           {t("learn.backToDiscovery")}
         </Link>
@@ -134,11 +143,14 @@ function GraphPage() {
                   : "border-border bg-card text-muted-foreground hover:border-primary/40"
               }`}
             >
-              {k === "all" ? t("graph.allKinds") : t(`search.kind${k.charAt(0).toUpperCase()}${k.slice(1)}` as const)}
+              {k === "all"
+                ? t("graph.allKinds")
+                : t(`search.kind${k.charAt(0).toUpperCase()}${k.slice(1)}` as const)}
             </button>
           ))}
           <span className="ms-auto text-xs text-muted-foreground">
-            {t("graph.nodeCount", { n: nodes.length })} · {t("graph.edgeCount", { n: edges.length })}
+            {t("graph.nodeCount", { n: nodes.length })} ·{" "}
+            {t("graph.edgeCount", { n: edges.length })}
           </span>
         </div>
 
@@ -183,7 +195,10 @@ function GraphPage() {
                     onMouseLeave={() => setHover((h) => (h === n.e.id ? null : h))}
                     className="cursor-pointer"
                   >
-                    <Link to="/learn/$kind/$slug" params={{ kind: n.e.kind as EntityKind, slug: n.e.slug }}>
+                    <Link
+                      to="/learn/$kind/$slug"
+                      params={{ kind: n.e.kind as EntityKind, slug: n.e.slug }}
+                    >
                       <circle
                         r={isHover ? n.r + 3 : n.r}
                         fill={color}
@@ -210,7 +225,9 @@ function GraphPage() {
                     stroke="hsl(var(--border))"
                   />
                   <text x={10} y={16} fontSize={11} fill="hsl(var(--primary))" fontWeight={600}>
-                    {t(`search.kind${hoverNode.e.kind.charAt(0).toUpperCase()}${hoverNode.e.kind.slice(1)}` as const)}
+                    {t(
+                      `search.kind${hoverNode.e.kind.charAt(0).toUpperCase()}${hoverNode.e.kind.slice(1)}` as const,
+                    )}
                   </text>
                   <text x={10} y={32} fontSize={13} fill="hsl(var(--foreground))" fontWeight={700}>
                     {pickLocale(hoverNode.e.title_i18n, locale).slice(0, 28)}
@@ -224,8 +241,14 @@ function GraphPage() {
         <div className="mt-4 flex flex-wrap gap-3 text-xs">
           {(Object.keys(KIND_COLOR) as EntityKind[]).map((k) => (
             <div key={k} className="flex items-center gap-1.5">
-              <span className="h-3 w-3 rounded-full" style={{ backgroundColor: KIND_COLOR[k] }} aria-hidden />
-              <span className="text-muted-foreground">{t(`search.kind${k.charAt(0).toUpperCase()}${k.slice(1)}` as const)}</span>
+              <span
+                className="h-3 w-3 rounded-full"
+                style={{ backgroundColor: KIND_COLOR[k] }}
+                aria-hidden
+              />
+              <span className="text-muted-foreground">
+                {t(`search.kind${k.charAt(0).toUpperCase()}${k.slice(1)}` as const)}
+              </span>
             </div>
           ))}
         </div>

@@ -13,8 +13,7 @@ export function LocaleSwitcher() {
   useEffect(() => {
     if (!open) return;
     const onClick = (e: MouseEvent) => {
-      if (ref.current && !ref.current.contains(e.target as Node))
-        setOpen(false);
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
     };
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") setOpen(false);
@@ -62,9 +61,7 @@ export function LocaleSwitcher() {
                   className="flex w-full items-center justify-between gap-2 rounded-lg px-3 py-2 text-sm text-foreground hover:bg-secondary"
                 >
                   <span>{LOCALE_LABEL[loc]}</span>
-                  {active && (
-                    <Check className="h-4 w-4 text-primary" aria-hidden="true" />
-                  )}
+                  {active && <Check className="h-4 w-4 text-primary" aria-hidden="true" />}
                 </button>
               </li>
             );

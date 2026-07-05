@@ -43,27 +43,30 @@ const ESSENTIALS_PLAN: ReadingPlan = {
   slug: "essentials-7",
   title: "7 ימים — סורות מרכזיות",
   subtitle: "מבט-על על הסורות המוכרות ביותר",
-  description:
-    "סיור של שבוע בין הסורות המוכרות והנפוצות ביותר בקוראן — מאל-פאתחה ועד אל-איח'לאץ.",
+  description: "סיור של שבוע בין הסורות המוכרות והנפוצות ביותר בקוראן — מאל-פאתחה ועד אל-איח'לאץ.",
   durationDays: 7,
   level: "מתחילים",
   days: [
-    { day: 1, title: "פתיחה ותחילה", segments: [{ surah: 1 }, { surah: 2, fromAyah: 1, toAyah: 5 }] },
+    {
+      day: 1,
+      title: "פתיחה ותחילה",
+      segments: [{ surah: 1 }, { surah: 2, fromAyah: 1, toAyah: 5 }],
+    },
     { day: 2, title: "כס המלכות", segments: [{ surah: 2, fromAyah: 255, toAyah: 257 }] },
     { day: 3, title: "סורת יאסין", segments: [{ surah: 36 }] },
     { day: 4, title: "סורת אר-רחמן", segments: [{ surah: 55 }] },
     { day: 5, title: "סורת אל-מולכ", segments: [{ surah: 67 }] },
     { day: 6, title: "סורת אל-כהף — תחילה", segments: [{ surah: 18, fromAyah: 1, toAyah: 10 }] },
-    { day: 7, title: "ארבע סורות החתימה", segments: [{ surah: 109 }, { surah: 112 }, { surah: 113 }, { surah: 114 }] },
+    {
+      day: 7,
+      title: "ארבע סורות החתימה",
+      segments: [{ surah: 109 }, { surah: 112 }, { surah: 113 }, { surah: 114 }],
+    },
   ],
 };
 
-export const READING_PLANS: ReadingPlan[] = [
-  ESSENTIALS_PLAN,
-  SHORT_SURAHS_PLAN,
-];
+export const READING_PLANS: ReadingPlan[] = [ESSENTIALS_PLAN, SHORT_SURAHS_PLAN];
 
 export function getPlan(slug: string): ReadingPlan | undefined {
   return READING_PLANS.find((p) => p.slug === slug);
 }
-

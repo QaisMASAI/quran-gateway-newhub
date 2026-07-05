@@ -66,10 +66,12 @@ export function useReadingProgress() {
       setProgress(next);
       writeLocalProgress(next);
       if (!user) return;
-      await supabase.from("reading_progress").upsert(
-        { user_id: user.id, surah, ayah, last_read_at: new Date().toISOString() },
-        { onConflict: "user_id" },
-      );
+      await supabase
+        .from("reading_progress")
+        .upsert(
+          { user_id: user.id, surah, ayah, last_read_at: new Date().toISOString() },
+          { onConflict: "user_id" },
+        );
     },
     [user],
   );

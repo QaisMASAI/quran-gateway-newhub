@@ -75,9 +75,7 @@ const QURAN_AI_MCP_URL = process.env.QURAN_AI_MCP_URL?.trim() || "https://mcp.qu
 async function withTimeout<T>(promise: Promise<T>, timeoutMs: number): Promise<T> {
   return await Promise.race([
     promise,
-    new Promise<never>((_, reject) =>
-      setTimeout(() => reject(new Error("timeout")), timeoutMs),
-    ),
+    new Promise<never>((_, reject) => setTimeout(() => reject(new Error("timeout")), timeoutMs)),
   ]);
 }
 
@@ -175,7 +173,10 @@ async function fetchQuranAiMcpEvidence(
 
     return {
       result: payload?.result,
-      sessionId: response.headers.get("mcp-session-id") ?? response.headers.get("Mcp-Session-Id") ?? sessionId,
+      sessionId:
+        response.headers.get("mcp-session-id") ??
+        response.headers.get("Mcp-Session-Id") ??
+        sessionId,
     };
   }
 
@@ -195,7 +196,7 @@ async function fetchQuranAiMcpEvidence(
     const toolList = await withTimeout(mcpRpcCall("tools/list", {}, sessionId), 5000);
     sessionId = toolList.sessionId ?? sessionId;
 
-    const tools = ((toolList.result as { tools?: Array<{ name: string }> })?.tools ?? []);
+    const tools = (toolList.result as { tools?: Array<{ name: string }> })?.tools ?? [];
     const candidateTools = tools
       .map((t) => t.name)
       .filter((name) => /quran|search|verse|ayah|query/i.test(name))
@@ -244,13 +245,14 @@ async function fetchQuranAiMcpEvidence(
           const key = `${surah}:${ayah}`;
           if (seen.has(key)) continue;
 
-          const arabic =
-            String(obj.arabic ?? obj.text_uthmani ?? obj.ayah_arabic ?? obj.text_ar ?? "").trim();
+          const arabic = String(
+            obj.arabic ?? obj.text_uthmani ?? obj.ayah_arabic ?? obj.text_ar ?? "",
+          ).trim();
           const translationCandidate =
             language === "he"
-              ? obj.hebrew ?? obj.translation_he ?? obj.translation ?? obj.text_en
+              ? (obj.hebrew ?? obj.translation_he ?? obj.translation ?? obj.text_en)
               : language === "en"
-                ? obj.english ?? obj.translation_en ?? obj.translation ?? obj.text_en
+                ? (obj.english ?? obj.translation_en ?? obj.translation ?? obj.text_en)
                 : "";
 
           seen.set(key, {
@@ -325,7 +327,8 @@ async function readResearchCache(
 
   const match = (data ?? []).find(
     (row: { question?: string | null; created_at?: string | null }) =>
-      normalizeCacheQuestion(row.question ?? "") === normalized && isRecentByTtl(row.created_at, config.ttlMs),
+      normalizeCacheQuestion(row.question ?? "") === normalized &&
+      isRecentByTtl(row.created_at, config.ttlMs),
   ) as
     | {
         answer?: string | null;
@@ -379,7 +382,11 @@ async function writeResearchCache(
   });
 }
 
-async function resolveCallerUserId(supabaseAdmin: { auth: { getUser: (token: string) => Promise<{ data: { user: { id: string } | null }; error: unknown }> } }): Promise<string | null> {
+async function resolveCallerUserId(supabaseAdmin: {
+  auth: {
+    getUser: (token: string) => Promise<{ data: { user: { id: string } | null }; error: unknown }>;
+  };
+}): Promise<string | null> {
   const req = getRequest();
   const authHeader = req?.headers.get("authorization") ?? "";
   if (!authHeader.startsWith("Bearer ")) return null;
@@ -391,7 +398,9 @@ async function resolveCallerUserId(supabaseAdmin: { auth: { getUser: (token: str
   return data.user.id;
 }
 
-async function getResearchCacheConfig(supabaseAdmin: { from: (table: string) => any }): Promise<ResearchCacheConfig> {
+async function getResearchCacheConfig(supabaseAdmin: {
+  from: (table: string) => any;
+}): Promise<ResearchCacheConfig> {
   const DEFAULT: ResearchCacheConfig = { ttlMs: 1000 * 60 * 60 * 6, version: 1 };
   const { data } = await supabaseAdmin
     .from("admin_runtime_settings")
@@ -416,7 +425,11 @@ function sanitize(s: string, max = 600) {
 }
 
 function cleanHtml(input: string) {
-  return input.replace(/<sup[^>]*>.*?<\/sup>/g, "").replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
+  return input
+    .replace(/<sup[^>]*>.*?<\/sup>/g, "")
+    .replace(/<[^>]+>/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
 }
 
 async function fetchFallbackVerses(
@@ -502,7 +515,8 @@ function lexicalOverlapScore(query: string, text: string, language: "he" | "en" 
   return hits / terms.length;
 }
 
-const NO_SOURCE_MESSAGE = "No authenticated Islamic source was found in the database for this question.";
+const NO_SOURCE_MESSAGE =
+  "No authenticated Islamic source was found in the database for this question.";
 
 const SYSTEM_BY_LANG: Record<string, string> = {
   he: `אתה עוזר מחקר על הקוראן. ענה אך ורק על בסיס הפסוקים והתפסירים המסופקים. אם המידע לא קיים — אמור זאת בכנות. צטט פסוקים בפורמט [סורה:איה]. כתוב בעברית בצורה נגישה לקוראים בני 9-70, מוסלמים ולא-מוסלמים כאחד. אסור להמציא פסוקים או מקורות.`,
@@ -529,7 +543,13 @@ export const askQuranResearch = createServerFn({ method: "POST" })
     const cacheConfig = await getResearchCacheConfig(supabaseAdmin);
 
     const cached = callerUserId
-      ? await readResearchCache(supabaseAdmin, data.question, data.language, callerUserId, cacheConfig)
+      ? await readResearchCache(
+          supabaseAdmin,
+          data.question,
+          data.language,
+          callerUserId,
+          cacheConfig,
+        )
       : null;
     if (
       cached &&
@@ -599,7 +619,8 @@ export const askQuranResearch = createServerFn({ method: "POST" })
       .map((row) => {
         const semantic = row.similarity ?? 0;
         const lexical = lexicalOverlapScore(data.question, row.chunk_text ?? "", data.language);
-        const languageBoost = row.language === data.language ? 0.06 : row.language === "ar" ? 0.03 : 0;
+        const languageBoost =
+          row.language === data.language ? 0.06 : row.language === "ar" ? 0.03 : 0;
         return {
           ...row,
           rankScore: semantic * 0.75 + lexical * 0.25 + languageBoost,
@@ -624,7 +645,9 @@ export const askQuranResearch = createServerFn({ method: "POST" })
         });
       }
 
-      const surahs = [...new Set(verses.map((v) => v.surah).filter((s) => Number.isFinite(s) && s > 0))];
+      const surahs = [
+        ...new Set(verses.map((v) => v.surah).filter((s) => Number.isFinite(s) && s > 0)),
+      ];
       if (surahs.length > 0) {
         const { data: verseRows } = await supabaseAdmin
           .from("verse_embeddings")
@@ -696,7 +719,9 @@ export const askQuranResearch = createServerFn({ method: "POST" })
       const surahs = [...new Set(verses.map((v) => v.surah))];
       const { data: tafRows } = await supabaseAdmin
         .from("tafsir_passages")
-        .select("surah,ayah_start,ayah_end,lang,body,source_id,tafsir_sources!inner(slug,name_en,name_ar,name_he,author)")
+        .select(
+          "surah,ayah_start,ayah_end,lang,body,source_id,tafsir_sources!inner(slug,name_en,name_ar,name_he,author)",
+        )
         .in("surah", surahs)
         .eq("lang", data.language)
         .eq("tafsir_sources.slug", "al_jalalayn")
@@ -708,9 +733,22 @@ export const askQuranResearch = createServerFn({ method: "POST" })
             v.surah === t.surah && v.ayah >= (t.ayah_start ?? 0) && v.ayah <= (t.ayah_end ?? 9999),
         );
         if (!matchVerse) continue;
-        const src = (t as { tafsir_sources?: { name_en?: string; name_ar?: string; name_he?: string; author?: string | null } }).tafsir_sources;
+        const src = (
+          t as {
+            tafsir_sources?: {
+              name_en?: string;
+              name_ar?: string;
+              name_he?: string;
+              author?: string | null;
+            };
+          }
+        ).tafsir_sources;
         const localizedName =
-          data.language === "ar" ? src?.name_ar : data.language === "he" ? src?.name_he : src?.name_en;
+          data.language === "ar"
+            ? src?.name_ar
+            : data.language === "he"
+              ? src?.name_he
+              : src?.name_en;
         tafsir.push({
           kind: "tafsir",
           source: localizedName || src?.name_en || "Tafsir",
@@ -728,19 +766,36 @@ export const askQuranResearch = createServerFn({ method: "POST" })
         const surahs = [...new Set(fallbackVerses.map((v) => v.surah))];
         const { data: tafRows } = await supabaseAdmin
           .from("tafsir_passages")
-          .select("surah,ayah_start,ayah_end,lang,body,source_id,tafsir_sources!inner(slug,name_en,name_ar,name_he,author)")
+          .select(
+            "surah,ayah_start,ayah_end,lang,body,source_id,tafsir_sources!inner(slug,name_en,name_ar,name_he,author)",
+          )
           .in("surah", surahs)
           .eq("tafsir_sources.slug", "al_jalalayn")
           .limit(10);
         for (const t of tafRows ?? []) {
           const matchVerse = fallbackVerses.find(
             (v) =>
-              v.surah === t.surah && v.ayah >= (t.ayah_start ?? 0) && v.ayah <= (t.ayah_end ?? 9999),
+              v.surah === t.surah &&
+              v.ayah >= (t.ayah_start ?? 0) &&
+              v.ayah <= (t.ayah_end ?? 9999),
           );
           if (!matchVerse) continue;
-          const src = (t as { tafsir_sources?: { name_en?: string; name_ar?: string; name_he?: string; author?: string | null } }).tafsir_sources;
+          const src = (
+            t as {
+              tafsir_sources?: {
+                name_en?: string;
+                name_ar?: string;
+                name_he?: string;
+                author?: string | null;
+              };
+            }
+          ).tafsir_sources;
           const localizedName =
-            data.language === "ar" ? src?.name_ar : data.language === "he" ? src?.name_he : src?.name_en;
+            data.language === "ar"
+              ? src?.name_ar
+              : data.language === "he"
+                ? src?.name_he
+                : src?.name_en;
           tafsir.push({
             kind: "tafsir",
             source: localizedName || src?.name_en || "Tafsir",
@@ -759,11 +814,14 @@ export const askQuranResearch = createServerFn({ method: "POST" })
     // 3b) Hadith retrieval (FTS, language-agnostic — Arabic + English indexed)
     const hadithList: HadithCitation[] = [];
     try {
-      const { data: hRows } = await supabaseAdmin.rpc("search_hadith_hybrid" as never, {
-        q: data.question,
-        collections: null,
-        match_count: 6,
-      } as never);
+      const { data: hRows } = await supabaseAdmin.rpc(
+        "search_hadith_hybrid" as never,
+        {
+          q: data.question,
+          collections: null,
+          match_count: 6,
+        } as never,
+      );
       const labelMap: Record<string, string> = {
         bukhari: "Sahih al-Bukhari",
         muslim: "Sahih Muslim",
@@ -793,7 +851,11 @@ export const askQuranResearch = createServerFn({ method: "POST" })
     }
 
     if (verses.length === 0 && tafsir.length === 0 && hadithList.length === 0) {
-      const emptyResult = { ...base, answer: NO_SOURCE_MESSAGE, mcpUnavailable: mcpResult.unavailable };
+      const emptyResult = {
+        ...base,
+        answer: NO_SOURCE_MESSAGE,
+        mcpUnavailable: mcpResult.unavailable,
+      };
       if (callerUserId) {
         await writeResearchCache(
           supabaseAdmin,
@@ -853,8 +915,10 @@ export const askQuranResearch = createServerFn({ method: "POST" })
       answer = text;
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err);
-      if (msg.includes("429")) return { ...base, verses, tafsir, hadith: hadithList, error: "rate_limit" };
-      if (msg.includes("402")) return { ...base, verses, tafsir, hadith: hadithList, error: "credits_exhausted" };
+      if (msg.includes("429"))
+        return { ...base, verses, tafsir, hadith: hadithList, error: "rate_limit" };
+      if (msg.includes("402"))
+        return { ...base, verses, tafsir, hadith: hadithList, error: "credits_exhausted" };
       return { ...base, verses, tafsir, hadith: hadithList, error: "generation_failed" };
     }
 

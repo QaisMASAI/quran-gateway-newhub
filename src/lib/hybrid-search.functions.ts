@@ -38,12 +38,15 @@ export const searchEntitiesHybrid = createServerFn({ method: "POST" })
       }
     }
 
-    const { data: rows, error } = await supabaseAdmin.rpc("search_entities_hybrid" as never, {
-      q: data.q || null,
-      query_embedding: embedding as unknown as string,
-      kind_filter: (data.kinds as unknown as string[]) ?? null,
-      match_count: data.limit,
-    } as never);
+    const { data: rows, error } = await supabaseAdmin.rpc(
+      "search_entities_hybrid" as never,
+      {
+        q: data.q || null,
+        query_embedding: embedding as unknown as string,
+        kind_filter: (data.kinds as unknown as string[]) ?? null,
+        match_count: data.limit,
+      } as never,
+    );
 
     if (error) return { hits: [], error: error.message };
     return { hits: (rows ?? []) as EntityHit[] };
@@ -81,12 +84,15 @@ export const searchVersesHybrid = createServerFn({ method: "POST" })
       }
     }
 
-    const { data: rows, error } = await supabaseAdmin.rpc("search_verses_hybrid" as never, {
-      q: data.q || null,
-      query_embedding: embedding as unknown as string,
-      theme_filter: data.themes ?? null,
-      match_count: data.limit,
-    } as never);
+    const { data: rows, error } = await supabaseAdmin.rpc(
+      "search_verses_hybrid" as never,
+      {
+        q: data.q || null,
+        query_embedding: embedding as unknown as string,
+        theme_filter: data.themes ?? null,
+        match_count: data.limit,
+      } as never,
+    );
 
     if (error) return { hits: [], error: error.message };
     return { hits: (rows ?? []) as VerseHit[] };

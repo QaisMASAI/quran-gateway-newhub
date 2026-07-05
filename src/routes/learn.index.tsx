@@ -3,7 +3,24 @@ import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import i18n from "@/lib/i18n";
 import { Header } from "@/components/Header";
-import { Loader2, Compass, Network, Clock, MapPin, ChevronLeft, Heart, Scale, BookOpen, Sun, Moon, Shield, Users, Sparkles, HandHelping, Star } from "lucide-react";
+import {
+  Loader2,
+  Compass,
+  Network,
+  Clock,
+  MapPin,
+  ChevronLeft,
+  Heart,
+  Scale,
+  BookOpen,
+  Sun,
+  Moon,
+  Shield,
+  Users,
+  Sparkles,
+  HandHelping,
+  Star,
+} from "lucide-react";
 import { listAllEntities, groupByKind, type EntityKind } from "@/lib/knowledge";
 import { EntityCard } from "@/components/discovery/EntityCard";
 import { normalizeLocale, type Locale } from "@/lib/i18n";
@@ -21,7 +38,10 @@ export const Route = createFileRoute("/learn/")({
           content: i18n.t("pages:learn.metaDescription", { lng: locale }),
         },
         { property: "og:title", content: i18n.t("pages:learn.metaTitle", { lng: locale }) },
-        { property: "og:description", content: i18n.t("pages:learn.metaDescription", { lng: locale }) },
+        {
+          property: "og:description",
+          content: i18n.t("pages:learn.metaDescription", { lng: locale }),
+        },
         { property: "og:url", content: "/learn" },
       ],
       links: [{ rel: "canonical", href: "/learn" }],
@@ -30,7 +50,16 @@ export const Route = createFileRoute("/learn/")({
   component: LearnIndex,
 });
 
-const ORDER: EntityKind[] = ["topic", "prophet", "story", "event", "place", "nation", "concept", "theme"];
+const ORDER: EntityKind[] = [
+  "topic",
+  "prophet",
+  "story",
+  "event",
+  "place",
+  "nation",
+  "concept",
+  "theme",
+];
 
 const TOPIC_ICONS = {
   heart: Heart,
@@ -55,7 +84,8 @@ function LearnIndex() {
     staleTime: 5 * 60_000,
   });
 
-  const kindLabel = (k: EntityKind) => t(`search.kind${k.charAt(0).toUpperCase()}${k.slice(1)}` as const);
+  const kindLabel = (k: EntityKind) =>
+    t(`search.kind${k.charAt(0).toUpperCase()}${k.slice(1)}` as const);
   const sectionLabel = (k: EntityKind) => {
     if (k === "topic") return t("learn.browseTopics");
     if (k === "prophet") return t("learn.browseProphets");
@@ -121,7 +151,9 @@ function LearnIndex() {
               <Clock className="h-5 w-5" />
             </div>
             <div className="min-w-0">
-              <div className="text-base font-semibold text-foreground group-hover:text-primary">{t("learn.openTimeline")}</div>
+              <div className="text-base font-semibold text-foreground group-hover:text-primary">
+                {t("learn.openTimeline")}
+              </div>
               <p className="mt-0.5 text-xs text-muted-foreground">{t("learn.openTimelineHint")}</p>
             </div>
           </Link>
@@ -133,7 +165,9 @@ function LearnIndex() {
               <MapPin className="h-5 w-5" />
             </div>
             <div className="min-w-0">
-              <div className="text-base font-semibold text-foreground group-hover:text-primary">{t("learn.openMap")}</div>
+              <div className="text-base font-semibold text-foreground group-hover:text-primary">
+                {t("learn.openMap")}
+              </div>
               <p className="mt-0.5 text-xs text-muted-foreground">{t("learn.openMapHint")}</p>
             </div>
           </Link>
@@ -148,7 +182,12 @@ function LearnIndex() {
           <p className="mb-4 text-sm text-muted-foreground">{t("topics.intro")}</p>
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {ALL_TOPICS.map((topic) => (
-              <LearnTopicCard key={topic.slug} slug={topic.slug} icon={topic.icon} refsCount={topic.refs.length} />
+              <LearnTopicCard
+                key={topic.slug}
+                slug={topic.slug}
+                icon={topic.icon}
+                refsCount={topic.refs.length}
+              />
             ))}
           </div>
         </section>
@@ -199,13 +238,24 @@ function LearnTopicCard({
         <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary transition-colors group-hover:bg-gold/10 group-hover:text-gold">
           <Icon className="h-5 w-5" aria-hidden="true" />
         </div>
-        <ChevronLeft className="mt-1 h-4 w-4 shrink-0 text-muted-foreground transition-all group-hover:-translate-x-0.5 group-hover:text-gold ltr:rotate-180" aria-hidden="true" />
+        <ChevronLeft
+          className="mt-1 h-4 w-4 shrink-0 text-muted-foreground transition-all group-hover:-translate-x-0.5 group-hover:text-gold ltr:rotate-180"
+          aria-hidden="true"
+        />
       </div>
 
       <div className="min-w-0">
-        <h3 className="line-clamp-1 font-display text-lg font-bold text-primary" dir="auto">{topic.title}</h3>
-        {topic.subtitle && <p className="mt-0.5 text-xs text-muted-foreground" dir="auto">{topic.subtitle}</p>}
-        <p className="mt-2 line-clamp-2 text-sm text-muted-foreground" dir="auto">{topic.description}</p>
+        <h3 className="line-clamp-1 font-display text-lg font-bold text-primary" dir="auto">
+          {topic.title}
+        </h3>
+        {topic.subtitle && (
+          <p className="mt-0.5 text-xs text-muted-foreground" dir="auto">
+            {topic.subtitle}
+          </p>
+        )}
+        <p className="mt-2 line-clamp-2 text-sm text-muted-foreground" dir="auto">
+          {topic.description}
+        </p>
         <p className="mt-3 text-[11px] font-medium text-gold">
           {refsCount} {t("topics.refsLabel")}
         </p>

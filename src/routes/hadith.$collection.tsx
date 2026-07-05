@@ -41,7 +41,10 @@ function HadithCollectionPage() {
     queryKey: ["hadith", "books", collection],
     queryFn: () => booksFn({ data: { collection } }),
   });
-  const { data: cols = [] } = useQuery({ queryKey: ["hadith", "collections"], queryFn: () => collFn() });
+  const { data: cols = [] } = useQuery({
+    queryKey: ["hadith", "collections"],
+    queryFn: () => collFn(),
+  });
   const meta = cols.find((c) => c.slug === collection);
 
   return (
@@ -53,7 +56,9 @@ function HadithCollectionPage() {
         </Link>
         {meta && (
           <header className="mt-2">
-            <div className="font-arabic-ui text-2xl" dir="rtl">{meta.title_ar}</div>
+            <div className="font-arabic-ui text-2xl" dir="rtl">
+              {meta.title_ar}
+            </div>
             <h1 className="text-xl font-bold text-foreground">{meta.title_en}</h1>
             {meta.author_en && <p className="text-sm text-muted-foreground">{meta.author_en}</p>}
           </header>
@@ -68,8 +73,12 @@ function HadithCollectionPage() {
               className="flex items-center justify-between gap-3 px-4 py-3 hover:bg-secondary/40"
             >
               <div className="min-w-0">
-                <div className="font-arabic-ui text-base" dir="rtl">{b.name_ar}</div>
-                <div className="truncate text-sm text-muted-foreground">{b.book_id}. {b.name_en}</div>
+                <div className="font-arabic-ui text-base" dir="rtl">
+                  {b.name_ar}
+                </div>
+                <div className="truncate text-sm text-muted-foreground">
+                  {b.book_id}. {b.name_en}
+                </div>
               </div>
               <div className="flex items-center gap-2 text-xs text-muted-foreground">
                 {b.hadith_count}

@@ -130,7 +130,11 @@ export async function linkHadithToGraphJob(input: unknown) {
         : Promise.resolve({ data: [] as Array<{ entity_id: string; similarity: number }> }),
     ]);
 
-    for (const m of (vMatches ?? []) as Array<{ surah: number; ayah: number; similarity: number }>) {
+    for (const m of (vMatches ?? []) as Array<{
+      surah: number;
+      ayah: number;
+      similarity: number;
+    }>) {
       verseRows.push({
         hadith_id: r.id as number,
         surah: m.surah,

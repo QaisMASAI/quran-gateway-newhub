@@ -7,7 +7,10 @@ type AdminSetupStatus = {
   canClaimFirstAdmin: boolean;
 };
 
-async function readAdminSetupStatus(context: { supabase: any; userId: string }): Promise<AdminSetupStatus> {
+async function readAdminSetupStatus(context: {
+  supabase: any;
+  userId: string;
+}): Promise<AdminSetupStatus> {
   const [{ supabaseAdmin }, currentRole] = await Promise.all([
     import("@/integrations/supabase/client.server"),
     context.supabase.rpc("has_role", {
@@ -17,7 +20,10 @@ async function readAdminSetupStatus(context: { supabase: any; userId: string }):
   ]);
 
   const [{ count: adminCount }, currentRoleErr] = await Promise.all([
-    supabaseAdmin.from("user_roles").select("id", { head: true, count: "exact" }).eq("role", "admin"),
+    supabaseAdmin
+      .from("user_roles")
+      .select("id", { head: true, count: "exact" })
+      .eq("role", "admin"),
     Promise.resolve(currentRole.error),
   ]);
 

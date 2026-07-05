@@ -115,7 +115,9 @@ export const semanticRetrieveVerses = createServerFn({ method: "POST" })
       if (!existing || v.similarity > existing.similarity) deduped.set(key, v);
     }
 
-    const verses = [...deduped.values()].sort((a, b) => b.similarity - a.similarity).slice(0, data.k);
+    const verses = [...deduped.values()]
+      .sort((a, b) => b.similarity - a.similarity)
+      .slice(0, data.k);
     return { verses };
   });
 

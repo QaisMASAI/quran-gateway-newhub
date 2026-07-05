@@ -36,14 +36,20 @@ const SOURCES: SourceSpec[] = [
 ];
 
 function cleanHtml(input: string): string {
-  return input.replace(/<sup[^>]*>.*?<\/sup>/g, " ").replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
+  return input
+    .replace(/<sup[^>]*>.*?<\/sup>/g, " ")
+    .replace(/<[^>]+>/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
 }
 
 export const Route = createFileRoute("/api/public/admin/backfill-verse-translations")({
   server: {
     handlers: {
       POST: async ({ request }) => {
-        const body = await request.json().catch(() => ({} as { token?: string; adminUserId?: string }));
+        const body = await request
+          .json()
+          .catch(() => ({}) as { token?: string; adminUserId?: string });
         const authResult = await authorizeAdminRouteRequest(request, body);
         if (!authResult.ok) return authResult.response;
 
@@ -69,7 +75,10 @@ export const Route = createFileRoute("/api/public/admin/backfill-verse-translati
             .select("id")
             .single();
           if (srcErr || !src?.id) {
-            return Response.json({ ok: false, error: srcErr?.message ?? `Failed source ${source.code}` }, { status: 500 });
+            return Response.json(
+              { ok: false, error: srcErr?.message ?? `Failed source ${source.code}` },
+              { status: 500 },
+            );
           }
           sourceIds.set(source.code, src.id);
         }
@@ -77,21 +86,32 @@ export const Route = createFileRoute("/api/public/admin/backfill-verse-translati
         let upserted = 0;
         const arabicRes = await fetch("https://api.quran.com/api/v4/quran/verses/uthmani");
         if (!arabicRes.ok) {
-          return Response.json({ ok: false, error: `Quran API failed for verse keys (${arabicRes.status})` }, { status: 502 });
+          return Response.json(
+            { ok: false, error: `Quran API failed for verse keys (${arabicRes.status})` },
+            { status: 502 },
+          );
         }
         const arabicJson = (await arabicRes.json()) as { verses?: ArabicVerse[] };
         const verseKeys = (arabicJson.verses ?? []).map((v) => v.verse_key);
 
         for (const source of SOURCES) {
-          const res = await fetch(`https://api.quran.com/api/v4/quran/translations/${source.resourceId}`);
+          const res = await fetch(
+            `https://api.quran.com/api/v4/quran/translations/${source.resourceId}`,
+          );
           if (!res.ok) {
-            return Response.json({ ok: false, error: `Quran API failed for ${source.code} (${res.status})` }, { status: 502 });
+            return Response.json(
+              { ok: false, error: `Quran API failed for ${source.code} (${res.status})` },
+              { status: 502 },
+            );
           }
 
           const json = (await res.json()) as { translations?: TranslationVerse[] };
           const sourceId = sourceIds.get(source.code);
           if (!sourceId) {
-            return Response.json({ ok: false, error: `Missing source id for ${source.code}` }, { status: 500 });
+            return Response.json(
+              { ok: false, error: `Missing source id for ${source.code}` },
+              { status: 500 },
+            );
           }
 
           const rows = (json.translations ?? [])
@@ -104,7 +124,9 @@ export const Route = createFileRoute("/api/public/admin/backfill-verse-translati
               if (!surah || !ayah || !text) return null;
               return { source_id: sourceId, surah, ayah, text };
             })
-            .filter((r): r is { source_id: string; surah: number; ayah: number; text: string } => !!r);
+            .filter(
+              (r): r is { source_id: string; surah: number; ayah: number; text: string } => !!r,
+            );
 
           if (rows.length > 0) {
             const { error } = await supabaseAdmin.from("ayah_translations").upsert(rows, {

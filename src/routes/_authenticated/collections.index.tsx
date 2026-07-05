@@ -10,7 +10,11 @@ export const Route = createFileRoute("/_authenticated/collections/")({
   head: () => ({
     meta: [
       { title: "My Collections — Discover Quran" },
-      { name: "description", content: "Curate and organize your favorite verses, topics and prophets into personal collections." },
+      {
+        name: "description",
+        content:
+          "Curate and organize your favorite verses, topics and prophets into personal collections.",
+      },
     ],
   }),
   component: CollectionsPage,

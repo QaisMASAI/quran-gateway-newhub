@@ -80,11 +80,20 @@ const JobPayloadSchemaMap: Record<JobKey, z.ZodType<Record<string, unknown>>> = 
 };
 
 const CacheSettingsSchema = z.object({
-  ttlMinutes: z.number().int().min(5).max(24 * 60),
+  ttlMinutes: z
+    .number()
+    .int()
+    .min(5)
+    .max(24 * 60),
 });
 
 const RegressionSchema = z.object({
-  sampleSurahs: z.array(z.number().int().min(1).max(114)).min(1).max(8).optional().default([1, 2, 18, 36]),
+  sampleSurahs: z
+    .array(z.number().int().min(1).max(114))
+    .min(1)
+    .max(8)
+    .optional()
+    .default([1, 2, 18, 36]),
 });
 
 const RunAllSchema = z.object({
@@ -131,12 +140,30 @@ type JobRunReport = {
 
 async function readBackfillCounts(context: { supabase: any }): Promise<BackfillCounts> {
   const [tafsirAr, tafsirEn, tafsirHe, asbabAr, asbabEn, asbabHe, hadithLinks] = await Promise.all([
-    context.supabase.from("tafsir_passages").select("id", { count: "exact", head: true }).eq("lang", "ar"),
-    context.supabase.from("tafsir_passages").select("id", { count: "exact", head: true }).eq("lang", "en"),
-    context.supabase.from("tafsir_passages").select("id", { count: "exact", head: true }).eq("lang", "he"),
-    context.supabase.from("asbab_nuzul").select("id", { count: "exact", head: true }).eq("lang", "ar"),
-    context.supabase.from("asbab_nuzul").select("id", { count: "exact", head: true }).eq("lang", "en"),
-    context.supabase.from("asbab_nuzul").select("id", { count: "exact", head: true }).eq("lang", "he"),
+    context.supabase
+      .from("tafsir_passages")
+      .select("id", { count: "exact", head: true })
+      .eq("lang", "ar"),
+    context.supabase
+      .from("tafsir_passages")
+      .select("id", { count: "exact", head: true })
+      .eq("lang", "en"),
+    context.supabase
+      .from("tafsir_passages")
+      .select("id", { count: "exact", head: true })
+      .eq("lang", "he"),
+    context.supabase
+      .from("asbab_nuzul")
+      .select("id", { count: "exact", head: true })
+      .eq("lang", "ar"),
+    context.supabase
+      .from("asbab_nuzul")
+      .select("id", { count: "exact", head: true })
+      .eq("lang", "en"),
+    context.supabase
+      .from("asbab_nuzul")
+      .select("id", { count: "exact", head: true })
+      .eq("lang", "he"),
     context.supabase
       .from("hadith_entity_links")
       .select("id", { count: "exact", head: true })
@@ -158,7 +185,11 @@ async function readBackfillCounts(context: { supabase: any }): Promise<BackfillC
   };
 }
 
-async function invokeAdminRoute(path: string, payload: Record<string, unknown>, adminUserId: string) {
+async function invokeAdminRoute(
+  path: string,
+  payload: Record<string, unknown>,
+  adminUserId: string,
+) {
   const token = process.env.QURAN_ADMIN_TOKEN;
   const req = getRequest();
   if (!token) throw new Error("Missing QURAN_ADMIN_TOKEN");
@@ -266,7 +297,11 @@ async function executeJobRun(args: {
   let errorMessage: string | null = null;
 
   try {
-    const routeResult = await invokeAdminRoute(routePathForJob(args.jobKey), args.payload, args.context.userId);
+    const routeResult = await invokeAdminRoute(
+      routePathForJob(args.jobKey),
+      args.payload,
+      args.context.userId,
+    );
     if (routeResult?.ok === false) {
       status = "failed";
       errorMessage = routeResult.error ?? "Job failed";
@@ -327,53 +362,63 @@ export const getAdminBackfillStatus = createServerFn({ method: "GET" })
       backfillCounts,
       { data: activeRuns },
       { data: jobHistoryRows },
-    ] =
-      await Promise.all([
-        context.supabase.from("quran_chapters").select("id", { count: "exact", head: true }),
-        context.supabase.from("asbab_nuzul").select("id", { count: "exact", head: true }),
-        context.supabase.from("ayah_translations").select("id", { count: "exact", head: true }),
-        context.supabase
-          .from("hadith_entity_links")
-          .select("id", { count: "exact", head: true })
-          .not("entity_id", "is", null),
-        context.supabase
-          .from("admin_job_runs")
-          .select("id,job_key,status,error_message,started_at,finished_at,updated_at")
-          .eq("requested_by", context.userId)
-          .eq("status", "failed")
-          .order("started_at", { ascending: false })
-          .limit(10),
-        context.supabase
-          .from("admin_runtime_settings")
-          .select("key,value_json,updated_at")
-          .eq("key", "research_cache")
-          .maybeSingle(),
-        context.supabase
-          .from("tafsir_passages")
-          .select("lang,source_id,source:tafsir_sources!inner(name_en)")
-          .order("lang", { ascending: true })
-          .limit(20000),
-        readBackfillCounts(context),
-        context.supabase
-          .from("admin_job_runs")
-          .select("id,job_key,status,started_at")
-          .eq("requested_by", context.userId)
-          .eq("status", "running")
-          .order("started_at", { ascending: false })
-          .limit(10),
-        context.supabase
-          .from("admin_job_runs")
-          .select("job_key,started_at,finished_at,status")
-          .eq("requested_by", context.userId)
-          .in("job_key", ["backfill-asbab-nuzul", "translate-tafsir-english", "translate-tafsir-hebrew"])
-          .order("started_at", { ascending: false })
-          .limit(100),
-      ]);
+    ] = await Promise.all([
+      context.supabase.from("quran_chapters").select("id", { count: "exact", head: true }),
+      context.supabase.from("asbab_nuzul").select("id", { count: "exact", head: true }),
+      context.supabase.from("ayah_translations").select("id", { count: "exact", head: true }),
+      context.supabase
+        .from("hadith_entity_links")
+        .select("id", { count: "exact", head: true })
+        .not("entity_id", "is", null),
+      context.supabase
+        .from("admin_job_runs")
+        .select("id,job_key,status,error_message,started_at,finished_at,updated_at")
+        .eq("requested_by", context.userId)
+        .eq("status", "failed")
+        .order("started_at", { ascending: false })
+        .limit(10),
+      context.supabase
+        .from("admin_runtime_settings")
+        .select("key,value_json,updated_at")
+        .eq("key", "research_cache")
+        .maybeSingle(),
+      context.supabase
+        .from("tafsir_passages")
+        .select("lang,source_id,source:tafsir_sources!inner(name_en)")
+        .order("lang", { ascending: true })
+        .limit(20000),
+      readBackfillCounts(context),
+      context.supabase
+        .from("admin_job_runs")
+        .select("id,job_key,status,started_at")
+        .eq("requested_by", context.userId)
+        .eq("status", "running")
+        .order("started_at", { ascending: false })
+        .limit(10),
+      context.supabase
+        .from("admin_job_runs")
+        .select("job_key,started_at,finished_at,status")
+        .eq("requested_by", context.userId)
+        .in("job_key", [
+          "backfill-asbab-nuzul",
+          "translate-tafsir-english",
+          "translate-tafsir-hebrew",
+        ])
+        .order("started_at", { ascending: false })
+        .limit(100),
+    ]);
 
     const valueJson = (settingsRow?.value_json ?? {}) as { ttl_minutes?: number; version?: number };
 
-    const tafsirAudit = new Map<string, { sourceName: string; ar: number; he: number; en: number }>();
-    for (const row of (tafsirAuditRows ?? []) as Array<{ lang: string; source: { name_en?: string } | null; source_id: string }>) {
+    const tafsirAudit = new Map<
+      string,
+      { sourceName: string; ar: number; he: number; en: number }
+    >();
+    for (const row of (tafsirAuditRows ?? []) as Array<{
+      lang: string;
+      source: { name_en?: string } | null;
+      source_id: string;
+    }>) {
       const key = row.source_id;
       const sourceName = row.source?.name_en ?? "Tafsir";
       const current = tafsirAudit.get(key) ?? { sourceName, ar: 0, he: 0, en: 0 };
@@ -383,8 +428,16 @@ export const getAdminBackfillStatus = createServerFn({ method: "GET" })
       tafsirAudit.set(key, current);
     }
 
-    const latestByJob = new Map<string, { started_at: string; finished_at: string | null; status: string }>();
-    for (const row of ((jobHistoryRows ?? []) as Array<{ job_key: string; started_at: string; finished_at: string | null; status: string }>)) {
+    const latestByJob = new Map<
+      string,
+      { started_at: string; finished_at: string | null; status: string }
+    >();
+    for (const row of (jobHistoryRows ?? []) as Array<{
+      job_key: string;
+      started_at: string;
+      finished_at: string | null;
+      status: string;
+    }>) {
       if (!latestByJob.has(row.job_key)) {
         latestByJob.set(row.job_key, {
           started_at: row.started_at,
@@ -396,10 +449,17 @@ export const getAdminBackfillStatus = createServerFn({ method: "GET" })
 
     return {
       jobs: {
-        quranChapters: { complete: (chapterCount ?? 0) >= 114, count: chapterCount ?? 0, target: 114 },
+        quranChapters: {
+          complete: (chapterCount ?? 0) >= 114,
+          count: chapterCount ?? 0,
+          target: 114,
+        },
         asbabNuzul: { complete: (asbabCount ?? 0) > 0, count: asbabCount ?? 0 },
         verseTranslations: { complete: (ayahCount ?? 0) >= 12000, count: ayahCount ?? 0 },
-        hadithTopics: { complete: (hadithTopicLinkCount ?? 0) > 0, count: hadithTopicLinkCount ?? 0 },
+        hadithTopics: {
+          complete: (hadithTopicLinkCount ?? 0) > 0,
+          count: hadithTopicLinkCount ?? 0,
+        },
       },
       failedJobs: failedJobs ?? [],
       cache: {
@@ -414,7 +474,9 @@ export const getAdminBackfillStatus = createServerFn({ method: "GET" })
         jalalaynEnglish: latestByJob.get("translate-tafsir-english") ?? null,
         jalalaynHebrew: latestByJob.get("translate-tafsir-hebrew") ?? null,
       },
-      tafsirAudit: [...tafsirAudit.values()].sort((a, b) => a.sourceName.localeCompare(b.sourceName)),
+      tafsirAudit: [...tafsirAudit.values()].sort((a, b) =>
+        a.sourceName.localeCompare(b.sourceName),
+      ),
     };
   });
 
@@ -469,13 +531,23 @@ export const runAllAdminBackfills = createServerFn({ method: "POST" })
           .limit(1)
           .maybeSingle();
 
-        if (latestFailed?.status === "failed" && latestFailed.payload && typeof latestFailed.payload === "object") {
+        if (
+          latestFailed?.status === "failed" &&
+          latestFailed.payload &&
+          typeof latestFailed.payload === "object"
+        ) {
           payload = { ...payload, ...(latestFailed.payload as Record<string, unknown>) };
         }
       }
 
       const step = await executeJobRun({ context, jobKey, payload });
-      steps.push({ jobKey, runId: step.runId, ok: step.ok, error: step.ok ? undefined : step.error, report: step.report });
+      steps.push({
+        jobKey,
+        runId: step.runId,
+        ok: step.ok,
+        error: step.ok ? undefined : step.error,
+        report: step.report,
+      });
       if (!step.ok) {
         return { ok: false as const, steps, stoppedAt: jobKey };
       }
@@ -560,8 +632,11 @@ export const runLocaleRegressionCheck = createServerFn({ method: "POST" })
         continue;
       }
 
-      const sampleAyahs = [enRows[0]?.ayah, enRows[Math.floor(enRows.length / 2)]?.ayah, enRows.at(-1)?.ayah]
-        .filter((v): v is number => Number.isFinite(v));
+      const sampleAyahs = [
+        enRows[0]?.ayah,
+        enRows[Math.floor(enRows.length / 2)]?.ayah,
+        enRows.at(-1)?.ayah,
+      ].filter((v): v is number => Number.isFinite(v));
 
       for (const ayah of sampleAyahs) {
         const [enVerse, heVerse, arVerse] = await Promise.all([
@@ -601,8 +676,10 @@ export const runLocaleRegressionCheck = createServerFn({ method: "POST" })
       if (!enV?.arabic || !heV?.arabic || !arV?.arabic) {
         errors.push(`DailyVerse sample ${item.surah}:${item.ayah}: Arabic missing`);
       }
-      if (!enV?.translation && !enV?.arabic) errors.push(`DailyVerse sample ${item.surah}:${item.ayah}: missing English translation`);
-      if (!heV?.translation && !heV?.arabic) errors.push(`DailyVerse sample ${item.surah}:${item.ayah}: missing Hebrew translation`);
+      if (!enV?.translation && !enV?.arabic)
+        errors.push(`DailyVerse sample ${item.surah}:${item.ayah}: missing English translation`);
+      if (!heV?.translation && !heV?.arabic)
+        errors.push(`DailyVerse sample ${item.surah}:${item.ayah}: missing Hebrew translation`);
       if (arV?.translation !== arV?.arabic) {
         errors.push(`DailyVerse sample ${item.surah}:${item.ayah}: Arabic locale not Arabic-only`);
       }

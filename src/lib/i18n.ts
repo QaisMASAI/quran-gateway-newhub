@@ -70,21 +70,21 @@ export function normalizeLocale(value: string | undefined | null): Locale | null
  */
 function applyDirectionGlobally(dir: "rtl" | "ltr", lang: Locale) {
   if (typeof document === "undefined") return;
-  
+
   // Update html element
   document.documentElement.lang = lang;
   document.documentElement.dir = dir;
-  
+
   // Update body element
   document.body.dir = dir;
-  
+
   // Update root/app container if it exists
   const root = document.getElementById("root");
   if (root) {
     root.dir = dir;
     root.lang = lang;
   }
-  
+
   // Store for React components to subscribe to
   window.__i18nDir = dir;
   window.__i18nLang = lang;
@@ -100,12 +100,12 @@ export function setLocale(locale: Locale) {
     }
     const dir = LOCALE_DIR[locale];
     applyDirectionGlobally(dir, locale);
-    
+
     // Dispatch custom event so components can react to language changes
     window.dispatchEvent(
       new CustomEvent("i18n:change", {
         detail: { locale, dir },
-      })
+      }),
     );
   }
 }

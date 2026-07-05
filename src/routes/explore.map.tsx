@@ -45,16 +45,17 @@ type PlaceEntityRow = {
   country_code?: string | null;
 };
 
-const PLACE_COORDS: Record<string, { latitude: number; longitude: number; country_code?: string }> = {
-  mecca: { latitude: 21.4225, longitude: 39.8262, country_code: "SA" },
-  medina: { latitude: 24.4672, longitude: 39.6111, country_code: "SA" },
-  jerusalem: { latitude: 31.7683, longitude: 35.2137, country_code: "PS" },
-  sinai: { latitude: 28.5394, longitude: 33.975, country_code: "EG" },
-  kaaba: { latitude: 21.4225, longitude: 39.8262, country_code: "SA" },
-  "cave-of-thawr": { latitude: 21.39, longitude: 39.857, country_code: "SA" },
-  egypt: { latitude: 26.8206, longitude: 30.8025, country_code: "EG" },
-  madyan: { latitude: 28.0, longitude: 35.0, country_code: "SA" },
-};
+const PLACE_COORDS: Record<string, { latitude: number; longitude: number; country_code?: string }> =
+  {
+    mecca: { latitude: 21.4225, longitude: 39.8262, country_code: "SA" },
+    medina: { latitude: 24.4672, longitude: 39.6111, country_code: "SA" },
+    jerusalem: { latitude: 31.7683, longitude: 35.2137, country_code: "PS" },
+    sinai: { latitude: 28.5394, longitude: 33.975, country_code: "EG" },
+    kaaba: { latitude: 21.4225, longitude: 39.8262, country_code: "SA" },
+    "cave-of-thawr": { latitude: 21.39, longitude: 39.857, country_code: "SA" },
+    egypt: { latitude: 26.8206, longitude: 30.8025, country_code: "EG" },
+    madyan: { latitude: 28.0, longitude: 35.0, country_code: "SA" },
+  };
 
 function MapPage() {
   const { t, i18n } = useTranslation("pages");
@@ -109,9 +110,7 @@ function MapPage() {
           </div>
           <div>
             <h1 className="text-3xl font-bold tracking-tight">{t("learn.openMap")}</h1>
-            <p className="text-sm text-muted-foreground">
-              {t("learn.openMapHint")}
-            </p>
+            <p className="text-sm text-muted-foreground">{t("learn.openMapHint")}</p>
           </div>
         </div>
 

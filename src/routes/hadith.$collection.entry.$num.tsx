@@ -8,7 +8,9 @@ import { getHadithEntry } from "@/lib/hadith.functions";
 export const Route = createFileRoute("/hadith/$collection/entry/$num")({
   head: ({ params }) => ({
     meta: [
-      { title: `${params.collection === "bukhari" ? "Sahih al-Bukhari" : "Sahih Muslim"} — Hadith #${params.num}` },
+      {
+        title: `${params.collection === "bukhari" ? "Sahih al-Bukhari" : "Sahih Muslim"} — Hadith #${params.num}`,
+      },
       { property: "og:url", content: `/hadith/${params.collection}/entry/${params.num}` },
     ],
     links: [{ rel: "canonical", href: `/hadith/${params.collection}/entry/${params.num}` }],
@@ -40,7 +42,9 @@ function HadithDetailPage() {
     return (
       <div className="min-h-screen bg-background">
         <Header />
-        <main className="mx-auto max-w-3xl px-4 py-10 text-sm text-muted-foreground">Hadith not found.</main>
+        <main className="mx-auto max-w-3xl px-4 py-10 text-sm text-muted-foreground">
+          Hadith not found.
+        </main>
       </div>
     );
   }
@@ -58,15 +62,24 @@ function HadithDetailPage() {
         >
           ← Book {h.book_id}
         </Link>
-        <h1 className="mt-2 text-xl font-bold text-foreground">{label} · #{h.id_in_book}</h1>
+        <h1 className="mt-2 text-xl font-bold text-foreground">
+          {label} · #{h.id_in_book}
+        </h1>
         {h.narrator && <p className="mt-1 text-sm italic text-muted-foreground">{h.narrator}</p>}
 
         <article className="mt-6 space-y-5 rounded-2xl border border-border bg-card p-5">
-          <p className="font-reading-ar text-right text-xl leading-loose text-foreground" dir="rtl" lang="ar">
+          <p
+            className="font-reading-ar text-right text-xl leading-loose text-foreground"
+            dir="rtl"
+            lang="ar"
+          >
             {h.arabic_text}
           </p>
           {h.english_text && (
-            <p className="font-reading-en border-t border-border pt-4 text-base leading-relaxed text-foreground/90" dir="ltr">
+            <p
+              className="font-reading-en border-t border-border pt-4 text-base leading-relaxed text-foreground/90"
+              dir="ltr"
+            >
               {h.english_text}
             </p>
           )}

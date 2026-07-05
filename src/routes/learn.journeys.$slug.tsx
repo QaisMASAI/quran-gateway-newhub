@@ -137,7 +137,8 @@ function JourneyPage() {
                     <div className="min-w-0 flex-1">
                       <div className="mb-0.5 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
                         {t("journeys.stepN", { n: idx + 1 })}
-                        {e && ` • ${t(`search.kind${e.kind.charAt(0).toUpperCase()}${e.kind.slice(1)}` as const)}`}
+                        {e &&
+                          ` • ${t(`search.kind${e.kind.charAt(0).toUpperCase()}${e.kind.slice(1)}` as const)}`}
                       </div>
                       {e ? (
                         <Link

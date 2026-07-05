@@ -2,7 +2,14 @@ import { createServerFn } from "@tanstack/react-start";
 import { getRequest } from "@tanstack/react-start/server";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import type { AdminUserRow, AppRole, AuditLogRow, AuthzSnapshot, RoleRecord, UserAccountStatus } from "./rbac.types";
+import type {
+  AdminUserRow,
+  AppRole,
+  AuditLogRow,
+  AuthzSnapshot,
+  RoleRecord,
+  UserAccountStatus,
+} from "./rbac.types";
 
 const ROLE_ORDER: AppRole[] = ["super_admin", "admin", "moderator", "editor", "user"];
 
@@ -20,7 +27,11 @@ const SetAccountStatusSchema = z.object({
 });
 
 const UpsertRoleSchema = z.object({
-  slug: z.string().min(2).max(64).regex(/^[a-z0-9_]+$/),
+  slug: z
+    .string()
+    .min(2)
+    .max(64)
+    .regex(/^[a-z0-9_]+$/),
   name: z.string().min(2).max(120),
   level: z.number().int().min(1).max(500),
 });
@@ -35,7 +46,13 @@ const SetRolePermissionsSchema = z.object({
 });
 
 function normalizeAppRole(value: string | null | undefined): AppRole {
-  if (value === "super_admin" || value === "admin" || value === "moderator" || value === "editor" || value === "user") {
+  if (
+    value === "super_admin" ||
+    value === "admin" ||
+    value === "moderator" ||
+    value === "editor" ||
+    value === "user"
+  ) {
     return value;
   }
   return "user";
@@ -51,7 +68,8 @@ async function logAudit(args: {
   metadata?: JsonValue;
 }) {
   const req = getRequest();
-  const ipAddress = req?.headers.get("x-forwarded-for") ?? req?.headers.get("cf-connecting-ip") ?? null;
+  const ipAddress =
+    req?.headers.get("x-forwarded-for") ?? req?.headers.get("cf-connecting-ip") ?? null;
   const userAgent = req?.headers.get("user-agent") ?? null;
 
   await args.supabaseAdmin.from("admin_audit_log").insert({
@@ -91,7 +109,10 @@ async function requireSuperAdmin(context: { supabase: any; userId: string }) {
   if (data !== true) throw new Error("Forbidden: super admin access required");
 }
 
-async function readAuthzSnapshot(context: { supabase: any; userId: string }): Promise<AuthzSnapshot> {
+async function readAuthzSnapshot(context: {
+  supabase: any;
+  userId: string;
+}): Promise<AuthzSnapshot> {
   await syncSuperAdminForCurrentUser(context);
 
   const [authUserRes, roleRes, permsRes, statusRes] = await Promise.all([
@@ -99,9 +120,15 @@ async function readAuthzSnapshot(context: { supabase: any; userId: string }): Pr
     context.supabase.rpc("get_current_user_role", { _user_id: context.userId }),
     context.supabase
       .from("user_roles")
-      .select("role,roles!inner(level),roles!inner(role_permissions(permission_id,permissions(code)))")
+      .select(
+        "role,roles!inner(level),roles!inner(role_permissions(permission_id,permissions(code)))",
+      )
       .eq("user_id", context.userId),
-    context.supabase.from("admin_account_status").select("is_suspended").eq("user_id", context.userId).maybeSingle(),
+    context.supabase
+      .from("admin_account_status")
+      .select("is_suspended")
+      .eq("user_id", context.userId)
+      .maybeSingle(),
   ]);
 
   if (roleRes.error) throw new Error(roleRes.error.message);
@@ -110,7 +137,10 @@ async function readAuthzSnapshot(context: { supabase: any; userId: string }): Pr
   const effectiveRole = normalizeAppRole(roleRes.data as string | null);
   const permissions = new Set<string>();
 
-  for (const row of (permsRes.data ?? []) as Array<{ role: string; roles: { role_permissions: Array<{ permissions: { code: string } | null }> } | null }>) {
+  for (const row of (permsRes.data ?? []) as Array<{
+    role: string;
+    roles: { role_permissions: Array<{ permissions: { code: string } | null }> } | null;
+  }>) {
     for (const rp of row.roles?.role_permissions ?? []) {
       if (rp.permissions?.code) permissions.add(rp.permissions.code);
     }
@@ -135,28 +165,61 @@ export const getAdminManagementData = createServerFn({ method: "GET" })
     await requireSuperAdmin(context);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
-    const [profilesRes, rolesRes, permsRes, rolePermRes, userRolesRes, statusRes, auditRes] = await Promise.all([
-      supabaseAdmin.from("profiles").select("id,display_name,avatar_url,created_at"),
-      supabaseAdmin.from("roles").select("id,slug,name,level,is_system").order("level", { ascending: false }),
-      supabaseAdmin.from("permissions").select("id,code,description").order("code", { ascending: true }),
-      supabaseAdmin.from("role_permissions").select("role_id,permission_id"),
-      supabaseAdmin.from("user_roles").select("user_id,role"),
-      supabaseAdmin.from("admin_account_status").select("user_id,is_suspended"),
-      supabaseAdmin
-        .from("admin_audit_log")
-        .select("id,actor_user_id,target_user_id,action,old_value,new_value,ip_address,user_agent,created_at")
-        .order("created_at", { ascending: false })
-        .limit(100),
-    ]);
+    const [profilesRes, rolesRes, permsRes, rolePermRes, userRolesRes, statusRes, auditRes] =
+      await Promise.all([
+        supabaseAdmin.from("profiles").select("id,display_name,avatar_url,created_at"),
+        supabaseAdmin
+          .from("roles")
+          .select("id,slug,name,level,is_system")
+          .order("level", { ascending: false }),
+        supabaseAdmin
+          .from("permissions")
+          .select("id,code,description")
+          .order("code", { ascending: true }),
+        supabaseAdmin.from("role_permissions").select("role_id,permission_id"),
+        supabaseAdmin.from("user_roles").select("user_id,role"),
+        supabaseAdmin.from("admin_account_status").select("user_id,is_suspended"),
+        supabaseAdmin
+          .from("admin_audit_log")
+          .select(
+            "id,actor_user_id,target_user_id,action,old_value,new_value,ip_address,user_agent,created_at",
+          )
+          .order("created_at", { ascending: false })
+          .limit(100),
+      ]);
 
     const firstErr =
-      profilesRes.error || rolesRes.error || permsRes.error || rolePermRes.error || userRolesRes.error || statusRes.error || auditRes.error;
+      profilesRes.error ||
+      rolesRes.error ||
+      permsRes.error ||
+      rolePermRes.error ||
+      userRolesRes.error ||
+      statusRes.error ||
+      auditRes.error;
     if (firstErr) throw new Error(firstErr.message);
 
-    const profiles = (profilesRes.data ?? []) as Array<{ id: string; display_name: string | null; avatar_url: string | null; created_at: string | null }>;
-    const roleRows = (rolesRes.data ?? []) as Array<{ id: string; slug: string; name: string; level: number; is_system: boolean }>;
-    const permRows = (permsRes.data ?? []) as Array<{ id: string; code: string; description: string }>;
-    const rolePermRows = (rolePermRes.data ?? []) as Array<{ role_id: string; permission_id: string }>;
+    const profiles = (profilesRes.data ?? []) as Array<{
+      id: string;
+      display_name: string | null;
+      avatar_url: string | null;
+      created_at: string | null;
+    }>;
+    const roleRows = (rolesRes.data ?? []) as Array<{
+      id: string;
+      slug: string;
+      name: string;
+      level: number;
+      is_system: boolean;
+    }>;
+    const permRows = (permsRes.data ?? []) as Array<{
+      id: string;
+      code: string;
+      description: string;
+    }>;
+    const rolePermRows = (rolePermRes.data ?? []) as Array<{
+      role_id: string;
+      permission_id: string;
+    }>;
     const userRoleRows = (userRolesRes.data ?? []) as Array<{ user_id: string; role: string }>;
     const statusRows = (statusRes.data ?? []) as Array<{ user_id: string; is_suspended: boolean }>;
 
@@ -187,7 +250,8 @@ export const getAdminManagementData = createServerFn({ method: "GET" })
         roleByUser.set(row.user_id, nextRole);
         continue;
       }
-      if (ROLE_ORDER.indexOf(nextRole) < ROLE_ORDER.indexOf(current)) roleByUser.set(row.user_id, nextRole);
+      if (ROLE_ORDER.indexOf(nextRole) < ROLE_ORDER.indexOf(current))
+        roleByUser.set(row.user_id, nextRole);
     }
 
     const statusByUser = new Map(statusRows.map((s) => [s.user_id, Boolean(s.is_suspended)]));
@@ -204,7 +268,12 @@ export const getAdminManagementData = createServerFn({ method: "GET" })
       status: statusByUser.get(p.id) ? "suspended" : "active",
     }));
 
-    const audit: Array<Omit<AuditLogRow, "oldValue" | "newValue"> & { oldValue: JsonValue | null; newValue: JsonValue | null }> = ((auditRes.data ?? []) as Array<any>).map((a) => ({
+    const audit: Array<
+      Omit<AuditLogRow, "oldValue" | "newValue"> & {
+        oldValue: JsonValue | null;
+        newValue: JsonValue | null;
+      }
+    > = ((auditRes.data ?? []) as Array<any>).map((a) => ({
       id: a.id,
       actorUserId: a.actor_user_id,
       targetUserId: a.target_user_id,
@@ -249,7 +318,10 @@ export const updateUserRole = createServerFn({ method: "POST" })
 
     const oldRoles = (oldRows ?? []).map((r: { role: string }) => normalizeAppRole(r.role));
 
-    const { error: delErr } = await supabaseAdmin.from("user_roles").delete().eq("user_id", data.targetUserId);
+    const { error: delErr } = await supabaseAdmin
+      .from("user_roles")
+      .delete()
+      .eq("user_id", data.targetUserId);
     if (delErr) throw new Error(delErr.message);
 
     const { error: insErr } = await supabaseAdmin.from("user_roles").insert({
@@ -302,7 +374,9 @@ export const setUserAccountStatus = createServerFn({ method: "POST" })
       actorUserId: context.userId,
       targetUserId: data.targetUserId,
       action: data.suspended ? "user.suspended" : "user.reactivated",
-      oldValue: oldRow ? { status: oldRow.is_suspended ? "suspended" : "active", reason: oldRow.reason } : null,
+      oldValue: oldRow
+        ? { status: oldRow.is_suspended ? "suspended" : "active", reason: oldRow.reason }
+        : null,
       newValue: { status: data.suspended ? "suspended" : "active", reason: data.reason ?? null },
     });
 
@@ -322,10 +396,17 @@ export const upsertRole = createServerFn({ method: "POST" })
       .eq("slug", data.slug)
       .maybeSingle();
 
-    const { error } = await supabaseAdmin.from("roles").upsert(
-      { slug: data.slug, name: data.name, level: data.level, is_system: oldRow?.is_system ?? false },
-      { onConflict: "slug" },
-    );
+    const { error } = await supabaseAdmin
+      .from("roles")
+      .upsert(
+        {
+          slug: data.slug,
+          name: data.name,
+          level: data.level,
+          is_system: oldRow?.is_system ?? false,
+        },
+        { onConflict: "slug" },
+      );
     if (error) throw new Error(error.message);
 
     await logAudit({
@@ -361,7 +442,8 @@ export const deleteRole = createServerFn({ method: "POST" })
       .select("id", { count: "exact", head: true })
       .eq("role", normalizeAppRole(role.slug));
     if (usageErr) throw new Error(usageErr.message);
-    if ((usageCount ?? 0) > 0) throw new Error("Cannot delete a role that is currently assigned to users.");
+    if ((usageCount ?? 0) > 0)
+      throw new Error("Cannot delete a role that is currently assigned to users.");
 
     const { error: delErr } = await supabaseAdmin.from("roles").delete().eq("id", data.roleId);
     if (delErr) throw new Error(delErr.message);
@@ -385,7 +467,11 @@ export const setRolePermissions = createServerFn({ method: "POST" })
     await requireSuperAdmin(context);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
-    const { data: role, error: roleErr } = await supabaseAdmin.from("roles").select("id,slug").eq("id", data.roleId).maybeSingle();
+    const { data: role, error: roleErr } = await supabaseAdmin
+      .from("roles")
+      .select("id,slug")
+      .eq("id", data.roleId)
+      .maybeSingle();
     if (roleErr) throw new Error(roleErr.message);
     if (!role) throw new Error("Role not found.");
 
@@ -422,7 +508,9 @@ export const setRolePermissions = createServerFn({ method: "POST" })
     }
 
     if (toInsert.length > 0) {
-      const { error: insErr } = await supabaseAdmin.from("role_permissions").insert(toInsert.map((pid) => ({ role_id: data.roleId, permission_id: pid })));
+      const { error: insErr } = await supabaseAdmin
+        .from("role_permissions")
+        .insert(toInsert.map((pid) => ({ role_id: data.roleId, permission_id: pid })));
       if (insErr) throw new Error(insErr.message);
     }
 

@@ -296,13 +296,12 @@ type SeedProphet = {
 };
 
 const seedProphetLinks = new Map(
-  ((seed.verses as Array<{ slug: string; links: [number, number, number][] }> | undefined) ?? []).map((v) => [
-    v.slug,
-    v.links,
-  ]),
+  (
+    (seed.verses as Array<{ slug: string; links: [number, number, number][] }> | undefined) ?? []
+  ).map((v) => [v.slug, v.links]),
 );
 
-const seedProphets: Prophet[] = (((seed.entities as SeedProphet[] | undefined) ?? [])
+const seedProphets: Prophet[] = ((seed.entities as SeedProphet[] | undefined) ?? [])
   .filter((e) => e.kind === "prophet")
   .map((e) => ({
     slug: e.slug,
@@ -314,7 +313,7 @@ const seedProphets: Prophet[] = (((seed.entities as SeedProphet[] | undefined) ?
       to,
     })),
   }))
-  .filter((p) => p.refs.length > 0));
+  .filter((p) => p.refs.length > 0);
 
 const mergedProphets = [...PROPHETS];
 const seenProphetSlugs = new Set(PROPHETS.map((p) => p.slug));

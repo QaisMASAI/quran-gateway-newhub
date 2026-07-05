@@ -32,18 +32,120 @@ export interface Verse {
 }
 
 const VERSE_COUNTS: Record<number, number> = {
-  1: 7, 2: 286, 3: 200, 4: 176, 5: 120, 6: 165, 7: 206, 8: 75, 9: 129, 10: 109,
-  11: 123, 12: 111, 13: 43, 14: 52, 15: 99, 16: 128, 17: 111, 18: 110, 19: 98, 20: 135,
-  21: 112, 22: 78, 23: 118, 24: 64, 25: 77, 26: 227, 27: 93, 28: 88, 29: 69, 30: 60,
-  31: 34, 32: 30, 33: 73, 34: 54, 35: 45, 36: 83, 37: 182, 38: 88, 39: 75, 40: 85,
-  41: 54, 42: 53, 43: 89, 44: 59, 45: 37, 46: 35, 47: 38, 48: 29, 49: 18, 50: 45,
-  51: 60, 52: 49, 53: 62, 54: 55, 55: 78, 56: 96, 57: 29, 58: 22, 59: 24, 60: 13,
-  61: 14, 62: 11, 63: 11, 64: 18, 65: 12, 66: 12, 67: 30, 68: 52, 69: 52, 70: 44,
-  71: 28, 72: 28, 73: 20, 74: 56, 75: 40, 76: 31, 77: 50, 78: 40, 79: 46, 80: 42,
-  81: 29, 82: 19, 83: 36, 84: 25, 85: 22, 86: 17, 87: 19, 88: 26, 89: 30, 90: 20,
-  91: 15, 92: 21, 93: 11, 94: 8, 95: 8, 96: 19, 97: 5, 98: 8, 99: 8, 100: 11,
-  101: 11, 102: 8, 103: 3, 104: 9, 105: 5, 106: 4, 107: 7, 108: 3, 109: 6, 110: 3,
-  111: 5, 112: 4, 113: 5, 114: 6,
+  1: 7,
+  2: 286,
+  3: 200,
+  4: 176,
+  5: 120,
+  6: 165,
+  7: 206,
+  8: 75,
+  9: 129,
+  10: 109,
+  11: 123,
+  12: 111,
+  13: 43,
+  14: 52,
+  15: 99,
+  16: 128,
+  17: 111,
+  18: 110,
+  19: 98,
+  20: 135,
+  21: 112,
+  22: 78,
+  23: 118,
+  24: 64,
+  25: 77,
+  26: 227,
+  27: 93,
+  28: 88,
+  29: 69,
+  30: 60,
+  31: 34,
+  32: 30,
+  33: 73,
+  34: 54,
+  35: 45,
+  36: 83,
+  37: 182,
+  38: 88,
+  39: 75,
+  40: 85,
+  41: 54,
+  42: 53,
+  43: 89,
+  44: 59,
+  45: 37,
+  46: 35,
+  47: 38,
+  48: 29,
+  49: 18,
+  50: 45,
+  51: 60,
+  52: 49,
+  53: 62,
+  54: 55,
+  55: 78,
+  56: 96,
+  57: 29,
+  58: 22,
+  59: 24,
+  60: 13,
+  61: 14,
+  62: 11,
+  63: 11,
+  64: 18,
+  65: 12,
+  66: 12,
+  67: 30,
+  68: 52,
+  69: 52,
+  70: 44,
+  71: 28,
+  72: 28,
+  73: 20,
+  74: 56,
+  75: 40,
+  76: 31,
+  77: 50,
+  78: 40,
+  79: 46,
+  80: 42,
+  81: 29,
+  82: 19,
+  83: 36,
+  84: 25,
+  85: 22,
+  86: 17,
+  87: 19,
+  88: 26,
+  89: 30,
+  90: 20,
+  91: 15,
+  92: 21,
+  93: 11,
+  94: 8,
+  95: 8,
+  96: 19,
+  97: 5,
+  98: 8,
+  99: 8,
+  100: 11,
+  101: 11,
+  102: 8,
+  103: 3,
+  104: 9,
+  105: 5,
+  106: 4,
+  107: 7,
+  108: 3,
+  109: 6,
+  110: 3,
+  111: 5,
+  112: 4,
+  113: 5,
+  114: 6,
 };
 
 const TRANSLATION_SOURCE_CODE: Record<ApiLang, string> = {
@@ -78,7 +180,9 @@ function translationIdFor(lang: ApiLang): number {
 export async function fetchChapters(lang: ApiLang = "he"): Promise<Chapter[]> {
   const { data: dbRows } = await supabase
     .from("quran_chapters" as never)
-    .select("chapter_number,name_ar,name_simple_en,name_translated_en,name_he,revelation_place,verses_count")
+    .select(
+      "chapter_number,name_ar,name_simple_en,name_translated_en,name_he,revelation_place,verses_count",
+    )
     .order("chapter_number", { ascending: true });
 
   const rows = (dbRows as unknown as ChapterRow[] | null) ?? [];
@@ -90,7 +194,7 @@ export async function fetchChapters(lang: ApiLang = "he"): Promise<Chapter[]> {
       translated_name: {
         name:
           lang === "he"
-            ? r.name_he ?? r.name_simple_en
+            ? (r.name_he ?? r.name_simple_en)
             : lang === "ar"
               ? r.name_ar
               : r.name_simple_en,
@@ -106,7 +210,14 @@ export async function fetchChapters(lang: ApiLang = "he"): Promise<Chapter[]> {
       id,
       name_arabic: SURAH_NAMES_AR[id] ?? `سورة ${id}`,
       name_simple: SURAH_NAMES_EN[id] ?? `Surah ${id}`,
-      translated_name: { name: lang === "he" ? SURAH_NAMES_HE[id] ?? SURAH_NAMES_EN[id] : lang === "ar" ? SURAH_NAMES_AR[id] ?? SURAH_NAMES_EN[id] : SURAH_NAMES_EN[id] ?? `Surah ${id}` },
+      translated_name: {
+        name:
+          lang === "he"
+            ? (SURAH_NAMES_HE[id] ?? SURAH_NAMES_EN[id])
+            : lang === "ar"
+              ? (SURAH_NAMES_AR[id] ?? SURAH_NAMES_EN[id])
+              : (SURAH_NAMES_EN[id] ?? `Surah ${id}`),
+      },
       verses_count: VERSE_COUNTS[id] ?? 0,
       revelation_place: "makkah",
     };
@@ -127,11 +238,14 @@ export async function fetchVerses(chapterId: number, lang: ApiLang = "he"): Prom
     verse_key: `${row.surah}:${row.ayah}`,
     verse_number: row.ayah,
     text_uthmani: row.arabic,
-    translations: [{
-      id: translationIdFor(lang),
-      text: lang === "ar" ? "" : row.translation,
-      resource_name: lang === "he" ? "Ben Shemesh" : lang === "en" ? "Sahih International" : "Arabic Original",
-    }],
+    translations: [
+      {
+        id: translationIdFor(lang),
+        text: lang === "ar" ? "" : row.translation,
+        resource_name:
+          lang === "he" ? "Ben Shemesh" : lang === "en" ? "Sahih International" : "Arabic Original",
+      },
+    ],
   }));
 }
 
@@ -156,7 +270,13 @@ export interface Reciter {
 }
 
 export const RECITERS: Reciter[] = [
-  { key: "yasser-ad-dussary", name_he: "יאסר א-דוסרי", name_ar: "ياسر الدوسري", name_en: "Yasser Al-Dosari", folder: "Yasser_Ad-Dussary_128kbps" },
+  {
+    key: "yasser-ad-dussary",
+    name_he: "יאסר א-דוסרי",
+    name_ar: "ياسر الدوسري",
+    name_en: "Yasser Al-Dosari",
+    folder: "Yasser_Ad-Dussary_128kbps",
+  },
 ];
 
 export function reciterName(r: Reciter, locale: "he" | "ar" | "en"): string {
@@ -179,7 +299,11 @@ export function setStoredReciter(key: ReciterKey) {
   window.dispatchEvent(new CustomEvent("qc:reciter-change", { detail: key }));
 }
 
-export function ayahAudioUrl(surahId: number, ayahNumber: number, reciter: ReciterKey = "yasser-ad-dussary"): string {
+export function ayahAudioUrl(
+  surahId: number,
+  ayahNumber: number,
+  reciter: ReciterKey = "yasser-ad-dussary",
+): string {
   const s = String(surahId).padStart(3, "0");
   const a = String(ayahNumber).padStart(3, "0");
   const folder = RECITERS.find((r) => r.key === reciter)?.folder ?? RECITERS[0].folder;
@@ -342,7 +466,10 @@ export async function buildQuranIndex(): Promise<QuranIndex> {
 
   if (error || !rows) throw new Error("Failed to load verses");
 
-  const verseMap = new Map<string, { surah: number; ayah: number; arabic: string; hebrew: string; english: string }>();
+  const verseMap = new Map<
+    string,
+    { surah: number; ayah: number; arabic: string; hebrew: string; english: string }
+  >();
   for (const row of rows) {
     const key = `${row.surah}:${row.ayah}`;
     const current = verseMap.get(key) ?? {
@@ -445,7 +572,9 @@ function highlight(text: string, term: string, normalize: (s: string) => string)
   const before = (start > 0 ? "… " : "") + text.slice(start, m.index);
   const hit = text.slice(m.index, m.index + m[0].length);
   const after = text.slice(m.index + m[0].length, end) + (end < text.length ? " …" : "");
-  return escapeHtml(before) + `<mark class="search-hit">${escapeHtml(hit)}</mark>` + escapeHtml(after);
+  return (
+    escapeHtml(before) + `<mark class="search-hit">${escapeHtml(hit)}</mark>` + escapeHtml(after)
+  );
 }
 
 function escapeHtml(s: string): string {
@@ -531,8 +660,14 @@ export function searchIndex(idx: QuranIndex, rawQuery: string, limit = 500): Sea
 
     const chapter = idx.chapters[v.surah - 1];
     if (!chapter) continue;
-    const snippetSource = matched === "hebrew" ? v.hebrew : matched === "english" ? v.english : v.arabic;
-    const normFn = matched === "hebrew" ? normalizeHebrew : matched === "english" ? normalizeEnglish : normalizeArabic;
+    const snippetSource =
+      matched === "hebrew" ? v.hebrew : matched === "english" ? v.english : v.arabic;
+    const normFn =
+      matched === "hebrew"
+        ? normalizeHebrew
+        : matched === "english"
+          ? normalizeEnglish
+          : normalizeArabic;
     const snippet = highlight(snippetSource, q, normFn);
     hits.push({ verse: v, chapter, matchedIn: matched, snippet });
     if (hits.length >= limit) break;

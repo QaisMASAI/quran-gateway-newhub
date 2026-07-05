@@ -59,21 +59,14 @@ export function DailyVerse() {
     staleTime: Infinity,
   });
 
-  const name = surahDisplayName(
-    pick.surah,
-    lang === "ar" || lang === "en" ? lang : "he"
-  );
+  const name = surahDisplayName(pick.surah, lang === "ar" || lang === "en" ? lang : "he");
 
   const verse = q.data?.find((v) => v.ayah === pick.ayah);
 
   return (
     <section className="mx-auto mt-10 max-w-3xl px-4 sm:px-6">
       <div className="surface-card relative overflow-hidden p-5 sm:p-7">
-        <span
-          className="arabesque-corner"
-          style={{ top: 0, left: 0 }}
-          aria-hidden
-        />
+        <span className="arabesque-corner" style={{ top: 0, left: 0 }} aria-hidden />
         <span
           className="arabesque-corner"
           style={{ bottom: 0, right: 0, transform: "rotate(180deg)" }}

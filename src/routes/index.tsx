@@ -3,13 +3,26 @@ import { useQuery } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { fetchChapters, type ApiLang } from "@/lib/quran-api";
-import { surahDisplayName, SURAH_NAMES_HE, SURAH_NAMES_EN, SURAH_NAMES_AR } from "@/lib/surah-names-he";
+import {
+  surahDisplayName,
+  SURAH_NAMES_HE,
+  SURAH_NAMES_EN,
+  SURAH_NAMES_AR,
+} from "@/lib/surah-names-he";
 import { Header } from "@/components/Header";
 import { Logo } from "@/components/Logo";
 import { DailyVerse } from "@/components/DailyVerse";
 // ContinueReading hidden per product decision
 import { TrustBadge } from "@/components/TrustBadge";
-import { BookOpen, Sparkles, Search as SearchIcon, ChevronRight, ChevronLeft, Loader2, MapPin } from "lucide-react";
+import {
+  BookOpen,
+  Sparkles,
+  Search as SearchIcon,
+  ChevronRight,
+  ChevronLeft,
+  Loader2,
+  MapPin,
+} from "lucide-react";
 import i18n, { normalizeLocale } from "@/lib/i18n";
 
 export const Route = createFileRoute("/")({
@@ -83,7 +96,11 @@ function Home() {
           <div
             className={`pointer-events-none absolute -bottom-24 ${isRtl ? "-right-10" : "-left-10"} h-72 w-72 rounded-full bg-primary-foreground/10 blur-3xl`}
           />
-          <span className="arabesque-corner" style={{ top: 0, [isRtl ? "left" : "right"]: 0 }} aria-hidden />
+          <span
+            className="arabesque-corner"
+            style={{ top: 0, [isRtl ? "left" : "right"]: 0 }}
+            aria-hidden
+          />
           <span
             className="arabesque-corner"
             style={{ bottom: 0, [isRtl ? "right" : "left"]: 0, transform: "rotate(180deg)" }}
@@ -157,7 +174,9 @@ function Home() {
           className={`mb-10 flex flex-col gap-5 md:flex-row md:items-end md:justify-between ${isRtl ? "md:flex-row-reverse" : ""}`}
         >
           <div className="space-y-1.5">
-            <h2 className="font-display text-3xl font-bold text-primary sm:text-4xl">{t("home.chaptersTitle")}</h2>
+            <h2 className="font-display text-3xl font-bold text-primary sm:text-4xl">
+              {t("home.chaptersTitle")}
+            </h2>
             <p className="text-sm text-muted-foreground">{t("home.chaptersSubtitle")}</p>
           </div>
           <div className="relative w-full md:w-96">
@@ -202,7 +221,9 @@ function Home() {
                 </div>
 
                 <div className="min-w-0 flex-1">
-                  <h4 className="truncate text-base font-bold text-primary">{surahDisplayName(c.id, lang)}</h4>
+                  <h4 className="truncate text-base font-bold text-primary">
+                    {surahDisplayName(c.id, lang)}
+                  </h4>
                   <div
                     className={`mt-1 flex flex-wrap items-center gap-1.5 text-[11px] text-muted-foreground ${isRtl ? "flex-row-reverse" : ""}`}
                   >
@@ -246,10 +267,18 @@ function Home() {
 
       <div className="mosque-arch mt-12" aria-hidden />
       <footer className="relative border-t border-border py-10 text-center text-xs text-muted-foreground">
-        <span className="arabesque-corner" style={{ top: 0, [isRtl ? "left" : "right"]: 0 }} aria-hidden />
         <span
           className="arabesque-corner"
-          style={{ top: 0, [isRtl ? "right" : "left"]: 0, transform: isRtl ? "scaleX(1)" : "scaleX(-1)" }}
+          style={{ top: 0, [isRtl ? "left" : "right"]: 0 }}
+          aria-hidden
+        />
+        <span
+          className="arabesque-corner"
+          style={{
+            top: 0,
+            [isRtl ? "right" : "left"]: 0,
+            transform: isRtl ? "scaleX(1)" : "scaleX(-1)",
+          }}
           aria-hidden
         />
         <p className="relative">{t("home.footerTagline")}</p>

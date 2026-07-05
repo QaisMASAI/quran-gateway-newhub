@@ -46,7 +46,10 @@ export function EntityCard({
       params={{ kind: entity.kind, slug: entity.slug }}
       className="surface-card group relative block overflow-hidden p-4 transition hover:border-primary/40 hover:shadow-md"
     >
-      <div className={`pointer-events-none absolute inset-0 bg-gradient-to-br ${tone} opacity-60`} aria-hidden />
+      <div
+        className={`pointer-events-none absolute inset-0 bg-gradient-to-br ${tone} opacity-60`}
+        aria-hidden
+      />
       <div className="relative flex items-start gap-3">
         <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-background/70 backdrop-blur">
           <Icon className="h-5 w-5" />
@@ -55,9 +58,13 @@ export function EntityCard({
           <div className="mb-1 text-[10px] font-semibold uppercase tracking-wider opacity-70">
             {kindLabel}
           </div>
-          <h3 className="line-clamp-1 text-base font-semibold text-foreground" dir="auto">{title}</h3>
+          <h3 className="line-clamp-1 text-base font-semibold text-foreground" dir="auto">
+            {title}
+          </h3>
           {summary && (
-            <p className="mt-1 line-clamp-2 text-sm text-muted-foreground" dir="auto">{summary}</p>
+            <p className="mt-1 line-clamp-2 text-sm text-muted-foreground" dir="auto">
+              {summary}
+            </p>
           )}
         </div>
       </div>
