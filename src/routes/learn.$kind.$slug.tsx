@@ -18,6 +18,8 @@ import {
 } from "@/lib/tafsir-content";
 import { normalizeLocale, type Locale } from "@/lib/i18n";
 import { useMemo } from "react";
+import { localeTextDir, readingFontClass, tafsirFontClass, uiFontClass } from "@/lib/locale-ui";
+import type { ReactNode } from "react";
 
 const VALID: EntityKind[] = [
   "topic", "prophet", "story", "event", "place", "nation", "concept", "theme",
@@ -31,6 +33,10 @@ function EntityPage() {
   const { kind, slug } = Route.useParams();
   const { t, i18n } = useTranslation("pages");
   const locale = (normalizeLocale(i18n.language) ?? "he") as Locale;
+  const uiClass = uiFontClass(locale);
+  const readingClass = readingFontClass(locale);
+  const tafsirClass = tafsirFontClass(locale);
+  const textDir = localeTextDir(locale);
 
   if (!VALID.includes(kind as EntityKind)) throw notFound();
 
@@ -104,7 +110,7 @@ function EntityPage() {
   }, [t, versesQ.data, relatedQ.data]);
 
   return (
-    <div className={`min-h-screen bg-background ${locale === "ar" ? "font-ui-ar" : locale === "en" ? "font-ui-en" : "font-ui-he"}`}>
+    <div className={`min-h-screen bg-background ${uiClass}`}>
       <Header />
 
       {entity && (
@@ -123,7 +129,7 @@ function EntityPage() {
               {pickLocale(entity.title_i18n, locale)}
             </h1>
             {pickLocale(entity.summary_i18n, locale) && (
-              <p className={`mt-3 max-w-2xl text-base leading-relaxed text-white/80 sm:text-lg ${locale === "ar" ? "font-reading-ar" : locale === "en" ? "font-reading-en" : "font-reading-he"}`} dir={locale === "en" ? "ltr" : "rtl"}>
+              <p className={`mt-3 max-w-2xl text-base leading-relaxed text-white/80 sm:text-lg ${readingClass}`} dir={textDir}>
                 {pickLocale(entity.summary_i18n, locale)}
               </p>
             )}
@@ -166,7 +172,7 @@ function EntityPage() {
               {/* Overview */}
               <Section id="overview" icon={<BookOpen className="h-4 w-4" />} title={t("learn.overview")}>
                 {pickLocale(entity.description_i18n, locale) ? (
-                  <p className={`whitespace-pre-line text-base leading-relaxed text-foreground/90 ${locale === "ar" ? "font-tafsir-hadith-ar" : locale === "en" ? "font-tafsir-hadith-en" : "font-tafsir-hadith-he"}`} dir={locale === "en" ? "ltr" : "rtl"}>
+                  <p className={`whitespace-pre-line text-base leading-relaxed text-foreground/90 ${tafsirClass}`} dir={textDir}>
                     {pickLocale(entity.description_i18n, locale)}
                   </p>
                 ) : (
@@ -247,7 +253,7 @@ function EntityPage() {
 
 function Section({
   id, icon, title, subtitle, children,
-}: { id: string; icon: React.ReactNode; title: string; subtitle?: string; children: React.ReactNode }) {
+}: { id: string; icon: ReactNode; title: string; subtitle?: string; children: ReactNode }) {
   return (
     <section id={id} className="scroll-mt-24">
       <header className="mb-4 flex items-start gap-3">
@@ -267,12 +273,13 @@ function Section({
 function PassageBlock({
   body, sourceLabel, citation, locale,
 }: { body: string; sourceLabel: string; citation?: string | null; locale: Locale }) {
-  const isRtl = locale !== "en";
+  const textDir = localeTextDir(locale);
+  const tafsirClass = tafsirFontClass(locale);
   return (
     <article className="rounded-2xl border border-primary/10 bg-card p-5 shadow-sm">
       <p
-        className={`ai-explanation-block whitespace-pre-line text-base leading-relaxed text-foreground/90 ${locale === "en" ? "font-tafsir-hadith-en" : locale === "ar" ? "font-tafsir-hadith-ar" : "font-tafsir-hadith-he"}`}
-        dir={isRtl ? "rtl" : "ltr"}
+        className={`ai-explanation-block whitespace-pre-line text-base leading-relaxed text-foreground/90 ${tafsirClass}`}
+        dir={textDir}
       >
         {body}
       </p>
