@@ -167,13 +167,9 @@ export async function getRelatedEntities(entityId: string): Promise<KnowledgeEnt
     ? entityId.slice(5)
     : seedEntities.find((e) => e.id === entityId)?.slug;
   if (sourceSlug) {
-    const relatedSlugs = seedRelations
-      .filter(([from]) => from === sourceSlug)
-      .map(([, to]) => to);
+    const relatedSlugs = seedRelations.filter(([from]) => from === sourceSlug).map(([, to]) => to);
     if (relatedSlugs.length > 0) {
-      return relatedSlugs
-        .map((s) => seedBySlug.get(s))
-        .filter((e): e is KnowledgeEntity => !!e);
+      return relatedSlugs.map((s) => seedBySlug.get(s)).filter((e): e is KnowledgeEntity => !!e);
     }
   }
 
@@ -213,16 +209,16 @@ export async function searchEntities(query: string, limit = 12): Promise<Knowled
   if (db.length >= limit) return db;
   const ql = safe.toLowerCase();
   const fallback = seedEntities.filter((e) => {
-    const title = `${e.title_i18n.he ?? ""} ${e.title_i18n.ar ?? ""} ${e.title_i18n.en ?? ""}`.toLowerCase();
-    const summary = `${e.summary_i18n.he ?? ""} ${e.summary_i18n.ar ?? ""} ${e.summary_i18n.en ?? ""}`.toLowerCase();
+    const title =
+      `${e.title_i18n.he ?? ""} ${e.title_i18n.ar ?? ""} ${e.title_i18n.en ?? ""}`.toLowerCase();
+    const summary =
+      `${e.summary_i18n.he ?? ""} ${e.summary_i18n.ar ?? ""} ${e.summary_i18n.en ?? ""}`.toLowerCase();
     return e.slug.includes(ql) || title.includes(ql) || summary.includes(ql);
   });
   return mergeEntities(db, fallback).slice(0, limit);
 }
 
-export function groupByKind(
-  entities: KnowledgeEntity[],
-): Record<EntityKind, KnowledgeEntity[]> {
+export function groupByKind(entities: KnowledgeEntity[]): Record<EntityKind, KnowledgeEntity[]> {
   const out: Record<string, KnowledgeEntity[]> = {};
   for (const e of entities) {
     (out[e.kind] ||= []).push(e);
@@ -266,7 +262,16 @@ export async function searchKnowledgeTexts(query: string, limit = 10): Promise<K
       .limit(Math.min(4, limit)),
   ]);
 
-  const tafsir = ((tafsirRes.data as Array<{ id: string; surah: number; ayah_start: number; ayah_end: number; body: string; source: { name_he?: string; name_en?: string } | null }> | null) ?? []).map((r) => ({
+  const tafsir = (
+    (tafsirRes.data as Array<{
+      id: string;
+      surah: number;
+      ayah_start: number;
+      ayah_end: number;
+      body: string;
+      source: { name_he?: string; name_en?: string } | null;
+    }> | null) ?? []
+  ).map((r) => ({
     id: r.id,
     kind: "tafsir" as const,
     surah: r.surah,
@@ -276,7 +281,16 @@ export async function searchKnowledgeTexts(query: string, limit = 10): Promise<K
     source_name: r.source?.name_en ?? r.source?.name_he ?? "Tafsir",
   }));
 
-  const asbab = ((asbabRes.data as Array<{ id: string; surah: number; ayah_start: number; ayah_end: number; body: string; source: { name_he?: string; name_en?: string } | null }> | null) ?? []).map((r) => ({
+  const asbab = (
+    (asbabRes.data as Array<{
+      id: string;
+      surah: number;
+      ayah_start: number;
+      ayah_end: number;
+      body: string;
+      source: { name_he?: string; name_en?: string } | null;
+    }> | null) ?? []
+  ).map((r) => ({
     id: r.id,
     kind: "asbab" as const,
     surah: r.surah,
@@ -286,7 +300,13 @@ export async function searchKnowledgeTexts(query: string, limit = 10): Promise<K
     source_name: r.source?.name_en ?? r.source?.name_he ?? "Asbab",
   }));
 
-  const lessons = ((lessonRes.data as Array<{ id: string; body: string; source: { name_he?: string; name_en?: string } | null }> | null) ?? []).map((r) => ({
+  const lessons = (
+    (lessonRes.data as Array<{
+      id: string;
+      body: string;
+      source: { name_he?: string; name_en?: string } | null;
+    }> | null) ?? []
+  ).map((r) => ({
     id: r.id,
     kind: "lesson" as const,
     surah: null,
@@ -443,10 +463,7 @@ export async function getJourneyBySlug(
   return { journey: j as Journey, steps: (steps as JourneyStep[] | null) ?? [] };
 }
 
-export async function getJourneyProgress(
-  userId: string,
-  journeyId: string,
-): Promise<Set<string>> {
+export async function getJourneyProgress(userId: string, journeyId: string): Promise<Set<string>> {
   const { data } = await supabase
     .from("knowledge_journey_progress")
     .select("step_id")
@@ -464,7 +481,10 @@ export async function toggleJourneyStep(
   if (done) {
     await supabase
       .from("knowledge_journey_progress")
-      .upsert({ user_id: userId, journey_id: journeyId, step_id: stepId }, { onConflict: "user_id,step_id" });
+      .upsert(
+        { user_id: userId, journey_id: journeyId, step_id: stepId },
+        { onConflict: "user_id,step_id" },
+      );
   } else {
     await supabase
       .from("knowledge_journey_progress")

@@ -28,9 +28,7 @@ export function PassageCard({ surah, ayahStart, ayahEnd, locale, title }: Passag
         hash={`v-${ayahStart}`}
         className="flex items-center justify-between gap-3 border-b border-border px-4 py-2.5 text-xs hover:bg-secondary/40"
       >
-        <span className="font-medium text-primary">
-          {title ?? `${surah}:${range}`}
-        </span>
+        <span className="font-medium text-primary">{title ?? `${surah}:${range}`}</span>
         <span className="inline-flex items-center gap-1 text-muted-foreground">
           <BookOpen className="h-3 w-3" />
           {surah}:{range}
@@ -51,7 +49,10 @@ export function PassageCard({ surah, ayahStart, ayahEnd, locale, title }: Passag
               {v.arabic}
             </p>
             {v.translation && v.translation !== v.arabic && (
-              <p className={`text-sm text-muted-foreground ${locale === "ar" ? "font-reading-ar" : locale === "en" ? "font-reading-en" : "font-reading-he"}`} dir={locale === "en" ? "ltr" : "rtl"}>
+              <p
+                className={`text-sm text-muted-foreground ${locale === "ar" ? "font-reading-ar" : locale === "en" ? "font-reading-en" : "font-reading-he"}`}
+                dir={locale === "en" ? "ltr" : "rtl"}
+              >
                 {v.translation}
               </p>
             )}

@@ -40,7 +40,8 @@ function AuthPage() {
 
   const translateAuthError = (msg: string): string => {
     if (/invalid login credentials/i.test(msg)) return t("ui.auth.invalidCreds");
-    if (/already registered/i.test(msg) || /already exists/i.test(msg)) return t("ui.auth.alreadyRegistered");
+    if (/already registered/i.test(msg) || /already exists/i.test(msg))
+      return t("ui.auth.alreadyRegistered");
     if (/email.*confirm/i.test(msg)) return t("ui.auth.emailNotConfirmed");
     if (/password/i.test(msg) && /6/.test(msg)) return t("ui.auth.weakPassword");
     return msg;
@@ -65,14 +66,20 @@ function AuthPage() {
           },
         });
         if (err) throw err;
-        const { error: signErr } = await supabase.auth.signInWithPassword({ email: email.trim(), password });
+        const { error: signErr } = await supabase.auth.signInWithPassword({
+          email: email.trim(),
+          password,
+        });
         if (!signErr) {
           navigate({ to: safeRedirect, replace: true });
           return;
         }
         setError(t("ui.auth.confirmEmail"));
       } else {
-        const { error: err } = await supabase.auth.signInWithPassword({ email: email.trim(), password });
+        const { error: err } = await supabase.auth.signInWithPassword({
+          email: email.trim(),
+          password,
+        });
         if (err) throw err;
         navigate({ to: safeRedirect, replace: true });
       }
@@ -223,7 +230,15 @@ function AuthPage() {
   );
 }
 
-function Field({ label, icon, children }: { label: string; icon?: React.ReactNode; children: React.ReactNode }) {
+function Field({
+  label,
+  icon,
+  children,
+}: {
+  label: string;
+  icon?: React.ReactNode;
+  children: React.ReactNode;
+}) {
   return (
     <label className="block">
       <span className="mb-1 flex items-center gap-1 text-[11px] font-medium text-muted-foreground">

@@ -7,7 +7,9 @@ import { validateHebrewTranslationTriplet } from "@/lib/hebrew-translation-guard
 async function withTimeout<T>(promise: Promise<T>, timeoutMs: number): Promise<T> {
   return await Promise.race([
     promise,
-    new Promise<never>((_, reject) => setTimeout(() => reject(new Error("generation_timeout")), timeoutMs)),
+    new Promise<never>((_, reject) =>
+      setTimeout(() => reject(new Error("generation_timeout")), timeoutMs),
+    ),
   ]);
 }
 
@@ -28,10 +30,13 @@ async function ensureAdminJobAuthorization(input: { token?: string; adminUserId?
   }
 
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-  const { data: isAdmin, error } = await supabaseAdmin.rpc("has_role" as never, {
-    _user_id: input.adminUserId,
-    _role: "admin",
-  } as never);
+  const { data: isAdmin, error } = await supabaseAdmin.rpc(
+    "has_role" as never,
+    {
+      _user_id: input.adminUserId,
+      _role: "admin",
+    } as never,
+  );
 
   if (error) return { ok: false as const, error: error.message };
   if (isAdmin !== true) return { ok: false as const, error: "forbidden" as const };
@@ -96,8 +101,13 @@ export async function rebuildGroundedChunksJob(input: unknown) {
         .select("id, source_id, surah, ayah, text")
         .eq(
           "source_id",
-          (await supabaseAdmin.from("translation_sources").select("id").eq("code", "arabic-original").maybeSingle())
-            .data?.id ?? "",
+          (
+            await supabaseAdmin
+              .from("translation_sources")
+              .select("id")
+              .eq("code", "arabic-original")
+              .maybeSingle()
+          ).data?.id ?? "",
         )
         .limit(data.limit),
       supabaseAdmin
@@ -105,8 +115,13 @@ export async function rebuildGroundedChunksJob(input: unknown) {
         .select("id, source_id, surah, ayah, text")
         .eq(
           "source_id",
-          (await supabaseAdmin.from("translation_sources").select("id").eq("code", "ben-shemesh").maybeSingle()).data
-            ?.id ?? "",
+          (
+            await supabaseAdmin
+              .from("translation_sources")
+              .select("id")
+              .eq("code", "ben-shemesh")
+              .maybeSingle()
+          ).data?.id ?? "",
         )
         .limit(data.limit),
       supabaseAdmin
@@ -114,11 +129,13 @@ export async function rebuildGroundedChunksJob(input: unknown) {
         .select("id, source_id, surah, ayah, text")
         .eq(
           "source_id",
-          (await supabaseAdmin
-            .from("translation_sources")
-            .select("id")
-            .eq("code", "saheeh-international")
-            .maybeSingle()).data?.id ?? "",
+          (
+            await supabaseAdmin
+              .from("translation_sources")
+              .select("id")
+              .eq("code", "saheeh-international")
+              .maybeSingle()
+          ).data?.id ?? "",
         )
         .limit(data.limit),
       supabaseAdmin
@@ -126,11 +143,19 @@ export async function rebuildGroundedChunksJob(input: unknown) {
         .select("id, source_id, surah, ayah_start, ayah_end, lang, body")
         .order("id", { ascending: true })
         .range(data.offset, data.offset + data.limit - 1),
-      supabaseAdmin.from("asbab_nuzul").select("id, source_id, surah, ayah_start, ayah_end, lang, body").limit(data.limit),
-      supabaseAdmin.from("topic_lessons").select("id, source_id, entity_id, lang, body").limit(data.limit),
+      supabaseAdmin
+        .from("asbab_nuzul")
+        .select("id, source_id, surah, ayah_start, ayah_end, lang, body")
+        .limit(data.limit),
+      supabaseAdmin
+        .from("topic_lessons")
+        .select("id, source_id, entity_id, lang, body")
+        .limit(data.limit),
       supabaseAdmin
         .from("tafsir_hebrew")
-        .select("id, original_tafsir_id, surah_id, ayah_number, source_tafsir_name, hebrew_translation")
+        .select(
+          "id, original_tafsir_id, surah_id, ayah_number, source_tafsir_name, hebrew_translation",
+        )
         .limit(data.limit),
       supabaseAdmin.from("tafsir_sources").select("id, name_he, name_ar, name_en, author"),
     ]);
@@ -140,8 +165,17 @@ export async function rebuildGroundedChunksJob(input: unknown) {
     { name_he: string; name_ar: string; name_en: string; author: string | null }
   >(
     (
-      (sourceRows.data ?? []) as Array<{ id: string; name_he: string; name_ar: string; name_en: string; author: string | null }>
-    ).map((s) => [s.id, { name_he: s.name_he, name_ar: s.name_ar, name_en: s.name_en, author: s.author }]),
+      (sourceRows.data ?? []) as Array<{
+        id: string;
+        name_he: string;
+        name_ar: string;
+        name_en: string;
+        author: string | null;
+      }>
+    ).map((s) => [
+      s.id,
+      { name_he: s.name_he, name_ar: s.name_ar, name_en: s.name_en, author: s.author },
+    ]),
   );
 
   const chunks: UpsertChunk[] = [];
@@ -173,19 +207,37 @@ export async function rebuildGroundedChunksJob(input: unknown) {
   };
 
   pushQuran(
-    (arQuran.data ?? []) as Array<{ id: number; source_id: string; surah: number; ayah: number; text: string }>,
+    (arQuran.data ?? []) as Array<{
+      id: number;
+      source_id: string;
+      surah: number;
+      ayah: number;
+      text: string;
+    }>,
     "ar",
     "Quran Arabic",
     "Uthmani Script",
   );
   pushQuran(
-    (heQuran.data ?? []) as Array<{ id: number; source_id: string; surah: number; ayah: number; text: string }>,
+    (heQuran.data ?? []) as Array<{
+      id: number;
+      source_id: string;
+      surah: number;
+      ayah: number;
+      text: string;
+    }>,
     "he",
     "Quran Hebrew",
     "Aharon Ben-Shemesh",
   );
   pushQuran(
-    (enQuran.data ?? []) as Array<{ id: number; source_id: string; surah: number; ayah: number; text: string }>,
+    (enQuran.data ?? []) as Array<{
+      id: number;
+      source_id: string;
+      surah: number;
+      ayah: number;
+      text: string;
+    }>,
     "en",
     "Quran English",
     "Saheeh International",
@@ -310,7 +362,9 @@ export async function rebuildGroundedChunksJob(input: unknown) {
   const UPSERT_BATCH = 100;
   for (let i = 0; i < chunks.length; i += UPSERT_BATCH) {
     const slice = chunks.slice(i, i + UPSERT_BATCH);
-    const { error: upsertError } = await supabaseAdmin.from("grounded_chunks").upsert(slice, { onConflict: "source_key" });
+    const { error: upsertError } = await supabaseAdmin
+      .from("grounded_chunks")
+      .upsert(slice, { onConflict: "source_key" });
     if (upsertError) {
       return {
         ok: false,
@@ -433,7 +487,9 @@ export async function generateEnglishTafsirJob(input: unknown) {
   }
 
   const jalalaynSource =
-    ((sourceRows ?? []) as Array<{ id: string; slug: string }>).find((s) => s.slug === "al_jalalayn") ??
+    ((sourceRows ?? []) as Array<{ id: string; slug: string }>).find(
+      (s) => s.slug === "al_jalalayn",
+    ) ??
     ((sourceRows ?? []) as Array<{ id: string; slug: string }>)[0] ??
     null;
   if (!jalalaynSource) return { ok: false, error: "No tafsir source configured" };
@@ -595,58 +651,77 @@ export async function generateHebrewTafsirJob(input: unknown) {
     return { ok: false, error: "Al-Jalalayn source is not configured" as const };
   }
 
-  const [heTafsirKeysRes, enTafsirRes, arTafsirRes, heAsbabKeysRes, enAsbabRes, arAsbabRes] = await Promise.all([
-    supabaseAdmin
-      .from("tafsir_passages")
-      .select("source_id,surah,ayah_start,ayah_end")
-      .eq("lang", "he")
-      .eq("source_id", jalalaynSource.id),
-    supabaseAdmin
-      .from("tafsir_passages")
-      .select("source_id,surah,ayah_start,ayah_end,body")
-      .eq("lang", "en")
-      .eq("source_id", jalalaynSource.id)
-      .order("surah", { ascending: true })
-      .order("ayah_start", { ascending: true })
-      .limit(data.batch * 3),
-    supabaseAdmin
-      .from("tafsir_passages")
-      .select("source_id,surah,ayah_start,ayah_end,body")
-      .eq("lang", "ar")
-      .eq("source_id", jalalaynSource.id)
-      .order("surah", { ascending: true })
-      .order("ayah_start", { ascending: true })
-      .limit(data.batch * 3),
-    supabaseAdmin.from("asbab_nuzul").select("source_id,surah,ayah_start,ayah_end").eq("lang", "he"),
-    supabaseAdmin
-      .from("asbab_nuzul")
-      .select("source_id,surah,ayah_start,ayah_end,body")
-      .eq("lang", "en")
-      .order("surah", { ascending: true })
-      .order("ayah_start", { ascending: true })
-      .limit(data.batch * 2),
-    supabaseAdmin
-      .from("asbab_nuzul")
-      .select("source_id,surah,ayah_start,ayah_end,body")
-      .eq("lang", "ar")
-      .order("surah", { ascending: true })
-      .order("ayah_start", { ascending: true })
-      .limit(data.batch * 2),
-  ]);
+  const [heTafsirKeysRes, enTafsirRes, arTafsirRes, heAsbabKeysRes, enAsbabRes, arAsbabRes] =
+    await Promise.all([
+      supabaseAdmin
+        .from("tafsir_passages")
+        .select("source_id,surah,ayah_start,ayah_end")
+        .eq("lang", "he")
+        .eq("source_id", jalalaynSource.id),
+      supabaseAdmin
+        .from("tafsir_passages")
+        .select("source_id,surah,ayah_start,ayah_end,body")
+        .eq("lang", "en")
+        .eq("source_id", jalalaynSource.id)
+        .order("surah", { ascending: true })
+        .order("ayah_start", { ascending: true })
+        .limit(data.batch * 3),
+      supabaseAdmin
+        .from("tafsir_passages")
+        .select("source_id,surah,ayah_start,ayah_end,body")
+        .eq("lang", "ar")
+        .eq("source_id", jalalaynSource.id)
+        .order("surah", { ascending: true })
+        .order("ayah_start", { ascending: true })
+        .limit(data.batch * 3),
+      supabaseAdmin
+        .from("asbab_nuzul")
+        .select("source_id,surah,ayah_start,ayah_end")
+        .eq("lang", "he"),
+      supabaseAdmin
+        .from("asbab_nuzul")
+        .select("source_id,surah,ayah_start,ayah_end,body")
+        .eq("lang", "en")
+        .order("surah", { ascending: true })
+        .order("ayah_start", { ascending: true })
+        .limit(data.batch * 2),
+      supabaseAdmin
+        .from("asbab_nuzul")
+        .select("source_id,surah,ayah_start,ayah_end,body")
+        .eq("lang", "ar")
+        .order("surah", { ascending: true })
+        .order("ayah_start", { ascending: true })
+        .limit(data.batch * 2),
+    ]);
 
   const error =
-    heTafsirKeysRes.error ?? enTafsirRes.error ?? arTafsirRes.error ?? heAsbabKeysRes.error ?? enAsbabRes.error ?? arAsbabRes.error;
+    heTafsirKeysRes.error ??
+    enTafsirRes.error ??
+    arTafsirRes.error ??
+    heAsbabKeysRes.error ??
+    enAsbabRes.error ??
+    arAsbabRes.error;
   if (error) return { ok: false, error: error.message };
 
   const existingTafsirKeys = new Set(
-    ((heTafsirKeysRes.data ?? []) as Array<{ source_id: string; surah: number; ayah_start: number; ayah_end: number }>).map(
-      (r) => `${r.source_id}:${r.surah}:${r.ayah_start}:${r.ayah_end}`,
-    ),
+    (
+      (heTafsirKeysRes.data ?? []) as Array<{
+        source_id: string;
+        surah: number;
+        ayah_start: number;
+        ayah_end: number;
+      }>
+    ).map((r) => `${r.source_id}:${r.surah}:${r.ayah_start}:${r.ayah_end}`),
   );
   const existingAsbabKeys = new Set(
-    ((heAsbabKeysRes.data ?? []) as Array<{ source_id: string; surah: number; ayah_start: number; ayah_end: number }>).map(
-      (r) => `${r.source_id}:${r.surah}:${r.ayah_start}:${r.ayah_end}`,
-    ),
+    (
+      (heAsbabKeysRes.data ?? []) as Array<{
+        source_id: string;
+        surah: number;
+        ayah_start: number;
+        ayah_end: number;
+      }>
+    ).map((r) => `${r.source_id}:${r.surah}:${r.ayah_start}:${r.ayah_end}`),
   );
 
   const enTafsirRows = (enTafsirRes.data ?? []) as Array<{
@@ -691,7 +766,9 @@ export async function generateHebrewTafsirJob(input: unknown) {
       body: string;
     }>),
   ]
-    .filter((r) => !existingAsbabKeys.has(`${r.source_id}:${r.surah}:${r.ayah_start}:${r.ayah_end}`))
+    .filter(
+      (r) => !existingAsbabKeys.has(`${r.source_id}:${r.surah}:${r.ayah_start}:${r.ayah_end}`),
+    )
     .slice(0, data.batch);
 
   const tafsirOut: Array<{

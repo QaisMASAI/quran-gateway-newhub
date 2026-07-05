@@ -1,5 +1,12 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { Outlet, Link, createRootRouteWithContext, useRouter, HeadContent, Scripts } from "@tanstack/react-router";
+import {
+  Outlet,
+  Link,
+  createRootRouteWithContext,
+  useRouter,
+  HeadContent,
+  Scripts,
+} from "@tanstack/react-router";
 import { useEffect, type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 
@@ -21,9 +28,12 @@ const ROOT_META = {
 function NotFoundComponent() {
   const { t, i18n } = useTranslation("common");
   const isRtl = i18n.dir() === "rtl";
-  
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background px-4" dir={isRtl ? "rtl" : "ltr"}>
+    <div
+      className="flex min-h-screen items-center justify-center bg-background px-4"
+      dir={isRtl ? "rtl" : "ltr"}
+    >
       <div className="max-w-md text-center">
         <h1 className="font-display text-7xl font-bold text-primary">404</h1>
         <p className="mt-3 font-arabic text-2xl text-gold" dir="rtl" lang="ar">
@@ -49,18 +59,23 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
   const router = useRouter();
   const { t, i18n } = useTranslation("common");
   const isRtl = i18n.dir() === "rtl";
-  
+
   useEffect(() => {
     reportLovableError(error, { boundary: "tanstack_root_error_component" });
   }, [error]);
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background px-4" dir={isRtl ? "rtl" : "ltr"}>
+    <div
+      className="flex min-h-screen items-center justify-center bg-background px-4"
+      dir={isRtl ? "rtl" : "ltr"}
+    >
       <div className="max-w-md text-center">
         <p className="font-arabic text-2xl text-gold" dir="rtl" lang="ar">
           إِنَّا لِلَّهِ وَإِنَّا إِلَيْهِ رَاجِعُونَ
         </p>
-        <h1 className="mt-4 text-xl font-semibold tracking-tight text-foreground">{t("errors.genericTitle")}</h1>
+        <h1 className="mt-4 text-xl font-semibold tracking-tight text-foreground">
+          {t("errors.genericTitle")}
+        </h1>
         <p className="mt-2 text-sm text-muted-foreground">{t("errors.genericBody")}</p>
         <div className="mt-6 flex flex-wrap justify-center gap-2">
           <button
@@ -111,14 +126,34 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "apple-mobile-web-app-capable", content: "yes" },
       { name: "apple-mobile-web-app-title", content: "Noor Quran & Hadith" },
       { name: "apple-mobile-web-app-status-bar-style", content: "black-translucent" },
-      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/74a0abc9-e4cc-4b74-8c76-a48ecb318cad/id-preview-85576619--684dac9d-8cf9-47d7-8d1b-d26c7de3781f.lovable.app-1782305499036.png" },
-      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/74a0abc9-e4cc-4b74-8c76-a48ecb318cad/id-preview-85576619--684dac9d-8cf9-47d7-8d1b-d26c7de3781f.lovable.app-1782305499036.png" },
+      {
+        property: "og:image",
+        content:
+          "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/74a0abc9-e4cc-4b74-8c76-a48ecb318cad/id-preview-85576619--684dac9d-8cf9-47d7-8d1b-d26c7de3781f.lovable.app-1782305499036.png",
+      },
+      {
+        name: "twitter:image",
+        content:
+          "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/74a0abc9-e4cc-4b74-8c76-a48ecb318cad/id-preview-85576619--684dac9d-8cf9-47d7-8d1b-d26c7de3781f.lovable.app-1782305499036.png",
+      },
       { title: "Lovable App" },
       { property: "og:title", content: "Lovable App" },
       { name: "twitter:title", content: "Lovable App" },
-      { name: "description", content: "- A web platform for Hebrew speakers to learn the Quran with Arabic text, Hebrew translation, and AI-powered explanations." },
-      { property: "og:description", content: "- A web platform for Hebrew speakers to learn the Quran with Arabic text, Hebrew translation, and AI-powered explanations." },
-      { name: "twitter:description", content: "- A web platform for Hebrew speakers to learn the Quran with Arabic text, Hebrew translation, and AI-powered explanations." },
+      {
+        name: "description",
+        content:
+          "- A web platform for Hebrew speakers to learn the Quran with Arabic text, Hebrew translation, and AI-powered explanations.",
+      },
+      {
+        property: "og:description",
+        content:
+          "- A web platform for Hebrew speakers to learn the Quran with Arabic text, Hebrew translation, and AI-powered explanations.",
+      },
+      {
+        name: "twitter:description",
+        content:
+          "- A web platform for Hebrew speakers to learn the Quran with Arabic text, Hebrew translation, and AI-powered explanations.",
+      },
     ],
     links: [
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
@@ -169,9 +204,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 
 function RootShell({ children }: { children: ReactNode }) {
   // Get initial locale from storage or detect
-  const storedLocale = typeof window !== "undefined" 
-    ? localStorage.getItem("qc:locale") 
-    : null;
+  const storedLocale = typeof window !== "undefined" ? localStorage.getItem("qc:locale") : null;
   const locale = storedLocale && isLocale(storedLocale) ? storedLocale : DEFAULT_LOCALE;
   const dir = LOCALE_DIR[locale];
 

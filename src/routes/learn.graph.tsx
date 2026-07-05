@@ -25,5 +25,7 @@ export const Route = createFileRoute("/learn/graph")({
     ],
     links: [{ rel: "canonical", href: "/learn/graph" }],
   }),
-  pendingComponent: () => <div className="mx-auto max-w-6xl px-4 py-10 text-sm text-muted-foreground">Loading…</div>,
+  pendingComponent: () => (
+    <div className="mx-auto max-w-6xl px-4 py-10 text-sm text-muted-foreground">Loading…</div>
+  ),
 });

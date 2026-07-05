@@ -16,7 +16,9 @@ function NavLink({ to, hash, label, icon }: NavLinkProps) {
       hash={hash}
       activeOptions={{ exact: to === "/" }}
       activeProps={{ className: "bg-secondary text-foreground", "aria-current": "page" }}
-      inactiveProps={{ className: "text-muted-foreground hover:bg-secondary/60 hover:text-foreground" }}
+      inactiveProps={{
+        className: "text-muted-foreground hover:bg-secondary/60 hover:text-foreground",
+      }}
       className="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-medium transition-colors"
     >
       {icon}
@@ -40,7 +42,11 @@ export function HeaderNav({ isAuthenticated }: HeaderNavProps) {
       <NavLink to="/hadith" label={t("nav.hadith")} icon={<BookMarked className="h-4 w-4" />} />
       <NavLink to="/search" label={t("nav.search")} icon={<Search className="h-4 w-4" />} />
       {isAuthenticated && (
-        <NavLink to="/collections" label={t("nav.collections")} icon={<Folder className="h-4 w-4" />} />
+        <NavLink
+          to="/collections"
+          label={t("nav.collections")}
+          icon={<Folder className="h-4 w-4" />}
+        />
       )}
       {isAuthenticated && (
         <NavLink to="/admin/setup" label="Admin setup" icon={<Compass className="h-4 w-4" />} />

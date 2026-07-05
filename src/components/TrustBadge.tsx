@@ -11,17 +11,20 @@ interface Props {
 const COPY = {
   he: {
     blockStrong: "תכנים ממקורות מאומתים בלבד.",
-    blockBody: "פסוקי הקוראן הקדוש ותפסיר אסלאמי קלאסי. ללא פרשנות AI, ללא ספקולציות — אם אין מקור, המערכת לא עונה.",
+    blockBody:
+      "פסוקי הקוראן הקדוש ותפסיר אסלאמי קלאסי. ללא פרשנות AI, ללא ספקולציות — אם אין מקור, המערכת לא עונה.",
     inline: "מקורות מאומתים בלבד",
   },
   ar: {
     blockStrong: "محتوى من مصادر موثّقة فقط.",
-    blockBody: "آيات القرآن الكريم وتفسير إسلامي كلاسيكي. لا تفسيرات بالذكاء الاصطناعي، ولا تخمين — إن لم يوجد مصدر، لا يجيب النظام.",
+    blockBody:
+      "آيات القرآن الكريم وتفسير إسلامي كلاسيكي. لا تفسيرات بالذكاء الاصطناعي، ولا تخمين — إن لم يوجد مصدر، لا يجيب النظام.",
     inline: "مصادر موثّقة فقط",
   },
   en: {
     blockStrong: "Content from authenticated sources only.",
-    blockBody: "Verses of the Holy Quran and classical Islamic tafsir. No AI interpretation, no speculation — if there is no source, the system does not answer.",
+    blockBody:
+      "Verses of the Holy Quran and classical Islamic tafsir. No AI interpretation, no speculation — if there is no source, the system does not answer.",
     inline: "Authenticated sources only",
   },
 } as const;
@@ -40,8 +43,7 @@ export function TrustBadge({ size = "sm", variant = "inline", className = "" }: 
           <ShieldCheck className="h-4 w-4" />
         </div>
         <div className="text-[12.5px] leading-relaxed text-muted-foreground">
-          <strong className="text-foreground/85">{c.blockStrong}</strong>{" "}
-          {c.blockBody}
+          <strong className="text-foreground/85">{c.blockStrong}</strong> {c.blockBody}
         </div>
       </div>
     );

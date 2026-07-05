@@ -28,7 +28,11 @@ type QuranTafsirResource = {
 };
 
 function stripHtml(input: string): string {
-  return input.replace(/<sup[^>]*>.*?<\/sup>/g, " ").replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
+  return input
+    .replace(/<sup[^>]*>.*?<\/sup>/g, " ")
+    .replace(/<[^>]+>/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
 }
 
 function extractAsbabSnippet(text: string): string | null {
@@ -70,7 +74,7 @@ export const Route = createFileRoute("/api/public/admin/backfill-asbab-nuzul")({
       POST: async ({ request }) => {
         const body = await request.json().catch(
           () =>
-            ({} as {
+            ({}) as {
               token?: string;
               adminUserId?: string;
               surah?: number;
@@ -79,7 +83,7 @@ export const Route = createFileRoute("/api/public/admin/backfill-asbab-nuzul")({
               batch?: number;
               startSurah?: number;
               resourceId?: number;
-            }),
+            },
         );
         const authResult = await authorizeAdminRouteRequest(request, body);
         if (!authResult.ok) return authResult.response;
@@ -98,7 +102,9 @@ export const Route = createFileRoute("/api/public/admin/backfill-asbab-nuzul")({
         }
 
         const resourceId =
-          explicitResourceId > 0 ? explicitResourceId : ((await resolveArabicAsbabResourceId()) ?? 14);
+          explicitResourceId > 0
+            ? explicitResourceId
+            : ((await resolveArabicAsbabResourceId()) ?? 14);
 
         const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
@@ -130,7 +136,10 @@ export const Route = createFileRoute("/api/public/admin/backfill-asbab-nuzul")({
               `https://api.quran.com/api/v4/tafsirs/${resourceId}/by_chapter/${surah}?page=${localPage}&per_page=${perPage}`,
             );
             if (!tafsirRes.ok) {
-              return Response.json({ ok: false, error: `Quran API failed (${tafsirRes.status})` }, { status: 502 });
+              return Response.json(
+                { ok: false, error: `Quran API failed (${tafsirRes.status})` },
+                { status: 502 },
+              );
             }
 
             const tafsirJson = (await tafsirRes.json()) as {

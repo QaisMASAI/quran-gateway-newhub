@@ -38,7 +38,9 @@ function PlanNotFound() {
     <div className="min-h-screen bg-background">
       <Header />
       <div className="mx-auto max-w-xl px-6 py-20 text-center">
-        <h1 className="mb-2 font-display text-2xl font-bold text-primary">{t("planDetail.notFound")}</h1>
+        <h1 className="mb-2 font-display text-2xl font-bold text-primary">
+          {t("planDetail.notFound")}
+        </h1>
         <Link to="/plans" className="text-sm text-gold underline">
           {t("planDetail.notFoundLink")}
         </Link>
@@ -54,7 +56,10 @@ function PlanError({ reset }: { reset: () => void }) {
       <Header />
       <div className="mx-auto max-w-xl px-6 py-20 text-center">
         <p className="mb-4 text-sm text-destructive">{t("planDetail.errorGeneric")}</p>
-        <button onClick={() => reset()} className="rounded-lg bg-primary px-4 py-2 text-sm text-primary-foreground">
+        <button
+          onClick={() => reset()}
+          className="rounded-lg bg-primary px-4 py-2 text-sm text-primary-foreground"
+        >
           {t("planDetail.tryAgain")}
         </button>
       </div>
@@ -105,7 +110,10 @@ function PlanPage() {
     <div className="min-h-screen bg-background">
       <Header />
       <main id="main" className="mx-auto max-w-3xl px-4 py-10 sm:px-6">
-        <Link to="/plans" className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-primary">
+        <Link
+          to="/plans"
+          className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-primary"
+        >
           <ArrowRight className="h-4 w-4 ltr:rotate-180" />
           {t("planDetail.backToPlans")}
         </Link>
@@ -138,13 +146,18 @@ function PlanPage() {
               )}
             </div>
             <div className="h-2 w-full overflow-hidden rounded-full bg-secondary">
-              <div className="h-full rounded-full bg-gold transition-all" style={{ width: `${pct}%` }} />
+              <div
+                className="h-full rounded-full bg-gold transition-all"
+                style={{ width: `${pct}%` }}
+              />
             </div>
           </div>
         </header>
 
         <section className="mt-8">
-          <h2 className="mb-4 font-display text-xl font-bold text-primary">{t("planDetail.dailyReading")}</h2>
+          <h2 className="mb-4 font-display text-xl font-bold text-primary">
+            {t("planDetail.dailyReading")}
+          </h2>
           <ul className="space-y-2">
             {plan.days.map((d: DailyReading) => {
               const isDone = done.includes(d.day);
@@ -170,7 +183,9 @@ function PlanPage() {
                     </button>
                     <div className="min-w-0 flex-1">
                       <div className="flex items-baseline justify-between gap-2">
-                        <h3 className="font-bold text-primary">{t("planDetail.dayHeading", { n: d.day, title })}</h3>
+                        <h3 className="font-bold text-primary">
+                          {t("planDetail.dayHeading", { n: d.day, title })}
+                        </h3>
                         <span className="shrink-0 text-[11px] text-muted-foreground">
                           {t("planDetail.segments", { n: d.segments.length })}
                         </span>

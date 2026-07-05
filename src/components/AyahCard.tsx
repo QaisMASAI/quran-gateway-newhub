@@ -1,9 +1,28 @@
 import { useState, useRef, useEffect, useMemo, type ReactNode } from "react";
 import { Link } from "@tanstack/react-router";
-import { Play, Pause, Sparkles, BookText, Star, Loader2, NotebookPen, User, Tag, HeartHandshake } from "lucide-react";
+import {
+  Play,
+  Pause,
+  Sparkles,
+  BookText,
+  Star,
+  Loader2,
+  NotebookPen,
+  User,
+  Tag,
+  HeartHandshake,
+} from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import { useTranslation } from "react-i18next";
-import { ayahAudioUrl, cleanText, normalizeHebrew, RECITERS, reciterName, getStoredReciter, type ReciterKey } from "@/lib/quran-api";
+import {
+  ayahAudioUrl,
+  cleanText,
+  normalizeHebrew,
+  RECITERS,
+  reciterName,
+  getStoredReciter,
+  type ReciterKey,
+} from "@/lib/quran-api";
 import { useFavorites } from "@/lib/favorites";
 import { useQuery } from "@tanstack/react-query";
 import { TAFSIR_SOURCES_META, tafsirSourceName } from "@/lib/tafsir-sources";
@@ -12,7 +31,12 @@ import { NotePanel } from "./NotePanel";
 import { getAyahLinks } from "@/lib/ayah-links";
 import { useReadingSettings, stripArabicDiacritics } from "@/lib/reading-settings";
 import { normalizeLocale } from "@/lib/i18n";
-import { getAsbabForVerse, getTafsirForVerseBySource, sourceName, TAFSIR_SOURCE_SLUG_BY_KEY } from "@/lib/tafsir-content";
+import {
+  getAsbabForVerse,
+  getTafsirForVerseBySource,
+  sourceName,
+  TAFSIR_SOURCE_SLUG_BY_KEY,
+} from "@/lib/tafsir-content";
 
 interface Props {
   surah: number;
@@ -61,14 +85,13 @@ export function AyahCard({ surah, surahName, ayah, arabic, hebrew, highlight }: 
   const { t, i18n } = useTranslation("common");
   const locale = (normalizeLocale(i18n.language) ?? "he") as "he" | "ar" | "en";
 
-
   const [playing, setPlaying] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const [reciter, setReciter] = useState<ReciterKey>(() => getStoredReciter());
 
   const [panel, setPanel] = useState<null | "tafsir" | "sabab">(null);
   const [showNote, setShowNote] = useState(false);
-  const [tafsirSource] = useState<typeof TAFSIR_SOURCES_META[number]["key"]>("jalalayn");
+  const [tafsirSource] = useState<(typeof TAFSIR_SOURCES_META)[number]["key"]>("jalalayn");
   const selectedTafsirSlug = TAFSIR_SOURCE_SLUG_BY_KEY[tafsirSource] ?? "al_jalalayn";
   const tafsirQ = useQuery({
     queryKey: ["tafsir-verse", surah, ayah, locale, selectedTafsirSlug],
@@ -112,7 +135,10 @@ export function AyahCard({ surah, surahName, ayah, arabic, hebrew, highlight }: 
       audioRef.current.pause();
       setPlaying(false);
     } else {
-      audioRef.current.play().then(() => setPlaying(true)).catch(() => setPlaying(false));
+      audioRef.current
+        .play()
+        .then(() => setPlaying(true))
+        .catch(() => setPlaying(false));
     }
   };
 
@@ -172,9 +198,13 @@ export function AyahCard({ surah, surahName, ayah, arabic, hebrew, highlight }: 
               : "font-reading-en text-[15px] leading-relaxed text-foreground/85 text-start";
             const translationDir = isHe ? "rtl" : "ltr";
             return heHighlight ? (
-              <p className={translationClass} dir={translationDir}>{heHighlight}</p>
+              <p className={translationClass} dir={translationDir}>
+                {heHighlight}
+              </p>
             ) : (
-              <p className={translationClass} dir={translationDir}>{cleanText(hebrew)}</p>
+              <p className={translationClass} dir={translationDir}>
+                {cleanText(hebrew)}
+              </p>
             );
           })()}
         </div>
@@ -189,9 +219,13 @@ export function AyahCard({ surah, surahName, ayah, arabic, hebrew, highlight }: 
 
         <div className="inline-flex items-center gap-1.5 rounded-full border border-primary/30 bg-primary/10 px-3 py-1.5 text-xs font-medium text-primary">
           <span className="text-[10px] opacity-70">{t("ui.ayah.reciter")}</span>
-          <span>{(() => { const r = RECITERS.find((x) => x.key === reciter); return r ? reciterName(r, locale) : ""; })()}</span>
+          <span>
+            {(() => {
+              const r = RECITERS.find((x) => x.key === reciter);
+              return r ? reciterName(r, locale) : "";
+            })()}
+          </span>
         </div>
-
 
         <ActionBtn onClick={() => openPanel("tafsir")} active={panel === "tafsir"}>
           <Sparkles className="h-3.5 w-3.5" />
@@ -232,8 +266,7 @@ export function AyahCard({ surah, surahName, ayah, arabic, hebrew, highlight }: 
                 : l.kind === "emotion"
                   ? "border-primary/15 bg-secondary/50 text-foreground/80 hover:border-primary/40 hover:text-primary"
                   : "border-primary/20 bg-primary/5 text-primary/90 hover:border-primary/50 hover:text-primary";
-            const Icon =
-              l.kind === "prophet" ? User : l.kind === "emotion" ? HeartHandshake : Tag;
+            const Icon = l.kind === "prophet" ? User : l.kind === "emotion" ? HeartHandshake : Tag;
             if (l.kind === "emotion") {
               return (
                 <Link
@@ -263,9 +296,6 @@ export function AyahCard({ surah, surahName, ayah, arabic, hebrew, highlight }: 
         </div>
       )}
 
-
-
-
       <div className="mt-4 border-t border-border pt-3">
         <ShareButtons
           surah={surah}
@@ -276,103 +306,119 @@ export function AyahCard({ surah, surahName, ayah, arabic, hebrew, highlight }: 
         />
       </div>
 
-
-
       {/* Tafsir/Asbab panel */}
-      {panel && (() => {
-        const isLoading = panel === "tafsir" ? tafsirQ.isLoading : asbabQ.isLoading;
-        const hasError = panel === "tafsir" ? tafsirQ.isError : asbabQ.isError;
-        return (
-          <div className="mt-4 rounded-xl border border-border bg-secondary/40 px-4 py-3.5">
-            <div className="mb-2 flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-primary">
-              {panel === "tafsir" ? <Sparkles className="h-3 w-3" /> : <BookText className="h-3 w-3" />}
-              {panel === "tafsir" ? t("ui.ayah.tafsirTitle") : t("ui.ayah.sababTitle")}
-            </div>
-
-            {panel === "tafsir" && (
-              <div className="mb-3 flex flex-wrap gap-1.5 border-b border-border/60 pb-2.5">
-                <span className="rounded-full border border-primary/40 bg-primary/10 px-3 py-1 text-[11.5px] font-medium text-primary">
-                  {tafsirSourceName(
-                    TAFSIR_SOURCES_META.find((s) => s.key === "jalalayn") ?? TAFSIR_SOURCES_META[0],
-                    locale,
-                  )}
-                </span>
-                {(tafsirQ.data ?? []).some((row) => row.lang === "en") && (
-                  <span className="rounded-full border border-gold/40 bg-gold/10 px-3 py-1 text-[11.5px] font-medium text-gold">
-                    EN
-                  </span>
+      {panel &&
+        (() => {
+          const isLoading = panel === "tafsir" ? tafsirQ.isLoading : asbabQ.isLoading;
+          const hasError = panel === "tafsir" ? tafsirQ.isError : asbabQ.isError;
+          return (
+            <div className="mt-4 rounded-xl border border-border bg-secondary/40 px-4 py-3.5">
+              <div className="mb-2 flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-primary">
+                {panel === "tafsir" ? (
+                  <Sparkles className="h-3 w-3" />
+                ) : (
+                  <BookText className="h-3 w-3" />
                 )}
+                {panel === "tafsir" ? t("ui.ayah.tafsirTitle") : t("ui.ayah.sababTitle")}
               </div>
-            )}
 
-            {isLoading && (
-              <div className="space-y-2 py-1" aria-label={t("ui.ayah.loadingContent")}>
-                <div className="h-3 w-2/3 animate-pulse rounded bg-muted" />
-                <div className="h-3 w-full animate-pulse rounded bg-muted" />
-                <div className="h-3 w-11/12 animate-pulse rounded bg-muted" />
-                <div className="h-3 w-9/12 animate-pulse rounded bg-muted" />
-                <div className="mt-2 flex items-center gap-2 text-[11px] text-muted-foreground">
-                  <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                  {t("ui.ayah.loadingSource")}
+              {panel === "tafsir" && (
+                <div className="mb-3 flex flex-wrap gap-1.5 border-b border-border/60 pb-2.5">
+                  <span className="rounded-full border border-primary/40 bg-primary/10 px-3 py-1 text-[11.5px] font-medium text-primary">
+                    {tafsirSourceName(
+                      TAFSIR_SOURCES_META.find((s) => s.key === "jalalayn") ??
+                        TAFSIR_SOURCES_META[0],
+                      locale,
+                    )}
+                  </span>
+                  {(tafsirQ.data ?? []).some((row) => row.lang === "en") && (
+                    <span className="rounded-full border border-gold/40 bg-gold/10 px-3 py-1 text-[11.5px] font-medium text-gold">
+                      EN
+                    </span>
+                  )}
                 </div>
-              </div>
-            )}
-            {!isLoading && hasError && (
-              <p className="text-sm text-destructive">{t("ui.ayah.networkError")}</p>
-            )}
-            {!isLoading && panel === "tafsir" && tafsirQ.data && tafsirQ.data.length > 0 && (
-              <div className="space-y-3">
-                {tafsirQ.data.slice(0, 3).map((row) => (
-                  <div key={row.id} className="rounded-lg border border-border/70 bg-background/60 p-3">
-                    <div className="prose prose-sm max-w-none text-[14.5px] text-foreground/90 [&>p]:my-1.5 [&>h1]:text-base [&>h2]:text-base [&>h3]:text-sm [&>ul]:my-1 [&>ol]:my-1">
-                      <div
-                        className={`ai-explanation-block ${row.lang === "ar" ? "font-tafsir-hadith-ar" : row.lang === "en" ? "font-tafsir-hadith-en" : "font-tafsir-hadith-he"}`}
-                        dir={row.lang === "en" ? "ltr" : "rtl"}
-                      >
-                        <ReactMarkdown skipHtml>{row.body}</ReactMarkdown>
+              )}
+
+              {isLoading && (
+                <div className="space-y-2 py-1" aria-label={t("ui.ayah.loadingContent")}>
+                  <div className="h-3 w-2/3 animate-pulse rounded bg-muted" />
+                  <div className="h-3 w-full animate-pulse rounded bg-muted" />
+                  <div className="h-3 w-11/12 animate-pulse rounded bg-muted" />
+                  <div className="h-3 w-9/12 animate-pulse rounded bg-muted" />
+                  <div className="mt-2 flex items-center gap-2 text-[11px] text-muted-foreground">
+                    <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                    {t("ui.ayah.loadingSource")}
+                  </div>
+                </div>
+              )}
+              {!isLoading && hasError && (
+                <p className="text-sm text-destructive">{t("ui.ayah.networkError")}</p>
+              )}
+              {!isLoading && panel === "tafsir" && tafsirQ.data && tafsirQ.data.length > 0 && (
+                <div className="space-y-3">
+                  {tafsirQ.data.slice(0, 3).map((row) => (
+                    <div
+                      key={row.id}
+                      className="rounded-lg border border-border/70 bg-background/60 p-3"
+                    >
+                      <div className="prose prose-sm max-w-none text-[14.5px] text-foreground/90 [&>p]:my-1.5 [&>h1]:text-base [&>h2]:text-base [&>h3]:text-sm [&>ul]:my-1 [&>ol]:my-1">
+                        <div
+                          className={`ai-explanation-block ${row.lang === "ar" ? "font-tafsir-hadith-ar" : row.lang === "en" ? "font-tafsir-hadith-en" : "font-tafsir-hadith-he"}`}
+                          dir={row.lang === "en" ? "ltr" : "rtl"}
+                        >
+                          <ReactMarkdown skipHtml>{row.body}</ReactMarkdown>
+                        </div>
+                      </div>
+                      <div className="mt-2 flex items-center gap-1.5 border-t border-border pt-2 text-[11px] text-muted-foreground">
+                        <BookText className="h-3 w-3" />
+                        <span>
+                          {t("ui.ayah.source")}{" "}
+                          <strong className="text-foreground/80">
+                            {sourceName(row.source, locale)}
+                          </strong>
+                        </span>
                       </div>
                     </div>
-                    <div className="mt-2 flex items-center gap-1.5 border-t border-border pt-2 text-[11px] text-muted-foreground">
-                      <BookText className="h-3 w-3" />
-                      <span>
-                        {t("ui.ayah.source")} <strong className="text-foreground/80">{sourceName(row.source, locale)}</strong>
-                      </span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-            {!isLoading && panel === "sabab" && asbabQ.data && asbabQ.data.length > 0 && (
-              <div className="space-y-3">
-                {asbabQ.data.slice(0, 2).map((row) => (
-                  <div key={row.id} className="rounded-lg border border-border/70 bg-background/60 p-3">
-                    <div className="prose prose-sm max-w-none text-[14.5px] text-foreground/90 [&>p]:my-1.5 [&>h1]:text-base [&>h2]:text-base [&>h3]:text-sm [&>ul]:my-1 [&>ol]:my-1">
-                      <div
-                        className={`ai-explanation-block ${row.lang === "ar" ? "font-tafsir-hadith-ar" : row.lang === "en" ? "font-tafsir-hadith-en" : "font-tafsir-hadith-he"}`}
-                        dir={row.lang === "en" ? "ltr" : "rtl"}
-                      >
-                        <ReactMarkdown skipHtml>{row.body}</ReactMarkdown>
+                  ))}
+                </div>
+              )}
+              {!isLoading && panel === "sabab" && asbabQ.data && asbabQ.data.length > 0 && (
+                <div className="space-y-3">
+                  {asbabQ.data.slice(0, 2).map((row) => (
+                    <div
+                      key={row.id}
+                      className="rounded-lg border border-border/70 bg-background/60 p-3"
+                    >
+                      <div className="prose prose-sm max-w-none text-[14.5px] text-foreground/90 [&>p]:my-1.5 [&>h1]:text-base [&>h2]:text-base [&>h3]:text-sm [&>ul]:my-1 [&>ol]:my-1">
+                        <div
+                          className={`ai-explanation-block ${row.lang === "ar" ? "font-tafsir-hadith-ar" : row.lang === "en" ? "font-tafsir-hadith-en" : "font-tafsir-hadith-he"}`}
+                          dir={row.lang === "en" ? "ltr" : "rtl"}
+                        >
+                          <ReactMarkdown skipHtml>{row.body}</ReactMarkdown>
+                        </div>
+                      </div>
+                      <div className="mt-2 flex items-center gap-1.5 border-t border-border pt-2 text-[11px] text-muted-foreground">
+                        <BookText className="h-3 w-3" />
+                        <span>
+                          {t("ui.ayah.source")}{" "}
+                          <strong className="text-foreground/80">
+                            {sourceName(row.source, locale)}
+                          </strong>
+                        </span>
                       </div>
                     </div>
-                    <div className="mt-2 flex items-center gap-1.5 border-t border-border pt-2 text-[11px] text-muted-foreground">
-                      <BookText className="h-3 w-3" />
-                      <span>
-                        {t("ui.ayah.source")} <strong className="text-foreground/80">{sourceName(row.source, locale)}</strong>
-                      </span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-            {!isLoading && panel === "tafsir" && tafsirQ.data && tafsirQ.data.length === 0 && (
-              <p className="text-sm text-muted-foreground">{t("ui.ayah.noTafsir")}</p>
-            )}
-            {!isLoading && panel === "sabab" && asbabQ.data && asbabQ.data.length === 0 && (
-              <p className="text-sm text-muted-foreground">{t("ui.ayah.noAsbab")}</p>
-            )}
-          </div>
-        );
-      })()}
+                  ))}
+                </div>
+              )}
+              {!isLoading && panel === "tafsir" && tafsirQ.data && tafsirQ.data.length === 0 && (
+                <p className="text-sm text-muted-foreground">{t("ui.ayah.noTafsir")}</p>
+              )}
+              {!isLoading && panel === "sabab" && asbabQ.data && asbabQ.data.length === 0 && (
+                <p className="text-sm text-muted-foreground">{t("ui.ayah.noAsbab")}</p>
+              )}
+            </div>
+          );
+        })()}
     </article>
   );
 }

@@ -28,13 +28,19 @@ export async function authorizeAdminRouteRequest(
   }
 
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-  const { data: isAdmin, error } = await supabaseAdmin.rpc("has_role" as never, {
-    _user_id: parsed.data.adminUserId,
-    _role: "admin",
-  } as never);
+  const { data: isAdmin, error } = await supabaseAdmin.rpc(
+    "has_role" as never,
+    {
+      _user_id: parsed.data.adminUserId,
+      _role: "admin",
+    } as never,
+  );
 
   if (error) {
-    return { ok: false, response: Response.json({ ok: false, error: error.message }, { status: 500 }) };
+    return {
+      ok: false,
+      response: Response.json({ ok: false, error: error.message }, { status: 500 }),
+    };
   }
 
   if (isAdmin !== true) {

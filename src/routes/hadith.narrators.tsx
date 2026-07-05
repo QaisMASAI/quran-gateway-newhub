@@ -37,10 +37,15 @@ function NarratorsPage() {
       <Header />
       <main id="main" className="mx-auto max-w-3xl px-4 py-8 sm:px-6">
         <h1 className="text-xl font-bold text-foreground">Top Hadith Narrators</h1>
-        <p className="mt-1 text-sm text-muted-foreground">Most frequent narrators across Bukhari and Muslim.</p>
+        <p className="mt-1 text-sm text-muted-foreground">
+          Most frequent narrators across Bukhari and Muslim.
+        </p>
         <ol className="mt-6 space-y-2">
           {data.map((n, i) => (
-            <li key={`${n.narrator}-${i}`} className="rounded-xl border border-border bg-card px-4 py-2 text-sm">
+            <li
+              key={`${n.narrator}-${i}`}
+              className="rounded-xl border border-border bg-card px-4 py-2 text-sm"
+            >
               <div className="flex items-baseline justify-between gap-3">
                 <span className="text-foreground">{n.narrator}</span>
                 <span className="text-xs text-muted-foreground">{n.hadith_count}</span>

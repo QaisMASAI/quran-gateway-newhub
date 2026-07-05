@@ -84,14 +84,12 @@ function TimelinePage() {
           </div>
         </div>
 
-        {isLoading && (
-          <div className="text-muted-foreground text-sm">Loading timeline…</div>
-        )}
+        {isLoading && <div className="text-muted-foreground text-sm">Loading timeline…</div>}
 
         {!isLoading && dated.length === 0 && undated.length === 0 && (
           <div className="rounded-xl border border-dashed border-border p-8 text-center text-sm text-muted-foreground">
-            No dated entities found yet. As prophets, nations and events are
-            enriched with historical eras they will appear here.
+            No dated entities found yet. As prophets, nations and events are enriched with
+            historical eras they will appear here.
           </div>
         )}
 
@@ -144,9 +142,7 @@ function TimelineCard({ row, flat, locale }: { row: Row; flat?: boolean; locale:
         <div className="flex items-center gap-2 mb-1">
           {row.icon && <span className="text-lg">{row.icon}</span>}
           <span className="font-semibold">{title}</span>
-          <span className="ml-auto text-xs text-muted-foreground capitalize">
-            {row.kind}
-          </span>
+          <span className="ml-auto text-xs text-muted-foreground capitalize">{row.kind}</span>
         </div>
         {row.era_start_year != null && (
           <div className="text-xs text-primary mb-1">

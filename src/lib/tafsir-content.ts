@@ -142,7 +142,9 @@ export async function getAsbabForVerse(
   for (const candidate of fallbackOrder) {
     const { data } = await supabase
       .from("tafsir_passages")
-      .select("id,source_id,surah,ayah_start,ayah_end,lang,body,citation,source:tafsir_sources!inner(*)")
+      .select(
+        "id,source_id,surah,ayah_start,ayah_end,lang,body,citation,source:tafsir_sources!inner(*)",
+      )
       .eq("surah", surah)
       .lte("ayah_start", ayah)
       .gte("ayah_end", ayah)
@@ -168,22 +170,26 @@ export async function getAsbabForVerse(
     }
   }
 
-  const englishTafsirRows = (await supabase
-    .from("tafsir_passages")
-    .select("id,source_id,surah,ayah_start,ayah_end,lang,body,citation,source:tafsir_sources!inner(*)")
-    .eq("surah", surah)
-    .lte("ayah_start", ayah)
-    .gte("ayah_end", ayah)
-    .eq("lang", "en")
-    .or(
-      [
-        "body.ilike.%occasion of revelation%",
-        "body.ilike.%reason for revelation%",
-        "body.ilike.%revealed concerning%",
-      ].join(","),
-    )
-    .order("created_at", { ascending: false })
-    .limit(4)).data as TafsirPassageRow[] | null;
+  const englishTafsirRows = (
+    await supabase
+      .from("tafsir_passages")
+      .select(
+        "id,source_id,surah,ayah_start,ayah_end,lang,body,citation,source:tafsir_sources!inner(*)",
+      )
+      .eq("surah", surah)
+      .lte("ayah_start", ayah)
+      .gte("ayah_end", ayah)
+      .eq("lang", "en")
+      .or(
+        [
+          "body.ilike.%occasion of revelation%",
+          "body.ilike.%reason for revelation%",
+          "body.ilike.%revealed concerning%",
+        ].join(","),
+      )
+      .order("created_at", { ascending: false })
+      .limit(4)
+  ).data as TafsirPassageRow[] | null;
   if ((englishTafsirRows ?? []).length > 0) {
     return (englishTafsirRows ?? []).map((r) => ({ ...r }));
   }

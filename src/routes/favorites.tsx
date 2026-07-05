@@ -29,17 +29,31 @@ function FavoritesPage() {
 
         {!isAuthenticated ? (
           <div className="surface-card flex flex-col items-center px-6 py-14 text-center">
-            <Star className="h-10 w-10 text-muted-foreground/50" strokeWidth={1.5} aria-hidden="true" />
+            <Star
+              className="h-10 w-10 text-muted-foreground/50"
+              strokeWidth={1.5}
+              aria-hidden="true"
+            />
             <p className="mt-3 text-sm text-muted-foreground">{t("favorites.signInPrompt")}</p>
-            <Link to="/auth" className="mt-4 inline-block rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90">
+            <Link
+              to="/auth"
+              className="mt-4 inline-block rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90"
+            >
               {t("favorites.signInCta")}
             </Link>
           </div>
         ) : items.length === 0 ? (
           <div className="surface-card flex flex-col items-center px-6 py-14 text-center">
-            <BookOpen className="h-10 w-10 text-muted-foreground/50" strokeWidth={1.5} aria-hidden="true" />
+            <BookOpen
+              className="h-10 w-10 text-muted-foreground/50"
+              strokeWidth={1.5}
+              aria-hidden="true"
+            />
             <p className="mt-3 text-sm text-muted-foreground">{t("favorites.emptyTitle")}</p>
-            <Link to="/" className="mt-4 inline-block rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90">
+            <Link
+              to="/"
+              className="mt-4 inline-block rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90"
+            >
               {t("favorites.browseSurahs")}
             </Link>
           </div>
@@ -53,7 +67,8 @@ function FavoritesPage() {
                     params={{ id: String(it.surah) }}
                     className="text-xs font-medium text-primary hover:underline"
                   >
-                    {t("favorites.verseLabel", { s: it.surah, a: it.ayah })} • <span className="font-arabic">{it.surahName}</span>
+                    {t("favorites.verseLabel", { s: it.surah, a: it.ayah })} •{" "}
+                    <span className="font-arabic">{it.surahName}</span>
                   </Link>
                   <button
                     onClick={() => remove(it.surah, it.ayah)}

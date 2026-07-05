@@ -10,11 +10,7 @@ interface HeaderUserProps {
   onSignOut: () => Promise<void>;
 }
 
-export function HeaderUser({
-  isAuthenticated,
-  user,
-  onSignOut,
-}: HeaderUserProps) {
+export function HeaderUser({ isAuthenticated, user, onSignOut }: HeaderUserProps) {
   const { t } = useTranslation("common");
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement | null>(null);

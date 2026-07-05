@@ -26,7 +26,8 @@ export function ContinueReading() {
               {t("continueReading.label")}
             </div>
             <div className="mt-0.5 text-sm font-semibold text-foreground">
-              {t("continueReading.surahN", { n: progress.surah })} · {surahDisplayName(progress.surah, lang)}
+              {t("continueReading.surahN", { n: progress.surah })} ·{" "}
+              {surahDisplayName(progress.surah, lang)}
             </div>
           </div>
         </div>

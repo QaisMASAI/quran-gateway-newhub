@@ -29,7 +29,10 @@ export const Route = createFileRoute("/api/public/admin/backfill-quran-chapters"
 
         const chaptersRes = await fetch("https://api.quran.com/api/v4/chapters?language=en");
         if (!chaptersRes.ok) {
-          return Response.json({ ok: false, error: `Quran API failed (${chaptersRes.status})` }, { status: 502 });
+          return Response.json(
+            { ok: false, error: `Quran API failed (${chaptersRes.status})` },
+            { status: 502 },
+          );
         }
 
         const chaptersJson = (await chaptersRes.json()) as { chapters?: QuranChapter[] };

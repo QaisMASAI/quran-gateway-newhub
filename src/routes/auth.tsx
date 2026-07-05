@@ -10,7 +10,8 @@ export const Route = createFileRoute("/auth")({
       { title: "Noor Al Quran| Sign in" },
       {
         name: "description",
-        content: "Sign in or create an account to save verses, personal notes, and track your reading progress.",
+        content:
+          "Sign in or create an account to save verses, personal notes, and track your reading progress.",
       },
       { property: "og:title", content: "Noor Al Quran| Sign in" },
       {
@@ -26,5 +27,7 @@ export const Route = createFileRoute("/auth")({
     ],
     links: [{ rel: "canonical", href: "/auth" }],
   }),
-  pendingComponent: () => <div className="mx-auto max-w-md px-4 py-10 text-sm text-muted-foreground">Loading…</div>,
+  pendingComponent: () => (
+    <div className="mx-auto max-w-md px-4 py-10 text-sm text-muted-foreground">Loading…</div>
+  ),
 });

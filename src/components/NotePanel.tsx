@@ -64,7 +64,9 @@ export function NotePanel({ surah, ayah, onClose }: Props) {
       <div className="mt-2 flex items-center justify-between text-[11px] text-muted-foreground">
         <span>
           {note
-            ? t("ui.note.lastUpdated", { when: new Date(note.updatedAt).toLocaleString(localeCode) })
+            ? t("ui.note.lastUpdated", {
+                when: new Date(note.updatedAt).toLocaleString(localeCode),
+              })
             : t("ui.note.notSaved")}
         </span>
         <div className="flex items-center gap-1.5">
@@ -96,4 +98,3 @@ export function NotePanel({ surah, ayah, onClose }: Props) {
     </div>
   );
 }
-

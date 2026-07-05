@@ -26,7 +26,11 @@ export interface SurahBilingualVerse {
 const sourceIdCache = new Map<string, string>();
 
 function cleanHtml(input: string): string {
-  return input.replace(/<sup[^>]*>.*?<\/sup>/g, "").replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
+  return input
+    .replace(/<sup[^>]*>.*?<\/sup>/g, "")
+    .replace(/<[^>]+>/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
 }
 
 async function fetchQuranComVerse(
@@ -36,7 +40,9 @@ async function fetchQuranComVerse(
 ): Promise<{ arabic: string; translation: string } | null> {
   try {
     const [arRes, trRes] = await Promise.all([
-      fetch(`https://api.quran.com/api/v4/verses/by_key/${surah}:${ayah}?words=false&translations=`),
+      fetch(
+        `https://api.quran.com/api/v4/verses/by_key/${surah}:${ayah}?words=false&translations=`,
+      ),
       fetch(
         `https://api.quran.com/api/v4/verses/by_key/${surah}:${ayah}?words=false&translations=${
           locale === "he" ? 233 : locale === "en" ? 20 : 0
@@ -52,9 +58,7 @@ async function fetchQuranComVerse(
     };
     const arabic = arJson.verse?.text_uthmani ?? trJson.verse?.text_uthmani ?? "";
     const translation =
-      locale === "ar"
-        ? arabic
-        : cleanHtml(trJson.verse?.translations?.[0]?.text ?? "") || arabic;
+      locale === "ar" ? arabic : cleanHtml(trJson.verse?.translations?.[0]?.text ?? "") || arabic;
     if (!arabic && !translation) return null;
     return { arabic, translation };
   } catch {
@@ -68,7 +72,8 @@ async function fetchAltVerse(
   locale: LocaleCode,
 ): Promise<{ arabic: string; translation: string } | null> {
   try {
-    const translationEdition = locale === "en" ? "en.asad" : locale === "ar" ? "ar.uthmani" : "en.asad";
+    const translationEdition =
+      locale === "en" ? "en.asad" : locale === "ar" ? "ar.uthmani" : "en.asad";
     const [arRes, trRes] = await Promise.all([
       fetch(`https://api.alquran.cloud/v1/ayah/${surah}:${ayah}/ar.uthmani`),
       fetch(`https://api.alquran.cloud/v1/ayah/${surah}:${ayah}/${translationEdition}`),
@@ -113,7 +118,7 @@ async function fetchQuranComSurah(
         arabic: v.text_uthmani ?? "",
         translation:
           locale === "ar"
-            ? v.text_uthmani ?? ""
+            ? (v.text_uthmani ?? "")
             : cleanHtml(v.translations?.[0]?.text ?? "") || v.text_uthmani || "",
       };
     });
@@ -124,7 +129,8 @@ async function fetchQuranComSurah(
 
 async function fetchAltSurah(surah: number, locale: LocaleCode): Promise<SurahBilingualVerse[]> {
   try {
-    const translationEdition = locale === "en" ? "en.asad" : locale === "ar" ? "ar.uthmani" : "en.asad";
+    const translationEdition =
+      locale === "en" ? "en.asad" : locale === "ar" ? "ar.uthmani" : "en.asad";
     const [arRes, trRes] = await Promise.all([
       fetch(`https://api.alquran.cloud/v1/surah/${surah}/ar.uthmani`),
       fetch(`https://api.alquran.cloud/v1/surah/${surah}/${translationEdition}`),
@@ -143,7 +149,8 @@ async function fetchAltSurah(surah: number, locale: LocaleCode): Promise<SurahBi
       surah,
       ayah: a.numberInSurah,
       arabic: a.text ?? "",
-      translation: locale === "ar" ? a.text ?? "" : trByAyah.get(a.numberInSurah) ?? a.text ?? "",
+      translation:
+        locale === "ar" ? (a.text ?? "") : (trByAyah.get(a.numberInSurah) ?? a.text ?? ""),
     }));
   } catch {
     return [];
@@ -176,8 +183,7 @@ async function fetchVerseFromEmbeddings(
     .maybeSingle();
   if (error || !data) return null;
   const arabic = data.arabic ?? "";
-  const translation =
-    locale === "ar" ? arabic : locale === "he" ? data.hebrew ?? "" : "";
+  const translation = locale === "ar" ? arabic : locale === "he" ? (data.hebrew ?? "") : "";
   if (locale !== "ar" && !translation) return null;
   if (!arabic && !translation) return null;
   return { arabic, translation };
@@ -227,7 +233,7 @@ export async function fetchVerseBilingual(
   const arRow = data.find((r) => r.source_id === arSid);
   const locRow = data.find((r) => r.source_id === locSid);
   const localArabic = arRow?.text ?? "";
-  const localTranslation = locale === "ar" ? arRow?.text ?? "" : locRow?.text ?? "";
+  const localTranslation = locale === "ar" ? (arRow?.text ?? "") : (locRow?.text ?? "");
 
   if (localArabic && (locale === "ar" || !!localTranslation)) {
     return {

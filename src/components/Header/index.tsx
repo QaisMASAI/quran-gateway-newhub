@@ -14,11 +14,7 @@ export function Header() {
   return (
     <header className="sticky top-0 z-30 border-b border-border bg-background/85 backdrop-blur-md">
       <div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-3 sm:px-6">
-        <Link
-          to="/"
-          className="flex items-center gap-2.5 group"
-          aria-label={t("site.name")}
-        >
+        <Link to="/" className="flex items-center gap-2.5 group" aria-label={t("site.name")}>
           <Logo className="h-10 w-10 drop-shadow-sm transition-transform group-hover:rotate-[8deg]" />
           <div className="leading-tight">
             <div className="text-[15px] font-semibold text-foreground">{t("site.name")}</div>
@@ -31,11 +27,7 @@ export function Header() {
         <div className="flex items-center gap-1.5">
           <LocaleSwitcher />
           <ThemeToggle />
-          <HeaderUser
-            isAuthenticated={isAuthenticated}
-            user={user}
-            onSignOut={signOut}
-          />
+          <HeaderUser isAuthenticated={isAuthenticated} user={user} onSignOut={signOut} />
         </div>
       </div>
     </header>

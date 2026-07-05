@@ -40,10 +40,7 @@ export function setStoredSettings(next: ReadingSettings) {
   window.dispatchEvent(new CustomEvent<ReadingSettings>(EVT, { detail: next }));
 }
 
-export function useReadingSettings(): [
-  ReadingSettings,
-  (patch: Partial<ReadingSettings>) => void,
-] {
+export function useReadingSettings(): [ReadingSettings, (patch: Partial<ReadingSettings>) => void] {
   const [settings, setSettings] = useState<ReadingSettings>(() => getStoredSettings());
 
   useEffect(() => {

@@ -10,19 +10,27 @@ export const Route = createFileRoute("/api/public/admin/backfill-arabic-ayat")({
   server: {
     handlers: {
       POST: async ({ request }) => {
-        const body = await request.json().catch(() => ({} as { token?: string; adminUserId?: string }));
+        const body = await request
+          .json()
+          .catch(() => ({}) as { token?: string; adminUserId?: string });
         const authResult = await authorizeAdminRouteRequest(request, body);
         if (!authResult.ok) return authResult.response;
 
         const quranRes = await fetch("https://api.quran.com/api/v4/quran/verses/uthmani");
         if (!quranRes.ok) {
-          return Response.json({ ok: false, error: `Quran API failed (${quranRes.status})` }, { status: 502 });
+          return Response.json(
+            { ok: false, error: `Quran API failed (${quranRes.status})` },
+            { status: 502 },
+          );
         }
 
         const quranJson = (await quranRes.json()) as { verses?: QuranVerse[] };
         const verses = quranJson.verses ?? [];
         if (verses.length === 0) {
-          return Response.json({ ok: false, error: "No verses returned from Quran API" }, { status: 502 });
+          return Response.json(
+            { ok: false, error: "No verses returned from Quran API" },
+            { status: 502 },
+          );
         }
 
         const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
@@ -46,7 +54,10 @@ export const Route = createFileRoute("/api/public/admin/backfill-arabic-ayat")({
           .single();
 
         if (srcErr || !src?.id) {
-          return Response.json({ ok: false, error: srcErr?.message ?? "Failed to upsert translation source" }, { status: 500 });
+          return Response.json(
+            { ok: false, error: srcErr?.message ?? "Failed to upsert translation source" },
+            { status: 500 },
+          );
         }
 
         const rows = verses
@@ -58,7 +69,9 @@ export const Route = createFileRoute("/api/public/admin/backfill-arabic-ayat")({
             if (!surah || !ayah || !text) return null;
             return { source_id: src.id, surah, ayah, text };
           })
-          .filter((r): r is { source_id: string; surah: number; ayah: number; text: string } => !!r);
+          .filter(
+            (r): r is { source_id: string; surah: number; ayah: number; text: string } => !!r,
+          );
 
         const { error: upErr } = await supabaseAdmin
           .from("ayah_translations")

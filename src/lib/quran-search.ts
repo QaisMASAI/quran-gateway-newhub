@@ -437,7 +437,13 @@ export function semanticSearch(
     if (matched >= minTerms) {
       const chapter = idx.chapters[v.surah - 1];
       if (!chapter) continue;
-      scored.push({ verse: v, chapter, matched, arabicMatches: arMatches, hebrewMatches: heMatches });
+      scored.push({
+        verse: v,
+        chapter,
+        matched,
+        arabicMatches: arMatches,
+        hebrewMatches: heMatches,
+      });
     }
   }
 
@@ -472,7 +478,11 @@ export function semanticToSearchOutput(
     const matchedIn: VerseHit["matchedIn"] =
       h.hebrewMatches >= h.arabicMatches ? (locale === "en" ? "english" : "hebrew") : "arabic";
     const snippetSource =
-      matchedIn === "english" ? h.verse.english : matchedIn === "hebrew" ? h.verse.hebrew : h.verse.arabic;
+      matchedIn === "english"
+        ? h.verse.english
+        : matchedIn === "hebrew"
+          ? h.verse.hebrew
+          : h.verse.arabic;
     return {
       verse: h.verse,
       chapter: h.chapter,
@@ -500,7 +510,11 @@ export function semanticToSearchOutput(
 }
 
 /** Keyword search with semantic fallback when few results are found. */
-export function searchWithFallback(idx: QuranIndex, query: string, locale: "he" | "ar" | "en" = "he"): SearchOutput {
+export function searchWithFallback(
+  idx: QuranIndex,
+  query: string,
+  locale: "he" | "ar" | "en" = "he",
+): SearchOutput {
   const keyword = searchIndex(idx, query);
   if (keyword.total >= 3 || query.trim().length < 2) return keyword;
 

@@ -359,12 +359,18 @@ export async function loadSurahNamesFromDb(fetcher: typeof fetch): Promise<void>
     const res = await fetcher("/api/public/surah-names");
     if (!res.ok) return;
     const json = (await res.json()) as {
-      items?: Array<{ chapter_number: number; name_he: string | null; name_simple_en: string; name_ar: string }>;
+      items?: Array<{
+        chapter_number: number;
+        name_he: string | null;
+        name_simple_en: string;
+        name_ar: string;
+      }>;
     };
     for (const row of json.items ?? []) {
       SURAH_DB_CACHE.set(row.chapter_number, {
         he: row.name_he ?? SURAH_NAMES_HE[row.chapter_number] ?? `סורה ${row.chapter_number}`,
-        en: row.name_simple_en || SURAH_NAMES_EN[row.chapter_number] || `Surah ${row.chapter_number}`,
+        en:
+          row.name_simple_en || SURAH_NAMES_EN[row.chapter_number] || `Surah ${row.chapter_number}`,
         ar: row.name_ar || SURAH_NAMES_AR[row.chapter_number] || `سورة ${row.chapter_number}`,
       });
     }
