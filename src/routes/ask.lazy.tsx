@@ -10,7 +10,7 @@ import { askQuranResearch, type ResearchResult } from "@/lib/ai-research.functio
 import { Header } from "@/components/Header";
 import { normalizeLocale, type Locale } from "@/lib/i18n";
 import { getNextMcpRetryDelay } from "@/lib/mcp-outage";
-import { localeTextDir, readingFontClass, tafsirFontClass, uiFontClass } from "@/lib/locale-ui";
+import { localeTextDir, tafsirFontClass, uiFontClass } from "@/lib/locale-ui";
 
 export const Route = createLazyFileRoute("/ask")({
   component: AskPage,
@@ -22,7 +22,6 @@ function AskPage() {
   const examples = t("ask.examples", { returnObjects: true }) as string[];
   const uiClass = uiFontClass(locale);
   const tafsirClass = tafsirFontClass(locale);
-  const readingClass = readingFontClass(locale);
   const textDir = localeTextDir(locale);
 
   const ask = useServerFn(askQuranResearch);
@@ -212,7 +211,7 @@ function AskPage() {
                   <p className="font-quran mt-1.5 text-right text-lg leading-loose text-foreground" dir="rtl">
                     {v.arabic}
                   </p>
-                  <p className={`mt-1.5 text-[13.5px] text-foreground/80 ${readingClass}`} dir={textDir}>
+                  <p className={`mt-1.5 text-[13.5px] text-foreground/80 ${locale === "en" ? "font-reading-en" : "font-reading-he"}`} dir={textDir}>
                     {v.hebrew}
                   </p>
                   {(v.translation_source || v.translator) && (
