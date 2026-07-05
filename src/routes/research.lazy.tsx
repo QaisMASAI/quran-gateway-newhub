@@ -8,8 +8,9 @@ import { Sparkles, Loader2, Send, BookOpen, ShieldCheck, ChevronLeft } from "luc
 import { askQuranResearch, type ResearchResult } from "@/lib/ai-research.functions";
 import { surahDisplayName } from "@/lib/surah-names-he";
 import { Header } from "@/components/Header";
-import { normalizeLocale } from "@/lib/i18n";
+import { normalizeLocale, type Locale } from "@/lib/i18n";
 import { getNextMcpRetryDelay } from "@/lib/mcp-outage";
+import { localeTextDir, tafsirFontClass, uiFontClass } from "@/lib/locale-ui";
 
 export const Route = createLazyFileRoute("/research")({
   component: ResearchPage,
@@ -17,7 +18,10 @@ export const Route = createLazyFileRoute("/research")({
 
 function ResearchPage() {
   const { t, i18n } = useTranslation("pages");
-  const lang = (normalizeLocale(i18n.language) ?? "he") as "he" | "en" | "ar";
+  const lang = (normalizeLocale(i18n.language) ?? "he") as Locale;
+  const uiClass = uiFontClass(lang);
+  const tafsirClass = tafsirFontClass(lang);
+  const textDir = localeTextDir(lang);
   const [q, setQ] = useState("");
   const [retryAttempt, setRetryAttempt] = useState(0);
   const [retryEta, setRetryEta] = useState<number | null>(null);
@@ -68,7 +72,7 @@ function ResearchPage() {
           ];
 
   return (
-    <div className={`min-h-screen bg-background ${lang === "ar" ? "font-ui-ar" : lang === "en" ? "font-ui-en" : "font-ui-he"}`}>
+    <div className={`min-h-screen bg-background ${uiClass}`}>
       <Header />
       <div className="container mx-auto max-w-4xl px-4 py-8">
         <Link
@@ -185,7 +189,7 @@ function ResearchPage() {
                 </h2>
                 <ConfidenceBadge confidence={result.confidence} />
               </div>
-              <div className={`ai-explanation-block prose prose-sm max-w-none dark:prose-invert ${lang === "ar" ? "font-tafsir-hadith-ar" : lang === "en" ? "font-tafsir-hadith-en" : "font-tafsir-hadith-he"}`} dir={lang === "en" ? "ltr" : "rtl"}>
+              <div className={`ai-explanation-block prose prose-sm max-w-none dark:prose-invert ${tafsirClass}`} dir={textDir}>
                 <ReactMarkdown skipHtml>{result.answer}</ReactMarkdown>
               </div>
             </div>
@@ -249,7 +253,7 @@ function ResearchPage() {
                           {tf.kind === "asbab" ? "Asbab al-Nuzul" : tf.source} · {tf.surah}:{tf.ayah}
                         {tf.translator ? ` · ${tf.translator}` : ""}
                       </div>
-                      <p className={`ai-explanation-block text-sm text-foreground/90 ${lang === "ar" ? "font-tafsir-hadith-ar" : lang === "en" ? "font-tafsir-hadith-en" : "font-tafsir-hadith-he"}`} dir={lang === "en" ? "ltr" : "rtl"}>{tf.text}</p>
+                      <p className={`ai-explanation-block text-sm text-foreground/90 ${tafsirClass}`} dir={textDir}>{tf.text}</p>
                       <div className="mt-2 rounded-md border border-border bg-background px-2 py-1 text-[11px] text-muted-foreground">
                         {t("research.tafsirSource", { source: tf.source })}
                         {tf.translator ? ` · ${t("research.translator", { translator: tf.translator })}` : ""}
