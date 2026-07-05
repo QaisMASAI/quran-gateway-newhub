@@ -4,6 +4,8 @@ import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { buildQuranIndex, chapterDisplayName, type SurahGroup } from "@/lib/quran-api";
 import { searchWithFallback } from "@/lib/quran-search";
+import { useServerFn } from "@tanstack/react-start";
+import { searchQuranItemsHybrid } from "@/lib/hybrid-search.functions";
 import { Header } from "@/components/Header";
 import { Search as SearchIcon, Loader2, ChevronLeft, ChevronRight, BookOpen } from "lucide-react";
 import { searchEntities, searchKnowledgeTexts, type EntityKind } from "@/lib/knowledge";
@@ -26,6 +28,7 @@ function SearchPage() {
   const [input, setInput] = useState("");
   const deferred = useDeferredValue(input);
   const trimmed = deferred.trim();
+  const runQuranItemsHybrid = useServerFn(searchQuranItemsHybrid);
 
   const indexQ = useQuery({
     queryKey: ["quran-index"],
@@ -44,6 +47,21 @@ function SearchPage() {
   const textsQ = useQuery({
     queryKey: ["knowledge-text-search", trimmed],
     queryFn: () => searchKnowledgeTexts(trimmed, 10),
+    enabled: trimmed.length >= 2,
+    staleTime: 60_000,
+  });
+
+  const quranItemsQ = useQuery({
+    queryKey: ["quran-items-hybrid", trimmed, locale],
+    queryFn: () =>
+      runQuranItemsHybrid({
+        data: {
+          q: trimmed,
+          language: locale,
+          semantic: true,
+          limit: 8,
+        },
+      }),
     enabled: trimmed.length >= 2,
     staleTime: 60_000,
   });
@@ -152,6 +170,37 @@ function SearchPage() {
                   </p>
                 </article>
               ))}
+            </div>
+          </section>
+        )}
+
+        {quranItemsQ.data && quranItemsQ.data.hits.length > 0 && (
+          <section className="mt-6">
+            <SectionTitle>{t("search.discoveryHeading")}</SectionTitle>
+            <div className="space-y-2">
+              {quranItemsQ.data.hits.map((hit) => {
+                const title = hit.title_i18n?.[locale] || hit.title_i18n?.en || hit.title_i18n?.ar || "";
+                const body = hit.body_i18n?.[locale] || hit.body_i18n?.en || hit.body_i18n?.ar || "";
+                return (
+                  <article key={hit.item_id} className="surface-card px-4 py-3">
+                    <p className="text-xs font-semibold text-primary">
+                      {hit.dataset_kind.toUpperCase()}
+                      {hit.surah && hit.ayah_start
+                        ? ` · ${hit.surah}:${hit.ayah_start}${hit.ayah_end && hit.ayah_end !== hit.ayah_start ? `-${hit.ayah_end}` : ""}`
+                        : ""}
+                    </p>
+                    {title ? (
+                      <p className="mt-1 text-sm font-semibold text-foreground">{title}</p>
+                    ) : null}
+                    {body ? (
+                      <p className={`mt-1 text-sm leading-relaxed text-foreground/85 ${tafsirClass}`} dir={textDir}>
+                        {body.slice(0, 180)}
+                        {body.length > 180 ? "…" : ""}
+                      </p>
+                    ) : null}
+                  </article>
+                );
+              })}
             </div>
           </section>
         )}

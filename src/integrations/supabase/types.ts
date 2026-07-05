@@ -1721,6 +1721,62 @@ export type Database = {
         }
         Relationships: []
       }
+      quran_audio_files: {
+        Row: {
+          ayah: number | null
+          bitrate_kbps: number | null
+          checksum: string | null
+          created_at: string
+          duration_ms: number | null
+          format: string
+          id: string
+          metadata: Json
+          quality_label: string
+          reciter_id: string
+          surah: number
+          updated_at: string
+          url: string
+        }
+        Insert: {
+          ayah?: number | null
+          bitrate_kbps?: number | null
+          checksum?: string | null
+          created_at?: string
+          duration_ms?: number | null
+          format?: string
+          id?: string
+          metadata?: Json
+          quality_label: string
+          reciter_id: string
+          surah: number
+          updated_at?: string
+          url: string
+        }
+        Update: {
+          ayah?: number | null
+          bitrate_kbps?: number | null
+          checksum?: string | null
+          created_at?: string
+          duration_ms?: number | null
+          format?: string
+          id?: string
+          metadata?: Json
+          quality_label?: string
+          reciter_id?: string
+          surah?: number
+          updated_at?: string
+          url?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "quran_audio_files_reciter_id_fkey"
+            columns: ["reciter_id"]
+            isOneToOne: false
+            referencedRelation: "quran_reciters"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       quran_chapters: {
         Row: {
           chapter_number: number
@@ -1757,6 +1813,364 @@ export type Database = {
           revelation_place?: string | null
           updated_at?: string
           verses_count?: number
+        }
+        Relationships: []
+      }
+      quran_dataset_items: {
+        Row: {
+          ayah_end: number | null
+          ayah_start: number | null
+          body_i18n: Json
+          checksum: string | null
+          chronology_order: number | null
+          content_type: string
+          created_at: string
+          dataset_id: string
+          external_key: string
+          hizb: number | null
+          id: string
+          is_meccan: boolean | null
+          juz: number | null
+          language_code: string | null
+          metadata: Json
+          page: number | null
+          payload: Json
+          publication_status: Database["public"]["Enums"]["knowledge_publication_status"]
+          revelation_order: number | null
+          surah: number | null
+          tags: string[]
+          title_i18n: Json
+          updated_at: string
+        }
+        Insert: {
+          ayah_end?: number | null
+          ayah_start?: number | null
+          body_i18n?: Json
+          checksum?: string | null
+          chronology_order?: number | null
+          content_type?: string
+          created_at?: string
+          dataset_id: string
+          external_key: string
+          hizb?: number | null
+          id?: string
+          is_meccan?: boolean | null
+          juz?: number | null
+          language_code?: string | null
+          metadata?: Json
+          page?: number | null
+          payload?: Json
+          publication_status?: Database["public"]["Enums"]["knowledge_publication_status"]
+          revelation_order?: number | null
+          surah?: number | null
+          tags?: string[]
+          title_i18n?: Json
+          updated_at?: string
+        }
+        Update: {
+          ayah_end?: number | null
+          ayah_start?: number | null
+          body_i18n?: Json
+          checksum?: string | null
+          chronology_order?: number | null
+          content_type?: string
+          created_at?: string
+          dataset_id?: string
+          external_key?: string
+          hizb?: number | null
+          id?: string
+          is_meccan?: boolean | null
+          juz?: number | null
+          language_code?: string | null
+          metadata?: Json
+          page?: number | null
+          payload?: Json
+          publication_status?: Database["public"]["Enums"]["knowledge_publication_status"]
+          revelation_order?: number | null
+          surah?: number | null
+          tags?: string[]
+          title_i18n?: Json
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "quran_dataset_items_dataset_id_fkey"
+            columns: ["dataset_id"]
+            isOneToOne: false
+            referencedRelation: "quran_datasets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      quran_datasets: {
+        Row: {
+          code: string
+          created_at: string
+          created_by: string | null
+          description_i18n: Json
+          id: string
+          import_mode: string
+          is_active: boolean
+          is_public: boolean
+          kind: Database["public"]["Enums"]["quran_dataset_kind"]
+          language_code: string | null
+          metadata: Json
+          schema_version: number
+          source_license: string | null
+          source_name: string | null
+          source_url: string | null
+          title_i18n: Json
+          updated_at: string
+          version: string
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          created_by?: string | null
+          description_i18n?: Json
+          id?: string
+          import_mode?: string
+          is_active?: boolean
+          is_public?: boolean
+          kind: Database["public"]["Enums"]["quran_dataset_kind"]
+          language_code?: string | null
+          metadata?: Json
+          schema_version?: number
+          source_license?: string | null
+          source_name?: string | null
+          source_url?: string | null
+          title_i18n?: Json
+          updated_at?: string
+          version?: string
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          created_by?: string | null
+          description_i18n?: Json
+          id?: string
+          import_mode?: string
+          is_active?: boolean
+          is_public?: boolean
+          kind?: Database["public"]["Enums"]["quran_dataset_kind"]
+          language_code?: string | null
+          metadata?: Json
+          schema_version?: number
+          source_license?: string | null
+          source_name?: string | null
+          source_url?: string | null
+          title_i18n?: Json
+          updated_at?: string
+          version?: string
+        }
+        Relationships: []
+      }
+      quran_item_embeddings: {
+        Row: {
+          chunk_index: number
+          chunk_text: string
+          created_at: string
+          embedding: string | null
+          embedding_model: string
+          id: string
+          item_id: string
+          language_code: string
+          metadata: Json
+          updated_at: string
+        }
+        Insert: {
+          chunk_index?: number
+          chunk_text: string
+          created_at?: string
+          embedding?: string | null
+          embedding_model?: string
+          id?: string
+          item_id: string
+          language_code: string
+          metadata?: Json
+          updated_at?: string
+        }
+        Update: {
+          chunk_index?: number
+          chunk_text?: string
+          created_at?: string
+          embedding?: string | null
+          embedding_model?: string
+          id?: string
+          item_id?: string
+          language_code?: string
+          metadata?: Json
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "quran_item_embeddings_item_id_fkey"
+            columns: ["item_id"]
+            isOneToOne: false
+            referencedRelation: "quran_dataset_items"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      quran_item_relations: {
+        Row: {
+          created_at: string
+          from_item_id: string
+          id: string
+          metadata: Json
+          relation_type: string
+          to_item_id: string
+          weight: number
+        }
+        Insert: {
+          created_at?: string
+          from_item_id: string
+          id?: string
+          metadata?: Json
+          relation_type: string
+          to_item_id: string
+          weight?: number
+        }
+        Update: {
+          created_at?: string
+          from_item_id?: string
+          id?: string
+          metadata?: Json
+          relation_type?: string
+          to_item_id?: string
+          weight?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "quran_item_relations_from_item_id_fkey"
+            columns: ["from_item_id"]
+            isOneToOne: false
+            referencedRelation: "quran_dataset_items"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "quran_item_relations_to_item_id_fkey"
+            columns: ["to_item_id"]
+            isOneToOne: false
+            referencedRelation: "quran_dataset_items"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      quran_reciters: {
+        Row: {
+          code: string
+          country_code: string | null
+          created_at: string
+          id: string
+          is_active: boolean
+          language_code: string
+          metadata: Json
+          name_i18n: Json
+          style: string | null
+          updated_at: string
+        }
+        Insert: {
+          code: string
+          country_code?: string | null
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          language_code?: string
+          metadata?: Json
+          name_i18n?: Json
+          style?: string | null
+          updated_at?: string
+        }
+        Update: {
+          code?: string
+          country_code?: string | null
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          language_code?: string
+          metadata?: Json
+          name_i18n?: Json
+          style?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      quran_word_annotations: {
+        Row: {
+          audio_end_ms: number | null
+          audio_start_ms: number | null
+          ayah: number
+          created_at: string
+          grammar_i18n: Json
+          id: string
+          lemma_ar: string | null
+          metadata: Json
+          morphology_code: string | null
+          morphology_detail_i18n: Json
+          normalized_ar: string | null
+          pos_tag: string | null
+          root_ar: string | null
+          surah: number
+          tajweed_i18n: Json
+          tajweed_rule_codes: string[]
+          token_ar: string
+          token_uthmani: string | null
+          translation_i18n: Json
+          transliteration_en: string | null
+          transliteration_he: string | null
+          updated_at: string
+          word_index: number
+        }
+        Insert: {
+          audio_end_ms?: number | null
+          audio_start_ms?: number | null
+          ayah: number
+          created_at?: string
+          grammar_i18n?: Json
+          id?: string
+          lemma_ar?: string | null
+          metadata?: Json
+          morphology_code?: string | null
+          morphology_detail_i18n?: Json
+          normalized_ar?: string | null
+          pos_tag?: string | null
+          root_ar?: string | null
+          surah: number
+          tajweed_i18n?: Json
+          tajweed_rule_codes?: string[]
+          token_ar: string
+          token_uthmani?: string | null
+          translation_i18n?: Json
+          transliteration_en?: string | null
+          transliteration_he?: string | null
+          updated_at?: string
+          word_index: number
+        }
+        Update: {
+          audio_end_ms?: number | null
+          audio_start_ms?: number | null
+          ayah?: number
+          created_at?: string
+          grammar_i18n?: Json
+          id?: string
+          lemma_ar?: string | null
+          metadata?: Json
+          morphology_code?: string | null
+          morphology_detail_i18n?: Json
+          normalized_ar?: string | null
+          pos_tag?: string | null
+          root_ar?: string | null
+          surah?: number
+          tajweed_i18n?: Json
+          tajweed_rule_codes?: string[]
+          token_ar?: string
+          token_uthmani?: string | null
+          translation_i18n?: Json
+          transliteration_en?: string | null
+          transliteration_he?: string | null
+          updated_at?: string
+          word_index?: number
         }
         Relationships: []
       }
@@ -2402,6 +2816,28 @@ export type Database = {
           score: number
         }[]
       }
+      search_quran_items_hybrid: {
+        Args: {
+          kind_filter?: Database["public"]["Enums"]["quran_dataset_kind"][]
+          language_filter?: string
+          match_count?: number
+          meccan_filter?: boolean
+          q: string
+          query_embedding?: string
+        }
+        Returns: {
+          ayah_end: number
+          ayah_start: number
+          body_i18n: Json
+          dataset_id: string
+          dataset_kind: Database["public"]["Enums"]["quran_dataset_kind"]
+          item_id: string
+          language_code: string
+          score: number
+          surah: number
+          title_i18n: Json
+        }[]
+      }
       search_verses_hybrid: {
         Args: {
           match_count?: number
@@ -2452,6 +2888,24 @@ export type Database = {
         | "teaches"
         | "mentions"
         | "part_of"
+      quran_dataset_kind:
+        | "translation"
+        | "tafsir"
+        | "hadith"
+        | "asbab"
+        | "word_by_word"
+        | "root_lexicon"
+        | "morphology"
+        | "grammar"
+        | "tajweed"
+        | "recitation"
+        | "topic_map"
+        | "entity_map"
+        | "timeline"
+        | "revelation_metadata"
+        | "cross_reference"
+        | "audio_asset"
+        | "other"
       translation_review_status:
         | "pending"
         | "reviewed"
@@ -2619,6 +3073,25 @@ export const Constants = {
         "teaches",
         "mentions",
         "part_of",
+      ],
+      quran_dataset_kind: [
+        "translation",
+        "tafsir",
+        "hadith",
+        "asbab",
+        "word_by_word",
+        "root_lexicon",
+        "morphology",
+        "grammar",
+        "tajweed",
+        "recitation",
+        "topic_map",
+        "entity_map",
+        "timeline",
+        "revelation_metadata",
+        "cross_reference",
+        "audio_asset",
+        "other",
       ],
       translation_review_status: [
         "pending",

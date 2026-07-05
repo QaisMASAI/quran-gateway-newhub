@@ -259,14 +259,15 @@ export function surahAudioUrl(surahId: number): string {
 // Per-ayah recitation — multiple authenticated reciters
 // Source: everyayah.com (public CDN of well-known murattal recitations)
 // ============================================================
-export type ReciterKey = "yasser-ad-dussary";
+export type ReciterKey = "yasser-ad-dussary" | "abdul-basit-murattal" | "mishary-alafasy";
+export type AudioQualityKey = "64k" | "128k" | "192k";
 
 export interface Reciter {
   key: ReciterKey;
   name_he: string;
   name_ar: string;
   name_en: string;
-  folder: string;
+  foldersByQuality: Record<AudioQualityKey, string>;
 }
 
 export const RECITERS: Reciter[] = [
@@ -275,7 +276,33 @@ export const RECITERS: Reciter[] = [
     name_he: "יאסר א-דוסרי",
     name_ar: "ياسر الدوسري",
     name_en: "Yasser Al-Dosari",
-    folder: "Yasser_Ad-Dussary_128kbps",
+    foldersByQuality: {
+      "64k": "Yasser_Ad-Dussary_64kbps",
+      "128k": "Yasser_Ad-Dussary_128kbps",
+      "192k": "Yasser_Ad-Dussary_192kbps",
+    },
+  },
+  {
+    key: "abdul-basit-murattal",
+    name_he: "עבד אל-באסט (מורתל)",
+    name_ar: "عبد الباسط (مرتّل)",
+    name_en: "Abdul Basit Murattal",
+    foldersByQuality: {
+      "64k": "Abdul_Basit_Murattal_64kbps",
+      "128k": "Abdul_Basit_Murattal_128kbps",
+      "192k": "Abdul_Basit_Murattal_192kbps",
+    },
+  },
+  {
+    key: "mishary-alafasy",
+    name_he: "משארי אל-עפאסי",
+    name_ar: "مشاري العفاسي",
+    name_en: "Mishary Alafasy",
+    foldersByQuality: {
+      "64k": "Alafasy_64kbps",
+      "128k": "Alafasy_128kbps",
+      "192k": "Alafasy_192kbps",
+    },
   },
 ];
 
@@ -286,6 +313,7 @@ export function reciterName(r: Reciter, locale: "he" | "ar" | "en"): string {
 }
 
 const RECITER_STORAGE_KEY = "qc:reciter";
+const AUDIO_QUALITY_STORAGE_KEY = "qc:audio-quality";
 
 export function getStoredReciter(): ReciterKey {
   if (typeof window === "undefined") return "yasser-ad-dussary";
@@ -299,14 +327,28 @@ export function setStoredReciter(key: ReciterKey) {
   window.dispatchEvent(new CustomEvent("qc:reciter-change", { detail: key }));
 }
 
+export function getStoredAudioQuality(): AudioQualityKey {
+  if (typeof window === "undefined") return "128k";
+  const v = window.localStorage.getItem(AUDIO_QUALITY_STORAGE_KEY) as AudioQualityKey | null;
+  return v === "64k" || v === "128k" || v === "192k" ? v : "128k";
+}
+
+export function setStoredAudioQuality(quality: AudioQualityKey) {
+  if (typeof window === "undefined") return;
+  window.localStorage.setItem(AUDIO_QUALITY_STORAGE_KEY, quality);
+  window.dispatchEvent(new CustomEvent("qc:audio-quality-change", { detail: quality }));
+}
+
 export function ayahAudioUrl(
   surahId: number,
   ayahNumber: number,
   reciter: ReciterKey = "yasser-ad-dussary",
+  quality: AudioQualityKey = "128k",
 ): string {
   const s = String(surahId).padStart(3, "0");
   const a = String(ayahNumber).padStart(3, "0");
-  const folder = RECITERS.find((r) => r.key === reciter)?.folder ?? RECITERS[0].folder;
+  const selected = RECITERS.find((r) => r.key === reciter) ?? RECITERS[0];
+  const folder = selected.foldersByQuality[quality] ?? selected.foldersByQuality["128k"];
   return `https://everyayah.com/data/${folder}/${s}${a}.mp3`;
 }
 
@@ -430,6 +472,12 @@ export function normalizeArabic(input: string): string {
 // --- loaders (full Quran in two requests) ---
 
 export async function buildQuranIndex(): Promise<QuranIndex> {
+  if (QURAN_INDEX_CACHE && Date.now() - QURAN_INDEX_CACHE.at < 10 * 60_000) {
+    return QURAN_INDEX_CACHE.value;
+  }
+  if (QURAN_INDEX_INFLIGHT) return QURAN_INDEX_INFLIGHT;
+
+  QURAN_INDEX_INFLIGHT = (async () => {
   const [chaptersRaw, arSourceId, heSourceId, enSourceId] = await Promise.all([
     fetchChapters(),
     resolveSourceId(TRANSLATION_SOURCE_CODE.ar),
@@ -454,7 +502,9 @@ export async function buildQuranIndex(): Promise<QuranIndex> {
       arr.push(v);
       bySurah.set(v.surah, arr);
     }
-    return { verses, chapters, bySurah };
+    const out = { verses, chapters, bySurah };
+    QURAN_INDEX_CACHE = { value: out, at: Date.now() };
+    return out;
   }
 
   const { data: rows, error } = await supabase
@@ -519,11 +569,25 @@ export async function buildQuranIndex(): Promise<QuranIndex> {
       arr.push(v);
       remoteBySurah.set(v.surah, arr);
     }
-    return { verses: remoteVerses, chapters, bySurah: remoteBySurah };
+    const out = { verses: remoteVerses, chapters, bySurah: remoteBySurah };
+    QURAN_INDEX_CACHE = { value: out, at: Date.now() };
+    return out;
   }
 
-  return { verses, chapters, bySurah };
+  const out = { verses, chapters, bySurah };
+  QURAN_INDEX_CACHE = { value: out, at: Date.now() };
+  return out;
+  })();
+
+  try {
+    return await QURAN_INDEX_INFLIGHT;
+  } finally {
+    QURAN_INDEX_INFLIGHT = null;
+  }
 }
+
+let QURAN_INDEX_CACHE: { value: QuranIndex; at: number } | null = null;
+let QURAN_INDEX_INFLIGHT: Promise<QuranIndex> | null = null;
 
 // --- search ---
 
