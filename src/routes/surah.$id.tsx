@@ -10,6 +10,7 @@ import { ReadingSettings } from "@/components/ReadingSettings";
 import { ChevronRight, ChevronLeft, Loader2, Play, Pause } from "lucide-react";
 import { useReadingProgress } from "@/lib/reading-progress";
 import { normalizeLocale } from "@/lib/i18n";
+import { uiFontClass } from "@/lib/locale-ui";
 
 function SurahNotFound() {
   const { t } = useTranslation("common");
@@ -69,6 +70,7 @@ function SurahPage() {
   const { t, i18n } = useTranslation("common");
   const lang = (normalizeLocale(i18n.language) ?? "he") as ApiLang;
   const isRtl = i18n.dir() === "rtl";
+  const uiClass = uiFontClass(lang);
   if (!surahId || surahId < 1 || surahId > 114) throw notFound();
 
   const chapterQ = useQuery({
@@ -165,7 +167,7 @@ function SurahPage() {
   }, [surahId, verses?.length]);
 
   return (
-    <div className={`min-h-screen bg-background ${lang === "ar" ? "font-ui-ar" : lang === "en" ? "font-ui-en" : "font-ui-he"}`} dir={isRtl ? "rtl" : "ltr"}>
+    <div className={`min-h-screen bg-background ${uiClass}`} dir={isRtl ? "rtl" : "ltr"}>
       <Header />
 
       <div className="mx-auto max-w-3xl px-4 py-6 sm:px-6">
