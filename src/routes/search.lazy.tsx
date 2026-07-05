@@ -10,6 +10,7 @@ import { searchEntities, searchKnowledgeTexts, type EntityKind } from "@/lib/kno
 import { EntityCard } from "@/components/discovery/EntityCard";
 import { normalizeLocale, type Locale } from "@/lib/i18n";
 import { localeTextDir, tafsirFontClass, uiFontClass } from "@/lib/locale-ui";
+import type { ReactNode } from "react";
 
 export const Route = createLazyFileRoute("/search")({
   component: SearchPage,
@@ -199,7 +200,7 @@ function SearchPage() {
   );
 }
 
-function SectionTitle({ children }: { children: React.ReactNode }) {
+function SectionTitle({ children }: { children: ReactNode }) {
   return (
     <h2 className="mb-3 flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-primary">
       <span className="h-px flex-1 bg-gradient-to-l from-primary/30 to-transparent" />
