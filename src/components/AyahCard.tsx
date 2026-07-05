@@ -21,7 +21,9 @@ import {
   RECITERS,
   reciterName,
   getStoredReciter,
+  getStoredAudioQuality,
   type ReciterKey,
+  type AudioQualityKey,
 } from "@/lib/quran-api";
 import { useFavorites } from "@/lib/favorites";
 import { useQuery } from "@tanstack/react-query";
@@ -88,6 +90,7 @@ export function AyahCard({ surah, surahName, ayah, arabic, hebrew, highlight }: 
   const [playing, setPlaying] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const [reciter, setReciter] = useState<ReciterKey>(() => getStoredReciter());
+  const [audioQuality] = useState<AudioQualityKey>(() => getStoredAudioQuality());
 
   const [panel, setPanel] = useState<null | "tafsir" | "sabab">(null);
   const [showNote, setShowNote] = useState(false);
@@ -127,7 +130,7 @@ export function AyahCard({ surah, surahName, ayah, arabic, hebrew, highlight }: 
 
   const togglePlay = () => {
     if (!audioRef.current) {
-      audioRef.current = new Audio(ayahAudioUrl(surah, ayah, reciter));
+      audioRef.current = new Audio(ayahAudioUrl(surah, ayah, reciter, audioQuality));
       audioRef.current.addEventListener("ended", () => setPlaying(false));
       audioRef.current.addEventListener("error", () => setPlaying(false));
     }
