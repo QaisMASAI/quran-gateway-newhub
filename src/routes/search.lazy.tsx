@@ -56,7 +56,8 @@ function SearchPage() {
 
   const suggestions = t("search.suggestions", { returnObjects: true }) as string[];
 
-  const kindLabel = (k: EntityKind) => t(`search.kind${k.charAt(0).toUpperCase()}${k.slice(1)}` as const);
+  const kindLabel = (k: EntityKind) =>
+    t(`search.kind${k.charAt(0).toUpperCase()}${k.slice(1)}` as const);
 
   return (
     <div className={`min-h-screen bg-background ${uiClass}`} dir={isRtl ? "rtl" : "ltr"}>
@@ -85,7 +86,10 @@ function SearchPage() {
         </div>
 
         {indexQ.isLoading && (
-          <p className="mt-6 flex items-center justify-center gap-2 text-sm text-muted-foreground" aria-live="polite">
+          <p
+            className="mt-6 flex items-center justify-center gap-2 text-sm text-muted-foreground"
+            aria-live="polite"
+          >
             <Loader2 className="h-4 w-4 animate-spin" />
             {t("search.loadingIndex")}
           </p>
@@ -98,7 +102,9 @@ function SearchPage() {
 
         {!results && input.trim().length < 2 && indexQ.data && (
           <div className="mt-8">
-            <p className="mb-2 text-xs font-medium text-muted-foreground">{t("search.suggestionsLabel")}</p>
+            <p className="mb-2 text-xs font-medium text-muted-foreground">
+              {t("search.suggestionsLabel")}
+            </p>
             <div className="flex flex-wrap gap-2">
               {suggestions.map((s) => (
                 <button
@@ -133,9 +139,17 @@ function SearchPage() {
                 <article key={`${row.kind}-${row.id}`} className="surface-card px-4 py-3">
                   <p className="text-xs font-semibold text-primary">
                     {row.kind.toUpperCase()} · {row.source_name}
-                    {row.surah && row.ayah_start ? ` · ${row.surah}:${row.ayah_start}${row.ayah_end && row.ayah_end !== row.ayah_start ? `-${row.ayah_end}` : ""}` : ""}
+                    {row.surah && row.ayah_start
+                      ? ` · ${row.surah}:${row.ayah_start}${row.ayah_end && row.ayah_end !== row.ayah_start ? `-${row.ayah_end}` : ""}`
+                      : ""}
                   </p>
-                  <p className={`mt-1 text-sm leading-relaxed text-foreground/90 ${tafsirClass}`} dir={textDir}>{row.text.slice(0, 220)}{row.text.length > 220 ? "…" : ""}</p>
+                  <p
+                    className={`mt-1 text-sm leading-relaxed text-foreground/90 ${tafsirClass}`}
+                    dir={textDir}
+                  >
+                    {row.text.slice(0, 220)}
+                    {row.text.length > 220 ? "…" : ""}
+                  </p>
                 </article>
               ))}
             </div>
@@ -159,7 +173,9 @@ function SearchPage() {
                         <span className="font-arabic-ui text-lg" dir="rtl">
                           {c.name_arabic}
                         </span>
-                        <span className="text-sm text-muted-foreground">{chapterDisplayName(c, locale)}</span>
+                        <span className="text-sm text-muted-foreground">
+                          {chapterDisplayName(c, locale)}
+                        </span>
                       </div>
                       {isRtl ? (
                         <ChevronRight className="h-4 w-4 text-primary" />
@@ -188,7 +204,12 @@ function SearchPage() {
                 </SectionTitle>
                 <div className="space-y-3">
                   {results.groups.map((g) => (
-                    <SurahGroupCard key={g.chapter.id} group={g} query={deferred.trim()} locale={locale} />
+                    <SurahGroupCard
+                      key={g.chapter.id}
+                      group={g}
+                      query={deferred.trim()}
+                      locale={locale}
+                    />
                   ))}
                 </div>
               </section>
@@ -210,7 +231,15 @@ function SectionTitle({ children }: { children: ReactNode }) {
   );
 }
 
-function SurahGroupCard({ group, query, locale }: { group: SurahGroup; query: string; locale: Locale }) {
+function SurahGroupCard({
+  group,
+  query,
+  locale,
+}: {
+  group: SurahGroup;
+  query: string;
+  locale: Locale;
+}) {
   const { t, i18n } = useTranslation("pages");
   const isRtl = i18n.dir() === "rtl";
   const [open, setOpen] = useState(group.count <= 3);
@@ -231,15 +260,23 @@ function SurahGroupCard({ group, query, locale }: { group: SurahGroup; query: st
               <span className="font-arabic text-base font-semibold" dir="rtl">
                 {group.chapter.name_arabic}
               </span>
-              <span className="text-sm text-muted-foreground">{chapterDisplayName(group.chapter, locale)}</span>
+              <span className="text-sm text-muted-foreground">
+                {chapterDisplayName(group.chapter, locale)}
+              </span>
             </div>
-            <div className="text-[11px] text-muted-foreground">{t("search.matchingVerses", { n: group.count })}</div>
+            <div className="text-[11px] text-muted-foreground">
+              {t("search.matchingVerses", { n: group.count })}
+            </div>
           </div>
         </div>
         {isRtl ? (
-          <ChevronRight className={`h-4 w-4 text-muted-foreground transition-transform ${open ? "rotate-90" : ""}`} />
+          <ChevronRight
+            className={`h-4 w-4 text-muted-foreground transition-transform ${open ? "rotate-90" : ""}`}
+          />
         ) : (
-          <ChevronLeft className={`h-4 w-4 text-muted-foreground transition-transform ${open ? "-rotate-90" : ""}`} />
+          <ChevronLeft
+            className={`h-4 w-4 text-muted-foreground transition-transform ${open ? "-rotate-90" : ""}`}
+          />
         )}
       </button>
 
@@ -254,7 +291,9 @@ function SurahGroupCard({ group, query, locale }: { group: SurahGroup; query: st
             className="block px-4 py-3 hover:bg-secondary/30"
           >
             <div className="mb-1 flex items-center justify-between gap-2 text-[11px]">
-              <span className="font-medium text-primary">{t("search.verseN", { n: h.verse.ayah })}</span>
+              <span className="font-medium text-primary">
+                {t("search.verseN", { n: h.verse.ayah })}
+              </span>
               <span className="inline-flex items-center gap-1 text-muted-foreground">
                 <BookOpen className="h-3 w-3" />
                 {t("search.openInSurah")}
@@ -267,7 +306,11 @@ function SurahGroupCard({ group, query, locale }: { group: SurahGroup; query: st
                     <p className="text-start text-sm text-foreground/90" dir="ltr">
                       {truncate(h.verse.english, 180)}
                     </p>
-                    <p className="font-quran mt-1.5 text-right text-base text-muted-foreground/80" dir="rtl" lang="ar">
+                    <p
+                      className="font-quran mt-1.5 text-right text-base text-muted-foreground/80"
+                      dir="rtl"
+                      lang="ar"
+                    >
                       {truncateArabic(h.verse.arabic)}
                     </p>
                   </>
@@ -282,7 +325,11 @@ function SurahGroupCard({ group, query, locale }: { group: SurahGroup; query: st
                     >
                       {stripSnippetHtml(h.snippet)}
                     </p>
-                    <p className="font-quran mt-1.5 text-right text-base text-muted-foreground/80" dir="rtl" lang="ar">
+                    <p
+                      className="font-quran mt-1.5 text-right text-base text-muted-foreground/80"
+                      dir="rtl"
+                      lang="ar"
+                    >
                       {truncateArabic(h.verse.arabic)}
                     </p>
                   </>
@@ -294,7 +341,9 @@ function SurahGroupCard({ group, query, locale }: { group: SurahGroup; query: st
                     {stripSnippetHtml(h.snippet)}
                   </p>
                   {locale === "he" && h.verse.hebrew && (
-                    <p className="hebrew-text mt-1.5 text-sm text-muted-foreground">{truncate(h.verse.hebrew, 140)}</p>
+                    <p className="hebrew-text mt-1.5 text-sm text-muted-foreground">
+                      {truncate(h.verse.hebrew, 140)}
+                    </p>
                   )}
                 </>
               );

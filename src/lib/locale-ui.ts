@@ -14,7 +14,9 @@ export function tafsirFontClass(
   return "font-tafsir-hadith-he";
 }
 
-export function readingFontClass(locale: Locale): "font-reading-ar" | "font-reading-en" | "font-reading-he" {
+export function readingFontClass(
+  locale: Locale,
+): "font-reading-ar" | "font-reading-en" | "font-reading-he" {
   if (locale === "ar") return "font-reading-ar";
   if (locale === "en") return "font-reading-en";
   return "font-reading-he";

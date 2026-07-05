@@ -58,13 +58,13 @@ function ResearchPage() {
   const result = mutation.data;
   const examples =
     lang === "he"
-      ? [
-          "מהם עיקרי האמונה בקוראן?",
-          "מה אומר הקוראן על צדקה?",
-          "מי היה הנביא יוסף לפי הקוראן?",
-        ]
+      ? ["מהם עיקרי האמונה בקוראן?", "מה אומר הקוראן על צדקה?", "מי היה הנביא יוסף לפי הקוראן?"]
       : lang === "ar"
-        ? ["ما هي أركان الإيمان في القرآن؟", "ماذا يقول القرآن عن الصدقة؟", "من هو يوسف عليه السلام؟"]
+        ? [
+            "ما هي أركان الإيمان في القرآن؟",
+            "ماذا يقول القرآن عن الصدقة؟",
+            "من هو يوسف عليه السلام؟",
+          ]
         : [
             "What are the pillars of faith in the Quran?",
             "What does the Quran say about charity?",
@@ -87,7 +87,9 @@ function ResearchPage() {
             <Sparkles className="h-6 w-6 text-primary" />
           </div>
           <div>
-            <h1 className="text-3xl font-bold tracking-tight">{t("research.title", "AI Research Assistant")}</h1>
+            <h1 className="text-3xl font-bold tracking-tight">
+              {t("research.title", "AI Research Assistant")}
+            </h1>
             <p className="text-sm text-muted-foreground">
               {t(
                 "research.subtitle",
@@ -118,7 +120,11 @@ function ResearchPage() {
             disabled={mutation.isPending || q.trim().length < 2}
             className="flex min-h-11 items-center gap-2 rounded-xl bg-primary px-5 py-3 font-medium text-primary-foreground disabled:opacity-50"
           >
-            {mutation.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
+            {mutation.isPending ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <Send className="h-4 w-4" />
+            )}
             {t("research.ask", "Ask")}
           </button>
         </form>
@@ -127,7 +133,7 @@ function ResearchPage() {
           <div className="mt-6 flex flex-wrap gap-2">
             {examples.map((ex) => (
               <button
-                  type="button"
+                type="button"
                 key={ex}
                 onClick={() => {
                   setQ(ex);
@@ -152,7 +158,10 @@ function ResearchPage() {
             {result.mcpUnavailable && (
               <div className="rounded-xl border border-destructive/20 bg-destructive/10 p-4">
                 <p className="text-sm text-destructive">
-                  {t("research.mcpUnavailable", "Quran.ai verification service is currently unavailable. Please retry for fully verified grounding.")}
+                  {t(
+                    "research.mcpUnavailable",
+                    "Quran.ai verification service is currently unavailable. Please retry for fully verified grounding.",
+                  )}
                 </p>
                 <button
                   type="button"
@@ -189,7 +198,10 @@ function ResearchPage() {
                 </h2>
                 <ConfidenceBadge confidence={result.confidence} />
               </div>
-              <div className={`ai-explanation-block prose prose-sm max-w-none dark:prose-invert ${tafsirClass}`} dir={textDir}>
+              <div
+                className={`ai-explanation-block prose prose-sm max-w-none dark:prose-invert ${tafsirClass}`}
+                dir={textDir}
+              >
                 <ReactMarkdown skipHtml>{result.answer}</ReactMarkdown>
               </div>
             </div>
@@ -213,12 +225,17 @@ function ResearchPage() {
                         <span className="text-sm font-medium">
                           {surahDisplayName(v.surah, lang)} · {v.surah}:{v.ayah}
                         </span>
-                        <span className="text-xs text-muted-foreground">{Math.round(v.similarity * 100)}% match</span>
+                        <span className="text-xs text-muted-foreground">
+                          {Math.round(v.similarity * 100)}% match
+                        </span>
                       </div>
                       <p className="font-arabic text-right text-lg leading-loose" dir="rtl">
                         {v.arabic}
                       </p>
-                      <p className="mt-2 text-sm text-muted-foreground" dir={lang === "en" ? "ltr" : "rtl"}>
+                      <p
+                        className="mt-2 text-sm text-muted-foreground"
+                        dir={lang === "en" ? "ltr" : "rtl"}
+                      >
                         {v.hebrew}
                       </p>
                       {(v.translation_source || v.translator) && (
@@ -248,15 +265,25 @@ function ResearchPage() {
                 </h3>
                 <div className="space-y-3">
                   {result.tafsir.map((tf, i) => (
-                    <div key={`${tf.source}-${tf.surah}-${tf.ayah}-${i}`} className="rounded-xl border border-border bg-card p-4">
-                        <div className="mb-1 text-xs font-medium text-primary">
-                          {tf.kind === "asbab" ? "Asbab al-Nuzul" : tf.source} · {tf.surah}:{tf.ayah}
+                    <div
+                      key={`${tf.source}-${tf.surah}-${tf.ayah}-${i}`}
+                      className="rounded-xl border border-border bg-card p-4"
+                    >
+                      <div className="mb-1 text-xs font-medium text-primary">
+                        {tf.kind === "asbab" ? "Asbab al-Nuzul" : tf.source} · {tf.surah}:{tf.ayah}
                         {tf.translator ? ` · ${tf.translator}` : ""}
                       </div>
-                      <p className={`ai-explanation-block text-sm text-foreground/90 ${tafsirClass}`} dir={textDir}>{tf.text}</p>
+                      <p
+                        className={`ai-explanation-block text-sm text-foreground/90 ${tafsirClass}`}
+                        dir={textDir}
+                      >
+                        {tf.text}
+                      </p>
                       <div className="mt-2 rounded-md border border-border bg-background px-2 py-1 text-[11px] text-muted-foreground">
                         {t("research.tafsirSource", { source: tf.source })}
-                        {tf.translator ? ` · ${t("research.translator", { translator: tf.translator })}` : ""}
+                        {tf.translator
+                          ? ` · ${t("research.translator", { translator: tf.translator })}`
+                          : ""}
                       </div>
                     </div>
                   ))}
@@ -283,7 +310,11 @@ function ResearchPage() {
                         <div className="text-[11px] italic text-muted-foreground">{h.narrator}</div>
                       )}
                       {h.english && <p className="mt-1 text-sm text-foreground/90">{h.english}</p>}
-                      <p className="font-arabic mt-2 text-right text-sm text-foreground" dir="rtl" lang="ar">
+                      <p
+                        className="font-arabic mt-2 text-right text-sm text-foreground"
+                        dir="rtl"
+                        lang="ar"
+                      >
                         {h.arabic}
                       </p>
                     </a>
@@ -306,5 +337,9 @@ function ConfidenceBadge({ confidence }: { confidence: number }) {
       : confidence >= 0.35
         ? "bg-gold-soft text-foreground"
         : "bg-secondary text-muted-foreground";
-  return <span className={`rounded-full px-2.5 py-1 text-xs font-medium ${tone}`}>{pct}% confidence</span>;
+  return (
+    <span className={`rounded-full px-2.5 py-1 text-xs font-medium ${tone}`}>
+      {pct}% confidence
+    </span>
+  );
 }
