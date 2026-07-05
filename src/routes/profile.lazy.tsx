@@ -2,7 +2,15 @@ import { createLazyFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
-import { BookOpen, Bookmark, NotebookPen, Compass, Sparkles, Map as MapIcon, LogIn } from "lucide-react";
+import {
+  BookOpen,
+  Bookmark,
+  NotebookPen,
+  Compass,
+  Sparkles,
+  Map as MapIcon,
+  LogIn,
+} from "lucide-react";
 import { Header } from "@/components/Header";
 import { useAuth } from "@/lib/use-auth";
 import { supabase } from "@/integrations/supabase/client";
@@ -27,44 +35,58 @@ interface ProfileSummary {
   }[];
   recommended: KnowledgeEntity[];
   continueReading: { surah: number; ayah: number; last_read_at: string } | null;
-  recentBookmarks: { surah: number; ayah: number; surah_name: string | null; hebrew_snapshot: string | null; created_at: string }[];
+  recentBookmarks: {
+    surah: number;
+    ayah: number;
+    surah_name: string | null;
+    hebrew_snapshot: string | null;
+    created_at: string;
+  }[];
   recentNotes: { surah: number; ayah: number; body: string; updated_at: string }[];
 }
 
 async function fetchProfileSummary(userId: string): Promise<ProfileSummary> {
-  const [bm, nt, rp, prog, journeys, steps, recs, lastRead, recentBm, recentNt] = await Promise.all([
-    supabase.from("bookmarks").select("id", { count: "exact", head: true }).eq("user_id", userId),
-    supabase.from("notes").select("id", { count: "exact", head: true }).eq("user_id", userId),
-    supabase.from("reading_progress").select("id", { count: "exact", head: true }).eq("user_id", userId),
-    supabase.from("knowledge_journey_progress").select("journey_id,step_id").eq("user_id", userId),
-    supabase.from("knowledge_journeys").select("id,slug,title_i18n").eq("published", true),
-    supabase.from("knowledge_journey_steps").select("id,journey_id"),
-    supabase
-      .from("knowledge_entities")
-      .select("*")
-      .eq("published", true)
-      .in("kind", ["topic", "story", "concept", "prophet"])
-      .limit(60),
-    supabase
-      .from("reading_progress")
-      .select("surah,ayah,last_read_at")
-      .eq("user_id", userId)
-      .order("last_read_at", { ascending: false })
-      .limit(1)
-      .maybeSingle(),
-    supabase
-      .from("bookmarks")
-      .select("surah,ayah,surah_name,hebrew_snapshot,created_at")
-      .eq("user_id", userId)
-      .order("created_at", { ascending: false })
-      .limit(3),
-    supabase
-      .from("notes")
-      .select("surah,ayah,body,updated_at")
-      .eq("user_id", userId)
-      .order("updated_at", { ascending: false })
-      .limit(3),
-  ]);
+  const [bm, nt, rp, prog, journeys, steps, recs, lastRead, recentBm, recentNt] = await Promise.all(
+    [
+      supabase.from("bookmarks").select("id", { count: "exact", head: true }).eq("user_id", userId),
+      supabase.from("notes").select("id", { count: "exact", head: true }).eq("user_id", userId),
+      supabase
+        .from("reading_progress")
+        .select("id", { count: "exact", head: true })
+        .eq("user_id", userId),
+      supabase
+        .from("knowledge_journey_progress")
+        .select("journey_id,step_id")
+        .eq("user_id", userId),
+      supabase.from("knowledge_journeys").select("id,slug,title_i18n").eq("published", true),
+      supabase.from("knowledge_journey_steps").select("id,journey_id"),
+      supabase
+        .from("knowledge_entities")
+        .select("*")
+        .eq("published", true)
+        .in("kind", ["topic", "story", "concept", "prophet"])
+        .limit(60),
+      supabase
+        .from("reading_progress")
+        .select("surah,ayah,last_read_at")
+        .eq("user_id", userId)
+        .order("last_read_at", { ascending: false })
+        .limit(1)
+        .maybeSingle(),
+      supabase
+        .from("bookmarks")
+        .select("surah,ayah,surah_name,hebrew_snapshot,created_at")
+        .eq("user_id", userId)
+        .order("created_at", { ascending: false })
+        .limit(3),
+      supabase
+        .from("notes")
+        .select("surah,ayah,body,updated_at")
+        .eq("user_id", userId)
+        .order("updated_at", { ascending: false })
+        .limit(3),
+    ],
+  );
 
   const stepsByJourney = new Map<string, number>();
   for (const s of (steps.data ?? []) as { id: string; journey_id: string }[]) {
@@ -93,7 +115,8 @@ async function fetchProfileSummary(userId: string): Promise<ProfileSummary> {
     readingProgressCount: rp.count ?? 0,
     journeyProgress,
     recommended,
-    continueReading: (lastRead.data as { surah: number; ayah: number; last_read_at: string } | null) ?? null,
+    continueReading:
+      (lastRead.data as { surah: number; ayah: number; last_read_at: string } | null) ?? null,
     recentBookmarks: (recentBm.data as ProfileSummary["recentBookmarks"] | null) ?? [],
     recentNotes: (recentNt.data as ProfileSummary["recentNotes"] | null) ?? [],
   };
@@ -140,7 +163,10 @@ function ProfilePage() {
   return (
     <div className="min-h-screen bg-background">
       <Header />
-      <section className="arabesque-bg px-4 pb-10 pt-10 sm:px-6" style={{ background: "var(--gradient-hero)" }}>
+      <section
+        className="arabesque-bg px-4 pb-10 pt-10 sm:px-6"
+        style={{ background: "var(--gradient-hero)" }}
+      >
         <div className="mx-auto max-w-4xl text-white">
           <div className="mb-2 inline-flex items-center gap-2 rounded-full border border-white/25 bg-white/10 px-3 py-1 text-xs">
             <Sparkles className="h-3 w-3" /> {t("profile.badge")}
@@ -152,15 +178,33 @@ function ProfilePage() {
 
       <main id="main" className="mx-auto max-w-4xl px-4 py-8 sm:px-6">
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-          <StatCard icon={<Bookmark className="h-4 w-4" />} label={t("profile.statBookmarks")} value={data?.bookmarkCount ?? 0} />
-          <StatCard icon={<NotebookPen className="h-4 w-4" />} label={t("profile.statNotes")} value={data?.noteCount ?? 0} />
-          <StatCard icon={<BookOpen className="h-4 w-4" />} label={t("profile.statReading")} value={data?.readingProgressCount ?? 0} />
-          <StatCard icon={<MapIcon className="h-4 w-4" />} label={t("profile.statJourneys")} value={data?.journeyProgress.filter((j) => j.done > 0).length ?? 0} />
+          <StatCard
+            icon={<Bookmark className="h-4 w-4" />}
+            label={t("profile.statBookmarks")}
+            value={data?.bookmarkCount ?? 0}
+          />
+          <StatCard
+            icon={<NotebookPen className="h-4 w-4" />}
+            label={t("profile.statNotes")}
+            value={data?.noteCount ?? 0}
+          />
+          <StatCard
+            icon={<BookOpen className="h-4 w-4" />}
+            label={t("profile.statReading")}
+            value={data?.readingProgressCount ?? 0}
+          />
+          <StatCard
+            icon={<MapIcon className="h-4 w-4" />}
+            label={t("profile.statJourneys")}
+            value={data?.journeyProgress.filter((j) => j.done > 0).length ?? 0}
+          />
         </div>
 
         {data?.continueReading && (
           <div className="mt-6 surface-card p-5">
-            <div className="mb-1 text-xs font-semibold uppercase tracking-wide text-primary">{t("profile.continueReading")}</div>
+            <div className="mb-1 text-xs font-semibold uppercase tracking-wide text-primary">
+              {t("profile.continueReading")}
+            </div>
             <div className="flex items-center justify-between gap-3">
               <div className="text-lg font-semibold">
                 {t("profile.continueReadingAt", {
@@ -182,10 +226,14 @@ function ProfilePage() {
 
         {topJourney && (
           <div className="mt-6 surface-card p-5">
-            <div className="mb-1 text-xs font-semibold uppercase tracking-wide text-primary">{t("profile.continueLearning")}</div>
+            <div className="mb-1 text-xs font-semibold uppercase tracking-wide text-primary">
+              {t("profile.continueLearning")}
+            </div>
             <div className="flex items-center justify-between gap-3">
               <div>
-                <div className="text-lg font-semibold">{pickLocale(topJourney.title_i18n, locale)}</div>
+                <div className="text-lg font-semibold">
+                  {pickLocale(topJourney.title_i18n, locale)}
+                </div>
                 <div className="text-xs text-muted-foreground">
                   {topJourney.done} / {topJourney.total} {t("profile.stepsDone")}
                 </div>
@@ -199,7 +247,10 @@ function ProfilePage() {
               </Link>
             </div>
             <div className="mt-3 h-2 w-full overflow-hidden rounded-full bg-secondary">
-              <div className="h-full bg-primary" style={{ width: `${Math.round((topJourney.done / topJourney.total) * 100)}%` }} />
+              <div
+                className="h-full bg-primary"
+                style={{ width: `${Math.round((topJourney.done / topJourney.total) * 100)}%` }}
+              />
             </div>
           </div>
         )}
@@ -280,8 +331,12 @@ function ProfilePage() {
                   <div className="text-[10px] uppercase tracking-wide text-muted-foreground">
                     {t(`search.kind${e.kind.charAt(0).toUpperCase()}${e.kind.slice(1)}` as const)}
                   </div>
-                  <div className="mt-1 font-semibold text-foreground">{pickLocale(e.title_i18n, locale)}</div>
-                  <div className="mt-1 line-clamp-2 text-xs text-muted-foreground">{pickLocale(e.summary_i18n, locale)}</div>
+                  <div className="mt-1 font-semibold text-foreground">
+                    {pickLocale(e.title_i18n, locale)}
+                  </div>
+                  <div className="mt-1 line-clamp-2 text-xs text-muted-foreground">
+                    {pickLocale(e.summary_i18n, locale)}
+                  </div>
                 </Link>
               ))}
             </div>

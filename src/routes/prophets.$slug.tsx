@@ -5,5 +5,3 @@ export const Route = createFileRoute("/prophets/$slug")({
     throw redirect({ to: "/learn/$kind/$slug", params: { kind: "prophet", slug: params.slug } });
   },
 });
-
-
