@@ -9,6 +9,7 @@ import { Search as SearchIcon, Loader2, ChevronLeft, ChevronRight, BookOpen } fr
 import { searchEntities, searchKnowledgeTexts, type EntityKind } from "@/lib/knowledge";
 import { EntityCard } from "@/components/discovery/EntityCard";
 import { normalizeLocale, type Locale } from "@/lib/i18n";
+import { localeTextDir, tafsirFontClass, uiFontClass } from "@/lib/locale-ui";
 
 export const Route = createLazyFileRoute("/search")({
   component: SearchPage,
@@ -18,6 +19,9 @@ function SearchPage() {
   const { t, i18n } = useTranslation("pages");
   const locale = (normalizeLocale(i18n.language) ?? "he") as Locale;
   const isRtl = i18n.dir() === "rtl";
+  const uiClass = uiFontClass(locale);
+  const tafsirClass = tafsirFontClass(locale);
+  const textDir = localeTextDir(locale);
   const [input, setInput] = useState("");
   const deferred = useDeferredValue(input);
   const trimmed = deferred.trim();
@@ -54,7 +58,7 @@ function SearchPage() {
   const kindLabel = (k: EntityKind) => t(`search.kind${k.charAt(0).toUpperCase()}${k.slice(1)}` as const);
 
   return (
-    <div className={`min-h-screen bg-background ${locale === "ar" ? "font-ui-ar" : locale === "en" ? "font-ui-en" : "font-ui-he"}`} dir={isRtl ? "rtl" : "ltr"}>
+    <div className={`min-h-screen bg-background ${uiClass}`} dir={isRtl ? "rtl" : "ltr"}>
       <Header />
 
       <div className="border-b border-border bg-gradient-to-b from-primary-soft/40 to-transparent">
@@ -130,7 +134,7 @@ function SearchPage() {
                     {row.kind.toUpperCase()} · {row.source_name}
                     {row.surah && row.ayah_start ? ` · ${row.surah}:${row.ayah_start}${row.ayah_end && row.ayah_end !== row.ayah_start ? `-${row.ayah_end}` : ""}` : ""}
                   </p>
-                  <p className={`mt-1 text-sm leading-relaxed text-foreground/90 ${locale === "ar" ? "font-tafsir-hadith-ar" : locale === "en" ? "font-tafsir-hadith-en" : "font-tafsir-hadith-he"}`} dir={locale === "en" ? "ltr" : "rtl"}>{row.text.slice(0, 220)}{row.text.length > 220 ? "…" : ""}</p>
+                  <p className={`mt-1 text-sm leading-relaxed text-foreground/90 ${tafsirClass}`} dir={textDir}>{row.text.slice(0, 220)}{row.text.length > 220 ? "…" : ""}</p>
                 </article>
               ))}
             </div>
