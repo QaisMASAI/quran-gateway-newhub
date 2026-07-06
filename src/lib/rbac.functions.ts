@@ -299,14 +299,14 @@ export const getAdminManagementData = createServerFn({ method: "GET" })
       created_at: string | null;
     }>).map((a) => ({
       id: a.id,
-      actorUserId: a.actor_user_id,
+      actorUserId: a.actor_user_id ?? "",
       targetUserId: a.target_user_id,
       action: a.action,
       oldValue: (a.old_value ?? null) as JsonValue | null,
       newValue: (a.new_value ?? null) as JsonValue | null,
       ipAddress: a.ip_address,
       userAgent: a.user_agent,
-      createdAt: a.created_at,
+      createdAt: a.created_at ?? "",
     }));
 
     return {
