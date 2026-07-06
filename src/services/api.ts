@@ -101,8 +101,9 @@ export async function fetchVerseBilingualFromDb(
 
   if (error || !data || data.length === 0) return null;
 
-  const arRow = (data as any[]).find((r) => r.source_id === arSid);
-  const locRow = (data as any[]).find((r) => r.source_id === locSid);
+  type AyahTranslationRow = { source_id: string; text: string };
+  const arRow = (data as AyahTranslationRow[]).find((r) => r.source_id === arSid);
+  const locRow = (data as AyahTranslationRow[]).find((r) => r.source_id === locSid);
 
   const arabic = arRow?.text ?? "";
 
@@ -152,7 +153,8 @@ export async function fetchSurahBilingualFromDb(
     }
   >();
 
-  for (const row of data as any[]) {
+  type AyahRow = { source_id: string; surah: number; ayah: number; text: string };
+  for (const row of data as AyahRow[]) {
     const current = byAyah.get(row.ayah) ?? {
       surah: row.surah,
       ayah: row.ayah,

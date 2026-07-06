@@ -140,7 +140,7 @@ export const upsertQuranDatasetBundle = createServerFn({ method: "POST" })
       const slice = records.slice(i, i + BATCH);
       const { error } = await supabaseAdmin
         .from("quran_dataset_items")
-        .upsert(slice as any, { onConflict: "dataset_id,external_key" });
+        .upsert(slice as never, { onConflict: "dataset_id,external_key" });
       if (error) throw new Error(error.message);
       inserted += slice.length;
     }
@@ -185,7 +185,7 @@ export const upsertQuranWordAnnotations = createServerFn({ method: "POST" })
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { error } = await supabaseAdmin
       .from("quran_word_annotations")
-      .upsert(data.rows as any, { onConflict: "surah,ayah,word_index" });
+      .upsert(data.rows as never, { onConflict: "surah,ayah,word_index" });
     if (error) throw new Error(error.message);
     return { ok: true as const, rows: data.rows.length };
   });
@@ -230,7 +230,7 @@ export const upsertQuranAudioBundle = createServerFn({ method: "POST" })
           name_i18n: data.reciter.name_i18n,
           style: data.reciter.style ?? null,
           country_code: data.reciter.country_code ?? null,
-          metadata: data.reciter.metadata as any,
+          metadata: data.reciter.metadata as never,
           is_active: true,
         },
         { onConflict: "code" },
@@ -260,7 +260,7 @@ export const upsertQuranAudioBundle = createServerFn({ method: "POST" })
       const slice = rows.slice(i, i + BATCH);
       const { error } = await supabaseAdmin
         .from("quran_audio_files")
-        .upsert(slice as any, { onConflict: "reciter_id,surah,ayah,quality_label" });
+        .upsert(slice as never, { onConflict: "reciter_id,surah,ayah,quality_label" });
       if (error) throw new Error(error.message);
     }
 

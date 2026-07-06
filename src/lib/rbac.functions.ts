@@ -99,7 +99,12 @@ async function syncSuperAdminForCurrentUser(context: { supabase: any; userId: st
   });
 }
 
-async function requireSuperAdmin(context: { supabase: any; userId: string }) {
+async function requireSuperAdmin(context: {
+  supabase: import("@supabase/supabase-js").SupabaseClient<
+    import("@/integrations/supabase/types").Database
+  >;
+  userId: string;
+}) {
   await syncSuperAdminForCurrentUser(context);
   const { data, error } = await context.supabase.rpc("has_role", {
     _user_id: context.userId,
@@ -110,7 +115,9 @@ async function requireSuperAdmin(context: { supabase: any; userId: string }) {
 }
 
 async function readAuthzSnapshot(context: {
-  supabase: any;
+  supabase: import("@supabase/supabase-js").SupabaseClient<
+    import("@/integrations/supabase/types").Database
+  >;
   userId: string;
 }): Promise<AuthzSnapshot> {
   await syncSuperAdminForCurrentUser(context);
@@ -273,7 +280,7 @@ export const getAdminManagementData = createServerFn({ method: "GET" })
         oldValue: JsonValue | null;
         newValue: JsonValue | null;
       }
-    > = ((auditRes.data ?? []) as Array<any>).map((a) => ({
+    > = ((auditRes.data ?? []) as Array<Record<string, unknown>>).map((a) => ({
       id: a.id,
       actorUserId: a.actor_user_id,
       targetUserId: a.target_user_id,
