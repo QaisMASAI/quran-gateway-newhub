@@ -417,12 +417,14 @@ async function getResearchCacheConfig(supabaseAdmin: {
 }
 
 function sanitize(s: string, max = 600) {
-  return s
+  return (
+    s
       // eslint-disable-next-line no-control-regex
       .replace(/[\u0000-\u0008\u000B-\u001F\u007F]/g, " ")
-    .replace(/```+/g, "'''")
-    .replace(/\b(ignore|disregard)\s+(previous|prior)\s+(instructions?)\b/gi, "[filtered]")
-    .slice(0, max);
+      .replace(/```+/g, "'''")
+      .replace(/\b(ignore|disregard)\s+(previous|prior)\s+(instructions?)\b/gi, "[filtered]")
+      .slice(0, max)
+  );
 }
 
 function cleanHtml(input: string) {

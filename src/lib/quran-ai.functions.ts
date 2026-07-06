@@ -23,6 +23,7 @@ function sanitizeUntrusted(input: string, maxLen = 4000): string {
   return (
     input
       // strip control chars except newline/tab
+      // eslint-disable-next-line no-control-regex
       .replace(/[\u0000-\u0008\u000B-\u001F\u007F]/g, " ")
       // collapse fenced code blocks that could mimic system instructions
       .replace(/```+/g, "'''")

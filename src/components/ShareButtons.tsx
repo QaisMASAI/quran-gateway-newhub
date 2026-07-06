@@ -81,7 +81,9 @@ export function ShareButtons(props: Props) {
         await navigator.clipboard.writeText(what === "link" ? url : shareMsg);
         setCopied(what);
         setTimeout(() => setCopied(null), 1800);
-      } catch {}
+      } catch {
+        // Clipboard unavailable — silently no-op.
+      }
     },
     [url, shareMsg],
   );
@@ -90,7 +92,12 @@ export function ShareButtons(props: Props) {
     setBusy("share");
     try {
       const file = await buildImageFile(props, format);
-      const nav: any = typeof navigator !== "undefined" ? navigator : null;
+      const nav = (typeof navigator !== "undefined" ? navigator : null) as
+        | (Navigator & {
+            canShare?: (data: { files?: File[] }) => boolean;
+            share?: (data: { files?: File[]; title?: string; text?: string }) => Promise<void>;
+          })
+        | null;
       const data = {
         files: [file],
         title: `${props.surahName} ${props.surah}:${props.ayah}`,
