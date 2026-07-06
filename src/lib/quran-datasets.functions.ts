@@ -1,28 +1,9 @@
 import { createServerFn } from "@tanstack/react-start";
-import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "@/integrations/supabase/types";
 
-const DatasetKindSchema = z.enum([
-  "translation",
-  "tafsir",
-  "hadith",
-  "asbab",
-  "word_by_word",
-  "root_lexicon",
-  "morphology",
-  "grammar",
-  "tajweed",
-  "recitation",
-  "topic_map",
-  "entity_map",
-  "timeline",
-  "revelation_metadata",
-  "cross_reference",
-  "audio_asset",
-  "other",
-]);
+// Reuse shared ingest schemas so uploads and in-app admin flows validate identically.
 
 async function requireAdmin(context: { supabase: SupabaseClient<Database>; userId: string }) {
   const { data, error } = await context.supabase.rpc("has_role", {
