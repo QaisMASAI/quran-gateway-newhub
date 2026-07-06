@@ -24,10 +24,7 @@ const DatasetKindSchema = z.enum([
   "other",
 ]);
 
-async function requireAdmin(context: {
-  supabase: SupabaseClient<Database>;
-  userId: string;
-}) {
+async function requireAdmin(context: { supabase: SupabaseClient<Database>; userId: string }) {
   const { data, error } = await context.supabase.rpc("has_role", {
     _user_id: context.userId,
     _role: "admin",

@@ -287,17 +287,19 @@ export const getAdminManagementData = createServerFn({ method: "GET" })
         oldValue: JsonValue | null;
         newValue: JsonValue | null;
       }
-    > = ((auditRes.data ?? []) as unknown as Array<{
-      id: string;
-      actor_user_id: string | null;
-      target_user_id: string | null;
-      action: string;
-      old_value: JsonValue | null;
-      new_value: JsonValue | null;
-      ip_address: string | null;
-      user_agent: string | null;
-      created_at: string | null;
-    }>).map((a) => ({
+    > = (
+      (auditRes.data ?? []) as unknown as Array<{
+        id: string;
+        actor_user_id: string | null;
+        target_user_id: string | null;
+        action: string;
+        old_value: JsonValue | null;
+        new_value: JsonValue | null;
+        ip_address: string | null;
+        user_agent: string | null;
+        created_at: string | null;
+      }>
+    ).map((a) => ({
       id: a.id,
       actorUserId: a.actor_user_id ?? "",
       targetUserId: a.target_user_id,
