@@ -310,6 +310,8 @@ type ResearchCacheConfig = {
 };
 
 async function readResearchCache(
+  // The concrete SupabaseClient<Database> recurses too deeply for TS here.
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   supabaseAdmin: { from: (table: string) => any },
   question: string,
   language: "he" | "en" | "ar",
@@ -359,6 +361,7 @@ async function readResearchCache(
 }
 
 async function writeResearchCache(
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   supabaseAdmin: { from: (table: string) => any },
   question: string,
   language: "he" | "en" | "ar",
@@ -399,6 +402,7 @@ async function resolveCallerUserId(supabaseAdmin: {
 }
 
 async function getResearchCacheConfig(supabaseAdmin: {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   from: (table: string) => any;
 }): Promise<ResearchCacheConfig> {
   const DEFAULT: ResearchCacheConfig = { ttlMs: 1000 * 60 * 60 * 6, version: 1 };
@@ -417,11 +421,14 @@ async function getResearchCacheConfig(supabaseAdmin: {
 }
 
 function sanitize(s: string, max = 600) {
-  return s
-    .replace(/[\u0000-\u0008\u000B-\u001F\u007F]/g, " ")
-    .replace(/```+/g, "'''")
-    .replace(/\b(ignore|disregard)\s+(previous|prior)\s+(instructions?)\b/gi, "[filtered]")
-    .slice(0, max);
+  return (
+    s
+      // eslint-disable-next-line no-control-regex
+      .replace(/[\u0000-\u0008\u000B-\u001F\u007F]/g, " ")
+      .replace(/```+/g, "'''")
+      .replace(/\b(ignore|disregard)\s+(previous|prior)\s+(instructions?)\b/gi, "[filtered]")
+      .slice(0, max)
+  );
 }
 
 function cleanHtml(input: string) {
@@ -492,7 +499,7 @@ function normalizeForSearch(input: string, language: "he" | "en" | "ar") {
   if (language === "he") {
     out = out
       .replace(/[\u0591-\u05C7]/g, "")
-      .replace(/[\u05BE\u05C0\u05C3\u05F3\u05F4"'.,!?;:()\[\]{}\-_/\\]/g, " ");
+      .replace(/[\u05BE\u05C0\u05C3\u05F3\u05F4"'.,!?;:()[\]{}\-_/\\]/g, " ");
   }
   if (language === "ar") {
     out = out
@@ -500,7 +507,7 @@ function normalizeForSearch(input: string, language: "he" | "en" | "ar") {
       .replace(/[\u0622\u0623\u0625]/g, "ا")
       .replace(/ى/g, "ي")
       .replace(/ة/g, "ه")
-      .replace(/["'.,!?;:()\[\]{}\-_/\\]/g, " ");
+      .replace(/["'.,!?;:()[\]{}\-_/\\]/g, " ");
   }
   return out.replace(/\s+/g, " ").trim();
 }

@@ -1,5 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import type { SupabaseClient } from "@supabase/supabase-js";
+import type { Database } from "@/integrations/supabase/types";
 
 type AdminSetupStatus = {
   hasAnyAdmin: boolean;
@@ -8,7 +10,7 @@ type AdminSetupStatus = {
 };
 
 async function readAdminSetupStatus(context: {
-  supabase: any;
+  supabase: SupabaseClient<Database>;
   userId: string;
 }): Promise<AdminSetupStatus> {
   const [{ supabaseAdmin }, currentRole] = await Promise.all([

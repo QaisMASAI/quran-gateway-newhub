@@ -22,7 +22,11 @@ export async function resolveSourceId(code: string): Promise<string | null> {
   const cached = sourceIdCache.get(code);
   if (cached) return cached;
 
-  const { data, error } = await supabase.from("translation_sources").select("id").eq("code", code).maybeSingle();
+  const { data, error } = await supabase
+    .from("translation_sources")
+    .select("id")
+    .eq("code", code)
+    .maybeSingle();
 
   if (error || !data) return null;
   sourceIdCache.set(code, data.id);
@@ -51,17 +55,33 @@ export async function fetchChaptersFromDb(lang: ApiLang = "he"): Promise<
 > {
   const { data: dbRows } = await supabase
     .from("quran_chapters" as never)
-    .select("chapter_number,name_ar,name_simple_en,name_translated_en,name_he,revelation_place,verses_count")
+    .select(
+      "chapter_number,name_ar,name_simple_en,name_translated_en,name_he,revelation_place,verses_count",
+    )
     .order("chapter_number", { ascending: true });
 
   if (!dbRows || !Array.isArray(dbRows)) return [];
 
-  return (dbRows as any[]).map((r) => ({
+  type ChapterRow = {
+    chapter_number: number;
+    name_ar: string;
+    name_simple_en: string;
+    name_translated_en: string | null;
+    name_he: string | null;
+    revelation_place: string | null;
+    verses_count: number;
+  };
+  return (dbRows as unknown as ChapterRow[]).map((r) => ({
     id: r.chapter_number,
     name_arabic: r.name_ar,
     name_simple: r.name_simple_en,
     translated_name: {
-      name: lang === "he" ? (r.name_he ?? r.name_simple_en) : lang === "ar" ? r.name_ar : r.name_simple_en,
+      name:
+        lang === "he"
+          ? (r.name_he ?? r.name_simple_en)
+          : lang === "ar"
+            ? r.name_ar
+            : r.name_simple_en,
     },
     verses_count: r.verses_count,
     revelation_place: r.revelation_place ?? "makkah",
@@ -90,8 +110,9 @@ export async function fetchVerseBilingualFromDb(
 
   if (error || !data || data.length === 0) return null;
 
-  const arRow = (data as any[]).find((r) => r.source_id === arSid);
-  const locRow = (data as any[]).find((r) => r.source_id === locSid);
+  type AyahTranslationRow = { source_id: string; text: string };
+  const arRow = (data as AyahTranslationRow[]).find((r) => r.source_id === arSid);
+  const locRow = (data as AyahTranslationRow[]).find((r) => r.source_id === locSid);
 
   const arabic = arRow?.text ?? "";
 
@@ -141,7 +162,8 @@ export async function fetchSurahBilingualFromDb(
     }
   >();
 
-  for (const row of data as any[]) {
+  type AyahRow = { source_id: string; surah: number; ayah: number; text: string };
+  for (const row of data as AyahRow[]) {
     const current = byAyah.get(row.ayah) ?? {
       surah: row.surah,
       ayah: row.ayah,

@@ -28,7 +28,7 @@ export interface TafsirPassageRow {
   source?: TafsirSourceRow | null;
 }
 
-export interface AsbabRow extends TafsirPassageRow {}
+export type AsbabRow = TafsirPassageRow;
 
 export interface TopicLessonRow {
   id: string;

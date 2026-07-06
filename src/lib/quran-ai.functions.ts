@@ -23,6 +23,7 @@ function sanitizeUntrusted(input: string, maxLen = 4000): string {
   return (
     input
       // strip control chars except newline/tab
+      // eslint-disable-next-line no-control-regex
       .replace(/[\u0000-\u0008\u000B-\u001F\u007F]/g, " ")
       // collapse fenced code blocks that could mimic system instructions
       .replace(/```+/g, "'''")
@@ -589,7 +590,7 @@ Strict rules:
 
       const allowed = new Set(ranked.map((v) => `${v.surah}:${v.ayah}`));
       const cited = new Set<string>();
-      for (const m of text.matchAll(/(\d{1,3})\s*[:\.]\s*(\d{1,3})/g)) {
+      for (const m of text.matchAll(/(\d{1,3})\s*[:.]\s*(\d{1,3})/g)) {
         cited.add(`${m[1]}:${m[2]}`);
       }
       const hasValidCitation = [...cited].some((c) => allowed.has(c));

@@ -59,7 +59,9 @@ function normalizeAppRole(value: string | null | undefined): AppRole {
 }
 
 async function logAudit(args: {
-  supabaseAdmin: any;
+  supabaseAdmin: import("@supabase/supabase-js").SupabaseClient<
+    import("@/integrations/supabase/types").Database
+  >;
   actorUserId: string;
   targetUserId?: string | null;
   action: string;
@@ -76,15 +78,20 @@ async function logAudit(args: {
     actor_user_id: args.actorUserId,
     target_user_id: args.targetUserId ?? null,
     action: args.action,
-    old_value: args.oldValue ?? null,
-    new_value: args.newValue ?? null,
+    old_value: (args.oldValue ?? null) as never,
+    new_value: (args.newValue ?? null) as never,
     ip_address: ipAddress,
     user_agent: userAgent,
-    metadata: args.metadata ?? {},
+    metadata: (args.metadata ?? {}) as never,
   });
 }
 
-async function syncSuperAdminForCurrentUser(context: { supabase: any; userId: string }) {
+async function syncSuperAdminForCurrentUser(context: {
+  supabase: import("@supabase/supabase-js").SupabaseClient<
+    import("@/integrations/supabase/types").Database
+  >;
+  userId: string;
+}) {
   const [{ supabaseAdmin }, authUserRes] = await Promise.all([
     import("@/integrations/supabase/client.server"),
     context.supabase.auth.getUser(),
@@ -99,7 +106,12 @@ async function syncSuperAdminForCurrentUser(context: { supabase: any; userId: st
   });
 }
 
-async function requireSuperAdmin(context: { supabase: any; userId: string }) {
+async function requireSuperAdmin(context: {
+  supabase: import("@supabase/supabase-js").SupabaseClient<
+    import("@/integrations/supabase/types").Database
+  >;
+  userId: string;
+}) {
   await syncSuperAdminForCurrentUser(context);
   const { data, error } = await context.supabase.rpc("has_role", {
     _user_id: context.userId,
@@ -110,7 +122,9 @@ async function requireSuperAdmin(context: { supabase: any; userId: string }) {
 }
 
 async function readAuthzSnapshot(context: {
-  supabase: any;
+  supabase: import("@supabase/supabase-js").SupabaseClient<
+    import("@/integrations/supabase/types").Database
+  >;
   userId: string;
 }): Promise<AuthzSnapshot> {
   await syncSuperAdminForCurrentUser(context);
@@ -137,7 +151,7 @@ async function readAuthzSnapshot(context: {
   const effectiveRole = normalizeAppRole(roleRes.data as string | null);
   const permissions = new Set<string>();
 
-  for (const row of (permsRes.data ?? []) as Array<{
+  for (const row of (permsRes.data ?? []) as unknown as Array<{
     role: string;
     roles: { role_permissions: Array<{ permissions: { code: string } | null }> } | null;
   }>) {
@@ -273,16 +287,28 @@ export const getAdminManagementData = createServerFn({ method: "GET" })
         oldValue: JsonValue | null;
         newValue: JsonValue | null;
       }
-    > = ((auditRes.data ?? []) as Array<any>).map((a) => ({
+    > = (
+      (auditRes.data ?? []) as unknown as Array<{
+        id: string;
+        actor_user_id: string | null;
+        target_user_id: string | null;
+        action: string;
+        old_value: JsonValue | null;
+        new_value: JsonValue | null;
+        ip_address: string | null;
+        user_agent: string | null;
+        created_at: string | null;
+      }>
+    ).map((a) => ({
       id: a.id,
-      actorUserId: a.actor_user_id,
+      actorUserId: a.actor_user_id ?? "",
       targetUserId: a.target_user_id,
       action: a.action,
       oldValue: (a.old_value ?? null) as JsonValue | null,
       newValue: (a.new_value ?? null) as JsonValue | null,
       ipAddress: a.ip_address,
       userAgent: a.user_agent,
-      createdAt: a.created_at,
+      createdAt: a.created_at ?? "",
     }));
 
     return {
@@ -396,17 +422,15 @@ export const upsertRole = createServerFn({ method: "POST" })
       .eq("slug", data.slug)
       .maybeSingle();
 
-    const { error } = await supabaseAdmin
-      .from("roles")
-      .upsert(
-        {
-          slug: data.slug,
-          name: data.name,
-          level: data.level,
-          is_system: oldRow?.is_system ?? false,
-        },
-        { onConflict: "slug" },
-      );
+    const { error } = await supabaseAdmin.from("roles").upsert(
+      {
+        slug: data.slug,
+        name: data.name,
+        level: data.level,
+        is_system: oldRow?.is_system ?? false,
+      },
+      { onConflict: "slug" },
+    );
     if (error) throw new Error(error.message);
 
     await logAudit({

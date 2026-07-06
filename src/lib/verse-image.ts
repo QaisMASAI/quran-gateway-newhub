@@ -26,7 +26,8 @@ const DIMS: Record<VerseImageFormat, { w: number; h: number }> = {
 
 async function ensureFonts() {
   if (typeof document === "undefined" || !("fonts" in document)) return;
-  const fonts = (document as any).fonts as FontFaceSet;
+  const fonts = (document as { fonts?: FontFaceSet }).fonts;
+  if (!fonts) return;
   // Sample strings include actual Arabic + Hebrew glyphs so the browser actually
   // fetches the right subsets — loading a Latin-only "test" string isn't enough.
   const arabicSample = "بِسْمِ اللَّهِ";

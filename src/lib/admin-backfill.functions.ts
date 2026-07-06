@@ -138,7 +138,11 @@ type JobRunReport = {
   failedBatches: string[];
 };
 
-async function readBackfillCounts(context: { supabase: any }): Promise<BackfillCounts> {
+async function readBackfillCounts(context: {
+  supabase: import("@supabase/supabase-js").SupabaseClient<
+    import("@/integrations/supabase/types").Database
+  >;
+}): Promise<BackfillCounts> {
   const [tafsirAr, tafsirEn, tafsirHe, asbabAr, asbabEn, asbabHe, hadithLinks] = await Promise.all([
     context.supabase
       .from("tafsir_passages")
@@ -217,7 +221,12 @@ async function invokeAdminRoute(
   return body as { ok?: boolean; error?: string; [key: string]: unknown };
 }
 
-async function requireAdminUser(context: { supabase: any; userId: string }) {
+async function requireAdminUser(context: {
+  supabase: import("@supabase/supabase-js").SupabaseClient<
+    import("@/integrations/supabase/types").Database
+  >;
+  userId: string;
+}) {
   const { data, error } = await context.supabase.rpc("has_role", {
     _user_id: context.userId,
     _role: "admin",
@@ -272,7 +281,12 @@ const RUN_ALL_DEFAULT_PAYLOADS: Record<JobKey, Record<string, unknown>> = {
 };
 
 async function executeJobRun(args: {
-  context: { supabase: any; userId: string };
+  context: {
+    supabase: import("@supabase/supabase-js").SupabaseClient<
+      import("@/integrations/supabase/types").Database
+    >;
+    userId: string;
+  };
   jobKey: JobKey;
   payload: Record<string, unknown>;
 }) {

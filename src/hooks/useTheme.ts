@@ -29,7 +29,9 @@ export function useTheme() {
       else root.classList.remove("dark");
       try {
         localStorage.setItem("qc:theme", next);
-      } catch {}
+      } catch {
+        // localStorage unavailable (e.g. private mode) — ignore.
+      }
       return next;
     });
   }, []);
