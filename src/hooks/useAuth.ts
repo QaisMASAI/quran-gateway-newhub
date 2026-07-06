@@ -28,14 +28,12 @@ export function useAuth(): UseAuthReturn {
 
     const initAuth = async () => {
       // Register listener first
-      const { data: sub } = supabase.auth.onAuthStateChange(
-        (_event, sess) => {
-          if (mounted) {
-            setSession(sess);
-            setUser(sess?.user ?? null);
-          }
+      const { data: sub } = supabase.auth.onAuthStateChange((_event, sess) => {
+        if (mounted) {
+          setSession(sess);
+          setUser(sess?.user ?? null);
         }
-      );
+      });
 
       // Hydrate existing session
       const { data } = await supabase.auth.getSession();

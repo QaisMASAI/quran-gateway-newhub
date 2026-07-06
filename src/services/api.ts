@@ -22,7 +22,11 @@ export async function resolveSourceId(code: string): Promise<string | null> {
   const cached = sourceIdCache.get(code);
   if (cached) return cached;
 
-  const { data, error } = await supabase.from("translation_sources").select("id").eq("code", code).maybeSingle();
+  const { data, error } = await supabase
+    .from("translation_sources")
+    .select("id")
+    .eq("code", code)
+    .maybeSingle();
 
   if (error || !data) return null;
   sourceIdCache.set(code, data.id);
@@ -51,7 +55,9 @@ export async function fetchChaptersFromDb(lang: ApiLang = "he"): Promise<
 > {
   const { data: dbRows } = await supabase
     .from("quran_chapters" as never)
-    .select("chapter_number,name_ar,name_simple_en,name_translated_en,name_he,revelation_place,verses_count")
+    .select(
+      "chapter_number,name_ar,name_simple_en,name_translated_en,name_he,revelation_place,verses_count",
+    )
     .order("chapter_number", { ascending: true });
 
   if (!dbRows || !Array.isArray(dbRows)) return [];
@@ -61,7 +67,12 @@ export async function fetchChaptersFromDb(lang: ApiLang = "he"): Promise<
     name_arabic: r.name_ar,
     name_simple: r.name_simple_en,
     translated_name: {
-      name: lang === "he" ? (r.name_he ?? r.name_simple_en) : lang === "ar" ? r.name_ar : r.name_simple_en,
+      name:
+        lang === "he"
+          ? (r.name_he ?? r.name_simple_en)
+          : lang === "ar"
+            ? r.name_ar
+            : r.name_simple_en,
     },
     verses_count: r.verses_count,
     revelation_place: r.revelation_place ?? "makkah",

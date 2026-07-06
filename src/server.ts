@@ -83,8 +83,8 @@ export default {
       return withSecurityHeaders(
         request,
         new Response(renderErrorPage(), {
-        status: 500,
-        headers: { "content-type": "text/html; charset=utf-8" },
+          status: 500,
+          headers: { "content-type": "text/html; charset=utf-8" },
         }),
       );
     }

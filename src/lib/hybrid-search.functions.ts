@@ -149,38 +149,42 @@ export interface QuranItemHit {
 
 export const searchQuranItemsHybrid = createServerFn({ method: "POST" })
   .inputValidator((input: unknown) => QuranItemsHybridSearchSchema.parse(input))
-  .handler(async ({ data }): Promise<{ hits: QuranItemHit[]; expandedTokens: string[]; error?: string }> => {
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const apiKey = process.env.LOVABLE_API_KEY;
+  .handler(
+    async ({
+      data,
+    }): Promise<{ hits: QuranItemHit[]; expandedTokens: string[]; error?: string }> => {
+      const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+      const apiKey = process.env.LOVABLE_API_KEY;
 
-    const expanded = expandSearchQuery(data.q);
-    const queryText = expanded.expandedQuery || data.q;
-    let embedding: number[] | null = null;
+      const expanded = expandSearchQuery(data.q);
+      const queryText = expanded.expandedQuery || data.q;
+      let embedding: number[] | null = null;
 
-    if (data.semantic && apiKey && queryText.trim().length > 1) {
-      try {
-        const [vec] = await embedTexts({ apiKey, input: queryText });
-        embedding = vec ?? null;
-      } catch {
-        embedding = null;
+      if (data.semantic && apiKey && queryText.trim().length > 1) {
+        try {
+          const [vec] = await embedTexts({ apiKey, input: queryText });
+          embedding = vec ?? null;
+        } catch {
+          embedding = null;
+        }
       }
-    }
 
-    const { data: rows, error } = await supabaseAdmin.rpc(
-      "search_quran_items_hybrid" as never,
-      {
-        q: queryText,
-        query_embedding: embedding as unknown as string,
-        language_filter: data.language ?? null,
-        kind_filter: data.kinds ?? null,
-        meccan_filter: data.meccanOnly ?? null,
-        match_count: data.limit,
-      } as never,
-    );
+      const { data: rows, error } = await supabaseAdmin.rpc(
+        "search_quran_items_hybrid" as never,
+        {
+          q: queryText,
+          query_embedding: embedding as unknown as string,
+          language_filter: data.language ?? null,
+          kind_filter: data.kinds ?? null,
+          meccan_filter: data.meccanOnly ?? null,
+          match_count: data.limit,
+        } as never,
+      );
 
-    if (error) return { hits: [], expandedTokens: expanded.expandedTokens, error: error.message };
-    return {
-      hits: (rows ?? []) as QuranItemHit[],
-      expandedTokens: expanded.expandedTokens,
-    };
-  });
+      if (error) return { hits: [], expandedTokens: expanded.expandedTokens, error: error.message };
+      return {
+        hits: (rows ?? []) as QuranItemHit[],
+        expandedTokens: expanded.expandedTokens,
+      };
+    },
+  );

@@ -478,105 +478,105 @@ export async function buildQuranIndex(): Promise<QuranIndex> {
   if (QURAN_INDEX_INFLIGHT) return QURAN_INDEX_INFLIGHT;
 
   QURAN_INDEX_INFLIGHT = (async () => {
-  const [chaptersRaw, arSourceId, heSourceId, enSourceId] = await Promise.all([
-    fetchChapters(),
-    resolveSourceId(TRANSLATION_SOURCE_CODE.ar),
-    resolveSourceId(TRANSLATION_SOURCE_CODE.he),
-    resolveSourceId(TRANSLATION_SOURCE_CODE.en),
-  ]);
+    const [chaptersRaw, arSourceId, heSourceId, enSourceId] = await Promise.all([
+      fetchChapters(),
+      resolveSourceId(TRANSLATION_SOURCE_CODE.ar),
+      resolveSourceId(TRANSLATION_SOURCE_CODE.he),
+      resolveSourceId(TRANSLATION_SOURCE_CODE.en),
+    ]);
 
-  const chapters: SurahMeta[] = chaptersRaw.map((c) => ({
-    id: c.id,
-    name_arabic: c.name_arabic,
-    name_he: c.translated_name?.name ?? "",
-    name_simple: c.name_simple,
-    verses_count: c.verses_count,
-  }));
+    const chapters: SurahMeta[] = chaptersRaw.map((c) => ({
+      id: c.id,
+      name_arabic: c.name_arabic,
+      name_he: c.translated_name?.name ?? "",
+      name_simple: c.name_simple,
+      verses_count: c.verses_count,
+    }));
 
-  const sourceIds = [arSourceId, heSourceId, enSourceId].filter(Boolean) as string[];
-  if (sourceIds.length === 0) {
-    const verses = await fetchRemoteQuranIndex();
+    const sourceIds = [arSourceId, heSourceId, enSourceId].filter(Boolean) as string[];
+    if (sourceIds.length === 0) {
+      const verses = await fetchRemoteQuranIndex();
+      const bySurah = new Map<number, IndexedVerse[]>();
+      for (const v of verses) {
+        const arr = bySurah.get(v.surah) ?? [];
+        arr.push(v);
+        bySurah.set(v.surah, arr);
+      }
+      const out = { verses, chapters, bySurah };
+      QURAN_INDEX_CACHE = { value: out, at: Date.now() };
+      return out;
+    }
+
+    const { data: rows, error } = await supabase
+      .from("ayah_translations")
+      .select("source_id,surah,ayah,text")
+      .in("source_id", sourceIds)
+      .order("surah", { ascending: true })
+      .order("ayah", { ascending: true });
+
+    if (error || !rows) throw new Error("Failed to load verses");
+
+    const verseMap = new Map<
+      string,
+      { surah: number; ayah: number; arabic: string; hebrew: string; english: string }
+    >();
+    for (const row of rows) {
+      const key = `${row.surah}:${row.ayah}`;
+      const current = verseMap.get(key) ?? {
+        surah: row.surah,
+        ayah: row.ayah,
+        arabic: "",
+        hebrew: "",
+        english: "",
+      };
+      if (row.source_id === arSourceId) current.arabic = row.text;
+      if (row.source_id === heSourceId) current.hebrew = cleanText(row.text);
+      if (row.source_id === enSourceId) current.english = cleanText(row.text);
+      verseMap.set(key, current);
+    }
+
+    const verses: IndexedVerse[] = Array.from(verseMap.values()).map((v) => {
+      const s = v.surah;
+      const a = v.ayah;
+      const heRaw = v.hebrew;
+      const enRaw = v.english;
+      const arRaw = v.arabic;
+      return {
+        surah: s,
+        ayah: a,
+        verse_key: `${s}:${a}`,
+        arabic: arRaw,
+        hebrew: heRaw,
+        english: enRaw,
+        hebrewNorm: normalizeHebrew(heRaw),
+        arabicNorm: normalizeArabic(arRaw),
+        englishNorm: normalizeEnglish(enRaw),
+      };
+    });
+
     const bySurah = new Map<number, IndexedVerse[]>();
     for (const v of verses) {
       const arr = bySurah.get(v.surah) ?? [];
       arr.push(v);
       bySurah.set(v.surah, arr);
     }
+
+    if (verses.length === 0) {
+      const remoteVerses = await fetchRemoteQuranIndex();
+      const remoteBySurah = new Map<number, IndexedVerse[]>();
+      for (const v of remoteVerses) {
+        const arr = remoteBySurah.get(v.surah) ?? [];
+        arr.push(v);
+        remoteBySurah.set(v.surah, arr);
+      }
+      const out = { verses: remoteVerses, chapters, bySurah: remoteBySurah };
+      QURAN_INDEX_CACHE = { value: out, at: Date.now() };
+      return out;
+    }
+
     const out = { verses, chapters, bySurah };
     QURAN_INDEX_CACHE = { value: out, at: Date.now() };
     return out;
-  }
-
-  const { data: rows, error } = await supabase
-    .from("ayah_translations")
-    .select("source_id,surah,ayah,text")
-    .in("source_id", sourceIds)
-    .order("surah", { ascending: true })
-    .order("ayah", { ascending: true });
-
-  if (error || !rows) throw new Error("Failed to load verses");
-
-  const verseMap = new Map<
-    string,
-    { surah: number; ayah: number; arabic: string; hebrew: string; english: string }
-  >();
-  for (const row of rows) {
-    const key = `${row.surah}:${row.ayah}`;
-    const current = verseMap.get(key) ?? {
-      surah: row.surah,
-      ayah: row.ayah,
-      arabic: "",
-      hebrew: "",
-      english: "",
-    };
-    if (row.source_id === arSourceId) current.arabic = row.text;
-    if (row.source_id === heSourceId) current.hebrew = cleanText(row.text);
-    if (row.source_id === enSourceId) current.english = cleanText(row.text);
-    verseMap.set(key, current);
-  }
-
-  const verses: IndexedVerse[] = Array.from(verseMap.values()).map((v) => {
-    const s = v.surah;
-    const a = v.ayah;
-    const heRaw = v.hebrew;
-    const enRaw = v.english;
-    const arRaw = v.arabic;
-    return {
-      surah: s,
-      ayah: a,
-      verse_key: `${s}:${a}`,
-      arabic: arRaw,
-      hebrew: heRaw,
-      english: enRaw,
-      hebrewNorm: normalizeHebrew(heRaw),
-      arabicNorm: normalizeArabic(arRaw),
-      englishNorm: normalizeEnglish(enRaw),
-    };
-  });
-
-  const bySurah = new Map<number, IndexedVerse[]>();
-  for (const v of verses) {
-    const arr = bySurah.get(v.surah) ?? [];
-    arr.push(v);
-    bySurah.set(v.surah, arr);
-  }
-
-  if (verses.length === 0) {
-    const remoteVerses = await fetchRemoteQuranIndex();
-    const remoteBySurah = new Map<number, IndexedVerse[]>();
-    for (const v of remoteVerses) {
-      const arr = remoteBySurah.get(v.surah) ?? [];
-      arr.push(v);
-      remoteBySurah.set(v.surah, arr);
-    }
-    const out = { verses: remoteVerses, chapters, bySurah: remoteBySurah };
-    QURAN_INDEX_CACHE = { value: out, at: Date.now() };
-    return out;
-  }
-
-  const out = { verses, chapters, bySurah };
-  QURAN_INDEX_CACHE = { value: out, at: Date.now() };
-  return out;
   })();
 
   try {

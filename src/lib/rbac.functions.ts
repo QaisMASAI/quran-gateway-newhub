@@ -396,17 +396,15 @@ export const upsertRole = createServerFn({ method: "POST" })
       .eq("slug", data.slug)
       .maybeSingle();
 
-    const { error } = await supabaseAdmin
-      .from("roles")
-      .upsert(
-        {
-          slug: data.slug,
-          name: data.name,
-          level: data.level,
-          is_system: oldRow?.is_system ?? false,
-        },
-        { onConflict: "slug" },
-      );
+    const { error } = await supabaseAdmin.from("roles").upsert(
+      {
+        slug: data.slug,
+        name: data.name,
+        level: data.level,
+        is_system: oldRow?.is_system ?? false,
+      },
+      { onConflict: "slug" },
+    );
     if (error) throw new Error(error.message);
 
     await logAudit({

@@ -179,8 +179,10 @@ function SearchPage() {
             <SectionTitle>{t("search.discoveryHeading")}</SectionTitle>
             <div className="space-y-2">
               {quranItemsQ.data.hits.map((hit) => {
-                const title = hit.title_i18n?.[locale] || hit.title_i18n?.en || hit.title_i18n?.ar || "";
-                const body = hit.body_i18n?.[locale] || hit.body_i18n?.en || hit.body_i18n?.ar || "";
+                const title =
+                  hit.title_i18n?.[locale] || hit.title_i18n?.en || hit.title_i18n?.ar || "";
+                const body =
+                  hit.body_i18n?.[locale] || hit.body_i18n?.en || hit.body_i18n?.ar || "";
                 return (
                   <article key={hit.item_id} className="surface-card px-4 py-3">
                     <p className="text-xs font-semibold text-primary">
@@ -193,7 +195,10 @@ function SearchPage() {
                       <p className="mt-1 text-sm font-semibold text-foreground">{title}</p>
                     ) : null}
                     {body ? (
-                      <p className={`mt-1 text-sm leading-relaxed text-foreground/85 ${tafsirClass}`} dir={textDir}>
+                      <p
+                        className={`mt-1 text-sm leading-relaxed text-foreground/85 ${tafsirClass}`}
+                        dir={textDir}
+                      >
                         {body.slice(0, 180)}
                         {body.length > 180 ? "…" : ""}
                       </p>
