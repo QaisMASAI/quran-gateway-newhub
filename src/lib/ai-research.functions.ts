@@ -309,43 +309,23 @@ type ResearchCacheConfig = {
   version: number;
 };
 
-// Loose Supabase surface for cache helpers — the concrete SupabaseClient<Database>
-// generic recurses too deeply and blows up TS inference here. We only touch two
-// tables, so a narrowed interface is enough and keeps `any` out of the module.
-type SupabaseLike = {
-  from: (table: string) => {
-    select: (columns: string) => unknown;
-    insert: (row: unknown) => unknown;
-  };
-  auth: {
-    getUser: (token: string) => Promise<{ data: { user: { id: string } | null }; error: unknown }>;
-  };
-};
-
 async function readResearchCache(
-  supabaseAdmin: SupabaseLike,
+  // The concrete SupabaseClient<Database> recurses too deeply for TS here.
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  supabaseAdmin: { from: (table: string) => any },
   question: string,
   language: "he" | "en" | "ar",
   userId: string,
   config: ResearchCacheConfig,
 ): Promise<CachedResearchPayload | null> {
   const normalized = normalizeCacheQuestion(question);
-  const { data } = (await (supabaseAdmin
+  const { data } = await supabaseAdmin
     .from("ai_research_queries")
-    .select("question,answer,confidence,citations,created_at,language") as unknown as {
-    eq: (a: string, b: string) => {
-      eq: (a: string, b: string) => {
-        order: (
-          a: string,
-          o: { ascending: boolean },
-        ) => { limit: (n: number) => Promise<{ data: unknown[] | null }> };
-      };
-    };
-  })
+    .select("question,answer,confidence,citations,created_at,language")
     .eq("user_id", userId)
     .eq("language", language)
     .order("created_at", { ascending: false })
-    .limit(20)) as { data: unknown[] | null };
+    .limit(20);
 
   const match = (data ?? []).find(
     (row: { question?: string | null; created_at?: string | null }) =>
@@ -381,16 +361,15 @@ async function readResearchCache(
 }
 
 async function writeResearchCache(
-  supabaseAdmin: SupabaseLike,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  supabaseAdmin: { from: (table: string) => any },
   question: string,
   language: "he" | "en" | "ar",
   userId: string,
   payload: CachedResearchPayload,
   config: ResearchCacheConfig,
 ): Promise<void> {
-  await (supabaseAdmin.from("ai_research_queries") as unknown as {
-    insert: (row: unknown) => Promise<unknown>;
-  }).insert({
+  await supabaseAdmin.from("ai_research_queries").insert({
     user_id: userId,
     question,
     answer: payload.answer,
@@ -423,13 +402,8 @@ async function resolveCallerUserId(supabaseAdmin: {
 }
 
 async function getResearchCacheConfig(supabaseAdmin: {
-  from: (table: string) => {
-    select: (columns: string) => {
-      eq: (column: string, value: string) => {
-        maybeSingle: () => Promise<{ data: { value_json?: unknown } | null }>;
-      };
-    };
-  };
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  from: (table: string) => any;
 }): Promise<ResearchCacheConfig> {
   const DEFAULT: ResearchCacheConfig = { ttlMs: 1000 * 60 * 60 * 6, version: 1 };
   const { data } = await supabaseAdmin
