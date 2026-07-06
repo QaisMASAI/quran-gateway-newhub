@@ -418,7 +418,8 @@ async function getResearchCacheConfig(supabaseAdmin: {
 
 function sanitize(s: string, max = 600) {
   return s
-    .replace(/[\u0000-\u0008\u000B-\u001F\u007F]/g, " ")
+      // eslint-disable-next-line no-control-regex
+      .replace(/[\u0000-\u0008\u000B-\u001F\u007F]/g, " ")
     .replace(/```+/g, "'''")
     .replace(/\b(ignore|disregard)\s+(previous|prior)\s+(instructions?)\b/gi, "[filtered]")
     .slice(0, max);
@@ -492,7 +493,7 @@ function normalizeForSearch(input: string, language: "he" | "en" | "ar") {
   if (language === "he") {
     out = out
       .replace(/[\u0591-\u05C7]/g, "")
-      .replace(/[\u05BE\u05C0\u05C3\u05F3\u05F4"'.,!?;:()\[\]{}\-_/\\]/g, " ");
+      .replace(/[\u05BE\u05C0\u05C3\u05F3\u05F4"'.,!?;:()[\]{}\-_/\\]/g, " ");
   }
   if (language === "ar") {
     out = out
@@ -500,7 +501,7 @@ function normalizeForSearch(input: string, language: "he" | "en" | "ar") {
       .replace(/[\u0622\u0623\u0625]/g, "ا")
       .replace(/ى/g, "ي")
       .replace(/ة/g, "ه")
-      .replace(/["'.,!?;:()\[\]{}\-_/\\]/g, " ");
+      .replace(/["'.,!?;:()[\]{}\-_/\\]/g, " ");
   }
   return out.replace(/\s+/g, " ").trim();
 }

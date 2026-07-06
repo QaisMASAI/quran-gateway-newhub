@@ -589,7 +589,7 @@ Strict rules:
 
       const allowed = new Set(ranked.map((v) => `${v.surah}:${v.ayah}`));
       const cited = new Set<string>();
-      for (const m of text.matchAll(/(\d{1,3})\s*[:\.]\s*(\d{1,3})/g)) {
+      for (const m of text.matchAll(/(\d{1,3})\s*[:.]\s*(\d{1,3})/g)) {
         cited.add(`${m[1]}:${m[2]}`);
       }
       const hasValidCitation = [...cited].some((c) => allowed.has(c));

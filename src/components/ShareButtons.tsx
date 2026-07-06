@@ -107,6 +107,7 @@ export function ShareButtons(props: Props) {
         downloadBlob(file);
       }
     } catch {
+      // Share cancelled or unsupported — silently no-op.
     } finally {
       setBusy(null);
     }

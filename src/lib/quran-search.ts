@@ -313,7 +313,7 @@ const STOP_AR_NORM = new Set(Array.from(STOP_AR).map((w) => normalizeArabic(w)))
 function tokenize(query: string): { he: string[]; ar: string[] } {
   // Split on whitespace + punctuation, keep both scripts.
   const parts = query
-    .replace(/["׳״'`.,;:!?()\[\]{}\-–—_/\\]/g, " ")
+    .replace(/["׳״'`.,;:!?()[\]{}\-–—_/\\]/g, " ")
     .split(/\s+/)
     .filter(Boolean);
 
@@ -352,7 +352,7 @@ export function expandTerms(query: string): Term[] {
 
   // Latin-script tokens (English)
   const parts = query
-    .replace(/["׳״'`.,;:!?()\[\]{}\-–—_/\\]/g, " ")
+    .replace(/["׳״'`.,;:!?()[\]{}\-–—_/\\]/g, " ")
     .split(/\s+/)
     .filter(Boolean);
   for (const w of parts) {
