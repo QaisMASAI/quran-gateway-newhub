@@ -310,7 +310,9 @@ type ResearchCacheConfig = {
 };
 
 async function readResearchCache(
-  supabaseAdmin: { from: (table: string) => any },
+  supabaseAdmin: import("@supabase/supabase-js").SupabaseClient<
+    import("@/integrations/supabase/types").Database
+  >,
   question: string,
   language: "he" | "en" | "ar",
   userId: string,
@@ -359,7 +361,9 @@ async function readResearchCache(
 }
 
 async function writeResearchCache(
-  supabaseAdmin: { from: (table: string) => any },
+  supabaseAdmin: import("@supabase/supabase-js").SupabaseClient<
+    import("@/integrations/supabase/types").Database
+  >,
   question: string,
   language: "he" | "en" | "ar",
   userId: string,
@@ -399,7 +403,13 @@ async function resolveCallerUserId(supabaseAdmin: {
 }
 
 async function getResearchCacheConfig(supabaseAdmin: {
-  from: (table: string) => any;
+  from: (table: string) => {
+    select: (columns: string) => {
+      eq: (column: string, value: string) => {
+        maybeSingle: () => Promise<{ data: { value_json?: unknown } | null }>;
+      };
+    };
+  };
 }): Promise<ResearchCacheConfig> {
   const DEFAULT: ResearchCacheConfig = { ttlMs: 1000 * 60 * 60 * 6, version: 1 };
   const { data } = await supabaseAdmin

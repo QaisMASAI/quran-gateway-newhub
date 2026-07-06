@@ -59,7 +59,9 @@ function normalizeAppRole(value: string | null | undefined): AppRole {
 }
 
 async function logAudit(args: {
-  supabaseAdmin: any;
+  supabaseAdmin: import("@supabase/supabase-js").SupabaseClient<
+    import("@/integrations/supabase/types").Database
+  >;
   actorUserId: string;
   targetUserId?: string | null;
   action: string;
@@ -76,15 +78,20 @@ async function logAudit(args: {
     actor_user_id: args.actorUserId,
     target_user_id: args.targetUserId ?? null,
     action: args.action,
-    old_value: args.oldValue ?? null,
-    new_value: args.newValue ?? null,
+    old_value: (args.oldValue ?? null) as never,
+    new_value: (args.newValue ?? null) as never,
     ip_address: ipAddress,
     user_agent: userAgent,
-    metadata: args.metadata ?? {},
+    metadata: (args.metadata ?? {}) as never,
   });
 }
 
-async function syncSuperAdminForCurrentUser(context: { supabase: any; userId: string }) {
+async function syncSuperAdminForCurrentUser(context: {
+  supabase: import("@supabase/supabase-js").SupabaseClient<
+    import("@/integrations/supabase/types").Database
+  >;
+  userId: string;
+}) {
   const [{ supabaseAdmin }, authUserRes] = await Promise.all([
     import("@/integrations/supabase/client.server"),
     context.supabase.auth.getUser(),

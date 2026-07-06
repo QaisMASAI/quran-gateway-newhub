@@ -62,7 +62,16 @@ export async function fetchChaptersFromDb(lang: ApiLang = "he"): Promise<
 
   if (!dbRows || !Array.isArray(dbRows)) return [];
 
-  return (dbRows as any[]).map((r) => ({
+  type ChapterRow = {
+    chapter_number: number;
+    name_ar: string;
+    name_simple_en: string;
+    name_translated_en: string | null;
+    name_he: string | null;
+    revelation_place: string | null;
+    verses_count: number;
+  };
+  return (dbRows as unknown as ChapterRow[]).map((r) => ({
     id: r.chapter_number,
     name_arabic: r.name_ar,
     name_simple: r.name_simple_en,

@@ -1,6 +1,8 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import type { SupabaseClient } from "@supabase/supabase-js";
+import type { Database } from "@/integrations/supabase/types";
 
 const DatasetKindSchema = z.enum([
   "translation",
@@ -22,7 +24,10 @@ const DatasetKindSchema = z.enum([
   "other",
 ]);
 
-async function requireAdmin(context: { supabase: any; userId: string }) {
+async function requireAdmin(context: {
+  supabase: SupabaseClient<Database>;
+  userId: string;
+}) {
   const { data, error } = await context.supabase.rpc("has_role", {
     _user_id: context.userId,
     _role: "admin",
@@ -94,7 +99,7 @@ export const upsertQuranDatasetBundle = createServerFn({ method: "POST" })
           source_license: data.dataset.source_license ?? null,
           version: data.dataset.version ?? "v1",
           import_mode: data.dataset.import_mode ?? "json",
-          metadata: data.dataset.metadata as any,
+          metadata: data.dataset.metadata as never,
           is_public: data.dataset.is_public,
           is_active: data.dataset.is_active,
           created_by: context.userId,
