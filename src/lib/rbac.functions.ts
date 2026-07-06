@@ -144,7 +144,7 @@ async function readAuthzSnapshot(context: {
   const effectiveRole = normalizeAppRole(roleRes.data as string | null);
   const permissions = new Set<string>();
 
-  for (const row of (permsRes.data ?? []) as Array<{
+  for (const row of (permsRes.data ?? []) as unknown as Array<{
     role: string;
     roles: { role_permissions: Array<{ permissions: { code: string } | null }> } | null;
   }>) {
@@ -280,7 +280,17 @@ export const getAdminManagementData = createServerFn({ method: "GET" })
         oldValue: JsonValue | null;
         newValue: JsonValue | null;
       }
-    > = ((auditRes.data ?? []) as Array<Record<string, unknown>>).map((a) => ({
+    > = ((auditRes.data ?? []) as unknown as Array<{
+      id: string;
+      actor_user_id: string | null;
+      target_user_id: string | null;
+      action: string;
+      old_value: JsonValue | null;
+      new_value: JsonValue | null;
+      ip_address: string | null;
+      user_agent: string | null;
+      created_at: string | null;
+    }>).map((a) => ({
       id: a.id,
       actorUserId: a.actor_user_id,
       targetUserId: a.target_user_id,
