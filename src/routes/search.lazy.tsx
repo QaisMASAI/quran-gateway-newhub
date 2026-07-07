@@ -9,6 +9,7 @@ import { searchQuranItemsHybrid } from "@/lib/hybrid-search.functions";
 import { Header } from "@/components/Header";
 import { Search as SearchIcon, Loader2, ChevronLeft, ChevronRight, BookOpen } from "lucide-react";
 import { searchEntities, searchKnowledgeTexts, type EntityKind } from "@/lib/knowledge";
+import { searchHadith } from "@/lib/hadith.functions";
 import { EntityCard } from "@/components/discovery/EntityCard";
 import { normalizeLocale, type Locale } from "@/lib/i18n";
 import { localeTextDir, tafsirFontClass, uiFontClass } from "@/lib/locale-ui";
@@ -29,6 +30,7 @@ function SearchPage() {
   const deferred = useDeferredValue(input);
   const trimmed = deferred.trim();
   const runQuranItemsHybrid = useServerFn(searchQuranItemsHybrid);
+  const runHadithSearch = useServerFn(searchHadith);
 
   const indexQ = useQuery({
     queryKey: ["quran-index"],
@@ -59,6 +61,19 @@ function SearchPage() {
           q: trimmed,
           language: locale,
           semantic: true,
+          limit: 8,
+        },
+      }),
+    enabled: trimmed.length >= 2,
+    staleTime: 60_000,
+  });
+
+  const hadithQ = useQuery({
+    queryKey: ["hadith-search", trimmed],
+    queryFn: () =>
+      runHadithSearch({
+        data: {
+          q: trimmed,
           limit: 8,
         },
       }),
@@ -206,6 +221,39 @@ function SearchPage() {
                   </article>
                 );
               })}
+            </div>
+          </section>
+        )}
+
+        {hadithQ.data && hadithQ.data.length > 0 && (
+          <section className="mt-6">
+            <SectionTitle>
+              {t("search.hadithHits", "Hadith matches")}
+            </SectionTitle>
+            <div className="space-y-2">
+              {hadithQ.data.map((h) => (
+                <Link
+                  key={`${h.collection_slug}-${h.global_id}`}
+                  to="/hadith/$collection/entry/$num"
+                  params={{ collection: h.collection_slug, num: String(h.global_id) }}
+                  className="surface-card block px-4 py-3 transition-colors hover:border-primary/40"
+                >
+                  <p className="text-xs font-semibold text-primary">
+                    {h.collection_slug === "bukhari" ? "Sahih al-Bukhari" : "Sahih Muslim"} · #{h.id_in_book}
+                  </p>
+                  {h.narrator ? <p className="text-[11px] italic text-muted-foreground">{h.narrator}</p> : null}
+                  {h.english_text ? (
+                    <p className="mt-1 text-sm text-foreground/85">
+                      {h.english_text.slice(0, 180)}
+                      {h.english_text.length > 180 ? "…" : ""}
+                    </p>
+                  ) : null}
+                  <p className="mt-1 text-right text-sm text-foreground" dir="rtl" lang="ar">
+                    {h.arabic_text.slice(0, 140)}
+                    {h.arabic_text.length > 140 ? "…" : ""}
+                  </p>
+                </Link>
+              ))}
             </div>
           </section>
         )}
