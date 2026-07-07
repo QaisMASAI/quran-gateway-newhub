@@ -1968,41 +1968,59 @@ export type Database = {
       quran_ingest_reports: {
         Row: {
           actor_user_id: string | null
+          batch_errors: Json
           batches: number
+          completed_at: string | null
           created_at: string
           dataset_id: string | null
           deduped: number
+          failed_count: number
           id: string
           kind: string
           metadata: Json
           received: number
           reciter_id: string | null
+          row_errors: Json
+          started_at: string
+          status: string
           written: number
         }
         Insert: {
           actor_user_id?: string | null
+          batch_errors?: Json
           batches?: number
+          completed_at?: string | null
           created_at?: string
           dataset_id?: string | null
           deduped?: number
+          failed_count?: number
           id?: string
           kind: string
           metadata?: Json
           received?: number
           reciter_id?: string | null
+          row_errors?: Json
+          started_at?: string
+          status?: string
           written?: number
         }
         Update: {
           actor_user_id?: string | null
+          batch_errors?: Json
           batches?: number
+          completed_at?: string | null
           created_at?: string
           dataset_id?: string | null
           deduped?: number
+          failed_count?: number
           id?: string
           kind?: string
           metadata?: Json
           received?: number
           reciter_id?: string | null
+          row_errors?: Json
+          started_at?: string
+          status?: string
           written?: number
         }
         Relationships: []
