@@ -23,7 +23,7 @@ export const Route = createFileRoute("/api/public/admin/ingest-quran-json/$id")(
         const { data, error } = await supabaseAdmin
           .from("quran_ingest_reports")
           .select(
-            "id, kind, dataset_id, reciter_id, received, deduped, written, batches, actor_user_id, metadata, created_at",
+            "id, kind, status, dataset_id, reciter_id, received, deduped, written, batches, failed_count, batch_errors, row_errors, actor_user_id, metadata, started_at, completed_at, created_at",
           )
           .eq("id", parsedId.data)
           .maybeSingle();
