@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { Header } from "@/components/Header";
@@ -219,6 +219,14 @@ function AdminBackfillPage() {
         <p className="mt-1 text-sm text-muted-foreground">
           Monitor backfills, resume failed batches, and manage MCP cache controls safely.
         </p>
+        <div className="mt-3">
+          <Link
+            to="/admin/ingest"
+            className="inline-flex min-h-11 items-center rounded-lg border border-border px-4 py-2 text-sm hover:bg-secondary"
+          >
+            Open ingest reports
+          </Link>
+        </div>
 
         {statusQ.isLoading ? (
           <div className="mt-6 inline-flex items-center gap-2 text-sm text-muted-foreground">
