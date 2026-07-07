@@ -1965,6 +1965,48 @@ export type Database = {
         }
         Relationships: []
       }
+      quran_ingest_reports: {
+        Row: {
+          actor_user_id: string | null
+          batches: number
+          created_at: string
+          dataset_id: string | null
+          deduped: number
+          id: string
+          kind: string
+          metadata: Json
+          received: number
+          reciter_id: string | null
+          written: number
+        }
+        Insert: {
+          actor_user_id?: string | null
+          batches?: number
+          created_at?: string
+          dataset_id?: string | null
+          deduped?: number
+          id?: string
+          kind: string
+          metadata?: Json
+          received?: number
+          reciter_id?: string | null
+          written?: number
+        }
+        Update: {
+          actor_user_id?: string | null
+          batches?: number
+          created_at?: string
+          dataset_id?: string | null
+          deduped?: number
+          id?: string
+          kind?: string
+          metadata?: Json
+          received?: number
+          reciter_id?: string | null
+          written?: number
+        }
+        Relationships: []
+      }
       quran_item_embeddings: {
         Row: {
           chunk_index: number

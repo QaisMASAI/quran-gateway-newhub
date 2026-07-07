@@ -134,6 +134,37 @@ export interface IngestReport {
   batches: number;
   datasetId?: string;
   reciterId?: string;
+  uploadId?: string;
+}
+
+async function recordReport(
+  kind: "dataset" | "words" | "audio",
+  report: IngestReport,
+  actorUserId: string | null,
+  metadata: Record<string, unknown> = {},
+): Promise<string | undefined> {
+  try {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data, error } = await supabaseAdmin
+      .from("quran_ingest_reports")
+      .insert({
+        kind,
+        dataset_id: report.datasetId ?? null,
+        reciter_id: report.reciterId ?? null,
+        received: report.received,
+        deduped: report.deduped,
+        written: report.written,
+        batches: report.batches,
+        actor_user_id: actorUserId,
+        metadata: metadata as never,
+      } as never)
+      .select("id")
+      .single();
+    if (error || !data?.id) return undefined;
+    return (data as { id: string }).id;
+  } catch {
+    return undefined;
+  }
 }
 
 function dedupeBy<T>(rows: T[], keyFn: (row: T) => string): { rows: T[]; deduped: number } {
@@ -318,12 +349,18 @@ export async function ingestEnvelope(
   env: IngestEnvelope,
   actorUserId: string | null,
 ): Promise<IngestReport> {
+  let report: IngestReport;
   switch (env.kind) {
     case "dataset":
-      return ingestDatasetBundle(env.payload, actorUserId);
+      report = await ingestDatasetBundle(env.payload, actorUserId);
+      break;
     case "words":
-      return ingestWordAnnotations(env.payload);
+      report = await ingestWordAnnotations(env.payload);
+      break;
     case "audio":
-      return ingestAudioBundle(env.payload);
+      report = await ingestAudioBundle(env.payload);
+      break;
   }
+  const uploadId = await recordReport(env.kind, report, actorUserId);
+  return { ...report, uploadId };
 }
