@@ -181,21 +181,19 @@ async function finalizeReportRecord(uploadId: string, report: IngestReport): Pro
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     await supabaseAdmin
       .from("quran_ingest_reports")
-      .update(
-        {
-          status: report.status,
-          dataset_id: report.datasetId ?? null,
-          reciter_id: report.reciterId ?? null,
-          received: report.received,
-          deduped: report.deduped,
-          written: report.written,
-          batches: report.batches,
-          failed_count: report.failedCount,
-          batch_errors: report.batchErrors as never,
-          row_errors: report.rowErrors as never,
-          completed_at: report.status === "running" ? null : new Date().toISOString(),
-        } as never,
-      )
+      .update({
+        status: report.status,
+        dataset_id: report.datasetId ?? null,
+        reciter_id: report.reciterId ?? null,
+        received: report.received,
+        deduped: report.deduped,
+        written: report.written,
+        batches: report.batches,
+        failed_count: report.failedCount,
+        batch_errors: report.batchErrors as never,
+        row_errors: report.rowErrors as never,
+        completed_at: report.status === "running" ? null : new Date().toISOString(),
+      } as never)
       .eq("id", uploadId);
   } catch {
     // Never fail ingest completion because report persistence failed.
@@ -337,11 +335,7 @@ export async function ingestDatasetBundle(
     publication_status: "published",
   }));
   const { rows, deduped } = dedupeBy(mapped, (r) => `${r.dataset_id}::${r.external_key}`);
-  const batchResult = await batchUpsert(
-    "quran_dataset_items",
-    rows,
-    "dataset_id,external_key",
-  );
+  const batchResult = await batchUpsert("quran_dataset_items", rows, "dataset_id,external_key");
   const failedCount =
     rowErrors.length + batchResult.batchErrors.reduce((sum, err) => sum + err.rowCount, 0);
   const failed = batchResult.batchErrors.length > 0 && batchResult.written === 0;
@@ -359,9 +353,7 @@ export async function ingestDatasetBundle(
   };
 }
 
-export async function ingestWordAnnotations(
-  input: WordAnnotationsInput,
-): Promise<IngestReport> {
+export async function ingestWordAnnotations(input: WordAnnotationsInput): Promise<IngestReport> {
   const received = input.rows.length;
   const rowErrors: IngestRowError[] = [];
   const validRows = input.rows.flatMap((raw, index) => {
@@ -375,15 +367,8 @@ export async function ingestWordAnnotations(
     return [parsed.data];
   });
 
-  const { rows, deduped } = dedupeBy(
-    validRows,
-    (r) => `${r.surah}::${r.ayah}::${r.word_index}`,
-  );
-  const batchResult = await batchUpsert(
-    "quran_word_annotations",
-    rows,
-    "surah,ayah,word_index",
-  );
+  const { rows, deduped } = dedupeBy(validRows, (r) => `${r.surah}::${r.ayah}::${r.word_index}`);
+  const batchResult = await batchUpsert("quran_word_annotations", rows, "surah,ayah,word_index");
   const failedCount =
     rowErrors.length + batchResult.batchErrors.reduce((sum, err) => sum + err.rowCount, 0);
   const failed = batchResult.batchErrors.length > 0 && batchResult.written === 0;
@@ -400,9 +385,7 @@ export async function ingestWordAnnotations(
   };
 }
 
-export async function ingestAudioBundle(
-  input: AudioBundleInput,
-): Promise<IngestReport> {
+export async function ingestAudioBundle(input: AudioBundleInput): Promise<IngestReport> {
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
   const { data: reciterRow, error: reciterError } = await supabaseAdmin
     .from("quran_reciters")

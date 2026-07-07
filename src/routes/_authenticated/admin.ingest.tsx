@@ -143,7 +143,11 @@ function AdminIngestPage() {
                 onClick={() => uploadsQ.fetchNextPage()}
                 className="min-h-11 rounded-md border border-border px-3 py-2 text-sm hover:bg-secondary disabled:opacity-60"
               >
-                {uploadsQ.isFetchingNextPage ? "Loading…" : uploadsQ.hasNextPage ? "Load more" : "No more"}
+                {uploadsQ.isFetchingNextPage
+                  ? "Loading…"
+                  : uploadsQ.hasNextPage
+                    ? "Load more"
+                    : "No more"}
               </button>
             </div>
           </article>

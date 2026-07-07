@@ -64,7 +64,7 @@ export const Route = createFileRoute("/api/public/admin/ingest-quran-json")({
         const rows = data ?? [];
         const hasMore = rows.length > parsed.data.limit;
         const entries = hasMore ? rows.slice(0, parsed.data.limit) : rows;
-        const nextCursor = hasMore ? entries[entries.length - 1]?.created_at ?? null : null;
+        const nextCursor = hasMore ? (entries[entries.length - 1]?.created_at ?? null) : null;
 
         return Response.json({ ok: true, entries, hasMore, nextCursor });
       },
@@ -89,10 +89,7 @@ export const Route = createFileRoute("/api/public/admin/ingest-quran-json")({
         });
         if (!auth.ok) return auth.response;
 
-        const {
-          IngestEnvelopeSchema,
-          ingestEnvelope,
-        } = await import("@/lib/quran-ingest.server");
+        const { IngestEnvelopeSchema, ingestEnvelope } = await import("@/lib/quran-ingest.server");
 
         const envelope = IngestEnvelopeSchema.safeParse({
           kind: parsed.data.kind,

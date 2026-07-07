@@ -95,7 +95,7 @@ export const listIngestReports = createServerFn({ method: "GET" })
     const entries = rows ?? [];
     const hasMore = entries.length > data.limit;
     const page = hasMore ? entries.slice(0, data.limit) : entries;
-    const nextCursor = hasMore ? page[page.length - 1]?.created_at ?? null : null;
+    const nextCursor = hasMore ? (page[page.length - 1]?.created_at ?? null) : null;
 
     return { entries: page, nextCursor, hasMore };
   });
