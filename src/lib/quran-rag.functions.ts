@@ -74,7 +74,8 @@ export const semanticRetrieveVerses = createServerFn({ method: "POST" })
     });
 
     if (error) {
-      return { verses: [], error: `retrieval_failed: ${error.message.slice(0, 120)}` };
+      console.error("semanticRetrieveVerses_failed", error);
+      return { verses: [], error: "retrieval_failed" };
     }
 
     type Row = Database["public"]["Functions"]["match_verses"]["Returns"][number];
@@ -178,7 +179,8 @@ export const semanticRetrieveGroundedChunks = createServerFn({ method: "POST" })
     });
 
     if (error) {
-      return { chunks: [], error: `retrieval_failed: ${error.message.slice(0, 120)}` };
+      console.error("semanticRetrieveGroundedChunks_failed", error);
+      return { chunks: [], error: "retrieval_failed" };
     }
 
     const chunks: RetrievedChunk[] = ((rows ?? []) as RetrievedChunk[]).map((r) => ({
