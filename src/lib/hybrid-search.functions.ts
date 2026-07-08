@@ -49,7 +49,10 @@ export const searchEntitiesHybrid = createServerFn({ method: "POST" })
       } as never,
     );
 
-    if (error) return { hits: [], error: error.message };
+    if (error) {
+      console.error("searchEntitiesHybrid_failed", error);
+      return { hits: [], error: "search_failed" };
+    }
     return { hits: (rows ?? []) as EntityHit[] };
   });
 
@@ -98,7 +101,10 @@ export const searchVersesHybrid = createServerFn({ method: "POST" })
       } as never,
     );
 
-    if (error) return { hits: [], error: error.message };
+    if (error) {
+      console.error("searchVersesHybrid_failed", error);
+      return { hits: [], error: "search_failed" };
+    }
     return { hits: (rows ?? []) as VerseHit[] };
   });
 
