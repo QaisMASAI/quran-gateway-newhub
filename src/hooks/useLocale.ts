@@ -19,9 +19,13 @@ export function useLocale() {
   const dir = LOCALE_DIR[current];
   const isRtl = dir === "rtl";
 
-  const changeLocale = useCallback((locale: Locale) => {
-    setLocale(locale);
-  }, []);
+  const changeLocale = useCallback(
+    (locale: Locale) => {
+      if (locale === current) return;
+      setLocale(locale);
+    },
+    [current],
+  );
 
   return {
     current,
