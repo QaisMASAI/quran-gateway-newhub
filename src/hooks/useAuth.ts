@@ -25,34 +25,35 @@ export function useAuth(): UseAuthReturn {
 
   useEffect(() => {
     let mounted = true;
+    let unsubscribe: (() => void) | undefined;
 
-    const initAuth = async () => {
-      // Register listener first
-      const { data: sub } = supabase.auth.onAuthStateChange((_event, sess) => {
+    void (async () => {
+      try {
+        // Register listener first
+        const { data: sub } = supabase.auth.onAuthStateChange((_event, sess) => {
+          if (mounted) {
+            setSession(sess);
+            setUser(sess?.user ?? null);
+          }
+        });
+        unsubscribe = () => sub.subscription.unsubscribe();
+
+        // Hydrate existing session
+        const { data } = await supabase.auth.getSession();
         if (mounted) {
-          setSession(sess);
-          setUser(sess?.user ?? null);
+          setSession(data.session);
+          setUser(data.session?.user ?? null);
         }
-      });
-
-      // Hydrate existing session
-      const { data } = await supabase.auth.getSession();
-      if (mounted) {
-        setSession(data.session);
-        setUser(data.session?.user ?? null);
-        setLoading(false);
+      } finally {
+        if (mounted) {
+          setLoading(false);
+        }
       }
-
-      return () => {
-        sub.subscription.unsubscribe();
-      };
-    };
-
-    const cleanup = initAuth();
+    })();
 
     return () => {
       mounted = false;
-      cleanup.then((fn) => fn?.());
+      unsubscribe?.();
     };
   }, []);
 

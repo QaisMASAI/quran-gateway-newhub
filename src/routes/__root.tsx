@@ -14,7 +14,7 @@ import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { BottomNav } from "@/components/BottomNav";
 import { DirectionProvider } from "@/components/DirectionProvider";
-import { LOCALE_DIR, isLocale, DEFAULT_LOCALE } from "@/lib/i18n";
+import { LOCALE_DIR, DEFAULT_LOCALE } from "@/lib/i18n";
 import "@/lib/i18n";
 
 const ROOT_META = {
@@ -136,26 +136,13 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         content:
           "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/74a0abc9-e4cc-4b74-8c76-a48ecb318cad/id-preview-85576619--684dac9d-8cf9-47d7-8d1b-d26c7de3781f.lovable.app-1782305499036.png",
       },
-      { title: "Lovable App" },
-      { property: "og:title", content: "Lovable App" },
-      { name: "twitter:title", content: "Lovable App" },
-      {
-        name: "description",
-        content:
-          "- A web platform for Hebrew speakers to learn the Quran with Arabic text, Hebrew translation, and AI-powered explanations.",
-      },
-      {
-        property: "og:description",
-        content:
-          "- A web platform for Hebrew speakers to learn the Quran with Arabic text, Hebrew translation, and AI-powered explanations.",
-      },
-      {
-        name: "twitter:description",
-        content:
-          "- A web platform for Hebrew speakers to learn the Quran with Arabic text, Hebrew translation, and AI-powered explanations.",
-      },
     ],
     links: [
+      { rel: "canonical", href: "/" },
+      { rel: "alternate", hrefLang: "en", href: "/" },
+      { rel: "alternate", hrefLang: "ar", href: "/" },
+      { rel: "alternate", hrefLang: "he", href: "/" },
+      { rel: "alternate", hrefLang: "x-default", href: "/" },
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
       { rel: "preconnect", href: "https://everyayah.com", crossOrigin: "anonymous" },
@@ -203,9 +190,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 });
 
 function RootShell({ children }: { children: ReactNode }) {
-  // Get initial locale from storage or detect
-  const storedLocale = typeof window !== "undefined" ? localStorage.getItem("qc:locale") : null;
-  const locale = storedLocale && isLocale(storedLocale) ? storedLocale : DEFAULT_LOCALE;
+  // Keep SSR/CSR markup stable; DirectionProvider syncs locale + dir after hydration.
+  const locale = DEFAULT_LOCALE;
   const dir = LOCALE_DIR[locale];
 
   return (
