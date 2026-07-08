@@ -25,8 +25,9 @@ export function useAuth(): UseAuthReturn {
 
   useEffect(() => {
     let mounted = true;
+    let unsubscribe: (() => void) | undefined;
 
-    const initAuth = async () => {
+    void (async () => {
       // Register listener first
       const { data: sub } = supabase.auth.onAuthStateChange((_event, sess) => {
         if (mounted) {
@@ -34,6 +35,7 @@ export function useAuth(): UseAuthReturn {
           setUser(sess?.user ?? null);
         }
       });
+      unsubscribe = () => sub.subscription.unsubscribe();
 
       // Hydrate existing session
       const { data } = await supabase.auth.getSession();
@@ -42,17 +44,11 @@ export function useAuth(): UseAuthReturn {
         setUser(data.session?.user ?? null);
         setLoading(false);
       }
-
-      return () => {
-        sub.subscription.unsubscribe();
-      };
-    };
-
-    const cleanup = initAuth();
+    })();
 
     return () => {
       mounted = false;
-      cleanup.then((fn) => fn?.());
+      unsubscribe?.();
     };
   }, []);
 
