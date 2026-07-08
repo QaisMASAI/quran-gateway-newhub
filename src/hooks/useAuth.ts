@@ -28,21 +28,26 @@ export function useAuth(): UseAuthReturn {
     let unsubscribe: (() => void) | undefined;
 
     void (async () => {
-      // Register listener first
-      const { data: sub } = supabase.auth.onAuthStateChange((_event, sess) => {
-        if (mounted) {
-          setSession(sess);
-          setUser(sess?.user ?? null);
-        }
-      });
-      unsubscribe = () => sub.subscription.unsubscribe();
+      try {
+        // Register listener first
+        const { data: sub } = supabase.auth.onAuthStateChange((_event, sess) => {
+          if (mounted) {
+            setSession(sess);
+            setUser(sess?.user ?? null);
+          }
+        });
+        unsubscribe = () => sub.subscription.unsubscribe();
 
-      // Hydrate existing session
-      const { data } = await supabase.auth.getSession();
-      if (mounted) {
-        setSession(data.session);
-        setUser(data.session?.user ?? null);
-        setLoading(false);
+        // Hydrate existing session
+        const { data } = await supabase.auth.getSession();
+        if (mounted) {
+          setSession(data.session);
+          setUser(data.session?.user ?? null);
+        }
+      } finally {
+        if (mounted) {
+          setLoading(false);
+        }
       }
     })();
 
