@@ -27,6 +27,7 @@ import {
 } from "@/lib/quran-api";
 import { useFavorites } from "@/lib/favorites";
 import { useQuery } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
 import { TAFSIR_SOURCES_META, tafsirSourceName } from "@/lib/tafsir-sources";
 import { ShareButtons } from "./ShareButtons";
 import { NotePanel } from "./NotePanel";
@@ -39,6 +40,7 @@ import {
   sourceName,
   TAFSIR_SOURCE_SLUG_BY_KEY,
 } from "@/lib/tafsir-content";
+import { fetchAsbabFromApi, fetchTafsirFromApi } from "@/lib/tafsir-api.functions";
 
 interface Props {
   surah: number;
@@ -96,15 +98,26 @@ export function AyahCard({ surah, surahName, ayah, arabic, hebrew, highlight }: 
   const [showNote, setShowNote] = useState(false);
   const [tafsirSource] = useState<(typeof TAFSIR_SOURCES_META)[number]["key"]>("jalalayn");
   const selectedTafsirSlug = TAFSIR_SOURCE_SLUG_BY_KEY[tafsirSource] ?? "al_jalalayn";
+  const tafsirApiFn = useServerFn(fetchTafsirFromApi);
+  const asbabApiFn = useServerFn(fetchAsbabFromApi);
+
   const tafsirQ = useQuery({
     queryKey: ["tafsir-verse", surah, ayah, locale, selectedTafsirSlug],
-    queryFn: () => getTafsirForVerseBySource(surah, ayah, locale, selectedTafsirSlug),
+    queryFn: async () => {
+      const apiRows = await tafsirApiFn({ data: { surah, ayah, lang: locale } });
+      if ((apiRows ?? []).length > 0) return apiRows;
+      return await getTafsirForVerseBySource(surah, ayah, locale, selectedTafsirSlug);
+    },
     enabled: panel === "tafsir",
     staleTime: 15 * 60_000,
   });
   const asbabQ = useQuery({
     queryKey: ["asbab-verse", surah, ayah, locale],
-    queryFn: () => getAsbabForVerse(surah, ayah, locale),
+    queryFn: async () => {
+      const apiRows = await asbabApiFn({ data: { surah, ayah, lang: locale } });
+      if ((apiRows ?? []).length > 0) return apiRows;
+      return await getAsbabForVerse(surah, ayah, locale);
+    },
     enabled: panel === "sabab",
     staleTime: 15 * 60_000,
   });
