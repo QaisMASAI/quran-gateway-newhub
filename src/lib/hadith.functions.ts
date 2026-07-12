@@ -196,7 +196,7 @@ export const getHadithKnowledgeBundle = createServerFn({ method: "GET" })
     if (!collection) return null;
 
     const entry = (await fetchHadithByGlobalNumber({ collection, num: data.num })) as HadithEntry | null;
-    if (!entry) return null;
+    if (!entry || entry.collection_slug !== collection) return null;
 
     const [collections, relatedHadith] = await Promise.all([
       fetchHadithCollections(),

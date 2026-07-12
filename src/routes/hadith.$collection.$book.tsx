@@ -36,7 +36,7 @@ function HadithBookPage() {
   const isRtl = i18n.dir() === "rtl";
   const [page, setPage] = useState(0);
   const fn = useServerFn(listHadithEntries);
-  const { data } = useQuery({
+  const { data, isLoading, isError, refetch } = useQuery({
     queryKey: ["hadith", "entries", collection, bookNum, page],
     queryFn: () => fn({ data: { collection, book: bookNum, page, pageSize: 40 } }),
   });
@@ -59,6 +59,19 @@ function HadithBookPage() {
         </h1>
 
         <ol className="mt-4 space-y-3">
+          {isLoading && <li className="text-sm text-muted-foreground">Loading hadith…</li>}
+          {isError && (
+            <li className="rounded-lg border border-destructive/30 bg-destructive/5 p-3 text-sm text-destructive">
+              Failed to load hadith entries.
+              <button
+                type="button"
+                onClick={() => void refetch()}
+                className="ms-2 underline underline-offset-2"
+              >
+                Retry
+              </button>
+            </li>
+          )}
           {items.map((h) => (
             <li key={h.id} className="rounded-xl border border-border bg-card p-4">
               <div className="mb-1 flex items-center justify-between text-xs text-muted-foreground">
@@ -88,6 +101,9 @@ function HadithBookPage() {
               </p>
             </li>
           ))}
+          {!isLoading && !isError && items.length === 0 && (
+            <li className="text-sm text-muted-foreground">No hadith entries were found for this book.</li>
+          )}
         </ol>
 
         <div className="mt-6 flex items-center justify-between text-sm">
