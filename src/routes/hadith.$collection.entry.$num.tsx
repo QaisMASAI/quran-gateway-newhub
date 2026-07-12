@@ -44,18 +44,16 @@ function HadithDetailPage() {
   const bundleFn = useServerFn(getHadithKnowledgeBundle);
   const summaryFn = useServerFn(generateHadithStudySummary);
 
-  const { data: bundle } = useQuery({
+  const {
+    data: bundle,
+    isLoading: bundleLoading,
+    isError: bundleError,
+  } = useQuery({
     queryKey: ["hadith", "knowledge", collection, numId],
     queryFn: () => bundleFn({ data: { collection, num: numId } }),
   });
 
   const h = bundle?.entry;
-
-  const bundleState = useQuery({
-    queryKey: ["hadith", "knowledge-state", collection, numId],
-    queryFn: () => bundleFn({ data: { collection, num: numId } }),
-    enabled: false,
-  });
 
   const studySummaryQ = useQuery({
     queryKey: ["hadith", "study-summary", collection, numId, locale],
@@ -81,7 +79,7 @@ function HadithDetailPage() {
       }),
   });
 
-  if (bundleState.isLoading) {
+  if (bundleLoading) {
     return (
       <div className="min-h-screen bg-background">
         <Header />
@@ -90,7 +88,7 @@ function HadithDetailPage() {
     );
   }
 
-  if (bundleState.isError) {
+  if (bundleError) {
     return (
       <div className="min-h-screen bg-background">
         <Header />
