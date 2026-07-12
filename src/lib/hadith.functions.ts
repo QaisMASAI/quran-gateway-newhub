@@ -366,8 +366,14 @@ export const listHadithTopics = createServerFn({ method: "GET" })
       .parse(input ?? {}),
   )
   .handler(async ({ data }): Promise<HadithTopic[]> => {
-    const books = await listHadithTopicBooks({ data: { limitPerCollection: 12 } });
-    return books.slice(0, data.limit).map((book, i) => ({
+    const books = await Promise.all([
+      fetchHadithBooks("bukhari"),
+      fetchHadithBooks("muslim"),
+    ]).then((all) => all.flat());
+
+    const topBooks = books.sort((a, b) => b.hadith_count - a.hadith_count).slice(0, data.limit);
+
+    return topBooks.map((book) => ({
       id: `${book.collection_slug}-${book.book_id}`,
       slug: `${book.collection_slug}-book-${book.book_id}`,
       title_i18n: {
