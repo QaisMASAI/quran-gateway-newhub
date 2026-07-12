@@ -27,6 +27,7 @@ function SearchPage() {
   const tafsirClass = tafsirFontClass(locale);
   const textDir = localeTextDir(locale);
   const [input, setInput] = useState("");
+  const [hadithPage, setHadithPage] = useState(0);
   const deferred = useDeferredValue(input);
   const trimmed = deferred.trim();
   const runQuranItemsHybrid = useServerFn(searchQuranItemsHybrid);
@@ -69,17 +70,24 @@ function SearchPage() {
   });
 
   const hadithQ = useQuery({
-    queryKey: ["hadith-search", trimmed],
+    queryKey: ["hadith-search", trimmed, hadithPage],
     queryFn: () =>
       runHadithSearch({
         data: {
           q: trimmed,
-          limit: 8,
+          page: hadithPage,
+          pageSize: 8,
         },
       }),
     enabled: trimmed.length >= 2,
     staleTime: 60_000,
   });
+
+  const hadithItems = hadithQ.data?.items ?? [];
+
+  if (hadithPage !== 0 && hadithItems.length === 0 && !hadithQ.isFetching) {
+    setHadithPage(0);
+  }
 
   const results = useMemo(() => {
     if (!indexQ.data) return null;
@@ -225,13 +233,22 @@ function SearchPage() {
           </section>
         )}
 
-        {hadithQ.data && hadithQ.data.length > 0 && (
+        {hadithQ.isError && (
+          <section className="mt-6">
+            <SectionTitle>{t("search.hadithHits", "Hadith matches")}</SectionTitle>
+            <p className="rounded-lg border border-destructive/30 bg-destructive/5 p-3 text-sm text-destructive">
+              {t("search.indexError")}
+            </p>
+          </section>
+        )}
+
+        {hadithItems.length > 0 && (
           <section className="mt-6">
             <SectionTitle>
               {t("search.hadithHits", "Hadith matches")}
             </SectionTitle>
             <div className="space-y-2">
-              {hadithQ.data.map((h) => (
+              {hadithItems.map((h) => (
                 <Link
                   key={`${h.collection_slug}-${h.global_id}`}
                   to="/hadith/$collection/entry/$num"
@@ -254,6 +271,29 @@ function SearchPage() {
                   </p>
                 </Link>
               ))}
+            </div>
+            <div className="mt-3 flex items-center justify-between">
+              <button
+                type="button"
+                onClick={() => setHadithPage((p) => Math.max(0, p - 1))}
+                disabled={hadithPage === 0 || hadithQ.isFetching}
+                className="rounded-lg border border-border px-3 py-1.5 text-xs text-foreground disabled:opacity-50"
+              >
+                {t("common.previous", "Previous")}
+              </button>
+              <span className="text-xs text-muted-foreground">
+                {hadithQ.data?.total
+                  ? `${hadithPage * 8 + 1}-${Math.min((hadithPage + 1) * 8, hadithQ.data.total)} / ${hadithQ.data.total}`
+                  : ""}
+              </span>
+              <button
+                type="button"
+                onClick={() => setHadithPage((p) => p + 1)}
+                disabled={!hadithQ.data?.hasMore || hadithQ.isFetching}
+                className="rounded-lg border border-border px-3 py-1.5 text-xs text-foreground disabled:opacity-50"
+              >
+                {t("common.next", "Next")}
+              </button>
             </div>
           </section>
         )}
