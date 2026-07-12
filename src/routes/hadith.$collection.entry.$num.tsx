@@ -44,7 +44,11 @@ function HadithDetailPage() {
   const bundleFn = useServerFn(getHadithKnowledgeBundle);
   const summaryFn = useServerFn(generateHadithStudySummary);
 
-  const { data: bundle } = useQuery({
+  const {
+    data: bundle,
+    isLoading: bundleLoading,
+    isError: bundleError,
+  } = useQuery({
     queryKey: ["hadith", "knowledge", collection, numId],
     queryFn: () => bundleFn({ data: { collection, num: numId } }),
   });
@@ -75,12 +79,32 @@ function HadithDetailPage() {
       }),
   });
 
-  if (!h) {
+  if (bundleLoading) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Header />
+        <main className="mx-auto max-w-3xl px-4 py-10 text-sm text-muted-foreground">Loading hadith…</main>
+      </div>
+    );
+  }
+
+  if (bundleError) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Header />
+        <main className="mx-auto max-w-3xl px-4 py-10 text-sm text-destructive">
+          Failed to load this hadith entry.
+        </main>
+      </div>
+    );
+  }
+
+  if (!h || h.collection_slug !== collection) {
     return (
       <div className="min-h-screen bg-background">
         <Header />
         <main className="mx-auto max-w-3xl px-4 py-10 text-sm text-muted-foreground">
-          Hadith not found.
+          This hadith was not found in the selected source.
         </main>
       </div>
     );

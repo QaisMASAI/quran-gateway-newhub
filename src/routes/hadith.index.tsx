@@ -38,7 +38,10 @@ function HadithIndex() {
   const isRtl = i18n.dir() === "rtl";
   const locale = (i18n.language?.slice(0, 2) ?? "he") as "he" | "ar" | "en";
   const fn = useServerFn(listHadithCollections);
-  const { data } = useQuery({ queryKey: ["hadith", "collections"], queryFn: () => fn() });
+  const { data, isLoading, isError, refetch } = useQuery({
+    queryKey: ["hadith", "collections"],
+    queryFn: () => fn(),
+  });
 
   return (
     <div className="min-h-screen bg-background" dir={isRtl ? "rtl" : "ltr"}>
@@ -56,6 +59,23 @@ function HadithIndex() {
         </p>
 
         <div className="mt-6 grid gap-4 sm:grid-cols-2">
+          {isLoading && (
+            <div className="rounded-xl border border-border bg-card p-4 text-sm text-muted-foreground">
+              Loading hadith collections…
+            </div>
+          )}
+          {isError && (
+            <div className="rounded-xl border border-destructive/30 bg-destructive/5 p-4 text-sm text-destructive">
+              Failed to load hadith collections.
+              <button
+                type="button"
+                onClick={() => void refetch()}
+                className="ms-2 underline underline-offset-2"
+              >
+                Retry
+              </button>
+            </div>
+          )}
           {(data ?? []).map((c) => (
             <Link
               key={c.slug}

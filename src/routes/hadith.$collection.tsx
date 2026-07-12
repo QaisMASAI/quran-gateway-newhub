@@ -37,11 +37,11 @@ function HadithCollectionPage() {
   const Chev = isRtl ? ChevronLeft : ChevronRight;
   const booksFn = useServerFn(listHadithBooks);
   const collFn = useServerFn(listHadithCollections);
-  const { data: books = [] } = useQuery({
+  const { data: books = [], isLoading: booksLoading, isError: booksError, refetch: refetchBooks } = useQuery({
     queryKey: ["hadith", "books", collection],
     queryFn: () => booksFn({ data: { collection } }),
   });
-  const { data: cols = [] } = useQuery({
+  const { data: cols = [], isError: collectionsError } = useQuery({
     queryKey: ["hadith", "collections"],
     queryFn: () => collFn(),
   });
@@ -65,6 +65,21 @@ function HadithCollectionPage() {
         )}
 
         <div className="mt-6 divide-y divide-border rounded-2xl border border-border bg-card">
+          {booksLoading && (
+            <div className="px-4 py-3 text-sm text-muted-foreground">Loading books…</div>
+          )}
+          {(booksError || collectionsError) && (
+            <div className="px-4 py-3 text-sm text-destructive">
+              Failed to load this collection.
+              <button
+                type="button"
+                onClick={() => void refetchBooks()}
+                className="ms-2 underline underline-offset-2"
+              >
+                Retry
+              </button>
+            </div>
+          )}
           {books.map((b) => (
             <Link
               key={b.book_id}

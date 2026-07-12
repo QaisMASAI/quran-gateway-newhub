@@ -106,6 +106,12 @@ export type HadithStudySummary = {
   main_lessons: string;
 };
 
+export type HadithSearchResult = {
+  items: HadithEntry[];
+  total: number;
+  hasMore: boolean;
+};
+
 function collectionLabel(slug: string) {
   return slug === "bukhari" ? "Sahih al-Bukhari" : "Sahih Muslim";
 }
@@ -190,13 +196,15 @@ export const getHadithKnowledgeBundle = createServerFn({ method: "GET" })
     if (!collection) return null;
 
     const entry = (await fetchHadithByGlobalNumber({ collection, num: data.num })) as HadithEntry | null;
-    if (!entry) return null;
+    if (!entry || entry.collection_slug !== collection) return null;
 
     const [collections, relatedHadith] = await Promise.all([
       fetchHadithCollections(),
       entry.narrator
-        ? fetchHadithSearch({ q: entry.narrator, limit: 8 }).then((rows) => rows.filter((r) => r.id !== entry.id))
-        : Promise.resolve([]),
+        ? fetchHadithSearch({ q: entry.narrator, page: 0, pageSize: 8 }).then((result) =>
+            result.items.filter((r) => r.id !== entry.id),
+          )
+        : Promise.resolve([] as HadithEntry[]),
     ]);
 
     const collectionMeta = collections.find((c) => c.slug === entry.collection_slug) ?? null;
@@ -308,19 +316,26 @@ export const searchHadith = createServerFn({ method: "POST" })
       .object({
         q: z.string().min(1).max(300),
         collections: z.array(z.string()).max(5).optional(),
-        limit: z.number().int().min(1).max(50).optional().default(20),
+        page: z.number().int().min(0).max(300).optional().default(0),
+        pageSize: z.number().int().min(1).max(50).optional().default(8),
       })
       .parse(input),
   )
-  .handler(async ({ data }): Promise<HadithEntry[]> => {
+  .handler(async ({ data }): Promise<HadithSearchResult> => {
     const collections = (data.collections ?? [])
       .map(normalizeHadithCollection)
       .filter(Boolean) as Array<"bukhari" | "muslim">;
-    return (await fetchHadithSearch({
+    const result = await fetchHadithSearch({
       q: data.q,
       collections,
-      limit: data.limit,
-    })) as HadithEntry[];
+      page: data.page,
+      pageSize: data.pageSize,
+    });
+    return {
+      items: result.items as HadithEntry[],
+      total: result.total,
+      hasMore: result.hasMore,
+    };
   });
 
 export const listTopNarrators = createServerFn({ method: "GET" })

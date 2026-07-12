@@ -1,5 +1,6 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
 import { useTranslation } from "react-i18next";
 import { Header } from "@/components/Header";
 import { ChevronLeft, Loader2, BookOpen, Quote, ScrollText, Compass } from "lucide-react";
@@ -19,6 +20,7 @@ import {
   type AsbabRow,
   type TafsirPassageRow,
 } from "@/lib/tafsir-content";
+import { fetchAsbabFromApi, fetchTafsirFromApi } from "@/lib/tafsir-api.functions";
 import { normalizeLocale, type Locale } from "@/lib/i18n";
 import { useMemo } from "react";
 import { localeTextDir, readingFontClass, tafsirFontClass, uiFontClass } from "@/lib/locale-ui";
@@ -47,6 +49,8 @@ function EntityPage() {
   const readingClass = readingFontClass(locale);
   const tafsirClass = tafsirFontClass(locale);
   const textDir = localeTextDir(locale);
+  const tafsirApiFn = useServerFn(fetchTafsirFromApi);
+  const asbabApiFn = useServerFn(fetchAsbabFromApi);
 
   if (!VALID.includes(kind as EntityKind)) throw notFound();
 
@@ -84,8 +88,13 @@ function EntityPage() {
     queryFn: async () => {
       const out: TafsirPassageRow[] = [];
       for (const v of anchorVerses) {
-        const rows = await getTafsirForVerse(v.surah, v.ayah_start, locale);
-        out.push(...rows);
+        const rows = await tafsirApiFn({ data: { surah: v.surah, ayah: v.ayah_start, lang: locale } });
+        if ((rows ?? []).length > 0) {
+          out.push(...rows);
+          continue;
+        }
+        const dbRows = await getTafsirForVerse(v.surah, v.ayah_start, locale);
+        out.push(...dbRows);
       }
       return out;
     },
@@ -103,8 +112,13 @@ function EntityPage() {
     queryFn: async () => {
       const out: AsbabRow[] = [];
       for (const v of anchorVerses) {
-        const rows = await getAsbabForVerse(v.surah, v.ayah_start, locale);
-        out.push(...rows);
+        const rows = await asbabApiFn({ data: { surah: v.surah, ayah: v.ayah_start, lang: locale } });
+        if ((rows ?? []).length > 0) {
+          out.push(...rows);
+          continue;
+        }
+        const dbRows = await getAsbabForVerse(v.surah, v.ayah_start, locale);
+        out.push(...dbRows);
       }
       return out;
     },
