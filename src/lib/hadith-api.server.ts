@@ -247,10 +247,13 @@ export async function fetchHadithByGlobalNumber(args: {
   collection: "bukhari" | "muslim";
   num: number;
 }): Promise<HadithApiEntry | null> {
-  const payload = await sunnahFetch<SunnahHadithRecord | { data?: SunnahHadithRecord }>(
+  const payload = await sunnahFetch<unknown>(
     `/collections/${args.collection}/hadiths/${args.num}`,
   );
-  const row = "data" in payload ? payload.data : payload;
+  const row =
+    payload && typeof payload === "object" && "data" in payload
+      ? (payload as { data?: SunnahHadithRecord }).data
+      : (payload as SunnahHadithRecord);
   if (!row) return null;
   return mapHadithRecord(row);
 }
