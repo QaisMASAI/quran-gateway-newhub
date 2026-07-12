@@ -1,5 +1,5 @@
 import { createLazyFileRoute, Link } from "@tanstack/react-router";
-import { useMemo, useState, useDeferredValue } from "react";
+import { useMemo, useState, useDeferredValue, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { buildQuranIndex, chapterDisplayName, type SurahGroup } from "@/lib/quran-api";
@@ -85,9 +85,15 @@ function SearchPage() {
 
   const hadithItems = hadithQ.data?.items ?? [];
 
-  if (hadithPage !== 0 && hadithItems.length === 0 && !hadithQ.isFetching) {
+  useEffect(() => {
+    if (hadithPage !== 0 && hadithItems.length === 0 && !hadithQ.isFetching) {
+      setHadithPage(0);
+    }
+  }, [hadithItems.length, hadithPage, hadithQ.isFetching]);
+
+  useEffect(() => {
     setHadithPage(0);
-  }
+  }, [trimmed]);
 
   const results = useMemo(() => {
     if (!indexQ.data) return null;
