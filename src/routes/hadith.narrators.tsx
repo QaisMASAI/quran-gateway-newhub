@@ -27,7 +27,7 @@ function NarratorsPage() {
   const { i18n } = useTranslation();
   const isRtl = i18n.dir() === "rtl";
   const fn = useServerFn(listTopNarrators);
-  const { data = [] } = useQuery({
+  const { data = [], isLoading, isError, refetch } = useQuery({
     queryKey: ["hadith", "narrators", 100],
     queryFn: () => fn({ data: { limit: 100 } }),
   });
@@ -40,6 +40,19 @@ function NarratorsPage() {
         <p className="mt-1 text-sm text-muted-foreground">
           Most frequent narrators across Bukhari and Muslim.
         </p>
+        {isLoading && <p className="mt-4 text-sm text-muted-foreground">Loading narrators…</p>}
+        {isError && (
+          <p className="mt-4 rounded-lg border border-destructive/30 bg-destructive/5 p-3 text-sm text-destructive">
+            Failed to load narrators.
+            <button
+              type="button"
+              onClick={() => void refetch()}
+              className="ms-2 underline underline-offset-2"
+            >
+              Retry
+            </button>
+          </p>
+        )}
         <ol className="mt-6 space-y-2">
           {data.map((n, i) => (
             <li
@@ -55,6 +68,9 @@ function NarratorsPage() {
               </div>
             </li>
           ))}
+          {!isLoading && !isError && data.length === 0 && (
+            <li className="text-sm text-muted-foreground">No narrators found.</li>
+          )}
         </ol>
       </main>
     </div>

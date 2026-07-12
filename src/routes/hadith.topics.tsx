@@ -23,11 +23,16 @@ function HadithTopicsPage() {
   const isRtl = i18n.dir() === "rtl";
   const fn = useServerFn(listHadithTopicBooks);
   const topicsFn = useServerFn(listHadithTopics);
-  const { data = [] } = useQuery({
+  const { data = [], isLoading: booksLoading, isError: booksError, refetch: refetchBooks } = useQuery({
     queryKey: ["hadith", "topic-books"],
     queryFn: () => fn({ data: { limitPerCollection: 10 } }),
   });
-  const { data: topics = [] } = useQuery({
+  const {
+    data: topics = [],
+    isLoading: topicsLoading,
+    isError: topicsError,
+    refetch: refetchTopics,
+  } = useQuery({
     queryKey: ["hadith", "topics"],
     queryFn: () => topicsFn({ data: { limit: 24 } }),
   });
@@ -50,6 +55,25 @@ function HadithTopicsPage() {
               ? "تصفح كتب الحديث الأبرز في كل مجموعة كموضوعات تعلم."
               : "Browse the top hadith books in each collection as learning topics."}
         </p>
+
+        {(booksLoading || topicsLoading) && (
+          <p className="mt-4 text-sm text-muted-foreground">Loading topic data…</p>
+        )}
+        {(booksError || topicsError) && (
+          <p className="mt-4 rounded-lg border border-destructive/30 bg-destructive/5 p-3 text-sm text-destructive">
+            Failed to load hadith topics.
+            <button
+              type="button"
+              onClick={() => {
+                void refetchBooks();
+                void refetchTopics();
+              }}
+              className="ms-2 underline underline-offset-2"
+            >
+              Retry
+            </button>
+          </p>
+        )}
 
         {topics.length > 0 ? (
           <div className="mt-6">
