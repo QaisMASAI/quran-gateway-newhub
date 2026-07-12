@@ -9,6 +9,8 @@ type SunnahLangItem = {
   body?: string;
 };
 
+import { normalizeArabic, normalizeEnglish } from "@/utils/normalize";
+
 type SunnahCollection = {
   name: string;
   hasBooks?: boolean;
@@ -76,6 +78,10 @@ export type HadithApiEntry = {
 };
 
 const SUNNAH_BASE = "https://api.sunnah.com/v1";
+const DEFAULT_CACHE_TTL_MS = 5 * 60_000;
+
+const requestCache = new Map<string, { expiresAt: number; data: unknown }>();
+const inFlightRequests = new Map<string, Promise<unknown>>();
 
 function getApiKey() {
   const key = process.env.SUNNAH_API_KEY;
@@ -92,6 +98,7 @@ export function normalizeHadithCollection(collection: string): "bukhari" | "musl
 async function sunnahFetch<T>(
   path: string,
   searchParams?: Record<string, string | number | null | undefined>,
+  options?: { ttlMs?: number },
 ): Promise<T> {
   const key = getApiKey();
   const url = new URL(`${SUNNAH_BASE}${path}`);
@@ -100,20 +107,60 @@ async function sunnahFetch<T>(
     url.searchParams.set(k, String(v));
   }
 
-  const response = await fetch(url.toString(), {
-    method: "GET",
-    headers: {
-      Accept: "application/json",
-      "X-API-Key": key,
-    },
-  });
-
-  if (!response.ok) {
-    const body = await response.text().catch(() => "");
-    throw new Error(`sunnah_api_${response.status}:${body.slice(0, 200)}`);
+  const cacheKey = `sunnah:${url.toString()}`;
+  const ttlMs = options?.ttlMs ?? DEFAULT_CACHE_TTL_MS;
+  const now = Date.now();
+  const cached = requestCache.get(cacheKey);
+  if (cached && cached.expiresAt > now) {
+    return cached.data as T;
   }
 
-  return (await response.json()) as T;
+  const running = inFlightRequests.get(cacheKey);
+  if (running) {
+    return (await running) as T;
+  }
+
+  const run = (async () => {
+    let lastError: Error | null = null;
+    for (let attempt = 0; attempt < 3; attempt += 1) {
+      try {
+        const response = await fetch(url.toString(), {
+          method: "GET",
+          headers: {
+            Accept: "application/json",
+            "X-API-Key": key,
+          },
+        });
+
+        if (!response.ok) {
+          const body = await response.text().catch(() => "");
+          const message = `sunnah_api_${response.status}:${body.slice(0, 200)}`;
+          if (response.status >= 500 && attempt < 2) {
+            await new Promise((resolve) => setTimeout(resolve, 150 * (attempt + 1)));
+            continue;
+          }
+          throw new Error(message);
+        }
+
+        const parsed = (await response.json()) as T;
+        requestCache.set(cacheKey, { expiresAt: Date.now() + ttlMs, data: parsed });
+        return parsed;
+      } catch (error) {
+        lastError = error instanceof Error ? error : new Error(String(error));
+        if (attempt < 2) {
+          await new Promise((resolve) => setTimeout(resolve, 150 * (attempt + 1)));
+        }
+      }
+    }
+    throw lastError ?? new Error("sunnah_api_failed");
+  })();
+
+  inFlightRequests.set(cacheKey, run);
+  try {
+    return (await run) as T;
+  } finally {
+    inFlightRequests.delete(cacheKey);
+  }
 }
 
 function pickLocalized(items: SunnahLangItem[] | undefined, lang: string, key: "title" | "name") {
@@ -145,7 +192,7 @@ export async function fetchHadithCollections(): Promise<HadithApiCollection[]> {
   const payload = await sunnahFetch<SunnahPage<SunnahCollection>>("/collections", {
     page: 1,
     limit: 100,
-  });
+  }, { ttlMs: 10 * 60_000 });
 
   const data = (payload.data ?? []).filter((row) => normalizeHadithCollection(row.name));
   return data
@@ -179,7 +226,7 @@ export async function fetchHadithBooks(collection: "bukhari" | "muslim"): Promis
     const payload = await sunnahFetch<SunnahPage<SunnahBook>>(`/collections/${collection}/books`, {
       page,
       limit: 100,
-    });
+    }, { ttlMs: 10 * 60_000 });
     rows.push(...(payload.data ?? []));
     if (!payload.next) break;
   }
@@ -235,6 +282,7 @@ export async function fetchHadithBookEntries(args: {
       page: args.page + 1,
       limit: args.pageSize,
     },
+    { ttlMs: 3 * 60_000 },
   );
 
   return {
@@ -249,6 +297,8 @@ export async function fetchHadithByGlobalNumber(args: {
 }): Promise<HadithApiEntry | null> {
   const payload = await sunnahFetch<unknown>(
     `/collections/${args.collection}/hadiths/${args.num}`,
+    undefined,
+    { ttlMs: 10 * 60_000 },
   );
   const row =
     payload && typeof payload === "object" && "data" in payload
@@ -258,41 +308,82 @@ export async function fetchHadithByGlobalNumber(args: {
   return mapHadithRecord(row);
 }
 
+function normalizeHadithSearchText(input: string): string {
+  const ar = normalizeArabic(input).toLowerCase();
+  const en = normalizeEnglish(input).toLowerCase();
+  return `${ar} ${en}`.replace(/\s+/g, " ").trim();
+}
+
+function tokenizeSearch(input: string): string[] {
+  return normalizeHadithSearchText(input)
+    .split(/\s+/)
+    .map((t) => t.trim())
+    .filter((t) => t.length > 1)
+    .slice(0, 10);
+}
+
 export async function fetchHadithSearch(args: {
   q: string;
   collections?: string[];
-  limit: number;
-}): Promise<HadithApiEntry[]> {
-  const q = args.q.trim().toLowerCase();
+  page: number;
+  pageSize: number;
+}): Promise<{ items: HadithApiEntry[]; total: number; hasMore: boolean }> {
+  const q = args.q.trim();
   if (!q) return [];
 
   const wanted = (args.collections?.map(normalizeHadithCollection).filter(Boolean) as Array<
     "bukhari" | "muslim"
   >) ?? ["bukhari", "muslim"];
 
+  const tokens = tokenizeSearch(q);
+  if (tokens.length === 0) return { items: [], total: 0, hasMore: false };
+
   const matches = new Map<number, { row: HadithApiEntry; score: number }>();
+  const scanHardLimitReached = { value: false };
   for (const collection of wanted) {
-    for (let page = 1; page <= 3; page += 1) {
+    for (let page = 1; page <= 6; page += 1) {
       const payload = await sunnahFetch<SunnahPage<SunnahHadithRecord>>("/hadiths", {
         collection,
         page,
         limit: 100,
       });
       for (const row of (payload.data ?? []).map(mapHadithRecord)) {
-        const text = `${row.english_text ?? ""}\n${row.arabic_text}`.toLowerCase();
-        if (!text.includes(q)) continue;
-        const score = (text.startsWith(q) ? 2 : 0) + (row.english_text?.toLowerCase().includes(q) ? 2 : 1);
+        const english = normalizeEnglish(row.english_text ?? "").toLowerCase();
+        const arabic = normalizeArabic(row.arabic_text).toLowerCase();
+        const text = `${english} ${arabic}`.replace(/\s+/g, " ").trim();
+        if (!tokens.every((t) => text.includes(t))) continue;
+
+        const phraseNorm = normalizeHadithSearchText(q);
+        const score =
+          (text.includes(phraseNorm) ? 4 : 0) +
+          (english.includes(phraseNorm) ? 2 : 0) +
+          (arabic.includes(phraseNorm) ? 2 : 0) +
+          Math.max(0, 4 - Math.abs((row.id_in_book ?? 0) - 1) / 1000);
         const prev = matches.get(row.id);
         if (!prev || score > prev.score) matches.set(row.id, { row, score });
       }
-      if (!payload.next || matches.size >= args.limit * 2) break;
+      if (!payload.next) break;
+      if (matches.size >= (args.page + 2) * args.pageSize * 3) {
+        scanHardLimitReached.value = true;
+        break;
+      }
     }
   }
 
-  return [...matches.values()]
+  const sorted = [...matches.values()]
     .sort((a, b) => b.score - a.score || b.row.global_id - a.row.global_id)
-    .slice(0, args.limit)
     .map((v) => v.row);
+
+  const start = args.page * args.pageSize;
+  const end = start + args.pageSize;
+  const items = sorted.slice(start, end);
+  const hasMore = end < sorted.length || scanHardLimitReached.value;
+
+  return {
+    items,
+    total: sorted.length,
+    hasMore,
+  };
 }
 
 export async function fetchTopNarrators(limit: number) {
@@ -305,7 +396,7 @@ export async function fetchTopNarrators(limit: number) {
         collection,
         page,
         limit: 100,
-      });
+      }, { ttlMs: 7 * 60_000 });
       for (const row of payload.data ?? []) {
         const mapped = mapHadithRecord(row);
         if (!mapped.narrator) continue;
