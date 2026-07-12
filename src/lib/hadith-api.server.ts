@@ -329,7 +329,7 @@ export async function fetchHadithSearch(args: {
   pageSize: number;
 }): Promise<{ items: HadithApiEntry[]; total: number; hasMore: boolean }> {
   const q = args.q.trim();
-  if (!q) return [];
+  if (!q) return { items: [], total: 0, hasMore: false };
 
   const wanted = (args.collections?.map(normalizeHadithCollection).filter(Boolean) as Array<
     "bukhari" | "muslim"
