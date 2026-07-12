@@ -285,7 +285,7 @@ function SearchPage() {
                 disabled={hadithPage === 0 || hadithQ.isFetching}
                 className="rounded-lg border border-border px-3 py-1.5 text-xs text-foreground disabled:opacity-50"
               >
-                {t("common.previous", "Previous")}
+                Previous
               </button>
               <span className="text-xs text-muted-foreground">
                 {hadithQ.data?.total
@@ -298,7 +298,7 @@ function SearchPage() {
                 disabled={!hadithQ.data?.hasMore || hadithQ.isFetching}
                 className="rounded-lg border border-border px-3 py-1.5 text-xs text-foreground disabled:opacity-50"
               >
-                {t("common.next", "Next")}
+                Next
               </button>
             </div>
           </section>
