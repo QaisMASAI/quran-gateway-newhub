@@ -7,7 +7,18 @@ import { searchWithFallback } from "@/lib/quran-search";
 import { useServerFn } from "@tanstack/react-start";
 import { searchQuranItemsHybrid } from "@/lib/hybrid-search.functions";
 import { Header } from "@/components/Header";
-import { Search as SearchIcon, Loader2, ChevronLeft, ChevronRight, BookOpen } from "lucide-react";
+import {
+  Search as SearchIcon,
+  Loader2,
+  ChevronLeft,
+  ChevronRight,
+  BookOpen,
+  Sparkles,
+  Brain,
+  Library,
+  Users,
+  MapPin,
+} from "lucide-react";
 import { searchEntities, searchKnowledgeTexts, type EntityKind } from "@/lib/knowledge";
 import { searchHadith } from "@/lib/hadith.functions";
 import { EntityCard } from "@/components/discovery/EntityCard";
@@ -103,6 +114,26 @@ function SearchPage() {
 
   const suggestions = t("search.suggestions", { returnObjects: true }) as string[];
 
+  const quickSuggestions = useMemo(
+    () =>
+      locale === "ar"
+        ? ["الرحمة", "الصبر", "موسى", "إبراهيم", "العدل", "التوبة"]
+        : locale === "he"
+          ? ["רחמים", "סבלנות", "משה", "אברהם", "צדק", "תשובה"]
+          : ["mercy", "patience", "Musa", "Abraham", "justice", "repentance"],
+    [locale],
+  );
+
+  const groupedResultCounts = useMemo(
+    () => ({
+      verses: (results?.total ?? 0) + (quranItemsQ.data?.hits.length ?? 0),
+      tafsir: textsQ.data?.length ?? 0,
+      hadith: hadithItems.length,
+      entities: entitiesQ.data?.length ?? 0,
+    }),
+    [results?.total, quranItemsQ.data?.hits.length, textsQ.data?.length, hadithItems.length, entitiesQ.data?.length],
+  );
+
   const kindLabel = (k: EntityKind) =>
     t(`search.kind${k.charAt(0).toUpperCase()}${k.slice(1)}` as const);
 
@@ -112,25 +143,60 @@ function SearchPage() {
 
       <div className="border-b border-border bg-gradient-to-b from-primary-soft/40 to-transparent">
         <div className="mx-auto max-w-3xl px-4 pb-2 pt-8 sm:px-6">
-          <h1 className="text-2xl font-bold text-foreground">{t("search.title")}</h1>
+          <h1 className="text-2xl font-bold text-foreground">
+            {locale === "ar" ? "المساعد الذكي للمعرفة" : locale === "he" ? "עוזר הידע החכם" : "Intelligent Knowledge Assistant"}
+          </h1>
           <p className="mt-1 text-sm text-muted-foreground">{t("search.subtitle")}</p>
         </div>
         <div className="mosque-arch" aria-hidden />
       </div>
 
       <main id="main" className="mx-auto max-w-3xl px-4 py-6 sm:px-6">
-        <div className="surface-card flex items-center gap-2 px-3 py-2.5">
-          <SearchIcon className="h-4 w-4 text-muted-foreground" />
-          <input
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            placeholder={t("search.placeholder")}
-            aria-label={t("search.placeholder")}
-            className="flex-1 bg-transparent text-base outline-none placeholder:text-muted-foreground/70"
-            dir="auto"
-          />
-          {indexQ.isFetching && <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />}
+        <div className="surface-card border-primary/20 bg-gradient-to-br from-card to-primary-soft/20 px-4 py-4">
+          <div className="mb-2 flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-primary">
+            <Sparkles className="h-3.5 w-3.5" />
+            {locale === "ar" ? "بحث دلالي" : locale === "he" ? "חיפוש סמנטי" : "Semantic Search"}
+          </div>
+          <div className="flex items-center gap-2 rounded-xl border border-border bg-background px-3 py-2.5">
+            <SearchIcon className="h-4 w-4 text-muted-foreground" />
+            <input
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              placeholder={t("search.placeholder")}
+              aria-label={t("search.placeholder")}
+              className="flex-1 bg-transparent text-base outline-none placeholder:text-muted-foreground/70"
+              dir="auto"
+              list="search-suggestions"
+            />
+            {indexQ.isFetching && <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />}
+            <datalist id="search-suggestions">
+              {[...suggestions, ...quickSuggestions].map((s) => (
+                <option key={s} value={s} />
+              ))}
+            </datalist>
+          </div>
+          <div className="mt-3 flex flex-wrap gap-2">
+            {quickSuggestions.map((s) => (
+              <button
+                key={s}
+                type="button"
+                onClick={() => setInput(s)}
+                className="rounded-full border border-border bg-background px-2.5 py-1 text-xs text-foreground hover:border-primary/40"
+              >
+                {s}
+              </button>
+            ))}
+          </div>
         </div>
+
+        {trimmed.length >= 2 && (
+          <section className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-4">
+            <ResultPill icon={<BookOpen className="h-3.5 w-3.5" />} label="Verses" value={groupedResultCounts.verses} />
+            <ResultPill icon={<Library className="h-3.5 w-3.5" />} label="Tafsir" value={groupedResultCounts.tafsir} />
+            <ResultPill icon={<Brain className="h-3.5 w-3.5" />} label="Hadith" value={groupedResultCounts.hadith} />
+            <ResultPill icon={<Users className="h-3.5 w-3.5" />} label="Knowledge" value={groupedResultCounts.entities} />
+          </section>
+        )}
 
         {indexQ.isLoading && (
           <p
@@ -197,6 +263,20 @@ function SearchPage() {
                     {row.text.slice(0, 220)}
                     {row.text.length > 220 ? "…" : ""}
                   </p>
+                    {(row.kind === "tafsir" || row.kind === "asbab") && row.surah && row.ayah_start ? (
+                      <Link
+                        to="/surah/$id"
+                        params={{ id: String(row.surah) }}
+                        hash={`v-${row.ayah_start}`}
+                        className="mt-2 inline-flex text-xs font-medium text-primary hover:underline"
+                      >
+                        {locale === "ar"
+                          ? "افتح في السورة"
+                          : locale === "he"
+                            ? "פתח בסורה"
+                            : "Open in surah"}
+                      </Link>
+                    ) : null}
                 </article>
               ))}
             </div>
@@ -304,6 +384,25 @@ function SearchPage() {
           </section>
         )}
 
+        {trimmed.length >= 2 && (
+          <section className="mt-8 rounded-xl border border-border bg-card/60 p-4">
+            <h2 className="text-sm font-semibold text-foreground">
+              {locale === "ar"
+                ? "شفافية المصادر"
+                : locale === "he"
+                  ? "שקיפות מקורות"
+                  : "Source Transparency"}
+            </h2>
+            <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
+              {locale === "ar"
+                ? "النصوص القرآنية والحديثية والتفسيرية تُعرض كما هي مع الإحالات. أي تلخيص ذكي يُعرض منفصلًا بوضوح."
+                : locale === "he"
+                  ? "טקסטי קוראן, חדית' ותפסיר מוצגים כמקור עם הפניות. כל סיכום חכם מוצג בנפרד ובסימון ברור."
+                  : "Quran, Hadith, and Tafsir source text is shown as-is with references; any AI summarization is clearly separated."}
+            </p>
+          </section>
+        )}
+
         {results && (
           <div className="mt-6 space-y-6">
             {results.chapterMatches.length > 0 && (
@@ -365,6 +464,18 @@ function SearchPage() {
           </div>
         )}
       </main>
+    </div>
+  );
+}
+
+function ResultPill({ icon, label, value }: { icon: ReactNode; label: string; value: number }) {
+  return (
+    <div className="rounded-lg border border-border bg-card px-3 py-2">
+      <div className="mb-0.5 inline-flex items-center gap-1 text-[11px] text-muted-foreground">
+        {icon}
+        {label}
+      </div>
+      <div className="text-sm font-semibold text-foreground">{value.toLocaleString()}</div>
     </div>
   );
 }
