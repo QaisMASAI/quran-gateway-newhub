@@ -3,7 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useTranslation } from "react-i18next";
 import { Header } from "@/components/Header";
-import { listHadithTopicBooks, listHadithTopics } from "@/lib/hadith.functions";
+import { listHadithTopicBooks, listHadithTopics, trackHadithTelemetryEvent } from "@/lib/hadith.functions";
 import { pickLocale } from "@/lib/knowledge";
 import { normalizeLocale } from "@/lib/i18n";
 
@@ -23,6 +23,7 @@ function HadithTopicsPage() {
   const isRtl = i18n.dir() === "rtl";
   const fn = useServerFn(listHadithTopicBooks);
   const topicsFn = useServerFn(listHadithTopics);
+  const trackTelemetry = useServerFn(trackHadithTelemetryEvent);
   const { data = [], isLoading: booksLoading, isError: booksError, refetch: refetchBooks } = useQuery({
     queryKey: ["hadith", "topic-books"],
     queryFn: () => fn({ data: { limitPerCollection: 10 } }),
@@ -90,6 +91,9 @@ function HadithTopicsPage() {
                   key={topic.id}
                   to="/learn/$kind/$slug"
                   params={{ kind: "topic", slug: topic.slug }}
+                  onClick={() => {
+                    void trackTelemetry({ data: { event: "topic_card_click", slug: topic.slug, route: "/hadith/topics" } });
+                  }}
                   className="surface-card block p-4 transition-colors hover:border-primary/40"
                 >
                   <div className="text-sm font-semibold text-foreground">
