@@ -654,19 +654,46 @@ export const trackHadithTelemetryEvent = createServerFn({ method: "POST" })
   .inputValidator((input: unknown) => HadithTelemetryEventSchema.parse(input))
   .handler(async ({ data }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    await supabaseAdmin.from("admin_audit_log").insert({
-      actor_user_id: null,
-      target_user_id: null,
-      action: `hadith_${data.event}`,
-      old_value: null,
-      new_value: null,
-      ip_address: null,
-      user_agent: null,
-      metadata: {
-        slug: data.slug ?? null,
-        route: data.route ?? null,
-      } as never,
-    });
+    const bucketDate = new Date().toISOString().slice(0, 10);
+    const key = `hadith_telemetry_${bucketDate}`;
+    const { data: current } = await supabaseAdmin
+      .from("admin_runtime_settings")
+      .select("value_json")
+      .eq("key", key)
+      .maybeSingle();
+
+    const value = (current?.value_json ?? {
+      topic_card_click: 0,
+      learn_not_found: 0,
+      topic_clicks_by_slug: {},
+      routes_not_found: {},
+    }) as {
+      topic_card_click?: number;
+      learn_not_found?: number;
+      topic_clicks_by_slug?: Record<string, number>;
+      routes_not_found?: Record<string, number>;
+    };
+
+    if (data.event === "topic_card_click") {
+      value.topic_card_click = (value.topic_card_click ?? 0) + 1;
+      const slug = data.slug ?? "unknown";
+      value.topic_clicks_by_slug = value.topic_clicks_by_slug ?? {};
+      value.topic_clicks_by_slug[slug] = (value.topic_clicks_by_slug[slug] ?? 0) + 1;
+    }
+    if (data.event === "learn_not_found") {
+      value.learn_not_found = (value.learn_not_found ?? 0) + 1;
+      const route = data.route ?? "unknown";
+      value.routes_not_found = value.routes_not_found ?? {};
+      value.routes_not_found[route] = (value.routes_not_found[route] ?? 0) + 1;
+    }
+
+    await supabaseAdmin.from("admin_runtime_settings").upsert(
+      {
+        key,
+        value_json: value as never,
+      },
+      { onConflict: "key" },
+    );
     return { ok: true as const };
   });
 
@@ -674,27 +701,22 @@ export const getHadithTelemetrySnapshot = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async (): Promise<HadithTelemetrySnapshot> => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const sinceIso = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
-    const { data: rows } = await supabaseAdmin
-      .from("admin_audit_log")
-      .select("action,metadata,created_at")
-      .in("action", ["hadith_topic_card_click", "hadith_learn_not_found"])
-      .gte("created_at", sinceIso)
-      .order("created_at", { ascending: false })
-      .limit(1000);
+    const bucketDate = new Date().toISOString().slice(0, 10);
+    const key = `hadith_telemetry_${bucketDate}`;
+    const { data: current } = await supabaseAdmin
+      .from("admin_runtime_settings")
+      .select("value_json")
+      .eq("key", key)
+      .maybeSingle();
 
-    const topicRows = (rows ?? []).filter((r) => r.action === "hadith_topic_card_click");
-    const notFoundRows = (rows ?? []).filter((r) => r.action === "hadith_learn_not_found");
+    const value = (current?.value_json ?? {}) as {
+      topic_card_click?: number;
+      learn_not_found?: number;
+      topic_clicks_by_slug?: Record<string, number>;
+    };
 
-    const slugCounts = new Map<string, number>();
-    for (const row of topicRows) {
-      const meta = (row.metadata ?? {}) as { slug?: string };
-      const slug = meta.slug || "unknown";
-      slugCounts.set(slug, (slugCounts.get(slug) ?? 0) + 1);
-    }
-
-    const totalTopicClicks24h = topicRows.length;
-    const totalLearnNotFound24h = notFoundRows.length;
+    const totalTopicClicks24h = value.topic_card_click ?? 0;
+    const totalLearnNotFound24h = value.learn_not_found ?? 0;
     const notFoundRatePercent = totalTopicClicks24h
       ? Math.round((totalLearnNotFound24h / totalTopicClicks24h) * 1000) / 10
       : 0;
@@ -718,8 +740,8 @@ export const getHadithTelemetrySnapshot = createServerFn({ method: "GET" })
     return {
       totalTopicClicks24h,
       totalLearnNotFound24h,
-      topicClicksBySlug: [...slugCounts.entries()]
-        .map(([slug, count]) => ({ slug, count }))
+      topicClicksBySlug: Object.entries(value.topic_clicks_by_slug ?? {})
+        .map(([slug, count]) => ({ slug, count: Number(count) || 0 }))
         .sort((a, b) => b.count - a.count)
         .slice(0, 12),
       notFoundRatePercent,
