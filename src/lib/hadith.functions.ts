@@ -3,6 +3,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { generateText } from "ai";
 import { createLovableAiGatewayProvider } from "@/lib/ai-gateway.server";
+import type { Database } from "@/integrations/supabase/types";
 import {
   fetchHadithBookEntries,
   fetchHadithBooks,
@@ -198,28 +199,29 @@ export const getHadithKnowledgeBundle = createServerFn({ method: "GET" })
     const entry = (await fetchHadithByGlobalNumber({ collection, num: data.num })) as HadithEntry | null;
     if (!entry || entry.collection_slug !== collection) return null;
 
-    const [collections, relatedHadith] = await Promise.all([
+    const [collections, books, relatedHadithResult] = await Promise.all([
       fetchHadithCollections(),
+      fetchHadithBooks(collection),
       entry.narrator
-        ? fetchHadithSearch({ q: entry.narrator, page: 0, pageSize: 8 }).then((result) =>
-            result.items.filter((r) => r.id !== entry.id),
-          )
-        : Promise.resolve([] as HadithEntry[]),
+        ? fetchHadithSearch({ q: entry.narrator, page: 0, pageSize: 8 })
+        : Promise.resolve({ items: [] as HadithEntry[], total: 0, hasMore: false }),
     ]);
+
+    const relatedHadith = relatedHadithResult.items.filter((r) => r.id !== entry.id);
 
     const collectionMeta = collections.find((c) => c.slug === entry.collection_slug) ?? null;
 
     const collectionData: HadithCollection | null = collectionMeta
       ? {
           ...collectionMeta,
-          total_books: 0,
+          total_books: books.length,
         }
       : null;
 
     const narrator: HadithNarratorProfile | null = entry.narrator
       ? {
           narrator: entry.narrator,
-          hadith_count: 0,
+          hadith_count: Math.max(relatedHadithResult.total, 1),
           collections: [entry.collection_slug],
         }
       : null;
@@ -381,21 +383,45 @@ export const listHadithTopics = createServerFn({ method: "GET" })
       .parse(input ?? {}),
   )
   .handler(async ({ data }): Promise<HadithTopic[]> => {
-    const books = await Promise.all([
-      fetchHadithBooks("bukhari"),
-      fetchHadithBooks("muslim"),
-    ]).then((all) => all.flat());
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
-    const topBooks = books.sort((a, b) => b.hadith_count - a.hadith_count).slice(0, data.limit);
+    const { data: rows } = await supabaseAdmin
+      .from("knowledge_entities")
+      .select("id,slug,title_i18n")
+      .eq("published", true)
+      .eq("kind", "topic")
+      .order("sort_order", { ascending: true })
+      .limit(data.limit);
 
-    return topBooks.map((book) => ({
-      id: `${book.collection_slug}-${book.book_id}`,
-      slug: `${book.collection_slug}-book-${book.book_id}`,
-      title_i18n: {
-        en: `${collectionLabel(book.collection_slug)} — ${book.name_en}`,
-        ar: book.name_ar,
-      },
-      hadith_count: book.hadith_count,
-      collections: [book.collection_slug],
-    }));
+    type TopicEntityRow = Pick<
+      Database["public"]["Tables"]["knowledge_entities"]["Row"],
+      "id" | "slug" | "title_i18n"
+    >;
+
+    const topicRows = (rows ?? []) as TopicEntityRow[];
+    if (topicRows.length === 0) return [];
+
+    const fallbackBooks = await Promise.all([fetchHadithBooks("bukhari"), fetchHadithBooks("muslim")]).then(
+      (all) => all.flat().sort((a, b) => b.hadith_count - a.hadith_count),
+    );
+
+    return topicRows.map((topic, index) => {
+      const fallbackCount = fallbackBooks[index]?.hadith_count ?? 0;
+      const title = topic.title_i18n;
+      const titleI18n =
+        title && typeof title === "object" && !Array.isArray(title)
+          ? {
+              he: typeof title.he === "string" ? title.he : undefined,
+              ar: typeof title.ar === "string" ? title.ar : undefined,
+              en: typeof title.en === "string" ? title.en : undefined,
+            }
+          : {};
+      return {
+        id: topic.id,
+        slug: topic.slug,
+        title_i18n: titleI18n,
+        hadith_count: fallbackCount,
+        collections: ["bukhari", "muslim"],
+      };
+    });
   });
