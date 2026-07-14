@@ -17,7 +17,6 @@ import {
   Brain,
   Library,
   Users,
-  MapPin,
 } from "lucide-react";
 import { searchEntities, searchKnowledgeTexts, type EntityKind } from "@/lib/knowledge";
 import { searchHadith } from "@/lib/hadith.functions";
@@ -130,8 +129,13 @@ function SearchPage() {
       tafsir: textsQ.data?.length ?? 0,
       hadith: hadithItems.length,
       entities: entitiesQ.data?.length ?? 0,
+      prophets: (entitiesQ.data ?? []).filter((e) => e.kind === "prophet").length,
+      stories: (entitiesQ.data ?? []).filter((e) => e.kind === "story").length,
+      topics: (entitiesQ.data ?? []).filter((e) => e.kind === "topic").length,
+      places: (entitiesQ.data ?? []).filter((e) => e.kind === "place").length,
+      people: (entitiesQ.data ?? []).filter((e) => e.kind === "nation").length,
     }),
-    [results?.total, quranItemsQ.data?.hits.length, textsQ.data?.length, hadithItems.length, entitiesQ.data?.length],
+    [results?.total, quranItemsQ.data?.hits.length, textsQ.data?.length, hadithItems.length, entitiesQ.data],
   );
 
   const kindLabel = (k: EntityKind) =>
@@ -195,6 +199,16 @@ function SearchPage() {
             <ResultPill icon={<Library className="h-3.5 w-3.5" />} label="Tafsir" value={groupedResultCounts.tafsir} />
             <ResultPill icon={<Brain className="h-3.5 w-3.5" />} label="Hadith" value={groupedResultCounts.hadith} />
             <ResultPill icon={<Users className="h-3.5 w-3.5" />} label="Knowledge" value={groupedResultCounts.entities} />
+          </section>
+        )}
+
+        {trimmed.length >= 2 && (
+          <section className="mt-2 flex flex-wrap gap-1.5">
+            <CategoryChip label="Prophets" value={groupedResultCounts.prophets} />
+            <CategoryChip label="Stories" value={groupedResultCounts.stories} />
+            <CategoryChip label="Topics" value={groupedResultCounts.topics} />
+            <CategoryChip label="Places" value={groupedResultCounts.places} />
+            <CategoryChip label="People" value={groupedResultCounts.people} />
           </section>
         )}
 
@@ -477,6 +491,15 @@ function ResultPill({ icon, label, value }: { icon: ReactNode; label: string; va
       </div>
       <div className="text-sm font-semibold text-foreground">{value.toLocaleString()}</div>
     </div>
+  );
+}
+
+function CategoryChip({ label, value }: { label: string; value: number }) {
+  return (
+    <span className="inline-flex items-center gap-1 rounded-full border border-border bg-card px-2.5 py-1 text-[11px] text-muted-foreground">
+      <span>{label}</span>
+      <span className="font-semibold text-foreground">{value.toLocaleString()}</span>
+    </span>
   );
 }
 
