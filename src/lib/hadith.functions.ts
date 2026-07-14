@@ -119,18 +119,22 @@ function collectionLabel(slug: string) {
 
 export const listHadithCollections = createServerFn({ method: "GET" }).handler(
   async (): Promise<HadithCollection[]> => {
-    const collections = await fetchHadithCollections();
-    const booksByCollection = await Promise.all(
-      collections.map(async (row) => {
-        const books = await fetchHadithBooks(row.slug as "bukhari" | "muslim");
-        return [row.slug, books.length] as const;
-      }),
-    );
-    const map = new Map(booksByCollection);
-    return collections.map((row) => ({
-      ...row,
-      total_books: map.get(row.slug) ?? 0,
-    }));
+    try {
+      const collections = await fetchHadithCollections();
+      const booksByCollection = await Promise.all(
+        collections.map(async (row) => {
+          const books = await fetchHadithBooks(row.slug as "bukhari" | "muslim");
+          return [row.slug, books.length] as const;
+        }),
+      );
+      const map = new Map(booksByCollection);
+      return collections.map((row) => ({
+        ...row,
+        total_books: map.get(row.slug) ?? 0,
+      }));
+    } catch {
+      return [];
+    }
   },
 );
 
@@ -139,9 +143,13 @@ export const listHadithBooks = createServerFn({ method: "GET" })
     z.object({ collection: z.string().min(1).max(40) }).parse(input),
   )
   .handler(async ({ data }): Promise<HadithBook[]> => {
-    const collection = normalizeHadithCollection(data.collection);
-    if (!collection) return [];
-    return (await fetchHadithBooks(collection)) as HadithBook[];
+    try {
+      const collection = normalizeHadithCollection(data.collection);
+      if (!collection) return [];
+      return (await fetchHadithBooks(collection)) as HadithBook[];
+    } catch {
+      return [];
+    }
   });
 
 export const listHadithEntries = createServerFn({ method: "GET" })
@@ -156,14 +164,18 @@ export const listHadithEntries = createServerFn({ method: "GET" })
       .parse(input),
   )
   .handler(async ({ data }): Promise<{ items: HadithEntry[]; total: number }> => {
-    const collection = normalizeHadithCollection(data.collection);
-    if (!collection) return { items: [], total: 0 };
-    return (await fetchHadithBookEntries({
-      collection,
-      book: data.book,
-      page: data.page,
-      pageSize: data.pageSize,
-    })) as { items: HadithEntry[]; total: number };
+    try {
+      const collection = normalizeHadithCollection(data.collection);
+      if (!collection) return { items: [], total: 0 };
+      return (await fetchHadithBookEntries({
+        collection,
+        book: data.book,
+        page: data.page,
+        pageSize: data.pageSize,
+      })) as { items: HadithEntry[]; total: number };
+    } catch {
+      return { items: [], total: 0 };
+    }
   });
 
 export const getHadithEntry = createServerFn({ method: "GET" })
@@ -176,11 +188,15 @@ export const getHadithEntry = createServerFn({ method: "GET" })
       .parse(input),
   )
   .handler(async ({ data }): Promise<HadithEntry | null> => {
-    const collection = normalizeHadithCollection(data.collection);
-    if (!collection) return null;
-    const entry = await fetchHadithByGlobalNumber({ collection, num: data.num });
-    if (!entry || entry.collection_slug !== collection) return null;
-    return entry as HadithEntry;
+    try {
+      const collection = normalizeHadithCollection(data.collection);
+      if (!collection) return null;
+      const entry = await fetchHadithByGlobalNumber({ collection, num: data.num });
+      if (!entry || entry.collection_slug !== collection) return null;
+      return entry as HadithEntry;
+    } catch {
+      return null;
+    }
   });
 
 export const getHadithKnowledgeBundle = createServerFn({ method: "GET" })
@@ -193,50 +209,54 @@ export const getHadithKnowledgeBundle = createServerFn({ method: "GET" })
       .parse(input),
   )
   .handler(async ({ data }): Promise<HadithKnowledgeBundle | null> => {
-    const collection = normalizeHadithCollection(data.collection);
-    if (!collection) return null;
+    try {
+      const collection = normalizeHadithCollection(data.collection);
+      if (!collection) return null;
 
-    const entry = (await fetchHadithByGlobalNumber({ collection, num: data.num })) as HadithEntry | null;
-    if (!entry || entry.collection_slug !== collection) return null;
+      const entry = (await fetchHadithByGlobalNumber({ collection, num: data.num })) as HadithEntry | null;
+      if (!entry || entry.collection_slug !== collection) return null;
 
-    const [collections, books, relatedHadithResult] = await Promise.all([
-      fetchHadithCollections(),
-      fetchHadithBooks(collection),
-      entry.narrator
-        ? fetchHadithSearch({ q: entry.narrator, page: 0, pageSize: 8 })
-        : Promise.resolve({ items: [] as HadithEntry[], total: 0, hasMore: false }),
-    ]);
+      const [collections, books, relatedHadithResult] = await Promise.all([
+        fetchHadithCollections(),
+        fetchHadithBooks(collection),
+        entry.narrator
+          ? fetchHadithSearch({ q: entry.narrator, page: 0, pageSize: 8 })
+          : Promise.resolve({ items: [] as HadithEntry[], total: 0, hasMore: false }),
+      ]);
 
-    const relatedHadith = relatedHadithResult.items.filter((r) => r.id !== entry.id);
+      const relatedHadith = relatedHadithResult.items.filter((r) => r.id !== entry.id);
 
-    const collectionMeta = collections.find((c) => c.slug === entry.collection_slug) ?? null;
+      const collectionMeta = collections.find((c) => c.slug === entry.collection_slug) ?? null;
 
-    const collectionData: HadithCollection | null = collectionMeta
-      ? {
-          ...collectionMeta,
-          total_books: books.length,
-        }
-      : null;
+      const collectionData: HadithCollection | null = collectionMeta
+        ? {
+            ...collectionMeta,
+            total_books: books.length,
+          }
+        : null;
 
-    const narrator: HadithNarratorProfile | null = entry.narrator
-      ? {
-          narrator: entry.narrator,
-          hadith_count: Math.max(relatedHadithResult.total, 1),
-          collections: [entry.collection_slug],
-        }
-      : null;
+      const narrator: HadithNarratorProfile | null = entry.narrator
+        ? {
+            narrator: entry.narrator,
+            hadith_count: Math.max(relatedHadithResult.total, 1),
+            collections: [entry.collection_slug],
+          }
+        : null;
 
-    return {
-      entry,
-      collection: collectionData,
-      narrator,
-      relatedVerses: [],
-      relatedTafsir: [],
-      relatedTopics: [],
-      relatedProphets: [],
-      relatedEntities: [],
-      relatedHadith,
-    };
+      return {
+        entry,
+        collection: collectionData,
+        narrator,
+        relatedVerses: [],
+        relatedTafsir: [],
+        relatedTopics: [],
+        relatedProphets: [],
+        relatedEntities: [],
+        relatedHadith,
+      };
+    } catch {
+      return null;
+    }
   });
 
 export const generateHadithStudySummary = createServerFn({ method: "POST" })
@@ -324,20 +344,28 @@ export const searchHadith = createServerFn({ method: "POST" })
       .parse(input),
   )
   .handler(async ({ data }): Promise<HadithSearchResult> => {
-    const collections = (data.collections ?? [])
-      .map(normalizeHadithCollection)
-      .filter(Boolean) as Array<"bukhari" | "muslim">;
-    const result = await fetchHadithSearch({
-      q: data.q,
-      collections,
-      page: data.page,
-      pageSize: data.pageSize,
-    });
-    return {
-      items: result.items as HadithEntry[],
-      total: result.total,
-      hasMore: result.hasMore,
-    };
+    try {
+      const collections = (data.collections ?? [])
+        .map(normalizeHadithCollection)
+        .filter(Boolean) as Array<"bukhari" | "muslim">;
+      const result = await fetchHadithSearch({
+        q: data.q,
+        collections,
+        page: data.page,
+        pageSize: data.pageSize,
+      });
+      return {
+        items: result.items as HadithEntry[],
+        total: result.total,
+        hasMore: result.hasMore,
+      };
+    } catch {
+      return {
+        items: [],
+        total: 0,
+        hasMore: false,
+      };
+    }
   });
 
 export const listTopNarrators = createServerFn({ method: "GET" })
@@ -350,7 +378,11 @@ export const listTopNarrators = createServerFn({ method: "GET" })
     async ({
       data,
     }): Promise<Array<{ narrator: string; hadith_count: number; collections: string[] }>> => {
-      return await fetchTopNarrators(data.limit);
+      try {
+        return await fetchTopNarrators(data.limit);
+      } catch {
+        return [];
+      }
     },
   );
 
@@ -363,15 +395,19 @@ export const listHadithTopicBooks = createServerFn({ method: "GET" })
       .parse(input ?? {}),
   )
   .handler(async ({ data }): Promise<HadithTopicBook[]> => {
-    const collections = ["bukhari", "muslim"];
-    const out: HadithTopicBook[] = [];
+    try {
+      const collections = ["bukhari", "muslim"];
+      const out: HadithTopicBook[] = [];
 
-    for (const collection of collections) {
-      const rows = await fetchHadithBooks(collection as "bukhari" | "muslim");
-      out.push(...rows.sort((a, b) => b.hadith_count - a.hadith_count).slice(0, data.limitPerCollection));
+      for (const collection of collections) {
+        const rows = await fetchHadithBooks(collection as "bukhari" | "muslim");
+        out.push(...rows.sort((a, b) => b.hadith_count - a.hadith_count).slice(0, data.limitPerCollection));
+      }
+
+      return out.sort((a, b) => b.hadith_count - a.hadith_count);
+    } catch {
+      return [];
     }
-
-    return out.sort((a, b) => b.hadith_count - a.hadith_count);
   });
 
 export const listHadithTopics = createServerFn({ method: "GET" })
@@ -383,45 +419,49 @@ export const listHadithTopics = createServerFn({ method: "GET" })
       .parse(input ?? {}),
   )
   .handler(async ({ data }): Promise<HadithTopic[]> => {
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    try {
+      const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
-    const { data: rows } = await supabaseAdmin
-      .from("knowledge_entities")
-      .select("id,slug,title_i18n")
-      .eq("published", true)
-      .eq("kind", "topic")
-      .order("sort_order", { ascending: true })
-      .limit(data.limit);
+      const { data: rows } = await supabaseAdmin
+        .from("knowledge_entities")
+        .select("id,slug,title_i18n")
+        .eq("published", true)
+        .eq("kind", "topic")
+        .order("sort_order", { ascending: true })
+        .limit(data.limit);
 
-    type TopicEntityRow = Pick<
-      Database["public"]["Tables"]["knowledge_entities"]["Row"],
-      "id" | "slug" | "title_i18n"
-    >;
+      type TopicEntityRow = Pick<
+        Database["public"]["Tables"]["knowledge_entities"]["Row"],
+        "id" | "slug" | "title_i18n"
+      >;
 
-    const topicRows = (rows ?? []) as TopicEntityRow[];
-    if (topicRows.length === 0) return [];
+      const topicRows = (rows ?? []) as TopicEntityRow[];
+      if (topicRows.length === 0) return [];
 
-    const fallbackBooks = await Promise.all([fetchHadithBooks("bukhari"), fetchHadithBooks("muslim")]).then(
-      (all) => all.flat().sort((a, b) => b.hadith_count - a.hadith_count),
-    );
+      const fallbackBooks = await Promise.all([fetchHadithBooks("bukhari"), fetchHadithBooks("muslim")]).then(
+        (all) => all.flat().sort((a, b) => b.hadith_count - a.hadith_count),
+      );
 
-    return topicRows.map((topic, index) => {
-      const fallbackCount = fallbackBooks[index]?.hadith_count ?? 0;
-      const title = topic.title_i18n;
-      const titleI18n =
-        title && typeof title === "object" && !Array.isArray(title)
-          ? {
-              he: typeof title.he === "string" ? title.he : undefined,
-              ar: typeof title.ar === "string" ? title.ar : undefined,
-              en: typeof title.en === "string" ? title.en : undefined,
-            }
-          : {};
-      return {
-        id: topic.id,
-        slug: topic.slug,
-        title_i18n: titleI18n,
-        hadith_count: fallbackCount,
-        collections: ["bukhari", "muslim"],
-      };
-    });
+      return topicRows.map((topic, index) => {
+        const fallbackCount = fallbackBooks[index]?.hadith_count ?? 0;
+        const title = topic.title_i18n;
+        const titleI18n =
+          title && typeof title === "object" && !Array.isArray(title)
+            ? {
+                he: typeof title.he === "string" ? title.he : undefined,
+                ar: typeof title.ar === "string" ? title.ar : undefined,
+                en: typeof title.en === "string" ? title.en : undefined,
+              }
+            : {};
+        return {
+          id: topic.id,
+          slug: topic.slug,
+          title_i18n: titleI18n,
+          hadith_count: fallbackCount,
+          collections: ["bukhari", "muslim"],
+        };
+      });
+    } catch {
+      return [];
+    }
   });
