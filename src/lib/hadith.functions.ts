@@ -407,10 +407,19 @@ export const listHadithTopics = createServerFn({ method: "GET" })
 
     return topicRows.map((topic, index) => {
       const fallbackCount = fallbackBooks[index]?.hadith_count ?? 0;
+      const title = topic.title_i18n;
+      const titleI18n =
+        title && typeof title === "object" && !Array.isArray(title)
+          ? {
+              he: typeof title.he === "string" ? title.he : undefined,
+              ar: typeof title.ar === "string" ? title.ar : undefined,
+              en: typeof title.en === "string" ? title.en : undefined,
+            }
+          : {};
       return {
         id: topic.id,
         slug: topic.slug,
-        title_i18n: topic.title_i18n ?? {},
+        title_i18n: titleI18n,
         hadith_count: fallbackCount,
         collections: ["bukhari", "muslim"],
       };
