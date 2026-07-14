@@ -83,6 +83,27 @@ const DEFAULT_CACHE_TTL_MS = 5 * 60_000;
 const requestCache = new Map<string, { expiresAt: number; data: unknown }>();
 const inFlightRequests = new Map<string, Promise<unknown>>();
 
+export class SunnahApiError extends Error {
+  status: number;
+  endpoint: string;
+  requestId: string | null;
+  responseBody: string;
+
+  constructor(args: {
+    status: number;
+    endpoint: string;
+    requestId?: string | null;
+    responseBody?: string;
+  }) {
+    super(`sunnah_api_${args.status}:${(args.responseBody ?? "").slice(0, 200)}`);
+    this.name = "SunnahApiError";
+    this.status = args.status;
+    this.endpoint = args.endpoint;
+    this.requestId = args.requestId ?? null;
+    this.responseBody = args.responseBody ?? "";
+  }
+}
+
 function getApiKey() {
   const key = process.env.SUNNAH_API_KEY;
   if (!key) throw new Error("missing_sunnah_api_key");
@@ -122,7 +143,7 @@ async function sunnahFetch<T>(
 
   const run = (async () => {
     let lastError: Error | null = null;
-    for (let attempt = 0; attempt < 3; attempt += 1) {
+    for (let attempt = 0; attempt < 4; attempt += 1) {
       try {
         const response = await fetch(url.toString(), {
           method: "GET",
@@ -134,12 +155,35 @@ async function sunnahFetch<T>(
 
         if (!response.ok) {
           const body = await response.text().catch(() => "");
-          const message = `sunnah_api_${response.status}:${body.slice(0, 200)}`;
-          if (response.status >= 500 && attempt < 2) {
-            await new Promise((resolve) => setTimeout(resolve, 150 * (attempt + 1)));
+          const requestId = response.headers.get("x-request-id") || response.headers.get("request-id");
+          const err = new SunnahApiError({
+            status: response.status,
+            endpoint: `${path}${url.search}`,
+            requestId,
+            responseBody: body,
+          });
+
+          console.error(
+            JSON.stringify({
+              type: "sunnah_api_failure",
+              status: response.status,
+              endpoint: `${path}${url.search}`,
+              request_id: requestId,
+              attempt: attempt + 1,
+            }),
+          );
+
+          if (response.status === 403) {
+            throw err;
+          }
+
+          const transientStatus = response.status === 408 || response.status === 429 || response.status >= 500;
+          if (transientStatus && attempt < 3) {
+            const backoffMs = Math.min(5000, 250 * 2 ** attempt);
+            await new Promise((resolve) => setTimeout(resolve, backoffMs));
             continue;
           }
-          throw new Error(message);
+          throw err;
         }
 
         const parsed = (await response.json()) as T;
@@ -147,8 +191,12 @@ async function sunnahFetch<T>(
         return parsed;
       } catch (error) {
         lastError = error instanceof Error ? error : new Error(String(error));
-        if (attempt < 2) {
-          await new Promise((resolve) => setTimeout(resolve, 150 * (attempt + 1)));
+        if (lastError instanceof SunnahApiError && lastError.status === 403) {
+          throw lastError;
+        }
+        if (attempt < 3) {
+          const backoffMs = Math.min(5000, 250 * 2 ** attempt);
+          await new Promise((resolve) => setTimeout(resolve, backoffMs));
         }
       }
     }
@@ -161,6 +209,53 @@ async function sunnahFetch<T>(
   } finally {
     inFlightRequests.delete(cacheKey);
   }
+}
+
+export async function probeSunnahApiConnection() {
+  const checks = [
+    { key: "collections", path: "/collections", params: { page: 1, limit: 1 } },
+    { key: "bukhari_books", path: "/collections/bukhari/books", params: { page: 1, limit: 1 } },
+    { key: "muslim_books", path: "/collections/muslim/books", params: { page: 1, limit: 1 } },
+  ] as const;
+
+  const results: Array<{
+    endpoint: string;
+    ok: boolean;
+    status: number;
+    requestId: string | null;
+    error: string | null;
+  }> = [];
+
+  for (const check of checks) {
+    try {
+      await sunnahFetch<unknown>(check.path, check.params, { ttlMs: 5_000 });
+      results.push({ endpoint: check.key, ok: true, status: 200, requestId: null, error: null });
+    } catch (error) {
+      if (error instanceof SunnahApiError) {
+        results.push({
+          endpoint: check.key,
+          ok: false,
+          status: error.status,
+          requestId: error.requestId,
+          error: error.message,
+        });
+      } else {
+        results.push({
+          endpoint: check.key,
+          ok: false,
+          status: 0,
+          requestId: null,
+          error: error instanceof Error ? error.message : String(error),
+        });
+      }
+    }
+  }
+
+  return {
+    ok: results.every((r) => r.ok),
+    has403: results.some((r) => r.status === 403),
+    results,
+  };
 }
 
 function pickLocalized(items: SunnahLangItem[] | undefined, lang: string, key: "title" | "name") {
