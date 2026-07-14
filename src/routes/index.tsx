@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { useMemo, useState } from "react";
+import { useMemo, useState, type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import { fetchChapters, type ApiLang } from "@/lib/quran-api";
 import {
@@ -318,9 +318,21 @@ function Home() {
 
       <section className="mx-auto -mt-8 grid max-w-6xl grid-cols-2 gap-3 px-4 sm:grid-cols-4 sm:px-6">
         <StatCard icon={<BookOpen className="h-4 w-4" />} label={t("home.stat1Label")} value="114" />
-        <StatCard icon={<Network className="h-4 w-4" />} label="Knowledge nodes" value={String(totalEntities)} />
-        <StatCard icon={<Compass className="h-4 w-4" />} label="Themes" value={String(totalTopics)} />
-        <StatCard icon={<GraduationCap className="h-4 w-4" />} label="Journeys" value={String(totalJourneys)} />
+        <StatCard
+          icon={<Network className="h-4 w-4" />}
+          label={locale === "ar" ? "عُقد المعرفة" : locale === "he" ? "צמתי ידע" : "Knowledge nodes"}
+          value={String(totalEntities)}
+        />
+        <StatCard
+          icon={<Compass className="h-4 w-4" />}
+          label={locale === "ar" ? "المحاور" : locale === "he" ? "תמות" : "Themes"}
+          value={String(totalTopics)}
+        />
+        <StatCard
+          icon={<GraduationCap className="h-4 w-4" />}
+          label={locale === "ar" ? "المسارات" : locale === "he" ? "מסלולים" : "Journeys"}
+          value={String(totalJourneys)}
+        />
       </section>
 
       <div className="mt-10">
@@ -385,7 +397,9 @@ function Home() {
                 <p className="mt-1 line-clamp-2 text-xs text-muted-foreground" dir="auto">
                   {topic.description}
                 </p>
-                <div className="mt-2 text-[11px] font-medium text-primary">{topic.refs.length} references</div>
+                <div className="mt-2 text-[11px] font-medium text-primary">
+                  {topic.refs.length} {locale === "ar" ? "إحالات" : locale === "he" ? "הפניות" : "references"}
+                </div>
               </Link>
             ))}
           </div>
@@ -523,7 +537,7 @@ function Home() {
                 className="surface-card p-4 transition hover:border-primary/40"
               >
                 <div className="text-[11px] font-semibold uppercase tracking-wider text-primary">
-                  Level {journey.level}
+                  {locale === "ar" ? "المستوى" : locale === "he" ? "רמה" : "Level"} {journey.level}
                 </div>
                 <h3 className="mt-1 text-sm font-semibold text-foreground" dir="auto">
                   {pickLocale(journey.title_i18n, locale)}
@@ -575,10 +589,22 @@ function Home() {
             icon={<BookOpen className="h-4 w-4" />}
           />
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-            <StatInline label="Surahs" value={String(data?.length ?? 114)} />
-            <StatInline label="Knowledge entities" value={String(totalEntities)} />
-            <StatInline label="Themes" value={String(totalTopics)} />
-            <StatInline label="Journeys" value={String(totalJourneys)} />
+            <StatInline
+              label={locale === "ar" ? "السور" : locale === "he" ? "סורות" : "Surahs"}
+              value={String(data?.length ?? 114)}
+            />
+            <StatInline
+              label={locale === "ar" ? "كيانات المعرفة" : locale === "he" ? "יישויות ידע" : "Knowledge entities"}
+              value={String(totalEntities)}
+            />
+            <StatInline
+              label={locale === "ar" ? "المحاور" : locale === "he" ? "תמות" : "Themes"}
+              value={String(totalTopics)}
+            />
+            <StatInline
+              label={locale === "ar" ? "المسارات" : locale === "he" ? "מסלולים" : "Journeys"}
+              value={String(totalJourneys)}
+            />
           </div>
         </section>
 
@@ -687,37 +713,47 @@ function Home() {
             <p className="mt-2 text-xs leading-relaxed text-muted-foreground">{t("home.footerTagline")}</p>
           </div>
           <div>
-            <p className="text-xs font-semibold uppercase tracking-wider text-primary">Discover</p>
+            <p className="text-xs font-semibold uppercase tracking-wider text-primary">
+              {locale === "ar" ? "اكتشف" : locale === "he" ? "גלו" : "Discover"}
+            </p>
             <div className="mt-2 space-y-1.5">
               <Link to="/search" className="block hover:text-primary">
-                Intelligent search
+                {locale === "ar" ? "بحث ذكي" : locale === "he" ? "חיפוש חכם" : "Intelligent search"}
               </Link>
               <Link to="/learn" className="block hover:text-primary">
-                Knowledge hubs
+                {locale === "ar" ? "مراكز معرفة" : locale === "he" ? "מרכזי ידע" : "Knowledge hubs"}
               </Link>
               <Link to="/learn/journeys" className="block hover:text-primary">
-                Learning journeys
+                {locale === "ar" ? "مسارات تعلم" : locale === "he" ? "מסלולי לימוד" : "Learning journeys"}
               </Link>
             </div>
           </div>
           <div>
-            <p className="text-xs font-semibold uppercase tracking-wider text-primary">Sources</p>
+            <p className="text-xs font-semibold uppercase tracking-wider text-primary">
+              {locale === "ar" ? "المصادر" : locale === "he" ? "מקורות" : "Sources"}
+            </p>
             <div className="mt-2 space-y-1.5">
               <Link to="/hadith" className="block hover:text-primary">
-                Hadith library
+                {locale === "ar" ? "مكتبة الحديث" : locale === "he" ? "ספריית חדית׳" : "Hadith library"}
               </Link>
               <Link to="/research" className="block hover:text-primary">
-                Citation-first research
+                {locale === "ar" ? "بحث موثّق" : locale === "he" ? "מחקר מבוסס ציטוטים" : "Citation-first research"}
               </Link>
               <Link to="/ask" className="block hover:text-primary">
-                Grounded AI answers
+                {locale === "ar" ? "إجابات موثقة" : locale === "he" ? "תשובות מעוגנות" : "Grounded AI answers"}
               </Link>
             </div>
           </div>
           <div>
-            <p className="text-xs font-semibold uppercase tracking-wider text-primary">Trust</p>
+            <p className="text-xs font-semibold uppercase tracking-wider text-primary">
+              {locale === "ar" ? "الثقة" : locale === "he" ? "אמון" : "Trust"}
+            </p>
             <p className="mt-2 leading-relaxed">
-              AI summaries are clearly separated from Quran, Tafsir, and Hadith source text with citations.
+              {locale === "ar"
+                ? "تُفصل الملخصات الذكية بوضوح عن نصوص القرآن والتفسير والحديث الأصلية مع الإحالات."
+                : locale === "he"
+                  ? "סיכומי AI מופרדים בבירור מטקסטי המקור של קוראן, תפסיר וחדית׳ עם הפניות."
+                  : "AI summaries are clearly separated from Quran, Tafsir, and Hadith source text with citations."}
             </p>
           </div>
         </div>
@@ -734,7 +770,7 @@ function SectionHeader({
 }: {
   title: string;
   subtitle: string;
-  icon: React.ReactNode;
+  icon: ReactNode;
 }) {
   return (
     <div className="mb-4">
@@ -747,7 +783,7 @@ function SectionHeader({
   );
 }
 
-function StatCard({ icon, label, value }: { icon: React.ReactNode; label: string; value: string }) {
+function StatCard({ icon, label, value }: { icon: ReactNode; label: string; value: string }) {
   return (
     <div className="rounded-xl border border-border bg-card px-3 py-3 shadow-sm">
       <div className="mb-1 text-primary">{icon}</div>
