@@ -54,6 +54,9 @@ export function HeaderNav({ isAuthenticated }: HeaderNavProps) {
       {isAuthenticated && (
         <NavLink to="/admin/backfill" label="Admin" icon={<Sparkles className="h-4 w-4" />} />
       )}
+      {isAuthenticated && (
+        <NavLink to="/admin/hadith-api" label="Hadith API" icon={<BookMarked className="h-4 w-4" />} />
+      )}
     </nav>
   );
 }

@@ -47,6 +47,7 @@ import { Route as ApiPublicSurahNamesRouteImport } from './routes/api/public/sur
 import { Route as ApiPublicSeedKnowledgeRouteImport } from './routes/api/public/seed-knowledge'
 import { Route as AuthenticatedAdminSetupRouteImport } from './routes/_authenticated/admin.setup'
 import { Route as AuthenticatedAdminIngestRouteImport } from './routes/_authenticated/admin.ingest'
+import { Route as AuthenticatedAdminHadithApiRouteImport } from './routes/_authenticated/admin.hadith-api'
 import { Route as AuthenticatedAdminBackfillRouteImport } from './routes/_authenticated/admin.backfill'
 import { Route as HadithCollectionEntryNumRouteImport } from './routes/hadith.$collection.entry.$num'
 import { Route as ApiPublicAdminTranslateTafsirHebrewRouteImport } from './routes/api/public/admin/translate-tafsir-hebrew'
@@ -253,6 +254,12 @@ const AuthenticatedAdminIngestRoute =
     path: '/admin/ingest',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedAdminHadithApiRoute =
+  AuthenticatedAdminHadithApiRouteImport.update({
+    id: '/admin/hadith-api',
+    path: '/admin/hadith-api',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedAdminBackfillRoute =
   AuthenticatedAdminBackfillRouteImport.update({
     id: '/admin/backfill',
@@ -368,6 +375,7 @@ export interface FileRoutesByFullPath {
   '/prophets/': typeof ProphetsIndexRoute
   '/topics/': typeof TopicsIndexRoute
   '/admin/backfill': typeof AuthenticatedAdminBackfillRoute
+  '/admin/hadith-api': typeof AuthenticatedAdminHadithApiRoute
   '/admin/ingest': typeof AuthenticatedAdminIngestRoute
   '/admin/setup': typeof AuthenticatedAdminSetupRoute
   '/api/public/seed-knowledge': typeof ApiPublicSeedKnowledgeRoute
@@ -420,6 +428,7 @@ export interface FileRoutesByTo {
   '/prophets': typeof ProphetsIndexRoute
   '/topics': typeof TopicsIndexRoute
   '/admin/backfill': typeof AuthenticatedAdminBackfillRoute
+  '/admin/hadith-api': typeof AuthenticatedAdminHadithApiRoute
   '/admin/ingest': typeof AuthenticatedAdminIngestRoute
   '/admin/setup': typeof AuthenticatedAdminSetupRoute
   '/api/public/seed-knowledge': typeof ApiPublicSeedKnowledgeRoute
@@ -475,6 +484,7 @@ export interface FileRoutesById {
   '/prophets/': typeof ProphetsIndexRoute
   '/topics/': typeof TopicsIndexRoute
   '/_authenticated/admin/backfill': typeof AuthenticatedAdminBackfillRoute
+  '/_authenticated/admin/hadith-api': typeof AuthenticatedAdminHadithApiRoute
   '/_authenticated/admin/ingest': typeof AuthenticatedAdminIngestRoute
   '/_authenticated/admin/setup': typeof AuthenticatedAdminSetupRoute
   '/api/public/seed-knowledge': typeof ApiPublicSeedKnowledgeRoute
@@ -530,6 +540,7 @@ export interface FileRouteTypes {
     | '/prophets/'
     | '/topics/'
     | '/admin/backfill'
+    | '/admin/hadith-api'
     | '/admin/ingest'
     | '/admin/setup'
     | '/api/public/seed-knowledge'
@@ -582,6 +593,7 @@ export interface FileRouteTypes {
     | '/prophets'
     | '/topics'
     | '/admin/backfill'
+    | '/admin/hadith-api'
     | '/admin/ingest'
     | '/admin/setup'
     | '/api/public/seed-knowledge'
@@ -636,6 +648,7 @@ export interface FileRouteTypes {
     | '/prophets/'
     | '/topics/'
     | '/_authenticated/admin/backfill'
+    | '/_authenticated/admin/hadith-api'
     | '/_authenticated/admin/ingest'
     | '/_authenticated/admin/setup'
     | '/api/public/seed-knowledge'
@@ -972,6 +985,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminIngestRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/admin/hadith-api': {
+      id: '/_authenticated/admin/hadith-api'
+      path: '/admin/hadith-api'
+      fullPath: '/admin/hadith-api'
+      preLoaderRoute: typeof AuthenticatedAdminHadithApiRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/admin/backfill': {
       id: '/_authenticated/admin/backfill'
       path: '/admin/backfill'
@@ -1075,6 +1095,7 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedAdminBackfillRoute: typeof AuthenticatedAdminBackfillRoute
+  AuthenticatedAdminHadithApiRoute: typeof AuthenticatedAdminHadithApiRoute
   AuthenticatedAdminIngestRoute: typeof AuthenticatedAdminIngestRoute
   AuthenticatedAdminSetupRoute: typeof AuthenticatedAdminSetupRoute
   AuthenticatedCollectionsIndexRoute: typeof AuthenticatedCollectionsIndexRoute
@@ -1082,6 +1103,7 @@ interface AuthenticatedRouteRouteChildren {
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAdminBackfillRoute: AuthenticatedAdminBackfillRoute,
+  AuthenticatedAdminHadithApiRoute: AuthenticatedAdminHadithApiRoute,
   AuthenticatedAdminIngestRoute: AuthenticatedAdminIngestRoute,
   AuthenticatedAdminSetupRoute: AuthenticatedAdminSetupRoute,
   AuthenticatedCollectionsIndexRoute: AuthenticatedCollectionsIndexRoute,
