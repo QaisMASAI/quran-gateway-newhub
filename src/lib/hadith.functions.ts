@@ -1,4 +1,4 @@
-// Hadith server functions — wired to authenticated external API (Sunnah API).
+// Hadith server functions — local DB first, provider-backed import only.
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { generateText } from "ai";
@@ -6,16 +6,12 @@ import { createLovableAiGatewayProvider } from "@/lib/ai-gateway.server";
 import type { Database } from "@/integrations/supabase/types";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import {
-  SunnahApiError,
-  fetchHadithBookEntries,
-  fetchHadithBooks,
-  fetchHadithByGlobalNumber,
-  fetchHadithCollections,
-  fetchHadithSearch,
-  fetchTopNarrators,
-  normalizeHadithCollection,
-  probeSunnahApiConnection,
-} from "@/lib/hadith-api.server";
+  buildSearchTokens,
+  probeHadithProviders,
+  runWithProviderFallback,
+  type ProviderEntry,
+} from "@/lib/hadith-providers.server";
+import { runHadithImportStep, type HadithImportReport } from "@/lib/hadith-ingest.server";
 
 export type HadithCollection = {
   slug: string;
@@ -138,37 +134,53 @@ export type HadithTelemetrySnapshot = {
 };
 
 function collectionLabel(slug: string) {
-  return slug === "bukhari" ? "Sahih al-Bukhari" : "Sahih Muslim";
+  const map: Record<string, string> = {
+    bukhari: "Sahih al-Bukhari",
+    muslim: "Sahih Muslim",
+    abudawud: "Sunan Abu Dawud",
+    tirmidhi: "Jami at-Tirmidhi",
+    ibnmajah: "Sunan Ibn Majah",
+    nasai: "Sunan an-Nasa'i",
+    malik: "Muwatta Malik",
+  };
+  return map[slug] ?? slug;
+}
+
+function normalizeHadithCollection(collection: string): string | null {
+  const value = collection.trim().toLowerCase().replace(/[^a-z0-9]+/g, "");
+  if (!value) return null;
+  return value;
+}
+
+type HadithEntryRow = Database["public"]["Tables"]["hadith_entries"]["Row"];
+
+function mapEntryRow(row: HadithEntryRow): HadithEntry {
+  return {
+    id: row.id,
+    collection_slug: row.collection_slug,
+    book_id: row.book_id,
+    id_in_book: row.id_in_book,
+    global_id: row.global_id,
+    narrator: row.narrator,
+    arabic_text: row.arabic_text,
+    english_text: row.english_text,
+    hebrew_text: row.hebrew_text,
+  };
 }
 
 export const listHadithCollections = createServerFn({ method: "GET" }).handler(
   async (): Promise<HadithCollection[]> => {
-    try {
-      const collections = await fetchHadithCollections();
-      const booksByCollection = await Promise.all(
-        collections.map(async (row) => {
-          const books = await fetchHadithBooks(row.slug as "bukhari" | "muslim");
-          return [row.slug, books.length] as const;
-        }),
-      );
-      const map = new Map(booksByCollection);
-      return collections.map((row) => ({
-        ...row,
-        total_books: map.get(row.slug) ?? 0,
-      }));
-    } catch (error) {
-      if (error instanceof SunnahApiError) {
-        console.error(
-          JSON.stringify({
-            type: "hadith_collections_failed",
-            status: error.status,
-            endpoint: error.endpoint,
-            request_id: error.requestId,
-          }),
-        );
-      }
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data, error } = await supabaseAdmin
+      .from("hadith_collections")
+      .select("slug,title_ar,title_en,title_he,author_ar,author_en,total_hadith,total_books,sort_order")
+      .order("sort_order", { ascending: true })
+      .order("slug", { ascending: true });
+    if (error || !data) {
+      console.error("hadith_collections_read_failed", error?.message ?? "unknown_error");
       return [];
     }
+    return data;
   },
 );
 
@@ -177,23 +189,19 @@ export const listHadithBooks = createServerFn({ method: "GET" })
     z.object({ collection: z.string().min(1).max(40) }).parse(input),
   )
   .handler(async ({ data }): Promise<HadithBook[]> => {
-    try {
-      const collection = normalizeHadithCollection(data.collection);
-      if (!collection) return [];
-      return (await fetchHadithBooks(collection)) as HadithBook[];
-    } catch (error) {
-      if (error instanceof SunnahApiError) {
-        console.error(
-          JSON.stringify({
-            type: "hadith_books_failed",
-            status: error.status,
-            endpoint: error.endpoint,
-            request_id: error.requestId,
-          }),
-        );
-      }
+    const collection = normalizeHadithCollection(data.collection);
+    if (!collection) return [];
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: rows, error } = await supabaseAdmin
+      .from("hadith_books")
+      .select("collection_slug,book_id,name_ar,name_en,name_he,hadith_count")
+      .eq("collection_slug", collection)
+      .order("book_id", { ascending: true });
+    if (error || !rows) {
+      console.error("hadith_books_read_failed", error?.message ?? "unknown_error");
       return [];
     }
+    return rows;
   });
 
 export const listHadithEntries = createServerFn({ method: "GET" })
@@ -208,28 +216,31 @@ export const listHadithEntries = createServerFn({ method: "GET" })
       .parse(input),
   )
   .handler(async ({ data }): Promise<{ items: HadithEntry[]; total: number }> => {
-    try {
-      const collection = normalizeHadithCollection(data.collection);
-      if (!collection) return { items: [], total: 0 };
-      return (await fetchHadithBookEntries({
-        collection,
-        book: data.book,
-        page: data.page,
-        pageSize: data.pageSize,
-      })) as { items: HadithEntry[]; total: number };
-    } catch (error) {
-      if (error instanceof SunnahApiError) {
-        console.error(
-          JSON.stringify({
-            type: "hadith_entries_failed",
-            status: error.status,
-            endpoint: error.endpoint,
-            request_id: error.requestId,
-          }),
-        );
-      }
+    const collection = normalizeHadithCollection(data.collection);
+    if (!collection) return { items: [], total: 0 };
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const from = data.page * data.pageSize;
+    const to = from + data.pageSize - 1;
+
+    const { data: rows, error, count } = await supabaseAdmin
+      .from("hadith_entries")
+      .select(
+        "id,collection_slug,book_id,id_in_book,global_id,narrator,arabic_text,english_text,hebrew_text",
+        { count: "exact" },
+      )
+      .eq("collection_slug", collection)
+      .eq("book_id", data.book)
+      .order("id_in_book", { ascending: true })
+      .range(from, to);
+
+    if (error) {
+      console.error("hadith_entries_read_failed", error.message);
       return { items: [], total: 0 };
     }
+    return {
+      items: (rows ?? []).map((row) => mapEntryRow(row as HadithEntryRow)),
+      total: count ?? 0,
+    };
   });
 
 export const getHadithEntry = createServerFn({ method: "GET" })
@@ -242,25 +253,20 @@ export const getHadithEntry = createServerFn({ method: "GET" })
       .parse(input),
   )
   .handler(async ({ data }): Promise<HadithEntry | null> => {
-    try {
-      const collection = normalizeHadithCollection(data.collection);
-      if (!collection) return null;
-      const entry = await fetchHadithByGlobalNumber({ collection, num: data.num });
-      if (!entry || entry.collection_slug !== collection) return null;
-      return entry as HadithEntry;
-    } catch (error) {
-      if (error instanceof SunnahApiError) {
-        console.error(
-          JSON.stringify({
-            type: "hadith_entry_failed",
-            status: error.status,
-            endpoint: error.endpoint,
-            request_id: error.requestId,
-          }),
-        );
-      }
+    const collection = normalizeHadithCollection(data.collection);
+    if (!collection) return null;
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: row, error } = await supabaseAdmin
+      .from("hadith_entries")
+      .select("id,collection_slug,book_id,id_in_book,global_id,narrator,arabic_text,english_text,hebrew_text")
+      .eq("collection_slug", collection)
+      .eq("global_id", data.num)
+      .maybeSingle();
+    if (error || !row) {
+      if (error) console.error("hadith_entry_read_failed", error.message);
       return null;
     }
+    return mapEntryRow(row as HadithEntryRow);
   });
 
 export const getHadithKnowledgeBundle = createServerFn({ method: "GET" })
@@ -273,62 +279,106 @@ export const getHadithKnowledgeBundle = createServerFn({ method: "GET" })
       .parse(input),
   )
   .handler(async ({ data }): Promise<HadithKnowledgeBundle | null> => {
-    try {
-      const collection = normalizeHadithCollection(data.collection);
-      if (!collection) return null;
+    const collection = normalizeHadithCollection(data.collection);
+    if (!collection) return null;
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
-      const entry = (await fetchHadithByGlobalNumber({ collection, num: data.num })) as HadithEntry | null;
-      if (!entry || entry.collection_slug !== collection) return null;
+    const { data: entryRow } = await supabaseAdmin
+      .from("hadith_entries")
+      .select("id,collection_slug,book_id,id_in_book,global_id,narrator,arabic_text,english_text,hebrew_text")
+      .eq("collection_slug", collection)
+      .eq("global_id", data.num)
+      .maybeSingle();
+    if (!entryRow) return null;
+    const entry = mapEntryRow(entryRow as HadithEntryRow);
 
-      const [collections, books, relatedHadithResult] = await Promise.all([
-        fetchHadithCollections(),
-        fetchHadithBooks(collection),
-        entry.narrator
-          ? fetchHadithSearch({ q: entry.narrator, page: 0, pageSize: 8 })
-          : Promise.resolve({ items: [] as HadithEntry[], total: 0, hasMore: false }),
-      ]);
+    const [{ data: collectionMeta }, { data: narratorRows }, { data: links }] = await Promise.all([
+      supabaseAdmin
+        .from("hadith_collections")
+        .select("slug,title_ar,title_en,title_he,author_ar,author_en,total_hadith,total_books,sort_order")
+        .eq("slug", entry.collection_slug)
+        .maybeSingle(),
+      entry.narrator
+        ? supabaseAdmin.from("hadith_narrators").select("narrator,hadith_count,collections").eq("narrator", entry.narrator)
+        : Promise.resolve({ data: [] as Array<{ narrator: string; hadith_count: number; collections: string[] }> }),
+      supabaseAdmin
+        .from("hadith_entity_links")
+        .select("entity_id,surah,ayah,weight")
+        .eq("hadith_id", entry.id)
+        .order("weight", { ascending: false })
+        .limit(40),
+    ]);
 
-      const relatedHadith = relatedHadithResult.items.filter((r) => r.id !== entry.id);
+    const verseRows = (links ?? []).filter((r) => r.surah !== null && r.ayah !== null);
+    const relatedVerses = verseRows.map((r) => ({ surah: r.surah!, ayah: r.ayah!, weight: r.weight }));
 
-      const collectionMeta = collections.find((c) => c.slug === entry.collection_slug) ?? null;
+    const entityIds = (links ?? []).map((r) => r.entity_id).filter((v): v is string => !!v);
+    const { data: entities } = entityIds.length
+      ? await supabaseAdmin
+          .from("knowledge_entities")
+          .select("id,slug,kind,title_i18n,summary_i18n")
+          .in("id", entityIds)
+      : { data: [] as Array<{ id: string; slug: string; kind: string; title_i18n: any; summary_i18n: any }> };
 
-      const collectionData: HadithCollection | null = collectionMeta
-        ? {
-            ...collectionMeta,
-            total_books: books.length,
-          }
-        : null;
+    const relatedEntities: HadithEntityLite[] = (entities ?? []).map((e) => ({
+      id: e.id,
+      slug: e.slug,
+      kind: e.kind,
+      title_i18n:
+        e.title_i18n && typeof e.title_i18n === "object" && !Array.isArray(e.title_i18n)
+          ? (e.title_i18n as { he?: string; ar?: string; en?: string })
+          : {},
+      summary_i18n:
+        e.summary_i18n && typeof e.summary_i18n === "object" && !Array.isArray(e.summary_i18n)
+          ? (e.summary_i18n as { he?: string; ar?: string; en?: string })
+          : {},
+    }));
 
-      const narrator: HadithNarratorProfile | null = entry.narrator
-        ? {
-            narrator: entry.narrator,
-            hadith_count: Math.max(relatedHadithResult.total, 1),
-            collections: [entry.collection_slug],
-          }
-        : null;
+    const relatedTopics = relatedEntities.filter((e) => e.kind === "topic");
+    const relatedProphets = relatedEntities.filter((e) => e.kind === "prophet");
 
-      return {
-        entry,
-        collection: collectionData,
-        narrator,
-        relatedVerses: [],
-        relatedTafsir: [],
-        relatedTopics: [],
-        relatedProphets: [],
-        relatedEntities: [],
-        relatedHadith,
-      };
-    } catch (error) {
-      if (error instanceof SunnahApiError) {
-        console.error(
-          JSON.stringify({
-            type: "hadith_bundle_failed",
-            status: error.status,
-            endpoint: error.endpoint,
-            request_id: error.requestId,
-          }),
-        );
-      }
+    const { data: tafsirRows } = relatedVerses.length
+      ? await supabaseAdmin
+          .from("tafsir_passages")
+          .select("id,surah,ayah_start,ayah_end,lang,body,source_name")
+          .in(
+            "surah",
+            [...new Set(relatedVerses.map((v) => v.surah))].slice(0, 8),
+          )
+          .limit(12)
+      : { data: [] as Array<HadithTafsirLite> };
+
+    const { data: relatedHadithRows } = entry.narrator
+      ? await supabaseAdmin
+          .from("hadith_entries")
+          .select("id,collection_slug,book_id,id_in_book,global_id,narrator,arabic_text,english_text,hebrew_text")
+          .eq("narrator", entry.narrator)
+          .neq("id", entry.id)
+          .order("global_id", { ascending: false })
+          .limit(8)
+      : { data: [] as HadithEntryRow[] };
+
+    const narrator = (narratorRows ?? [])[0]
+      ? {
+          narrator: narratorRows![0].narrator,
+          hadith_count: narratorRows![0].hadith_count,
+          collections: narratorRows![0].collections,
+        }
+      : null;
+
+    return {
+      entry,
+      collection: (collectionMeta as HadithCollection | null) ?? null,
+      narrator,
+      relatedVerses,
+      relatedTafsir: (tafsirRows ?? []) as HadithTafsirLite[],
+      relatedTopics,
+      relatedProphets,
+      relatedEntities,
+      relatedHadith: (relatedHadithRows ?? []).map((row) => mapEntryRow(row as HadithEntryRow)),
+    };
+  } catch (error) {
+      console.error("hadith_bundle_failed", error instanceof Error ? error.message : String(error));
       return null;
     }
   });
@@ -418,38 +468,40 @@ export const searchHadith = createServerFn({ method: "POST" })
       .parse(input),
   )
   .handler(async ({ data }): Promise<HadithSearchResult> => {
-    try {
-      const collections = (data.collections ?? [])
-        .map(normalizeHadithCollection)
-        .filter(Boolean) as Array<"bukhari" | "muslim">;
-      const result = await fetchHadithSearch({
-        q: data.q,
-        collections,
-        page: data.page,
-        pageSize: data.pageSize,
-      });
-      return {
-        items: result.items as HadithEntry[],
-        total: result.total,
-        hasMore: result.hasMore,
-      };
-    } catch (error) {
-      if (error instanceof SunnahApiError) {
-        console.error(
-          JSON.stringify({
-            type: "hadith_search_failed",
-            status: error.status,
-            endpoint: error.endpoint,
-            request_id: error.requestId,
-          }),
-        );
-      }
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const normalizedCollections = (data.collections ?? [])
+      .map((c) => normalizeHadithCollection(c))
+      .filter((v): v is string => !!v);
+
+    const query = data.q.trim();
+    if (!query) {
       return {
         items: [],
         total: 0,
         hasMore: false,
       };
     }
+
+    const fetchLimit = Math.min(100, Math.max(data.pageSize * (data.page + 2), 30));
+    const { data: ranked, error } = await supabaseAdmin.rpc("search_hadith_hybrid", {
+      q: query,
+      collections: normalizedCollections.length > 0 ? normalizedCollections : null,
+      match_count: fetchLimit,
+    });
+
+    if (error) {
+      console.error("hadith_search_rpc_failed", error.message);
+      return { items: [], total: 0, hasMore: false };
+    }
+
+    const start = data.page * data.pageSize;
+    const end = start + data.pageSize;
+    const rows = (ranked ?? []) as Array<HadithEntryRow>;
+    return {
+      items: rows.slice(start, end).map((row) => mapEntryRow(row)),
+      total: rows.length,
+      hasMore: end < rows.length,
+    };
   });
 
 export const listTopNarrators = createServerFn({ method: "GET" })
@@ -462,11 +514,14 @@ export const listTopNarrators = createServerFn({ method: "GET" })
     async ({
       data,
     }): Promise<Array<{ narrator: string; hadith_count: number; collections: string[] }>> => {
-      try {
-        return await fetchTopNarrators(data.limit);
-      } catch {
-        return [];
-      }
+      const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+      const { data: rows, error } = await supabaseAdmin
+        .from("hadith_narrators")
+        .select("narrator,hadith_count,collections")
+        .order("hadith_count", { ascending: false })
+        .limit(data.limit);
+      if (error || !rows) return [];
+      return rows;
     },
   );
 
@@ -479,17 +534,94 @@ export const listHadithTopicBooks = createServerFn({ method: "GET" })
       .parse(input ?? {}),
   )
   .handler(async ({ data }): Promise<HadithTopicBook[]> => {
-    try {
-      const collections = ["bukhari", "muslim"];
-      const out: HadithTopicBook[] = [];
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: collections, error: cErr } = await supabaseAdmin
+      .from("hadith_collections")
+      .select("slug")
+      .order("sort_order", { ascending: true });
+    if (cErr || !collections) return [];
 
-      for (const collection of collections) {
-        const rows = await fetchHadithBooks(collection as "bukhari" | "muslim");
-        out.push(...rows.sort((a, b) => b.hadith_count - a.hadith_count).slice(0, data.limitPerCollection));
-      }
+    const out: HadithTopicBook[] = [];
+    for (const c of collections) {
+      const { data: rows } = await supabaseAdmin
+        .from("hadith_books")
+        .select("collection_slug,book_id,name_ar,name_en,name_he,hadith_count")
+        .eq("collection_slug", c.slug)
+        .order("hadith_count", { ascending: false })
+        .limit(data.limitPerCollection);
+      out.push(...((rows ?? []) as HadithTopicBook[]));
+    }
+    return out.sort((a, b) => b.hadith_count - a.hadith_count);
+  });
 
-      return out.sort((a, b) => b.hadith_count - a.hadith_count);
-    } catch {
+export const runHadithImport = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) =>
+    z
+      .object({
+        collection: z.string().min(1).max(60),
+        maxBooks: z.number().int().min(1).max(20).optional().default(2),
+        maxPagesPerBook: z.number().int().min(1).max(20).optional().default(3),
+        pageSize: z.number().int().min(10).max(200).optional().default(100),
+      })
+      .parse(input),
+  )
+  .handler(async ({ data, context }): Promise<HadithImportReport> => {
+    const { data: isAdmin } = await context.supabase.rpc("has_role", {
+      _user_id: context.userId,
+      _role: "admin",
+    });
+    if (!isAdmin) throw new Error("Forbidden");
+
+    const collection = normalizeHadithCollection(data.collection);
+    if (!collection) throw new Error("Invalid collection");
+    return runHadithImportStep({
+      collection,
+      maxBooks: data.maxBooks,
+      maxPagesPerBook: data.maxPagesPerBook,
+      pageSize: data.pageSize,
+      requestedBy: context.userId,
+    });
+  });
+
+export const listHadithImportJobs = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) =>
+    z.object({ limit: z.number().int().min(1).max(50).optional().default(20) }).parse(input ?? {}),
+  )
+  .handler(async ({ data, context }) => {
+    const { data: isAdmin } = await context.supabase.rpc("has_role", {
+      _user_id: context.userId,
+      _role: "admin",
+    });
+    if (!isAdmin) throw new Error("Forbidden");
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: rows } = await supabaseAdmin
+      .from("import_jobs")
+      .select("id,job_name,status,checkpoint,stats,error_message,created_at,updated_at,started_at,finished_at")
+      .ilike("job_name", "hadith_import:%")
+      .order("created_at", { ascending: false })
+      .limit(data.limit);
+    return rows ?? [];
+  });
+
+export const cancelHadithImportJob = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) => z.object({ id: z.string().uuid() }).parse(input))
+  .handler(async ({ data, context }) => {
+    const { data: isAdmin } = await context.supabase.rpc("has_role", {
+      _user_id: context.userId,
+      _role: "admin",
+    });
+    if (!isAdmin) throw new Error("Forbidden");
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    await supabaseAdmin
+      .from("import_jobs")
+      .update({ status: "cancelled", cancelled_at: new Date().toISOString() })
+      .eq("id", data.id)
+      .ilike("job_name", "hadith_import:%");
+    return { ok: true as const };
+  });
       return [];
     }
   });
@@ -555,93 +687,52 @@ const HadithApiKeySchema = z.object({ apiKey: z.string().min(16).max(500) });
 export const getHadithDiagnostics = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async (): Promise<HadithDiagnostics> => {
-    const apiConfigured = !!process.env.SUNNAH_API_KEY;
-    if (!apiConfigured) {
-      return {
-        apiConfigured: false,
-        connectionOk: false,
-        has403: false,
-        endpoints: [],
-      };
-    }
-    const probe = await probeSunnahApiConnection();
+    const probe = await probeHadithProviders();
+    const apiConfigured = probe.length > 0;
     return {
-      apiConfigured: true,
-      connectionOk: probe.ok,
-      has403: probe.has403,
-      endpoints: probe.results,
+      apiConfigured,
+      connectionOk: probe.some((p) => p.ok),
+      has403: probe.some((p) => p.status === 403),
+      endpoints: probe.map((p) => ({
+        endpoint: p.id,
+        ok: p.ok,
+        status: p.status,
+        requestId: null,
+        error: p.error,
+      })),
     };
   });
 
 export const testSunnahConnection = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) => HadithApiKeySchema.parse(input))
-  .handler(async ({ data }): Promise<HadithDiagnostics> => {
-    const key = data.apiKey.trim();
-    const base = "https://api.sunnah.com/v1";
-    const checks = [
-      { endpoint: "collections", path: "/collections?page=1&limit=1" },
-      { endpoint: "bukhari_books", path: "/collections/bukhari/books?page=1&limit=1" },
-      { endpoint: "muslim_books", path: "/collections/muslim/books?page=1&limit=1" },
-    ] as const;
-
-    const endpoints: HadithDiagnostics["endpoints"] = [];
-    for (const check of checks) {
-      const response = await fetch(`${base}${check.path}`, {
-        headers: { Accept: "application/json", "X-API-Key": key },
-      }).catch(() => null);
-
-      if (!response) {
-        endpoints.push({ endpoint: check.endpoint, ok: false, status: 0, requestId: null, error: "network_error" });
-        continue;
-      }
-
-      const requestId = response.headers.get("x-request-id") || response.headers.get("request-id");
-      if (response.ok) {
-        endpoints.push({ endpoint: check.endpoint, ok: true, status: response.status, requestId, error: null });
-      } else {
-        const body = await response.text().catch(() => "");
-        endpoints.push({
-          endpoint: check.endpoint,
-          ok: false,
-          status: response.status,
-          requestId,
-          error: body.slice(0, 160) || `http_${response.status}`,
-        });
-      }
-    }
-
+  .handler(async (): Promise<HadithDiagnostics> => {
+    const probe = await probeHadithProviders();
     return {
       apiConfigured: true,
-      connectionOk: endpoints.every((e) => e.ok),
-      has403: endpoints.some((e) => e.status === 403),
-      endpoints,
+      connectionOk: probe.some((p) => p.ok),
+      has403: probe.some((p) => p.status === 403),
+      endpoints: probe.map((p) => ({
+        endpoint: p.id,
+        ok: p.ok,
+        status: p.status,
+        requestId: null,
+        error: p.error,
+      })),
     };
   });
 
 export const updateSunnahApiKey = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) => HadithApiKeySchema.parse(input))
-  .handler(async ({ data, context }) => {
+  .handler(async ({ context }) => {
     const { data: isAdmin } = await context.supabase.rpc("has_role", {
       _user_id: context.userId,
       _role: "admin",
     });
     if (!isAdmin) throw new Error("Forbidden");
 
-    const key = data.apiKey.trim();
-    if (!key) throw new Error("Invalid API key");
-
-    const fs = await import("node:fs/promises");
-    const envPath = ".env";
-    const existing = await fs.readFile(envPath, "utf8").catch(() => "");
-    const hasEntry = /(^|\n)SUNNAH_API_KEY=/.test(existing);
-    const next = hasEntry
-      ? existing.replace(/(^|\n)SUNNAH_API_KEY=.*/g, `$1SUNNAH_API_KEY=${key}`)
-      : `${existing}${existing.endsWith("\n") || existing.length === 0 ? "" : "\n"}SUNNAH_API_KEY=${key}\n`;
-    await fs.writeFile(envPath, next, "utf8");
-
-    return { ok: true as const };
+    return { ok: false as const, message: "Use project secrets to update provider keys securely." };
   });
 
 const HadithTelemetryEventSchema = z.object({
