@@ -362,9 +362,9 @@ export const getHadithKnowledgeBundle = createServerFn({ method: "GET" })
 
     const narrator = (narratorRows ?? [])[0]
       ? {
-          narrator: narratorRows![0].narrator,
-          hadith_count: narratorRows![0].hadith_count,
-          collections: narratorRows![0].collections,
+          narrator: narratorRows![0].narrator ?? entry.narrator ?? "Unknown",
+          hadith_count: narratorRows![0].hadith_count ?? 0,
+          collections: narratorRows![0].collections ?? [entry.collection_slug],
         }
       : null;
 
@@ -487,7 +487,7 @@ export const searchHadith = createServerFn({ method: "POST" })
     const fetchLimit = Math.min(100, Math.max(data.pageSize * (data.page + 2), 30));
     const { data: ranked, error } = await supabaseAdmin.rpc("search_hadith_hybrid", {
       q: query,
-      collections: normalizedCollections.length > 0 ? normalizedCollections : null,
+      collections: normalizedCollections.length > 0 ? normalizedCollections : undefined,
       match_count: fetchLimit,
     });
 
@@ -548,7 +548,13 @@ export const listTopNarrators = createServerFn({ method: "GET" })
         .order("hadith_count", { ascending: false })
         .limit(data.limit);
       if (error || !rows) return [];
-      return rows;
+      return rows
+        .filter((row) => typeof row.narrator === "string" && row.narrator.trim().length > 0)
+        .map((row) => ({
+          narrator: row.narrator!,
+          hadith_count: row.hadith_count ?? 0,
+          collections: row.collections ?? [],
+        }));
     },
   );
 
