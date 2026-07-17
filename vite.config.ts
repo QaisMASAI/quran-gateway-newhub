@@ -5,6 +5,7 @@
 //     error logger plugins, and sandbox detection (port/host/strictPort).
 // You can pass additional config via defineConfig({ vite: { ... }, etc... }) if needed.
 import { defineConfig } from "@lovable.dev/vite-tanstack-config";
+import type { IncomingMessage, ServerResponse } from "node:http";
 import type { Plugin } from "vite";
 
 function suppressDevErrorCollector500(): Plugin {
@@ -13,7 +14,11 @@ function suppressDevErrorCollector500(): Plugin {
     name: "suppress-dev-error-collector-500",
     apply: "serve",
     configureServer(server) {
-      const middleware = (req: Parameters<typeof server.middlewares.use>[0], res: Parameters<typeof server.middlewares.use>[1], next: Parameters<typeof server.middlewares.use>[2]) => {
+      const middleware = (
+        req: IncomingMessage,
+        res: ServerResponse,
+        next: () => void,
+      ) => {
         if (req.method !== "POST" || !req.url?.startsWith(endpoint)) {
           return next();
         }
@@ -36,10 +41,11 @@ function suppressDevErrorCollector500(): Plugin {
       };
 
       // Ensure this runs before Lovable's internal error collector middleware.
-      (server.middlewares as unknown as { stack?: Array<{ route: string; handle: typeof middleware }> }).stack?.unshift({
-        route: "",
-        handle: middleware,
-      });
+      (
+        server.middlewares as unknown as {
+          stack?: Array<{ route: string; handle: typeof middleware }>;
+        }
+      ).stack?.unshift({ route: "", handle: middleware });
     },
   };
 }
