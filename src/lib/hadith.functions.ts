@@ -6,10 +6,7 @@ import { createLovableAiGatewayProvider } from "@/lib/ai-gateway.server";
 import type { Database } from "@/integrations/supabase/types";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import {
-  buildSearchTokens,
   probeHadithProviders,
-  runWithProviderFallback,
-  type ProviderEntry,
 } from "@/lib/hadith-providers.server";
 import { runHadithImportStep, type HadithImportReport } from "@/lib/hadith-ingest.server";
 
@@ -111,6 +108,16 @@ export type HadithSearchResult = {
   total: number;
   hasMore: boolean;
 };
+
+function coerceI18n(value: unknown): { he?: string; ar?: string; en?: string } {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return {};
+  const v = value as Record<string, unknown>;
+  return {
+    he: typeof v.he === "string" ? v.he : undefined,
+    ar: typeof v.ar === "string" ? v.ar : undefined,
+    en: typeof v.en === "string" ? v.en : undefined,
+  };
+}
 
 export type HadithDiagnostics = {
   apiConfigured: boolean;
@@ -279,6 +286,7 @@ export const getHadithKnowledgeBundle = createServerFn({ method: "GET" })
       .parse(input),
   )
   .handler(async ({ data }): Promise<HadithKnowledgeBundle | null> => {
+    try {
     const collection = normalizeHadithCollection(data.collection);
     if (!collection) return null;
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
@@ -324,14 +332,8 @@ export const getHadithKnowledgeBundle = createServerFn({ method: "GET" })
       id: e.id,
       slug: e.slug,
       kind: e.kind,
-      title_i18n:
-        e.title_i18n && typeof e.title_i18n === "object" && !Array.isArray(e.title_i18n)
-          ? (e.title_i18n as { he?: string; ar?: string; en?: string })
-          : {},
-      summary_i18n:
-        e.summary_i18n && typeof e.summary_i18n === "object" && !Array.isArray(e.summary_i18n)
-          ? (e.summary_i18n as { he?: string; ar?: string; en?: string })
-          : {},
+      title_i18n: coerceI18n(e.title_i18n),
+      summary_i18n: coerceI18n(e.summary_i18n),
     }));
 
     const relatedTopics = relatedEntities.filter((e) => e.kind === "topic");
@@ -496,7 +498,32 @@ export const searchHadith = createServerFn({ method: "POST" })
 
     const start = data.page * data.pageSize;
     const end = start + data.pageSize;
-    const rows = (ranked ?? []) as Array<HadithEntryRow>;
+    const rows = (ranked ?? []).map((row) => ({
+      id: row.id,
+      collection_slug: row.collection_slug,
+      book_id: row.book_id,
+      id_in_book: row.id_in_book,
+      global_id: row.global_id,
+      narrator: row.narrator,
+      arabic_text: row.arabic_text,
+      english_text: row.english_text,
+      hebrew_text: null,
+      created_at: new Date().toISOString(),
+      fts: null,
+      embedding: null,
+      embedding_model: null,
+      embedded_at: null,
+      chapter_id: null,
+      grade: null,
+      grade_source: null,
+      chain_text: null,
+      reference_text: null,
+      notes: null,
+      api_source: "import",
+      source_payload: {},
+      import_run_id: null,
+      updated_at: new Date().toISOString(),
+    })) as HadithEntryRow[];
     return {
       items: rows.slice(start, end).map((row) => mapEntryRow(row)),
       total: rows.length,
@@ -622,9 +649,6 @@ export const cancelHadithImportJob = createServerFn({ method: "POST" })
       .ilike("job_name", "hadith_import:%");
     return { ok: true as const };
   });
-      return [];
-    }
-  });
 
 export const listHadithTopics = createServerFn({ method: "GET" })
   .inputValidator((input: unknown) =>
@@ -654,27 +678,23 @@ export const listHadithTopics = createServerFn({ method: "GET" })
       const topicRows = (rows ?? []) as TopicEntityRow[];
       if (topicRows.length === 0) return [];
 
-      const fallbackBooks = await Promise.all([fetchHadithBooks("bukhari"), fetchHadithBooks("muslim")]).then(
-        (all) => all.flat().sort((a, b) => b.hadith_count - a.hadith_count),
-      );
+      const { data: books } = await supabaseAdmin
+        .from("hadith_books")
+        .select("collection_slug,hadith_count")
+        .order("hadith_count", { ascending: false })
+        .limit(topicRows.length);
+
+      const fallbackBooks = books ?? [];
 
       return topicRows.map((topic, index) => {
         const fallbackCount = fallbackBooks[index]?.hadith_count ?? 0;
-        const title = topic.title_i18n;
-        const titleI18n =
-          title && typeof title === "object" && !Array.isArray(title)
-            ? {
-                he: typeof title.he === "string" ? title.he : undefined,
-                ar: typeof title.ar === "string" ? title.ar : undefined,
-                en: typeof title.en === "string" ? title.en : undefined,
-              }
-            : {};
+        const titleI18n = coerceI18n(topic.title_i18n);
         return {
           id: topic.id,
           slug: topic.slug,
           title_i18n: titleI18n,
           hadith_count: fallbackCount,
-          collections: ["bukhari", "muslim"],
+          collections: fallbackBooks[index]?.collection_slug ? [fallbackBooks[index]!.collection_slug] : [],
         };
       });
     } catch {
