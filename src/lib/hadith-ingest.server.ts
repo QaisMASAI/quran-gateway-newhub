@@ -104,7 +104,7 @@ export async function runHadithImportStep(args: {
             chain_text: i.chain_text,
             reference_text: i.reference_text,
             api_source: provider.id,
-            source_payload: i.source_payload,
+            source_payload: i.source_payload as unknown as Database["public"]["Tables"]["hadith_entries"]["Insert"]["source_payload"],
             import_run_id: jobId,
           }));
 
