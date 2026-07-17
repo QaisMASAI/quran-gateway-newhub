@@ -1,4 +1,4 @@
-import { createLazyFileRoute, Link } from "@tanstack/react-router";
+import { createLazyFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useMutation } from "@tanstack/react-query";
 import { useEffect, useMemo, useState } from "react";
 import ReactMarkdown from "react-markdown";
@@ -11,13 +11,16 @@ import { Header } from "@/components/Header";
 import { normalizeLocale, type Locale } from "@/lib/i18n";
 import { getNextMcpRetryDelay } from "@/lib/mcp-outage";
 import { localeTextDir, tafsirFontClass, uiFontClass } from "@/lib/locale-ui";
+import { useQueryPrefillInput } from "@/hooks/useQueryPrefillInput";
+import { trackHomePromptEvent } from "@/lib/home-prompts.functions";
 
 export const Route = createLazyFileRoute("/ask")({
   component: AskPage,
 });
 
 function AskPage() {
-  const { q } = Route.useSearch();
+  const { q, qState, src } = Route.useSearch();
+  const navigate = useNavigate({ from: "/ask" });
   const { t, i18n } = useTranslation("pages");
   const locale = (normalizeLocale(i18n.language) ?? "he") as Locale;
   const examples = t("ask.examples", { returnObjects: true }) as string[];
@@ -26,10 +29,11 @@ function AskPage() {
   const textDir = localeTextDir(locale);
 
   const ask = useServerFn(askQuranResearch);
-  const [question, setQuestion] = useState(() => q);
+  const { input: question, setInput: setQuestion, trimmed } = useQueryPrefillInput({ initialQ: q });
   const [retryAttempt, setRetryAttempt] = useState(0);
   const [retryEta, setRetryEta] = useState<number | null>(null);
   const [chatTurns, setChatTurns] = useState<Array<{ question: string; answer: string }>>([]);
+  const trackPrompt = useServerFn(trackHomePromptEvent);
   const historyPayload = useMemo(
     () =>
       chatTurns.flatMap((turn) => [
@@ -63,11 +67,52 @@ function AskPage() {
   const loading = mutation.isPending;
 
   useEffect(() => {
-    const normalizedQ = typeof q === "string" ? q.trim() : "";
-    if (normalizedQ && normalizedQ !== question.trim()) {
-      setQuestion(normalizedQ);
-    }
-  }, [q, question]);
+    if (src !== "hero_input" && src !== "popular_questions") return;
+    if (qState !== "ok" || !q) return;
+    void trackPrompt({
+      data: {
+        event: "prefill_applied",
+        destination: "/ask",
+        source: src,
+        q,
+        qState,
+      },
+    });
+  }, [q, qState, src, trackPrompt]);
+
+  const prefillMessage =
+    qState === "missing"
+      ? locale === "ar"
+        ? "اكتب سؤالك لبدء الإجابة الموثقة."
+        : locale === "he"
+          ? "כתוב שאלה כדי לקבל תשובה עם מקורות."
+          : "Type your question to get a source-grounded answer."
+      : qState === "empty"
+        ? locale === "ar"
+          ? "قيمة السؤال فارغة — اكتب سؤالًا للمتابعة."
+          : locale === "he"
+            ? "ערך השאלה ריק — כתוב שאלה כדי להמשיך."
+            : "The question value is empty — enter a question to continue."
+        : qState === "invalid"
+          ? locale === "ar"
+            ? "قيمة ?q غير صالحة وتم تنظيفها. راجعها ثم أرسل."
+            : locale === "he"
+              ? "הערך ?q לא תקין ונוקה. אפשר לערוך ואז לשלוח."
+              : "The ?q value was invalid and has been sanitized. You can edit and submit."
+          : null;
+
+  function submitQuestion() {
+    if (trimmed.length < 2) return;
+    void navigate({
+      to: "/ask",
+      search: {
+        q: trimmed,
+        src,
+      },
+      replace: true,
+    });
+    mutation.mutate(trimmed);
+  }
 
   return (
     <div className={`min-h-screen bg-background ${uiClass}`}>
@@ -100,7 +145,7 @@ function AskPage() {
         <form
           onSubmit={(e) => {
             e.preventDefault();
-            if (question.trim().length > 1) mutation.mutate(question.trim());
+            submitQuestion();
           }}
           className="surface-card flex items-center gap-2 p-2"
         >
@@ -122,6 +167,11 @@ function AskPage() {
             <span>{t("ask.send")}</span>
           </button>
         </form>
+          {prefillMessage ? (
+            <p className="mt-3 rounded-lg border border-border bg-card px-3 py-2 text-xs text-muted-foreground">
+              {prefillMessage}
+            </p>
+          ) : null}
 
         {!result && !loading && (
           <div className="mt-5">
@@ -135,6 +185,11 @@ function AskPage() {
                   type="button"
                   onClick={() => {
                     setQuestion(ex);
+                    void navigate({
+                      to: "/ask",
+                      search: { q: ex, src: "unknown" },
+                      replace: true,
+                    });
                     mutation.mutate(ex);
                   }}
                   disabled={loading}

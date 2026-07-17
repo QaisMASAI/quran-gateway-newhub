@@ -7,7 +7,7 @@ import {
   HeadContent,
   Scripts,
 } from "@tanstack/react-router";
-import { useEffect, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 
 import appCss from "../styles.css?url";
@@ -216,6 +216,10 @@ function RootShell({ children }: { children: ReactNode }) {
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
   const router = useRouter();
+  const [devErrorStatus, setDevErrorStatus] = useState<{
+    interceptedCount: number;
+    lastViteError: string | null;
+  } | null>(null);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -232,9 +236,60 @@ function RootComponent() {
     }
   }, [router]);
 
+  useEffect(() => {
+    if (!import.meta.env.DEV) return;
+    let cancelled = false;
+
+    const poll = async () => {
+      try {
+        const res = await fetch("/__lovable/dev-error-status", {
+          method: "GET",
+          headers: { accept: "application/json" },
+        });
+        if (!res.ok) return;
+        const json = (await res.json()) as {
+          interceptedCount?: number;
+          lastViteError?: string | null;
+        };
+        if (cancelled) return;
+        setDevErrorStatus({
+          interceptedCount: json.interceptedCount ?? 0,
+          lastViteError: json.lastViteError ?? null,
+        });
+      } catch {
+        // noop in local/dev only banner
+      }
+    };
+
+    void poll();
+    const id = window.setInterval(() => {
+      void poll();
+    }, 2500);
+
+    return () => {
+      cancelled = true;
+      window.clearInterval(id);
+    };
+  }, []);
+
+  const showDevBanner =
+    import.meta.env.DEV &&
+    !!devErrorStatus &&
+    (devErrorStatus.interceptedCount > 0 || !!devErrorStatus.lastViteError);
+
   return (
     <QueryClientProvider client={queryClient}>
       <DirectionProvider>
+        {showDevBanner ? (
+          <div className="sticky top-0 z-50 border-b border-warning/40 bg-warning-soft px-4 py-2 text-xs text-warning-foreground">
+            <strong>Dev middleware active:</strong> intercepted /__lovable/error-collector {devErrorStatus?.interceptedCount ?? 0} time(s).
+            {devErrorStatus?.lastViteError ? (
+              <span className="ml-2">Latest Vite error: {devErrorStatus.lastViteError}</span>
+            ) : (
+              <span className="ml-2">No underlying Vite transform/build error captured yet.</span>
+            )}
+          </div>
+        ) : null}
         {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
         <Outlet />
         <BottomNav />
