@@ -2,6 +2,9 @@ import { createFileRoute } from "@tanstack/react-router";
 import i18n, { normalizeLocale } from "@/lib/i18n";
 
 export const Route = createFileRoute("/search")({
+  validateSearch: (search: Record<string, unknown>) => ({
+    q: typeof search.q === "string" ? search.q : "",
+  }),
   head: () => {
     const locale = normalizeLocale(i18n.resolvedLanguage) ?? "he";
     return {
