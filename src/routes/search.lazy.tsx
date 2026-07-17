@@ -30,13 +30,14 @@ export const Route = createLazyFileRoute("/search")({
 });
 
 function SearchPage() {
+  const { q } = Route.useSearch();
   const { t, i18n } = useTranslation("pages");
   const locale = (normalizeLocale(i18n.language) ?? "he") as Locale;
   const isRtl = i18n.dir() === "rtl";
   const uiClass = uiFontClass(locale);
   const tafsirClass = tafsirFontClass(locale);
   const textDir = localeTextDir(locale);
-  const [input, setInput] = useState("");
+  const [input, setInput] = useState(() => q);
   const [hadithPage, setHadithPage] = useState(0);
   const deferred = useDeferredValue(input);
   const trimmed = deferred.trim();
@@ -104,6 +105,13 @@ function SearchPage() {
   useEffect(() => {
     setHadithPage(0);
   }, [trimmed]);
+
+  useEffect(() => {
+    const normalizedQ = typeof q === "string" ? q.trim() : "";
+    if (normalizedQ && normalizedQ !== input.trim()) {
+      setInput(normalizedQ);
+    }
+  }, [q, input]);
 
   const results = useMemo(() => {
     if (!indexQ.data) return null;

@@ -1,6 +1,6 @@
 import { createLazyFileRoute, Link } from "@tanstack/react-router";
 import { useMutation } from "@tanstack/react-query";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import { useTranslation } from "react-i18next";
 import { useServerFn } from "@tanstack/react-start";
@@ -17,6 +17,7 @@ export const Route = createLazyFileRoute("/ask")({
 });
 
 function AskPage() {
+  const { q } = Route.useSearch();
   const { t, i18n } = useTranslation("pages");
   const locale = (normalizeLocale(i18n.language) ?? "he") as Locale;
   const examples = t("ask.examples", { returnObjects: true }) as string[];
@@ -25,7 +26,7 @@ function AskPage() {
   const textDir = localeTextDir(locale);
 
   const ask = useServerFn(askQuranResearch);
-  const [question, setQuestion] = useState("");
+  const [question, setQuestion] = useState(() => q);
   const [retryAttempt, setRetryAttempt] = useState(0);
   const [retryEta, setRetryEta] = useState<number | null>(null);
   const [chatTurns, setChatTurns] = useState<Array<{ question: string; answer: string }>>([]);
@@ -60,6 +61,13 @@ function AskPage() {
 
   const result = mutation.data;
   const loading = mutation.isPending;
+
+  useEffect(() => {
+    const normalizedQ = typeof q === "string" ? q.trim() : "";
+    if (normalizedQ && normalizedQ !== question.trim()) {
+      setQuestion(normalizedQ);
+    }
+  }, [q, question]);
 
   return (
     <div className={`min-h-screen bg-background ${uiClass}`}>
