@@ -1,4 +1,4 @@
-import { createLazyFileRoute, Link } from "@tanstack/react-router";
+import { createLazyFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useMemo, useState, useDeferredValue, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
@@ -24,25 +24,29 @@ import { EntityCard } from "@/components/discovery/EntityCard";
 import { normalizeLocale, type Locale } from "@/lib/i18n";
 import { localeTextDir, tafsirFontClass, uiFontClass } from "@/lib/locale-ui";
 import type { ReactNode } from "react";
+import { useQueryPrefillInput } from "@/hooks/useQueryPrefillInput";
+import { trackHomePromptEvent } from "@/lib/home-prompts.functions";
 
 export const Route = createLazyFileRoute("/search")({
   component: SearchPage,
 });
 
 function SearchPage() {
-  const { q } = Route.useSearch();
+  const { q, qState, src } = Route.useSearch();
+  const navigate = useNavigate({ from: "/search" });
   const { t, i18n } = useTranslation("pages");
   const locale = (normalizeLocale(i18n.language) ?? "he") as Locale;
   const isRtl = i18n.dir() === "rtl";
   const uiClass = uiFontClass(locale);
   const tafsirClass = tafsirFontClass(locale);
   const textDir = localeTextDir(locale);
-  const [input, setInput] = useState(() => q);
+  const { input, setInput, trimmed } = useQueryPrefillInput({ initialQ: q });
   const [hadithPage, setHadithPage] = useState(0);
   const deferred = useDeferredValue(input);
-  const trimmed = deferred.trim();
+  const deferredTrimmed = deferred.trim();
   const runQuranItemsHybrid = useServerFn(searchQuranItemsHybrid);
   const runHadithSearch = useServerFn(searchHadith);
+  const trackPrompt = useServerFn(trackHomePromptEvent);
 
   const indexQ = useQuery({
     queryKey: ["quran-index"],
@@ -52,45 +56,45 @@ function SearchPage() {
   });
 
   const entitiesQ = useQuery({
-    queryKey: ["entity-search", trimmed],
-    queryFn: () => searchEntities(trimmed, 12),
-    enabled: trimmed.length >= 2,
+    queryKey: ["entity-search", deferredTrimmed],
+    queryFn: () => searchEntities(deferredTrimmed, 12),
+    enabled: deferredTrimmed.length >= 2,
     staleTime: 60_000,
   });
 
   const textsQ = useQuery({
-    queryKey: ["knowledge-text-search", trimmed],
-    queryFn: () => searchKnowledgeTexts(trimmed, 10),
-    enabled: trimmed.length >= 2,
+    queryKey: ["knowledge-text-search", deferredTrimmed],
+    queryFn: () => searchKnowledgeTexts(deferredTrimmed, 10),
+    enabled: deferredTrimmed.length >= 2,
     staleTime: 60_000,
   });
 
   const quranItemsQ = useQuery({
-    queryKey: ["quran-items-hybrid", trimmed, locale],
+    queryKey: ["quran-items-hybrid", deferredTrimmed, locale],
     queryFn: () =>
       runQuranItemsHybrid({
         data: {
-          q: trimmed,
+          q: deferredTrimmed,
           language: locale,
           semantic: true,
           limit: 8,
         },
       }),
-    enabled: trimmed.length >= 2,
+    enabled: deferredTrimmed.length >= 2,
     staleTime: 60_000,
   });
 
   const hadithQ = useQuery({
-    queryKey: ["hadith-search", trimmed, hadithPage],
+    queryKey: ["hadith-search", deferredTrimmed, hadithPage],
     queryFn: () =>
       runHadithSearch({
         data: {
-          q: trimmed,
+          q: deferredTrimmed,
           page: hadithPage,
           pageSize: 8,
         },
       }),
-    enabled: trimmed.length >= 2,
+    enabled: deferredTrimmed.length >= 2,
     staleTime: 60_000,
   });
 
@@ -104,7 +108,56 @@ function SearchPage() {
 
   useEffect(() => {
     setHadithPage(0);
-  }, [trimmed]);
+  }, [deferredTrimmed]);
+
+  useEffect(() => {
+    if (src !== "hero_input" && src !== "popular_questions") return;
+    if (qState !== "ok" || !q) return;
+    void trackPrompt({
+      data: {
+        event: "prefill_applied",
+        destination: "/search",
+        source: src,
+        q,
+        qState,
+      },
+    });
+  }, [q, qState, src, trackPrompt]);
+
+  function submitSearch(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const nextQ = trimmed;
+    if (nextQ.length < 2) return;
+    void navigate({
+      to: "/search",
+      search: {
+        q: nextQ,
+        src,
+      },
+      replace: true,
+    });
+  }
+
+  const prefillMessage =
+    qState === "missing"
+      ? locale === "ar"
+        ? "ابدأ بكتابة سؤال للبحث."
+        : locale === "he"
+          ? "התחל בהקלדת שאלה לחיפוש."
+          : "Start by typing a question to search."
+      : qState === "empty"
+        ? locale === "ar"
+          ? "قيمة البحث فارغة — اكتب سؤالًا للمتابعة."
+          : locale === "he"
+            ? "ערך החיפוש ריק — כתוב שאלה כדי להמשיך."
+            : "The search query is empty — enter a question to continue."
+        : qState === "invalid"
+          ? locale === "ar"
+            ? "قيمة ?q غير صالحة وتم تنظيفها. يمكنك تعديلها ثم البحث."
+            : locale === "he"
+              ? "הערך ?q לא תקין ונוקה. אפשר לערוך ולהמשיך בחיפוש."
+              : "The ?q value was invalid and has been sanitized. You can edit it and continue."
+          : null;
 
   useEffect(() => {
     const normalizedQ = typeof q === "string" ? q.trim() : "";
@@ -115,9 +168,9 @@ function SearchPage() {
 
   const results = useMemo(() => {
     if (!indexQ.data) return null;
-    if (trimmed.length < 2) return null;
-    return searchWithFallback(indexQ.data, trimmed, locale);
-  }, [indexQ.data, trimmed, locale]);
+    if (deferredTrimmed.length < 2) return null;
+    return searchWithFallback(indexQ.data, deferredTrimmed, locale);
+  }, [indexQ.data, deferredTrimmed, locale]);
 
   const suggestions = t("search.suggestions", { returnObjects: true }) as string[];
 
@@ -169,7 +222,7 @@ function SearchPage() {
             <Sparkles className="h-3.5 w-3.5" />
             {locale === "ar" ? "بحث دلالي" : locale === "he" ? "חיפוש סמנטי" : "Semantic Search"}
           </div>
-          <div className="flex items-center gap-2 rounded-xl border border-border bg-background px-3 py-2.5">
+          <form onSubmit={submitSearch} className="flex items-center gap-2 rounded-xl border border-border bg-background px-3 py-2.5">
             <SearchIcon className="h-4 w-4 text-muted-foreground" />
             <input
               value={input}
@@ -180,13 +233,24 @@ function SearchPage() {
               dir="auto"
               list="search-suggestions"
             />
+            <button
+              type="submit"
+              className="rounded-lg border border-border px-2 py-1 text-xs text-foreground hover:border-primary/40"
+            >
+              {locale === "ar" ? "ابحث" : locale === "he" ? "חפש" : "Search"}
+            </button>
             {indexQ.isFetching && <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />}
             <datalist id="search-suggestions">
               {[...suggestions, ...quickSuggestions].map((s) => (
                 <option key={s} value={s} />
               ))}
             </datalist>
-          </div>
+          </form>
+          {prefillMessage ? (
+            <p className="mt-2 rounded-lg border border-border bg-background px-3 py-2 text-xs text-muted-foreground">
+              {prefillMessage}
+            </p>
+          ) : null}
           <div className="mt-3 flex flex-wrap gap-2">
             {quickSuggestions.map((s) => (
               <button
@@ -201,7 +265,7 @@ function SearchPage() {
           </div>
         </div>
 
-        {trimmed.length >= 2 && (
+        {deferredTrimmed.length >= 2 && (
           <section className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-4">
             <ResultPill icon={<BookOpen className="h-3.5 w-3.5" />} label="Verses" value={groupedResultCounts.verses} />
             <ResultPill icon={<Library className="h-3.5 w-3.5" />} label="Tafsir" value={groupedResultCounts.tafsir} />
@@ -210,7 +274,7 @@ function SearchPage() {
           </section>
         )}
 
-        {trimmed.length >= 2 && (
+        {deferredTrimmed.length >= 2 && (
           <section className="mt-2 flex flex-wrap gap-1.5">
             <CategoryChip label="Prophets" value={groupedResultCounts.prophets} />
             <CategoryChip label="Stories" value={groupedResultCounts.stories} />
@@ -406,7 +470,7 @@ function SearchPage() {
           </section>
         )}
 
-        {trimmed.length >= 2 && (
+        {deferredTrimmed.length >= 2 && (
           <section className="mt-8 rounded-xl border border-border bg-card/60 p-4">
             <h2 className="text-sm font-semibold text-foreground">
               {locale === "ar"

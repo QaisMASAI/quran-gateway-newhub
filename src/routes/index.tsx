@@ -16,6 +16,7 @@ import { ContinueReading } from "@/components/ContinueReading";
 import { TrustBadge } from "@/components/TrustBadge";
 import { useServerFn } from "@tanstack/react-start";
 import { searchHadith } from "@/lib/hadith.functions";
+import { trackHomePromptEvent } from "@/lib/home-prompts.functions";
 import { ALL_TOPICS } from "@/lib/topics";
 import { listAllEntities, listJourneys, pickLocale } from "@/lib/knowledge";
 import {
@@ -70,6 +71,7 @@ function Home() {
   const isRtl = i18n.dir() === "rtl";
   const navigate = useNavigate();
   const runHadithSearch = useServerFn(searchHadith);
+  const trackPrompt = useServerFn(trackHomePromptEvent);
   const { data, isLoading, error } = useQuery({
     queryKey: ["chapters", lang],
     queryFn: () => fetchChapters(lang),
@@ -173,7 +175,15 @@ function Home() {
     event.preventDefault();
     const q = assistantPrompt.trim();
     if (!q) return;
-    navigate({ to: "/search", search: { q } });
+    void trackPrompt({
+      data: {
+        event: "home_prompt_navigate",
+        destination: "/search",
+        source: "hero_input",
+        q,
+      },
+    });
+    navigate({ to: "/search", search: { q, src: "hero_input" } });
   }
   const filtered = useMemo(() => {
     if (!data) return [];
@@ -361,7 +371,17 @@ function Home() {
               <Link
                 key={question}
                 to="/ask"
-                search={{ q: question }}
+                search={{ q: question, src: "popular_questions" }}
+                onClick={() => {
+                  void trackPrompt({
+                    data: {
+                      event: "home_prompt_navigate",
+                      destination: "/ask",
+                      source: "popular_questions",
+                      q: question,
+                    },
+                  });
+                }}
                 className="surface-card flex items-start gap-3 p-4 transition hover:border-primary/40"
               >
                 <Sparkles className="mt-0.5 h-4 w-4 shrink-0 text-primary" />

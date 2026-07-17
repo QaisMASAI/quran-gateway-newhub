@@ -5,11 +5,14 @@
   "type": "module",
   "scripts": {
     "dev": "vite dev",
-    "build": "vite build",
+    "build": "bun run typecheck:vite && vite build",
     "build:dev": "vite build --mode development",
     "preview": "vite preview",
+    "typecheck": "tsgo -p tsconfig.json",
+    "typecheck:vite": "tsgo -p tsconfig.vite.json",
     "lint": "eslint .",
-    "format": "prettier --write ."
+    "format": "prettier --write .",
+    "test": "bunx vitest run"
   },
   "dependencies": {
     "@ai-sdk/mcp": "^2.0.0",

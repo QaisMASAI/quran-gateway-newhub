@@ -10,34 +10,90 @@ import type { Plugin } from "vite";
 
 function suppressDevErrorCollector500(): Plugin {
   const endpoint = "/__lovable/error-collector";
+  const debugEndpoint = "/__lovable/dev-error-status";
+
+  type DevCollectorState = {
+    interceptedCount: number;
+    lastInterceptedAt: string | null;
+    lastPayloadSnippet: string | null;
+    lastViteError: string | null;
+  };
+
+  const state: DevCollectorState = {
+    interceptedCount: 0,
+    lastInterceptedAt: null,
+    lastPayloadSnippet: null,
+    lastViteError: null,
+  };
+
+  const updateLastViteError = (message: string) => {
+    const normalized = message.trim();
+    if (!normalized) return;
+    const lowered = normalized.toLowerCase();
+    if (
+      lowered.includes("error") ||
+      lowered.includes("failed") ||
+      lowered.includes("transform") ||
+      lowered.includes("ts2339") ||
+      lowered.includes("ts2493")
+    ) {
+      state.lastViteError = normalized.slice(0, 2000);
+    }
+  };
+
   return {
     name: "suppress-dev-error-collector-500",
     apply: "serve",
     configureServer(server) {
+      const logger = server.config.logger;
+      const originalLoggerError = logger.error.bind(logger);
+      logger.error = (msg, options) => {
+        updateLastViteError(typeof msg === "string" ? msg : String(msg));
+        return originalLoggerError(msg, options);
+      };
+
       const middleware = (
         req: IncomingMessage,
         res: ServerResponse,
         next: () => void,
       ) => {
+        if (req.method === "GET" && req.url?.startsWith(debugEndpoint)) {
+          if (!res.writableEnded) {
+            res.statusCode = 200;
+            res.setHeader("content-type", "application/json; charset=utf-8");
+            res.end(JSON.stringify(state));
+          }
+          return;
+        }
+
         if (req.method !== "POST" || !req.url?.startsWith(endpoint)) {
           return next();
         }
 
-        req.on("data", () => {
-          // drain request body
-        });
-        req.on("end", () => {
+        state.interceptedCount += 1;
+        state.lastInterceptedAt = new Date().toISOString();
+
+        let payload = "";
+        let finalized = false;
+        const finalize = () => {
+          if (finalized) return;
+          finalized = true;
+          state.lastPayloadSnippet = payload.slice(0, 2000);
           if (!res.writableEnded) {
             res.statusCode = 204;
+            res.setHeader("x-lovable-error-collector", "intercepted");
             res.end();
           }
+        };
+
+        req.on("data", (chunk: Buffer | string) => {
+          if (payload.length >= 2000) return;
+          payload += typeof chunk === "string" ? chunk : chunk.toString("utf8");
         });
-        req.on("error", () => {
-          if (!res.writableEnded) {
-            res.statusCode = 204;
-            res.end();
-          }
-        });
+        req.on("end", finalize);
+        req.on("error", finalize);
+        req.on("aborted", finalize);
+        req.on("close", finalize);
       };
 
       // Ensure this runs before Lovable's internal error collector middleware.
