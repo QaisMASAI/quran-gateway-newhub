@@ -785,6 +785,50 @@ export type Database = {
           },
         ]
       }
+      hadith_chapters: {
+        Row: {
+          book_id: number
+          chapter_number: number
+          collection_slug: string
+          created_at: string
+          id: number
+          metadata: Json
+          title_ar: string | null
+          title_en: string | null
+          title_he: string | null
+        }
+        Insert: {
+          book_id: number
+          chapter_number: number
+          collection_slug: string
+          created_at?: string
+          id?: number
+          metadata?: Json
+          title_ar?: string | null
+          title_en?: string | null
+          title_he?: string | null
+        }
+        Update: {
+          book_id?: number
+          chapter_number?: number
+          collection_slug?: string
+          created_at?: string
+          id?: number
+          metadata?: Json
+          title_ar?: string | null
+          title_en?: string | null
+          title_he?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "hadith_chapters_collection_slug_fkey"
+            columns: ["collection_slug"]
+            isOneToOne: false
+            referencedRelation: "hadith_collections"
+            referencedColumns: ["slug"]
+          },
+        ]
+      }
       hadith_collections: {
         Row: {
           author_ar: string | null
@@ -868,8 +912,11 @@ export type Database = {
       }
       hadith_entries: {
         Row: {
+          api_source: string
           arabic_text: string
           book_id: number
+          chain_text: string | null
+          chapter_id: number | null
           collection_slug: string
           created_at: string
           embedded_at: string | null
@@ -878,14 +925,24 @@ export type Database = {
           english_text: string | null
           fts: unknown
           global_id: number
+          grade: string | null
+          grade_source: string | null
           hebrew_text: string | null
           id: number
           id_in_book: number
+          import_run_id: string | null
           narrator: string | null
+          notes: string | null
+          reference_text: string | null
+          source_payload: Json
+          updated_at: string
         }
         Insert: {
+          api_source?: string
           arabic_text: string
           book_id: number
+          chain_text?: string | null
+          chapter_id?: number | null
           collection_slug: string
           created_at?: string
           embedded_at?: string | null
@@ -894,14 +951,24 @@ export type Database = {
           english_text?: string | null
           fts?: unknown
           global_id: number
+          grade?: string | null
+          grade_source?: string | null
           hebrew_text?: string | null
           id?: number
           id_in_book: number
+          import_run_id?: string | null
           narrator?: string | null
+          notes?: string | null
+          reference_text?: string | null
+          source_payload?: Json
+          updated_at?: string
         }
         Update: {
+          api_source?: string
           arabic_text?: string
           book_id?: number
+          chain_text?: string | null
+          chapter_id?: number | null
           collection_slug?: string
           created_at?: string
           embedded_at?: string | null
@@ -910,18 +977,95 @@ export type Database = {
           english_text?: string | null
           fts?: unknown
           global_id?: number
+          grade?: string | null
+          grade_source?: string | null
           hebrew_text?: string | null
           id?: number
           id_in_book?: number
+          import_run_id?: string | null
           narrator?: string | null
+          notes?: string | null
+          reference_text?: string | null
+          source_payload?: Json
+          updated_at?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "hadith_entries_chapter_id_fkey"
+            columns: ["chapter_id"]
+            isOneToOne: false
+            referencedRelation: "hadith_chapters"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "hadith_entries_collection_slug_fkey"
             columns: ["collection_slug"]
             isOneToOne: false
             referencedRelation: "hadith_collections"
             referencedColumns: ["slug"]
+          },
+          {
+            foreignKeyName: "hadith_entries_import_run_id_fkey"
+            columns: ["import_run_id"]
+            isOneToOne: false
+            referencedRelation: "import_jobs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      hadith_translations: {
+        Row: {
+          body: string
+          created_at: string
+          fts: unknown
+          hadith_id: number
+          id: number
+          is_machine: boolean
+          language_code: string
+          metadata: Json
+          source: string | null
+          title: string | null
+          translated_at: string | null
+          translator: string | null
+          updated_at: string
+        }
+        Insert: {
+          body: string
+          created_at?: string
+          fts?: unknown
+          hadith_id: number
+          id?: number
+          is_machine?: boolean
+          language_code: string
+          metadata?: Json
+          source?: string | null
+          title?: string | null
+          translated_at?: string | null
+          translator?: string | null
+          updated_at?: string
+        }
+        Update: {
+          body?: string
+          created_at?: string
+          fts?: unknown
+          hadith_id?: number
+          id?: number
+          is_machine?: boolean
+          language_code?: string
+          metadata?: Json
+          source?: string | null
+          title?: string | null
+          translated_at?: string | null
+          translator?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "hadith_translations_hadith_id_fkey"
+            columns: ["hadith_id"]
+            isOneToOne: false
+            referencedRelation: "hadith_entries"
+            referencedColumns: ["id"]
           },
         ]
       }
