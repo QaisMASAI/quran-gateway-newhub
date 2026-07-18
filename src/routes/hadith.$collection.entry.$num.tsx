@@ -14,23 +14,67 @@ import { normalizeLocale } from "@/lib/i18n";
 import { pickLocale, type EntityKind } from "@/lib/knowledge";
 
 export const Route = createFileRoute("/hadith/$collection/entry/$num")({
-  head: ({ params }) => ({
-    meta: [
-      {
-        title: `${params.collection === "bukhari" ? "Sahih al-Bukhari" : "Sahih Muslim"} — Hadith #${params.num}`,
-      },
-      { property: "og:url", content: `/hadith/${params.collection}/entry/${params.num}` },
-    ],
-    links: [{ rel: "canonical", href: `/hadith/${params.collection}/entry/${params.num}` }],
-  }),
+  head: ({ params, loaderData }) => {
+    const bundle = loaderData?.bundle;
+    const h = bundle?.entry;
+    const label =
+      bundle?.collection?.title_en ??
+      (params.collection === "bukhari" ? "Sahih al-Bukhari" : params.collection === "muslim" ? "Sahih Muslim" : params.collection);
+    const title = `${label} — Hadith #${params.num}`;
+    const description = h?.english_text
+      ? h.english_text.slice(0, 150)
+      : `Read authenticated hadith text, related Quran verses, tafsir context, and linked references for ${label} hadith #${params.num}.`;
+    const canonical = `/hadith/${params.collection}/entry/${params.num}`;
+
+    return {
+      meta: [
+        { title },
+        { name: "description", content: description },
+        { property: "og:title", content: title },
+        { property: "og:description", content: description },
+        { property: "og:url", content: canonical },
+        { property: "og:type", content: "article" },
+        { name: "twitter:card", content: "summary_large_image" },
+        { name: "twitter:title", content: title },
+        { name: "twitter:description", content: description },
+      ],
+      links: [{ rel: "canonical", href: canonical }],
+      scripts: h
+        ? [
+            {
+              type: "application/ld+json",
+              children: JSON.stringify({
+                "@context": "https://schema.org",
+                "@type": "Article",
+                headline: title,
+                inLanguage: "ar",
+                isPartOf: {
+                  "@type": "CreativeWorkSeries",
+                  name: label,
+                },
+                articleSection: `Book ${h.book_id}`,
+                pagination: String(h.id_in_book),
+                citation: [
+                  `${label}, Book ${h.book_id}, Hadith ${h.id_in_book}`,
+                  ...(bundle?.relatedVerses ?? []).slice(0, 8).map((v) => `Quran ${v.surah}:${v.ayah}`),
+                ],
+                url: canonical,
+                description,
+              }),
+            },
+          ]
+        : [],
+    };
+  },
   loader: async ({ context, params }) => {
     if (!["bukhari", "muslim"].includes(params.collection)) throw notFound();
     const num = Number(params.num);
     if (!Number.isFinite(num) || num < 1) throw notFound();
-    await context.queryClient.ensureQueryData({
+    const bundle = await context.queryClient.ensureQueryData({
       queryKey: ["hadith", "knowledge", params.collection, num],
       queryFn: () => getHadithKnowledgeBundle({ data: { collection: params.collection, num } }),
     });
+    return { bundle };
   },
   component: HadithDetailPage,
 });
@@ -74,6 +118,12 @@ function HadithDetailPage() {
           relatedHadithSnippets: (bundle?.relatedHadith ?? []).map(
             (rh) => rh.english_text?.slice(0, 280) || rh.arabic_text.slice(0, 280),
           ),
+          citations: [
+            `${label}, Book ${h?.book_id ?? ""}, Hadith ${h?.id_in_book ?? numId}`,
+            ...(bundle?.relatedVerses ?? []).map((v) => `Quran ${v.surah}:${v.ayah}`),
+            ...(bundle?.relatedTafsir ?? []).map((t) => `${t.source_name} ${t.surah}:${t.ayah_start}`),
+            ...(bundle?.relatedAsbab ?? []).map((a) => `Asbab ${a.surah}:${a.ayah_start}`),
+          ],
           lang: locale,
         },
       }),
@@ -166,6 +216,15 @@ function HadithDetailPage() {
               dir="ltr"
             >
               {h.english_text}
+            </p>
+          )}
+          {h.arabic_translation && (
+            <p
+              className="font-reading-ar border-t border-border pt-4 text-base leading-relaxed text-foreground/90"
+              dir="rtl"
+              lang="ar"
+            >
+              {h.arabic_translation}
             </p>
           )}
           {h.hebrew_text && (
@@ -291,6 +350,28 @@ function HadithDetailPage() {
           </section>
         )}
 
+        {(bundle?.relatedAsbab?.length ?? 0) > 0 && (
+          <section className="mt-6 rounded-2xl border border-border bg-card p-5">
+            <h2 className="mb-3 text-sm font-semibold text-foreground">
+              {locale === "ar" ? "أسباب النزول" : locale === "he" ? "אסבאב אל־נוזול" : "Asbab al-Nuzul"}
+            </h2>
+            <div className="space-y-3">
+              {bundle.relatedAsbab.map((a) => (
+                <article key={a.id} className="rounded-lg border border-border bg-background px-3 py-2">
+                  <p className="text-xs text-primary">
+                    {a.surah}:{a.ayah_start}
+                    {a.ayah_end !== a.ayah_start ? `-${a.ayah_end}` : ""}
+                  </p>
+                  <p className="mt-1 text-sm leading-relaxed text-foreground/90">
+                    {a.body.slice(0, 420)}
+                    {a.body.length > 420 ? "…" : ""}
+                  </p>
+                </article>
+              ))}
+            </div>
+          </section>
+        )}
+
         {(bundle?.relatedTopics?.length ?? 0) > 0 && (
           <section className="mt-6">
             <h2 className="mb-3 text-sm font-semibold text-foreground">
@@ -379,6 +460,17 @@ function HadithDetailPage() {
             <p className="mt-1 text-xs text-muted-foreground">
               {bundle.narrator.hadith_count} hadith · {bundle.narrator.collections.join(", ")}
             </p>
+          </section>
+        )}
+
+        {(studySummaryQ.data?.citations?.length ?? 0) > 0 && (
+          <section className="mt-6 rounded-2xl border border-border bg-card p-5">
+            <h2 className="mb-2 text-sm font-semibold text-foreground">
+              {locale === "ar" ? "الاستشهادات" : locale === "he" ? "ציטוטים" : "Citations"}
+            </h2>
+            <ul className="list-disc space-y-1 ps-5 text-xs text-muted-foreground">
+              {studySummaryQ.data?.citations?.map((c) => <li key={c}>{c}</li>)}
+            </ul>
           </section>
         )}
 
