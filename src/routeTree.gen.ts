@@ -47,6 +47,7 @@ import { Route as ApiPublicSurahNamesRouteImport } from './routes/api/public/sur
 import { Route as ApiPublicSeedKnowledgeRouteImport } from './routes/api/public/seed-knowledge'
 import { Route as AuthenticatedAdminSetupRouteImport } from './routes/_authenticated/admin.setup'
 import { Route as AuthenticatedAdminIngestRouteImport } from './routes/_authenticated/admin.ingest'
+import { Route as AuthenticatedAdminHadithIngestRouteImport } from './routes/_authenticated/admin.hadith-ingest'
 import { Route as AuthenticatedAdminHadithApiRouteImport } from './routes/_authenticated/admin.hadith-api'
 import { Route as AuthenticatedAdminBackfillRouteImport } from './routes/_authenticated/admin.backfill'
 import { Route as HadithCollectionEntryNumRouteImport } from './routes/hadith.$collection.entry.$num'
@@ -254,6 +255,12 @@ const AuthenticatedAdminIngestRoute =
     path: '/admin/ingest',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedAdminHadithIngestRoute =
+  AuthenticatedAdminHadithIngestRouteImport.update({
+    id: '/admin/hadith-ingest',
+    path: '/admin/hadith-ingest',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedAdminHadithApiRoute =
   AuthenticatedAdminHadithApiRouteImport.update({
     id: '/admin/hadith-api',
@@ -376,6 +383,7 @@ export interface FileRoutesByFullPath {
   '/topics/': typeof TopicsIndexRoute
   '/admin/backfill': typeof AuthenticatedAdminBackfillRoute
   '/admin/hadith-api': typeof AuthenticatedAdminHadithApiRoute
+  '/admin/hadith-ingest': typeof AuthenticatedAdminHadithIngestRoute
   '/admin/ingest': typeof AuthenticatedAdminIngestRoute
   '/admin/setup': typeof AuthenticatedAdminSetupRoute
   '/api/public/seed-knowledge': typeof ApiPublicSeedKnowledgeRoute
@@ -429,6 +437,7 @@ export interface FileRoutesByTo {
   '/topics': typeof TopicsIndexRoute
   '/admin/backfill': typeof AuthenticatedAdminBackfillRoute
   '/admin/hadith-api': typeof AuthenticatedAdminHadithApiRoute
+  '/admin/hadith-ingest': typeof AuthenticatedAdminHadithIngestRoute
   '/admin/ingest': typeof AuthenticatedAdminIngestRoute
   '/admin/setup': typeof AuthenticatedAdminSetupRoute
   '/api/public/seed-knowledge': typeof ApiPublicSeedKnowledgeRoute
@@ -485,6 +494,7 @@ export interface FileRoutesById {
   '/topics/': typeof TopicsIndexRoute
   '/_authenticated/admin/backfill': typeof AuthenticatedAdminBackfillRoute
   '/_authenticated/admin/hadith-api': typeof AuthenticatedAdminHadithApiRoute
+  '/_authenticated/admin/hadith-ingest': typeof AuthenticatedAdminHadithIngestRoute
   '/_authenticated/admin/ingest': typeof AuthenticatedAdminIngestRoute
   '/_authenticated/admin/setup': typeof AuthenticatedAdminSetupRoute
   '/api/public/seed-knowledge': typeof ApiPublicSeedKnowledgeRoute
@@ -541,6 +551,7 @@ export interface FileRouteTypes {
     | '/topics/'
     | '/admin/backfill'
     | '/admin/hadith-api'
+    | '/admin/hadith-ingest'
     | '/admin/ingest'
     | '/admin/setup'
     | '/api/public/seed-knowledge'
@@ -594,6 +605,7 @@ export interface FileRouteTypes {
     | '/topics'
     | '/admin/backfill'
     | '/admin/hadith-api'
+    | '/admin/hadith-ingest'
     | '/admin/ingest'
     | '/admin/setup'
     | '/api/public/seed-knowledge'
@@ -649,6 +661,7 @@ export interface FileRouteTypes {
     | '/topics/'
     | '/_authenticated/admin/backfill'
     | '/_authenticated/admin/hadith-api'
+    | '/_authenticated/admin/hadith-ingest'
     | '/_authenticated/admin/ingest'
     | '/_authenticated/admin/setup'
     | '/api/public/seed-knowledge'
@@ -985,6 +998,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminIngestRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/admin/hadith-ingest': {
+      id: '/_authenticated/admin/hadith-ingest'
+      path: '/admin/hadith-ingest'
+      fullPath: '/admin/hadith-ingest'
+      preLoaderRoute: typeof AuthenticatedAdminHadithIngestRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/admin/hadith-api': {
       id: '/_authenticated/admin/hadith-api'
       path: '/admin/hadith-api'
@@ -1096,6 +1116,7 @@ declare module '@tanstack/react-router' {
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedAdminBackfillRoute: typeof AuthenticatedAdminBackfillRoute
   AuthenticatedAdminHadithApiRoute: typeof AuthenticatedAdminHadithApiRoute
+  AuthenticatedAdminHadithIngestRoute: typeof AuthenticatedAdminHadithIngestRoute
   AuthenticatedAdminIngestRoute: typeof AuthenticatedAdminIngestRoute
   AuthenticatedAdminSetupRoute: typeof AuthenticatedAdminSetupRoute
   AuthenticatedCollectionsIndexRoute: typeof AuthenticatedCollectionsIndexRoute
@@ -1104,6 +1125,7 @@ interface AuthenticatedRouteRouteChildren {
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAdminBackfillRoute: AuthenticatedAdminBackfillRoute,
   AuthenticatedAdminHadithApiRoute: AuthenticatedAdminHadithApiRoute,
+  AuthenticatedAdminHadithIngestRoute: AuthenticatedAdminHadithIngestRoute,
   AuthenticatedAdminIngestRoute: AuthenticatedAdminIngestRoute,
   AuthenticatedAdminSetupRoute: AuthenticatedAdminSetupRoute,
   AuthenticatedCollectionsIndexRoute: AuthenticatedCollectionsIndexRoute,

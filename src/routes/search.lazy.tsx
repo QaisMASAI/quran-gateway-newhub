@@ -419,22 +419,33 @@ function SearchPage() {
             <SectionTitle>
               {t("search.hadithHits", "Hadith matches")}
             </SectionTitle>
-            <div className="space-y-2">
+            <div className="space-y-3">
               {hadithItems.map((h) => (
                 <Link
                   key={`${h.collection_slug}-${h.global_id}`}
                   to="/hadith/$collection/entry/$num"
                   params={{ collection: h.collection_slug, num: String(h.global_id) }}
-                  className="surface-card block px-4 py-3 transition-colors hover:border-primary/40"
+                  className="surface-card block border-primary/10 bg-gradient-to-br from-card to-primary-soft/10 px-4 py-3 transition-colors hover:border-primary/40"
                 >
-                  <p className="text-xs font-semibold text-primary">
-                    {h.collection_slug === "bukhari" ? "Sahih al-Bukhari" : "Sahih Muslim"} · #{h.id_in_book}
-                  </p>
+                  <div className="flex flex-wrap items-center gap-1.5 text-xs">
+                    <span className="rounded-full border border-primary/20 bg-primary/10 px-2 py-0.5 font-semibold text-primary">
+                      {h.collection_slug === "bukhari" ? "Sahih al-Bukhari" : "Sahih Muslim"}
+                    </span>
+                    <span className="rounded-full border border-border bg-background px-2 py-0.5 text-muted-foreground">
+                      #{h.id_in_book}
+                    </span>
+                  </div>
                   {h.narrator ? <p className="text-[11px] italic text-muted-foreground">{h.narrator}</p> : null}
                   {h.english_text ? (
                     <p className="mt-1 text-sm text-foreground/85">
                       {h.english_text.slice(0, 180)}
                       {h.english_text.length > 180 ? "…" : ""}
+                    </p>
+                  ) : null}
+                  {h.hebrew_text ? (
+                    <p className="mt-1 text-sm text-foreground/75" dir="rtl">
+                      {h.hebrew_text.slice(0, 150)}
+                      {h.hebrew_text.length > 150 ? "…" : ""}
                     </p>
                   ) : null}
                   <p className="mt-1 text-right text-sm text-foreground" dir="rtl" lang="ar">
