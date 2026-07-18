@@ -3,7 +3,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { generateText } from "ai";
 import { createLovableAiGatewayProvider } from "@/lib/ai-gateway.server";
-import type { Database } from "@/integrations/supabase/types";
+import type { Database, Json } from "@/integrations/supabase/types";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import {
   probeHadithProviders,
@@ -94,10 +94,10 @@ export type HadithKnowledgeBundle = {
   relatedAsbab: Array<{
     id: string;
     surah: number;
-    ayah: number;
+    ayah_start: number;
+    ayah_end: number;
     lang: string;
-    source_name: string;
-    text: string;
+    body: string;
   }>;
   relatedTopics: HadithEntityLite[];
   relatedProphets: HadithEntityLite[];
@@ -119,14 +119,23 @@ export type HadithSearchResult = {
   hasMore: boolean;
 };
 
+type HadithAsbabLite = {
+  id: string;
+  surah: number;
+  ayah_start: number;
+  ayah_end: number;
+  lang: string;
+  body: string;
+};
+
 export type HadithAdminDashboard = {
   imports: Array<{
     id: string;
     job_name: string;
     status: Database["public"]["Enums"]["knowledge_job_status"];
-    checkpoint: Record<string, unknown> | null;
-    stats: Record<string, unknown> | null;
-    failed_batches: unknown[] | null;
+    checkpoint: Json;
+    stats: Json;
+    failed_batches: Json;
     error_message: string | null;
     created_at: string;
     updated_at: string;
@@ -411,22 +420,13 @@ export const getHadithKnowledgeBundle = createServerFn({ method: "GET" })
     const { data: asbabRows } = relatedVerses.length
       ? await supabaseAdmin
           .from("asbab_nuzul")
-          .select("id,surah,ayah,lang,source_name,text")
+          .select("id,surah,ayah_start,ayah_end,lang,body")
           .in(
             "surah",
             [...new Set(relatedVerses.map((v) => v.surah))].slice(0, 8),
           )
           .limit(16)
-      : {
-          data: [] as Array<{
-            id: string;
-            surah: number;
-            ayah: number;
-            lang: string;
-            source_name: string;
-            text: string;
-          }>,
-        };
+      : { data: [] as HadithAsbabLite[] };
 
     const { data: relatedHadithRows } = entry.narrator
       ? await supabaseAdmin
@@ -452,7 +452,7 @@ export const getHadithKnowledgeBundle = createServerFn({ method: "GET" })
       narrator,
       relatedVerses,
       relatedTafsir: (tafsirRows ?? []) as HadithTafsirLite[],
-      relatedAsbab: asbabRows ?? [],
+      relatedAsbab: (asbabRows ?? []) as HadithAsbabLite[],
       relatedTopics,
       relatedProphets,
       relatedEntities,
@@ -847,7 +847,9 @@ export const getHadithAdminDashboard = createServerFn({ method: "GET" })
       imports:
         (imports ?? []).map((row) => ({
           ...row,
-          failed_batches: (Array.isArray(row.failed_batches) ? row.failed_batches : null) as unknown[] | null,
+          checkpoint: row.checkpoint,
+          stats: row.stats,
+          failed_batches: row.failed_batches,
         })) ?? [],
       embeddings: {
         total: totalRows,
