@@ -14,16 +14,15 @@ import { normalizeLocale } from "@/lib/i18n";
 import { pickLocale, type EntityKind } from "@/lib/knowledge";
 
 export const Route = createFileRoute("/hadith/$collection/entry/$num")({
-  head: ({ params, loaderData }) => {
-    const bundle = loaderData?.bundle;
-    const h = bundle?.entry;
+  head: ({ params }) => {
     const label =
-      bundle?.collection?.title_en ??
-      (params.collection === "bukhari" ? "Sahih al-Bukhari" : params.collection === "muslim" ? "Sahih Muslim" : params.collection);
+      params.collection === "bukhari"
+        ? "Sahih al-Bukhari"
+        : params.collection === "muslim"
+          ? "Sahih Muslim"
+          : params.collection;
     const title = `${label} — Hadith #${params.num}`;
-    const description = h?.english_text
-      ? h.english_text.slice(0, 150)
-      : `Read authenticated hadith text, related Quran verses, tafsir context, and linked references for ${label} hadith #${params.num}.`;
+    const description = `Read authenticated hadith text, related Quran verses, tafsir context, and linked references for ${label} hadith #${params.num}.`;
     const canonical = `/hadith/${params.collection}/entry/${params.num}`;
 
     return {
@@ -39,31 +38,22 @@ export const Route = createFileRoute("/hadith/$collection/entry/$num")({
         { name: "twitter:description", content: description },
       ],
       links: [{ rel: "canonical", href: canonical }],
-      scripts: h
-        ? [
-            {
-              type: "application/ld+json",
-              children: JSON.stringify({
-                "@context": "https://schema.org",
-                "@type": "Article",
-                headline: title,
-                inLanguage: "ar",
-                isPartOf: {
-                  "@type": "CreativeWorkSeries",
-                  name: label,
-                },
-                articleSection: `Book ${h.book_id}`,
-                pagination: String(h.id_in_book),
-                citation: [
-                  `${label}, Book ${h.book_id}, Hadith ${h.id_in_book}`,
-                  ...(bundle?.relatedVerses ?? []).slice(0, 8).map((v) => `Quran ${v.surah}:${v.ayah}`),
-                ],
-                url: canonical,
-                description,
-              }),
+      scripts: [
+        {
+          type: "application/ld+json",
+          children: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "Article",
+            headline: title,
+            isPartOf: {
+              "@type": "CreativeWorkSeries",
+              name: label,
             },
-          ]
-        : [],
+            url: canonical,
+            description,
+          }),
+        },
+      ],
     };
   },
   loader: async ({ context, params }) => {
