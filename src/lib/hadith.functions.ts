@@ -3,7 +3,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { generateText } from "ai";
 import { createLovableAiGatewayProvider } from "@/lib/ai-gateway.server";
-import type { Database } from "@/integrations/supabase/types";
+import type { Database, Json } from "@/integrations/supabase/types";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import {
   probeHadithProviders,
@@ -58,6 +58,7 @@ export type HadithEntry = {
   arabic_text: string;
   english_text: string | null;
   hebrew_text: string | null;
+  arabic_translation: string | null;
 };
 
 type HadithEntityLite = {
@@ -90,6 +91,14 @@ export type HadithKnowledgeBundle = {
   narrator: HadithNarratorProfile | null;
   relatedVerses: Array<{ surah: number; ayah: number; weight: number }>;
   relatedTafsir: HadithTafsirLite[];
+  relatedAsbab: Array<{
+    id: string;
+    surah: number;
+    ayah_start: number;
+    ayah_end: number;
+    lang: string;
+    body: string;
+  }>;
   relatedTopics: HadithEntityLite[];
   relatedProphets: HadithEntityLite[];
   relatedEntities: HadithEntityLite[];
@@ -101,12 +110,44 @@ export type HadithStudySummary = {
   historical_context: string;
   why_narrated: string;
   main_lessons: string;
+  citations?: string[];
 };
 
 export type HadithSearchResult = {
   items: HadithEntry[];
   total: number;
   hasMore: boolean;
+};
+
+type HadithAsbabLite = {
+  id: string;
+  surah: number;
+  ayah_start: number;
+  ayah_end: number;
+  lang: string;
+  body: string;
+};
+
+export type HadithAdminDashboard = {
+  imports: Array<{
+    id: string;
+    job_name: string;
+    status: Database["public"]["Enums"]["knowledge_job_status"];
+    checkpoint: Json;
+    stats: Json;
+    failed_batches: Json;
+    error_message: string | null;
+    created_at: string;
+    updated_at: string;
+    started_at: string | null;
+    finished_at: string | null;
+  }>;
+  embeddings: {
+    total: number;
+    embedded: number;
+    pending: number;
+    latestEmbeddedAt: string | null;
+  };
 };
 
 function coerceI18n(value: unknown): { he?: string; ar?: string; en?: string } {
@@ -172,6 +213,7 @@ function mapEntryRow(row: HadithEntryRow): HadithEntry {
     arabic_text: row.arabic_text,
     english_text: row.english_text,
     hebrew_text: row.hebrew_text,
+    arabic_translation: null,
   };
 }
 
@@ -273,7 +315,20 @@ export const getHadithEntry = createServerFn({ method: "GET" })
       if (error) console.error("hadith_entry_read_failed", error.message);
       return null;
     }
-    return mapEntryRow(row as HadithEntryRow);
+    const entry = mapEntryRow(row as HadithEntryRow);
+    const { data: translations } = await supabaseAdmin
+      .from("hadith_translations")
+      .select("language_code,body")
+      .eq("hadith_id", entry.id)
+      .in("language_code", ["en", "he", "ar"]);
+
+    for (const t of translations ?? []) {
+      if (t.language_code === "en" && t.body) entry.english_text = t.body;
+      if (t.language_code === "he" && t.body) entry.hebrew_text = t.body;
+      if (t.language_code === "ar" && t.body) entry.arabic_translation = t.body;
+    }
+
+    return entry;
   });
 
 export const getHadithKnowledgeBundle = createServerFn({ method: "GET" })
@@ -299,6 +354,18 @@ export const getHadithKnowledgeBundle = createServerFn({ method: "GET" })
       .maybeSingle();
     if (!entryRow) return null;
     const entry = mapEntryRow(entryRow as HadithEntryRow);
+
+    const { data: translationRows } = await supabaseAdmin
+      .from("hadith_translations")
+      .select("language_code,body")
+      .eq("hadith_id", entry.id)
+      .in("language_code", ["en", "he", "ar"]);
+
+    for (const t of translationRows ?? []) {
+      if (t.language_code === "en" && t.body) entry.english_text = t.body;
+      if (t.language_code === "he" && t.body) entry.hebrew_text = t.body;
+      if (t.language_code === "ar" && t.body) entry.arabic_translation = t.body;
+    }
 
     const [{ data: collectionMeta }, { data: narratorRows }, { data: links }] = await Promise.all([
       supabaseAdmin
@@ -350,6 +417,17 @@ export const getHadithKnowledgeBundle = createServerFn({ method: "GET" })
           .limit(12)
       : { data: [] as Array<HadithTafsirLite> };
 
+    const { data: asbabRows } = relatedVerses.length
+      ? await supabaseAdmin
+          .from("asbab_nuzul")
+          .select("id,surah,ayah_start,ayah_end,lang,body")
+          .in(
+            "surah",
+            [...new Set(relatedVerses.map((v) => v.surah))].slice(0, 8),
+          )
+          .limit(16)
+      : { data: [] as HadithAsbabLite[] };
+
     const { data: relatedHadithRows } = entry.narrator
       ? await supabaseAdmin
           .from("hadith_entries")
@@ -374,6 +452,7 @@ export const getHadithKnowledgeBundle = createServerFn({ method: "GET" })
       narrator,
       relatedVerses,
       relatedTafsir: (tafsirRows ?? []) as HadithTafsirLite[],
+      relatedAsbab: (asbabRows ?? []) as HadithAsbabLite[],
       relatedTopics,
       relatedProphets,
       relatedEntities,
@@ -397,6 +476,7 @@ export const generateHadithStudySummary = createServerFn({ method: "POST" })
         verseRefs: z.array(z.string().min(3).max(20)).max(12).optional().default([]),
         tafsirSnippets: z.array(z.string().min(1).max(700)).max(8).optional().default([]),
         relatedHadithSnippets: z.array(z.string().min(1).max(500)).max(6).optional().default([]),
+          citations: z.array(z.string().min(1).max(120)).max(24).optional().default([]),
         lang: z.enum(["he", "ar", "en"]).optional().default("en"),
       })
       .parse(input),
@@ -424,6 +504,7 @@ export const generateHadithStudySummary = createServerFn({ method: "POST" })
       data.relatedHadithSnippets.length
         ? `Related hadith snippets:\n- ${data.relatedHadithSnippets.join("\n- ")}`
         : "",
+      data.citations.length ? `Citations you must ground on:\n- ${data.citations.join("\n- ")}` : "",
       "Return strict JSON only.",
     ]
       .filter(Boolean)
@@ -452,6 +533,7 @@ export const generateHadithStudySummary = createServerFn({ method: "POST" })
         historical_context: safe(parsed.historical_context),
         why_narrated: safe(parsed.why_narrated),
         main_lessons: safe(parsed.main_lessons),
+        citations: data.citations.slice(0, 12),
       };
     } catch {
       return null;
@@ -498,7 +580,7 @@ export const searchHadith = createServerFn({ method: "POST" })
 
     const start = data.page * data.pageSize;
     const end = start + data.pageSize;
-    const rows = (ranked ?? []).map((row) => ({
+    const exactRows = (ranked ?? []).map((row) => ({
       id: row.id,
       collection_slug: row.collection_slug,
       book_id: row.book_id,
@@ -508,6 +590,7 @@ export const searchHadith = createServerFn({ method: "POST" })
       arabic_text: row.arabic_text,
       english_text: row.english_text,
       hebrew_text: null,
+      arabic_translation: null,
       created_at: new Date().toISOString(),
       fts: null,
       embedding: null,
@@ -524,8 +607,43 @@ export const searchHadith = createServerFn({ method: "POST" })
       import_run_id: null,
       updated_at: new Date().toISOString(),
     })) as HadithEntryRow[];
+    const typoTokens = query
+      .toLowerCase()
+      .split(/\s+/)
+      .map((v) => v.trim())
+      .filter((v) => v.length >= 3)
+      .slice(0, 3);
+
+    let fallbackRows: HadithEntry[] = [];
+    if (typoTokens.length > 0) {
+      let fallbackQuery = supabaseAdmin
+        .from("hadith_entries")
+        .select("id,collection_slug,book_id,id_in_book,global_id,narrator,arabic_text,english_text,hebrew_text")
+        .order("global_id", { ascending: false })
+        .limit(40);
+
+      if (normalizedCollections.length > 0) {
+        fallbackQuery = fallbackQuery.in("collection_slug", normalizedCollections);
+      }
+
+      const joined = typoTokens.join(" ");
+      fallbackQuery = fallbackQuery.or(
+        `english_text.ilike.%${joined}%,hebrew_text.ilike.%${joined}%,arabic_text.ilike.%${joined}%,narrator.ilike.%${joined}%`,
+      );
+
+      const { data: fallback } = await fallbackQuery;
+      fallbackRows = (fallback ?? []).map((row) => mapEntryRow(row as HadithEntryRow));
+    }
+
+    const merged = new Map<number, HadithEntry>();
+    for (const row of exactRows) merged.set(row.id, mapEntryRow(row as HadithEntryRow));
+    for (const row of fallbackRows) {
+      if (!merged.has(row.id)) merged.set(row.id, row);
+    }
+
+    const rows = Array.from(merged.values());
     return {
-      items: rows.slice(start, end).map((row) => mapEntryRow(row)),
+      items: rows.slice(start, end),
       total: rows.length,
       hasMore: end < rows.length,
     };
@@ -631,7 +749,7 @@ export const listHadithImportJobs = createServerFn({ method: "GET" })
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { data: rows } = await supabaseAdmin
       .from("import_jobs")
-      .select("id,job_name,status,checkpoint,stats,error_message,created_at,updated_at,started_at,finished_at")
+      .select("id,job_name,status,checkpoint,stats,failed_batches,error_message,created_at,updated_at,started_at,finished_at")
       .ilike("job_name", "hadith_import:%")
       .order("created_at", { ascending: false })
       .limit(data.limit);
@@ -654,6 +772,92 @@ export const cancelHadithImportJob = createServerFn({ method: "POST" })
       .eq("id", data.id)
       .ilike("job_name", "hadith_import:%");
     return { ok: true as const };
+  });
+
+export const retryHadithImportJob = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) => z.object({ id: z.string().uuid() }).parse(input))
+  .handler(async ({ data, context }) => {
+    const { data: isAdmin } = await context.supabase.rpc("has_role", {
+      _user_id: context.userId,
+      _role: "admin",
+    });
+    if (!isAdmin) throw new Error("Forbidden");
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    await supabaseAdmin
+      .from("import_jobs")
+      .update({ status: "queued", error_message: null, cancelled_at: null, updated_at: new Date().toISOString() })
+      .eq("id", data.id)
+      .ilike("job_name", "hadith_import:%");
+    return { ok: true as const };
+  });
+
+export const runHadithEmbeddingsWorker = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) =>
+    z
+      .object({
+        batch: z.number().int().min(1).max(500).optional().default(200),
+        untilDone: z.boolean().optional().default(false),
+        maxRuns: z.number().int().min(1).max(100).optional().default(5),
+      })
+      .parse(input ?? {}),
+  )
+  .handler(async ({ context, data }) => {
+    const { data: isAdmin } = await context.supabase.rpc("has_role", {
+      _user_id: context.userId,
+      _role: "admin",
+    });
+    if (!isAdmin) throw new Error("Forbidden");
+    const { embedHadithBatchJob } = await import("@/lib/hadith-graph.server");
+    return embedHadithBatchJob({ batch: data.batch, untilDone: data.untilDone, maxRuns: data.maxRuns });
+  });
+
+export const getHadithAdminDashboard = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }): Promise<HadithAdminDashboard> => {
+    const { data: isAdmin } = await context.supabase.rpc("has_role", {
+      _user_id: context.userId,
+      _role: "admin",
+    });
+    if (!isAdmin) throw new Error("Forbidden");
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+
+    const [{ data: imports }, { count: total }, { count: embedded }, { data: latestEmbedded }] = await Promise.all([
+      supabaseAdmin
+        .from("import_jobs")
+        .select("id,job_name,status,checkpoint,stats,failed_batches,error_message,created_at,updated_at,started_at,finished_at")
+        .ilike("job_name", "hadith_import:%")
+        .order("created_at", { ascending: false })
+        .limit(50),
+      supabaseAdmin.from("hadith_entries").select("id", { count: "exact", head: true }),
+      supabaseAdmin.from("hadith_entries").select("id", { count: "exact", head: true }).not("embedding", "is", null),
+      supabaseAdmin
+        .from("hadith_entries")
+        .select("embedded_at")
+        .not("embedded_at", "is", null)
+        .order("embedded_at", { ascending: false })
+        .limit(1)
+        .maybeSingle(),
+    ]);
+
+    const totalRows = total ?? 0;
+    const embeddedRows = embedded ?? 0;
+    return {
+      imports:
+        (imports ?? []).map((row) => ({
+          ...row,
+          checkpoint: row.checkpoint,
+          stats: row.stats,
+          failed_batches: row.failed_batches,
+        })) ?? [],
+      embeddings: {
+        total: totalRows,
+        embedded: embeddedRows,
+        pending: Math.max(0, totalRows - embeddedRows),
+        latestEmbeddedAt: latestEmbedded?.embedded_at ?? null,
+      },
+    };
   });
 
 export const listHadithTopics = createServerFn({ method: "GET" })
