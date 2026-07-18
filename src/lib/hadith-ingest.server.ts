@@ -86,6 +86,7 @@ export async function runHadithImportStep(args: {
   let failedRows = stats.failedRows ?? 0;
   let currentBookOffset = checkpoint.bookOffset ?? stats.booksProcessed ?? 0;
   let totalBooks = stats.totalBooks ?? checkpoint.totalBooks ?? 0;
+  let earlyResult: HadithImportReport | null = null;
 
   const appendFailed = (entry: NonNullable<HadithImportReport["failedBatches"]>[number]) => {
     failedBatches.push(entry);
@@ -149,7 +150,7 @@ export async function runHadithImportStep(args: {
                 updated_at: new Date().toISOString(),
               })
               .eq("id", jobId);
-            return {
+            earlyResult = {
               ok: true,
               jobId,
               provider: provider.id,
@@ -163,6 +164,7 @@ export async function runHadithImportStep(args: {
               status: "retrying",
               statusMessage: `Paused on fetch error at book ${book.book_id}, page ${page}`,
             };
+            break;
           }
           rowsReceived += items.length;
           if (items.length === 0) break;
@@ -256,10 +258,13 @@ export async function runHadithImportStep(args: {
             .eq("id", jobId);
           if (reachedEnd) break;
         }
+        if (earlyResult) break;
         currentBookOffset = bookOffset + 1;
       }
       return provider.id;
     });
+
+    if (earlyResult) return earlyResult;
 
     const finalBookOffset = currentBookOffset;
     const isDone = totalBooks > 0 && finalBookOffset >= totalBooks;
