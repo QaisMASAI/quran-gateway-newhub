@@ -912,11 +912,15 @@ export const listHadithTopics = createServerFn({ method: "GET" })
     }
   });
 
-const HadithApiKeySchema = z.object({ apiKey: z.string().min(16).max(500) });
-
 export const getHadithDiagnostics = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
-  .handler(async (): Promise<HadithDiagnostics> => {
+  .handler(async ({ context }): Promise<HadithDiagnostics> => {
+    const { data: isAdmin } = await context.supabase.rpc("has_role", {
+      _user_id: context.userId,
+      _role: "admin",
+    });
+    if (!isAdmin) throw new Error("Forbidden");
+
     const probe = await probeHadithProviders();
     const apiConfigured = probe.length > 0;
     return {
@@ -931,38 +935,6 @@ export const getHadithDiagnostics = createServerFn({ method: "GET" })
         error: p.error,
       })),
     };
-  });
-
-export const testSunnahConnection = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
-  .inputValidator((input: unknown) => HadithApiKeySchema.parse(input))
-  .handler(async (): Promise<HadithDiagnostics> => {
-    const probe = await probeHadithProviders();
-    return {
-      apiConfigured: true,
-      connectionOk: probe.some((p) => p.ok),
-      has403: probe.some((p) => p.status === 403),
-      endpoints: probe.map((p) => ({
-        endpoint: p.id,
-        ok: p.ok,
-        status: p.status,
-        requestId: null,
-        error: p.error,
-      })),
-    };
-  });
-
-export const updateSunnahApiKey = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
-  .inputValidator((input: unknown) => HadithApiKeySchema.parse(input))
-  .handler(async ({ context }) => {
-    const { data: isAdmin } = await context.supabase.rpc("has_role", {
-      _user_id: context.userId,
-      _role: "admin",
-    });
-    if (!isAdmin) throw new Error("Forbidden");
-
-    return { ok: false as const, message: "Use project secrets to update provider keys securely." };
   });
 
 const HadithTelemetryEventSchema = z.object({
@@ -1020,7 +992,13 @@ export const trackHadithTelemetryEvent = createServerFn({ method: "POST" })
 
 export const getHadithTelemetrySnapshot = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
-  .handler(async (): Promise<HadithTelemetrySnapshot> => {
+  .handler(async ({ context }): Promise<HadithTelemetrySnapshot> => {
+    const { data: isAdmin } = await context.supabase.rpc("has_role", {
+      _user_id: context.userId,
+      _role: "admin",
+    });
+    if (!isAdmin) throw new Error("Forbidden");
+
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const bucketDate = new Date().toISOString().slice(0, 10);
     const key = `hadith_telemetry_${bucketDate}`;

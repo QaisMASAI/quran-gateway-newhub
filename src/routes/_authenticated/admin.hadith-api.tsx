@@ -1,32 +1,28 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { useState } from "react";
 import { Header } from "@/components/Header";
 import {
   getHadithDiagnostics,
   getHadithTelemetrySnapshot,
-  testSunnahConnection,
-  updateSunnahApiKey,
 } from "@/lib/hadith.functions";
 
 export const Route = createFileRoute("/_authenticated/admin/hadith-api")({
   component: AdminHadithApiPage,
   head: () => ({
     meta: [
-      { title: "Hadith API Admin" },
-      { name: "description", content: "Diagnostics, key validation, and telemetry for Sunnah API." },
+      { title: "Hadith Provider Admin" },
+      {
+        name: "description",
+        content: "Diagnostics and telemetry for background hadith import providers.",
+      },
     ],
   }),
 });
 
 function AdminHadithApiPage() {
-  const [draftKey, setDraftKey] = useState("");
-
   const diagnosticsFn = useServerFn(getHadithDiagnostics);
   const telemetryFn = useServerFn(getHadithTelemetrySnapshot);
-  const testFn = useServerFn(testSunnahConnection);
-  const saveFn = useServerFn(updateSunnahApiKey);
 
   const diagnosticsQ = useQuery({
     queryKey: ["admin", "hadith", "diagnostics"],
@@ -39,26 +35,8 @@ function AdminHadithApiPage() {
     queryFn: () => telemetryFn(),
     refetchInterval: 60_000,
   });
-
-  const testM = useMutation({
-    mutationFn: (apiKey: string) => testFn({ data: { apiKey } }),
-  });
-
-  const saveM = useMutation({
-    mutationFn: (apiKey: string) => saveFn({ data: { apiKey } }),
-    onSuccess: () => diagnosticsQ.refetch(),
-  });
-
-  const testResult = testM.data;
   const diagnostics = diagnosticsQ.data;
   const telemetry = telemetryQ.data;
-
-  const canSave =
-    !!testResult &&
-    testResult.connectionOk &&
-    draftKey.trim().length >= 16 &&
-    !saveM.isPending &&
-    !testM.isPending;
 
   return (
     <div className="min-h-screen bg-background">
@@ -66,7 +44,7 @@ function AdminHadithApiPage() {
       <main className="mx-auto max-w-5xl px-4 py-8 sm:px-6">
         <h1 className="text-2xl font-bold text-foreground">Hadith API diagnostics</h1>
         <p className="mt-1 text-sm text-muted-foreground">
-          Validate Sunnah connectivity, inspect 403s by endpoint, and monitor Hadith route health.
+          Monitor importer provider connectivity and hadith-route health.
         </p>
 
         <section className="mt-6 rounded-xl border border-border bg-card p-4">
@@ -105,50 +83,6 @@ function AdminHadithApiPage() {
               </div>
             </>
           )}
-        </section>
-
-        <section className="mt-6 rounded-xl border border-border bg-card p-4">
-          <h2 className="text-sm font-semibold text-foreground">Update SUNNAH_API_KEY</h2>
-          <p className="mt-1 text-xs text-muted-foreground">
-            Test the key first. Save is enabled only after a successful connection test.
-          </p>
-          <div className="mt-3 space-y-3">
-            <input
-              type="password"
-              value={draftKey}
-              onChange={(e) => setDraftKey(e.target.value)}
-              placeholder="Paste a Sunnah API key"
-              className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm"
-              autoComplete="off"
-            />
-            <div className="flex flex-wrap gap-2">
-              <button
-                type="button"
-                onClick={() => testM.mutate(draftKey)}
-                disabled={draftKey.trim().length < 16 || testM.isPending}
-                className="rounded-lg border border-border px-4 py-2 text-sm disabled:opacity-50"
-              >
-                {testM.isPending ? "Testing…" : "Test connection"}
-              </button>
-              <button
-                type="button"
-                onClick={() => saveM.mutate(draftKey)}
-                disabled={!canSave}
-                className="rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground disabled:opacity-50"
-              >
-                {saveM.isPending ? "Saving…" : "Save key"}
-              </button>
-            </div>
-            {testM.data && (
-              <p className={`text-sm ${testM.data.connectionOk ? "text-emerald-700" : "text-destructive"}`}>
-                {testM.data.connectionOk
-                  ? "Connection test passed. You can now save this key."
-                  : "Connection test failed. Check endpoint statuses above."}
-              </p>
-            )}
-            {saveM.data?.ok && <p className="text-sm text-emerald-700">Key saved successfully.</p>}
-            {saveM.error && <p className="text-sm text-destructive">Failed to save key: {saveM.error.message}</p>}
-          </div>
         </section>
 
         <section className="mt-6 rounded-xl border border-border bg-card p-4">

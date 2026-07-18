@@ -88,6 +88,8 @@ function HadithDetailPage() {
   });
 
   const h = bundle?.entry;
+  const collectionLabel =
+    bundle?.collection?.title_en ?? (collection === "bukhari" ? "Sahih al-Bukhari" : "Sahih Muslim");
 
   const studySummaryQ = useQuery({
     queryKey: ["hadith", "study-summary", collection, numId, locale],
@@ -96,9 +98,7 @@ function HadithDetailPage() {
     queryFn: () =>
       summaryFn({
         data: {
-          collectionLabel:
-            bundle?.collection?.title_en ??
-            (collection === "bukhari" ? "Sahih al-Bukhari" : "Sahih Muslim"),
+          collectionLabel,
           hadithNumber: h?.id_in_book ?? numId,
           narrator: h?.narrator,
           arabicText: h?.arabic_text ?? "",
@@ -109,7 +109,7 @@ function HadithDetailPage() {
             (rh) => rh.english_text?.slice(0, 280) || rh.arabic_text.slice(0, 280),
           ),
           citations: [
-            `${label}, Book ${h?.book_id ?? ""}, Hadith ${h?.id_in_book ?? numId}`,
+            `${collectionLabel}, Book ${h?.book_id ?? ""}, Hadith ${h?.id_in_book ?? numId}`,
             ...(bundle?.relatedVerses ?? []).map((v) => `Quran ${v.surah}:${v.ayah}`),
             ...(bundle?.relatedTafsir ?? []).map((t) => `${t.source_name} ${t.surah}:${t.ayah_start}`),
             ...(bundle?.relatedAsbab ?? []).map((a) => `Asbab ${a.surah}:${a.ayah_start}`),
@@ -150,7 +150,7 @@ function HadithDetailPage() {
     );
   }
 
-  const label = bundle?.collection?.title_en || (collection === "bukhari" ? "Sahih al-Bukhari" : "Sahih Muslim");
+  const label = collectionLabel;
   const kindLabel = (k: string) =>
     k === "prophet"
       ? locale === "ar"

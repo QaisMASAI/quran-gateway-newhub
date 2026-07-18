@@ -84,8 +84,9 @@ export async function runHadithImportStep(args: {
   let rowsReceived = stats.rowsReceived ?? 0;
   let rowsWritten = stats.rowsWritten ?? 0;
   let failedRows = stats.failedRows ?? 0;
-  let booksProcessed = stats.booksProcessed ?? 0;
+  let currentBookOffset = checkpoint.bookOffset ?? stats.booksProcessed ?? 0;
   let totalBooks = stats.totalBooks ?? checkpoint.totalBooks ?? 0;
+  let earlyResult: HadithImportReport | null = null;
 
   const appendFailed = (entry: NonNullable<HadithImportReport["failedBatches"]>[number]) => {
     failedBatches.push(entry);
@@ -98,7 +99,7 @@ export async function runHadithImportStep(args: {
       totalBooks = books.length;
       const slice = books
         .sort((a, b) => a.book_id - b.book_id)
-        .slice(checkpoint.bookOffset ?? 0, (checkpoint.bookOffset ?? 0) + args.maxBooks);
+        .slice(currentBookOffset, currentBookOffset + args.maxBooks);
 
       if (slice.length === 0) {
         return provider.id;
@@ -106,6 +107,7 @@ export async function runHadithImportStep(args: {
 
       for (let bIndex = 0; bIndex < slice.length; bIndex += 1) {
         const book = slice[bIndex];
+        const bookOffset = currentBookOffset + bIndex;
         const startPage = bIndex === 0 ? checkpoint.page ?? 0 : 0;
         for (let page = startPage; page < startPage + args.maxPagesPerBook; page += 1) {
           let items: Awaited<ReturnType<(typeof provider)["listBookEntries"]>>["items"] = [];
@@ -133,16 +135,36 @@ export async function runHadithImportStep(args: {
                 status: "retrying",
                 checkpoint: {
                   collection: args.collection,
-                  bookOffset: (checkpoint.bookOffset ?? 0) + bIndex,
+                  bookOffset,
                   page,
                   totalBooks,
                 },
-                stats: { rowsReceived, rowsWritten, failedRows, booksProcessed, totalBooks },
+                stats: {
+                  rowsReceived,
+                  rowsWritten,
+                  failedRows,
+                  booksProcessed: bookOffset,
+                  totalBooks,
+                },
                 failed_batches: failedBatches as never,
                 updated_at: new Date().toISOString(),
               })
               .eq("id", jobId);
-            continue;
+            earlyResult = {
+              ok: true,
+              jobId,
+              provider: provider.id,
+              collection: args.collection,
+              totalBooks,
+              booksProcessed: bookOffset,
+              rowsReceived,
+              rowsWritten,
+              failedRows,
+              failedBatches,
+              status: "retrying",
+              statusMessage: `Paused on fetch error at book ${book.book_id}, page ${page}`,
+            };
+            break;
           }
           rowsReceived += items.length;
           if (items.length === 0) break;
@@ -183,20 +205,24 @@ export async function runHadithImportStep(args: {
             })
             .filter((row): row is NonNullable<typeof row> => row !== null);
 
-          if (payload.length === 0) {
+          const dedupedPayload = Array.from(
+            new Map(payload.map((row) => [`${row.collection_slug}:${row.global_id}`, row])).values(),
+          );
+
+          if (dedupedPayload.length === 0) {
             continue;
           }
 
           const { error: upErr, count } = await supabaseAdmin
             .from("hadith_entries")
-            .upsert(payload, {
+            .upsert(dedupedPayload, {
               onConflict: "collection_slug,global_id",
               ignoreDuplicates: false,
               count: "exact",
             });
 
           if (upErr) {
-            failedRows += payload.length;
+            failedRows += dedupedPayload.length;
             appendFailed({
               phase: "upsert",
               collection: args.collection,
@@ -205,7 +231,7 @@ export async function runHadithImportStep(args: {
               error: upErr.message,
             });
           } else {
-            rowsWritten += count ?? payload.length;
+            rowsWritten += count ?? dedupedPayload.length;
           }
 
           const reachedEnd = total > 0 && (page + 1) * args.pageSize >= total;
@@ -215,23 +241,32 @@ export async function runHadithImportStep(args: {
               status: "running",
               checkpoint: {
                 collection: args.collection,
-                bookOffset: (checkpoint.bookOffset ?? 0) + bIndex,
+                bookOffset,
                 page: page + 1,
                 totalBooks,
               },
-              stats: { rowsReceived, rowsWritten, failedRows, booksProcessed, totalBooks },
+              stats: {
+                rowsReceived,
+                rowsWritten,
+                failedRows,
+                booksProcessed: bookOffset,
+                totalBooks,
+              },
               failed_batches: failedBatches as never,
               updated_at: new Date().toISOString(),
             })
             .eq("id", jobId);
           if (reachedEnd) break;
         }
-        booksProcessed += 1;
+        if (earlyResult) break;
+        currentBookOffset = bookOffset + 1;
       }
       return provider.id;
     });
 
-    const finalBookOffset = (checkpoint.bookOffset ?? 0) + booksProcessed;
+    if (earlyResult) return earlyResult;
+
+    const finalBookOffset = currentBookOffset;
     const isDone = totalBooks > 0 && finalBookOffset >= totalBooks;
 
     if (!isDone) {
@@ -245,7 +280,13 @@ export async function runHadithImportStep(args: {
             page: 0,
             totalBooks,
           },
-          stats: { rowsReceived, rowsWritten, failedRows, booksProcessed, totalBooks },
+          stats: {
+            rowsReceived,
+            rowsWritten,
+            failedRows,
+            booksProcessed: finalBookOffset,
+            totalBooks,
+          },
           failed_batches: failedBatches as never,
           updated_at: new Date().toISOString(),
         })
@@ -257,7 +298,7 @@ export async function runHadithImportStep(args: {
         provider: providerResult.provider,
         collection: args.collection,
         totalBooks,
-        booksProcessed,
+        booksProcessed: finalBookOffset,
         rowsReceived,
         rowsWritten,
         failedRows,
@@ -273,7 +314,13 @@ export async function runHadithImportStep(args: {
         status: "succeeded",
         finished_at: new Date().toISOString(),
         checkpoint: { collection: args.collection, done: true, totalBooks },
-        stats: { rowsReceived, rowsWritten, failedRows, booksProcessed, totalBooks },
+        stats: {
+          rowsReceived,
+          rowsWritten,
+          failedRows,
+          booksProcessed: finalBookOffset,
+          totalBooks,
+        },
         failed_batches: failedBatches as never,
       })
       .eq("id", jobId);
@@ -284,7 +331,7 @@ export async function runHadithImportStep(args: {
       provider: providerResult.provider,
       collection: args.collection,
       totalBooks,
-      booksProcessed,
+      booksProcessed: finalBookOffset,
       rowsReceived,
       rowsWritten,
       failedRows,
@@ -299,7 +346,13 @@ export async function runHadithImportStep(args: {
         status: "failed",
         error_message: message,
         finished_at: new Date().toISOString(),
-        stats: { rowsReceived, rowsWritten, failedRows, booksProcessed, totalBooks },
+        stats: {
+          rowsReceived,
+          rowsWritten,
+          failedRows,
+          booksProcessed: currentBookOffset,
+          totalBooks,
+        },
         failed_batches: failedBatches as never,
       })
       .eq("id", jobId);
@@ -309,7 +362,7 @@ export async function runHadithImportStep(args: {
       provider: "none",
       collection: args.collection,
       totalBooks,
-      booksProcessed,
+      booksProcessed: currentBookOffset,
       rowsReceived,
       rowsWritten,
       failedRows,
