@@ -15,6 +15,7 @@ export function ContinueReading() {
       <Link
         to="/surah/$id"
         params={{ id: String(progress.surah) }}
+        search={{ q: "" }}
         className="surface-card flex items-center justify-between gap-3 px-5 py-4 hover:border-primary/40"
       >
         <div className="flex items-center gap-3">
