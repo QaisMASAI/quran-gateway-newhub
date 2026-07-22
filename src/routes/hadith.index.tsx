@@ -10,6 +10,34 @@ export const Route = createFileRoute("/hadith/")({
   head: () => ({
     meta: [
       { title: "Hadith — Sahih al-Bukhari & Sahih Muslim" },
+      { name: "description", content: "Browse Sahih al-Bukhari and Sahih Muslim with full Arabic text, English translation, and connections to Quran verses and topics." },
+      { property: "og:title", content: "Hadith Library" },
+      { property: "og:description", content: "Sahih al-Bukhari and Sahih Muslim in one searchable library." },
+      { property: "og:url", content: "https://hadith.com/hadith" },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:title", content: "Hadith Library" },
+      { name: "twitter:description", content: "Sahih al-Bukhari and Sahih Muslim in one searchable library." },
+    ],
+    links: [
+      { rel: "canonical", href: "https://hadith.com/hadith" },
+    ],
+    scripts: [
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "BreadcrumbList",
+          "itemListElement": [
+            { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://hadith.com/" },
+            { "@type": "ListItem", "position": 2, "name": "Hadith", "item": "https://hadith.com/hadith" }
+          ]
+        })
+      }
+    ],
+  }),
+    meta: [
+      { title: "Hadith — Sahih al-Bukhari & Sahih Muslim" },
       {
         name: "description",
         content:
