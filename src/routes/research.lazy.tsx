@@ -218,6 +218,7 @@ function ResearchPage() {
                       key={`${v.surah}-${v.ayah}`}
                       to="/surah/$id"
                       params={{ id: String(v.surah) }}
+                      search={{ q: undefined }}
                       hash={`v-${v.ayah}`}
                       className="block rounded-xl border border-border bg-card p-4 transition hover:border-primary"
                     >
