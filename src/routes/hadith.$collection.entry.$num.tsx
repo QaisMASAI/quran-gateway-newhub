@@ -53,6 +53,18 @@ export const Route = createFileRoute("/hadith/$collection/entry/$num")({
             description,
           }),
         },
+        {
+          type: "application/ld+json",
+          children: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "BreadcrumbList",
+            "itemListElement": [
+              { "@type": "ListItem", "position": 1, "name": "Hadith", "item": "/hadith" },
+              { "@type": "ListItem", "position": 2, "name": label, "item": `/hadith/${params.collection}` },
+              { "@type": "ListItem", "position": 3, "name": `Hadith #${params.num}`, "item": canonical }
+            ]
+          }),
+        },
       ],
     };
   },
