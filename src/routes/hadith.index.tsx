@@ -9,19 +9,24 @@ import { BookMarked, Users } from "lucide-react";
 export const Route = createFileRoute("/hadith/")({
   head: () => ({
     meta: [
-      { title: "Hadith — Sahih al-Bukhari & Sahih Muslim" },
-      { name: "description", content: "Browse Sahih al-Bukhari and Sahih Muslim with full Arabic text, English translation, and connections to Quran verses and topics." },
+      { title: "Hadith Library — Sahih al-Bukhari & Sahih Muslim" },
+      {
+        name: "description",
+        content:
+          "Explore the authentic Hadith collections of Sahih al-Bukhari and Sahih Muslim. Search by book, topic, or narrator with full Arabic text and English translations.",
+      },
       { property: "og:title", content: "Hadith Library" },
-      { property: "og:description", content: "Sahih al-Bukhari and Sahih Muslim in one searchable library." },
-      { property: "og:url", content: "https://hadith.com/hadith" },
+      {
+        property: "og:description",
+        content: "Sahih al-Bukhari and Sahih Muslim in one searchable library with Quranic connections.",
+      },
+      { property: "og:url", content: "/hadith" },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:title", content: "Hadith Library" },
-      { name: "twitter:description", content: "Sahih al-Bukhari and Sahih Muslim in one searchable library." },
+      { name: "twitter:description", content: "Browse Sahih al-Bukhari and Sahih Muslim with full Arabic text and English translation." },
     ],
-    links: [
-      { rel: "canonical", href: "https://hadith.com/hadith" },
-    ],
+    links: [{ rel: "canonical", href: "/hadith" }],
     scripts: [
       {
         type: "application/ld+json",
@@ -29,28 +34,11 @@ export const Route = createFileRoute("/hadith/")({
           "@context": "https://schema.org",
           "@type": "BreadcrumbList",
           "itemListElement": [
-            { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://hadith.com/" },
-            { "@type": "ListItem", "position": 2, "name": "Hadith", "item": "https://hadith.com/hadith" }
+            { "@type": "ListItem", "position": 1, "name": "Hadith", "item": "/hadith" }
           ]
-        })
-      }
-    ],
-  }),
-    meta: [
-      { title: "Hadith — Sahih al-Bukhari & Sahih Muslim" },
-      {
-        name: "description",
-        content:
-          "Browse Sahih al-Bukhari and Sahih Muslim with full Arabic text, English translation, and connections to Quran verses and topics.",
+        }),
       },
-      { property: "og:title", content: "Hadith Library" },
-      {
-        property: "og:description",
-        content: "Sahih al-Bukhari and Sahih Muslim in one searchable library.",
-      },
-      { property: "og:url", content: "/hadith" },
     ],
-    links: [{ rel: "canonical", href: "/hadith" }],
   }),
   loader: async ({ context }) => {
     await context.queryClient.ensureQueryData({

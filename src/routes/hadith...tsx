@@ -1,0 +1,159 @@
+import { createFileRoute, Link, notFound } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
+import { useTranslation } from "react-i18next";
+import { useState } from "react";
+import { Header } from "@/components/Header";
+import { listHadithEntries } from "@/lib/hadith.functions";
+
+export const Route = createFileRoute("/hadith/$collection/$book")({
+  head: ({ params }) => {
+    const label = params.collection === "bukhari" ? "Sahih al-Bukhari" : "Sahih Muslim";
+    const title = `${label} — Book ${params.book}`;
+    const description = `Read authenticated hadiths from Book ${params.book} of ${label}. Includes original Arabic text and English translations.`;
+    const canonical = `/hadith/${params.collection}/${params.book}`;
+
+    return {
+      meta: [
+        { title },
+        { name: "description", content: description },
+        { property: "og:title", content: title },
+        { property: "og:description", content: description },
+        { property: "og:url", content: canonical },
+        { property: "og:type", content: "website" },
+        { name: "twitter:card", content: "summary" },
+        { name: "twitter:title", content: title },
+        { name: "twitter:description", content: description },
+      ],
+      links: [{ rel: "canonical", href: canonical }],
+      scripts: [
+        {
+          type: "application/ld+json",
+          children: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "BreadcrumbList",
+            "itemListElement": [
+              { "@type": "ListItem", "position": 1, "name": "Hadith", "item": "/hadith" },
+              { "@type": "ListItem", "position": 2, "name": label, "item": `/hadith/${params.collection}` },
+              { "@type": "ListItem", "position": 3, "name": `Book ${params.book}`, "item": canonical }
+            ]
+          }),
+        },
+      ],
+    };
+  },
+  loader: async ({ context, params }) => {
+    if (!["bukhari", "muslim"].includes(params.collection)) throw notFound();
+    const book = Number(params.book);
+    if (!Number.isFinite(book) || book < 1) throw notFound();
+    await context.queryClient.ensureQueryData({
+      queryKey: ["hadith", "entries", params.collection, book, 0],
+      queryFn: () =>
+        listHadithEntries({ data: { collection: params.collection, book, page: 0, pageSize: 40 } }),
+    });
+  },
+  component: HadithBookPage,
+});
+
+function HadithBookPage() {
+  const { collection, book } = Route.useParams();
+  const bookNum = Number(book);
+  const { i18n } = useTranslation();
+  const isRtl = i18n.dir() === "rtl";
+  const [page, setPage] = useState(0);
+  const fn = useServerFn(listHadithEntries);
+  const { data, isLoading, isError, refetch } = useQuery({
+    queryKey: ["hadith", "entries", collection, bookNum, page],
+    queryFn: () => fn({ data: { collection, book: bookNum, page, pageSize: 40 } }),
+  });
+  const items = data?.items ?? [];
+  const total = data?.total ?? 0;
+
+  return (
+    <div className="min-h-screen bg-background" dir={isRtl ? "rtl" : "ltr"}>
+      <Header />
+      <main id="main" className="mx-auto max-w-3xl px-4 py-8 sm:px-6">
+        <Link
+          to="/hadith/$collection"
+          params={{ collection }}
+          className="text-sm text-muted-foreground hover:text-foreground"
+        >
+          ← Books
+        </Link>
+        <h1 className="mt-2 text-lg font-bold text-foreground">
+          Book {bookNum} · {total} hadith
+        </h1>
+
+        <ol className="mt-4 space-y-3">
+          {isLoading && <li className="text-sm text-muted-foreground">Loading hadith…</li>}
+          {isError && (
+            <li className="rounded-lg border border-destructive/30 bg-destructive/5 p-3 text-sm text-destructive">
+              Failed to load hadith entries.
+              <button
+                type="button"
+                onClick={() => void refetch()}
+                className="ms-2 underline underline-offset-2"
+              >
+                Retry
+              </button>
+            </li>
+          )}
+          {items.map((h) => (
+            <li key={h.id} className="rounded-xl border border-border bg-card p-4">
+              <div className="mb-1 flex items-center justify-between text-xs text-muted-foreground">
+                <span>#{h.id_in_book}</span>
+                <Link
+                  to="/hadith/$collection/entry/$num"
+                  params={{ collection, num: String(h.global_id) }}
+                  className="text-primary hover:underline"
+                >
+                  Open
+                </Link>
+              </div>
+              {h.narrator && <p className="text-xs italic text-muted-foreground">{h.narrator}</p>}
+              {h.english_text && (
+                <p className="font-reading-en mt-1 text-sm text-foreground/90">
+                  {h.english_text.slice(0, 320)}
+                  {h.english_text.length > 320 ? "…" : ""}
+                </p>
+              )}
+              <p
+                className="font-reading-ar mt-2 text-right text-base text-foreground"
+                dir="rtl"
+                lang="ar"
+              >
+                {h.arabic_text.slice(0, 300)}
+                {h.arabic_text.length > 300 ? "…" : ""}
+              </p>
+            </li>
+          ))}
+          {!isLoading && !isError && items.length === 0 && (
+            <li className="text-sm text-muted-foreground">No hadith entries were found for this book.</li>
+          )}
+        </ol>
+
+        <div className="mt-6 flex items-center justify-between text-sm">
+          <button
+            type="button"
+            disabled={page === 0}
+            onClick={() => setPage((p) => Math.max(0, p - 1))}
+            className="rounded-lg border border-border px-3 py-1.5 disabled:opacity-50"
+          >
+            ← Prev
+          </button>
+          <span className="text-muted-foreground">
+            Page {page + 1} / {Math.max(1, Math.ceil(total / 40))}
+          </span>
+          <button
+            type="button"
+            disabled={(page + 1) * 40 >= total}
+            onClick={() => setPage((p) => p + 1)}
+            className="rounded-lg border border-border px-3 py-1.5 disabled:opacity-50"
+          >
+            Next →
+          </button>
+        </div>
+      </main>
+    </div>
+  );
+}

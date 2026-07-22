@@ -8,11 +8,30 @@ import { listTopNarrators } from "@/lib/hadith.functions";
 export const Route = createFileRoute("/hadith/narrators")({
   head: () => ({
     meta: [
-      { title: "Hadith Narrators" },
-      { name: "description", content: "Top narrators across Sahih al-Bukhari and Sahih Muslim." },
+      { title: "Hadith Narrators — Sahih al-Bukhari & Sahih Muslim" },
+      { name: "description", content: "Explore the most frequent narrators across Sahih al-Bukhari and Sahih Muslim hadith collections." },
+      { property: "og:title", content: "Hadith Narrators" },
+      { property: "og:description", content: "Discover the top narrators across major authenticated hadith collections." },
       { property: "og:url", content: "/hadith/narrators" },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
+      { name: "twitter:title", content: "Hadith Narrators" },
+      { name: "twitter:description", content: "Top narrators across Sahih al-Bukhari and Sahih Muslim." },
     ],
     links: [{ rel: "canonical", href: "/hadith/narrators" }],
+    scripts: [
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "BreadcrumbList",
+          "itemListElement": [
+            { "@type": "ListItem", "position": 1, "name": "Hadith", "item": "/hadith" },
+            { "@type": "ListItem", "position": 2, "name": "Narrators", "item": "/hadith/narrators" }
+          ]
+        }),
+      },
+    ],
   }),
   loader: async ({ context }) => {
     await context.queryClient.ensureQueryData({
