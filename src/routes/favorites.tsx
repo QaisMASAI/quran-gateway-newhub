@@ -65,6 +65,7 @@ function FavoritesPage() {
                   <Link
                     to="/surah/$id"
                     params={{ id: String(it.surah) }}
+                    search={{ q: undefined }}
                     className="text-xs font-medium text-primary hover:underline"
                   >
                     {t("favorites.verseLabel", { s: it.surah, a: it.ayah })} •{" "}

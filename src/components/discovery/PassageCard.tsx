@@ -25,6 +25,7 @@ export function PassageCard({ surah, ayahStart, ayahEnd, locale, title }: Passag
       <Link
         to="/surah/$id"
         params={{ id: String(surah) }}
+        search={{ q: undefined }}
         hash={`v-${ayahStart}`}
         className="flex items-center justify-between gap-3 border-b border-border px-4 py-2.5 text-xs hover:bg-secondary/40"
       >

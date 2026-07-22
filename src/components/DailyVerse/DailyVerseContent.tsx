@@ -61,6 +61,7 @@ export function DailyVerseContent({
         <Link
           to="/surah/$id"
           params={{ id: String(surah) }}
+          search={{ q: undefined }}
           hash={`v-${ayah}`}
           className="inline-flex items-center gap-1 text-xs font-semibold text-primary hover:underline"
         >

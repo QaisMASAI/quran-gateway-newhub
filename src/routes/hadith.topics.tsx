@@ -8,6 +8,33 @@ import { pickLocale } from "@/lib/knowledge";
 import { normalizeLocale } from "@/lib/i18n";
 
 export const Route = createFileRoute("/hadith/topics")({
+  head: () => ({
+    meta: [
+      { title: "Hadith Topics — Sahih al-Bukhari & Sahih Muslim" },
+      { name: "description", content: "Explore Hadiths categorized by topic and theme across Sahih al-Bukhari and Sahih Muslim collections." },
+      { property: "og:title", content: "Hadith Topics" },
+      { property: "og:description", content: "Browse Hadith collections by topic to find relevant authenticated traditions." },
+      { property: "og:url", content: "/hadith/topics" },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
+      { name: "twitter:title", content: "Hadith Topics" },
+      { name: "twitter:description", content: "Explore Hadiths by topic and theme." },
+    ],
+    links: [{ rel: "canonical", href: "/hadith/topics" }],
+    scripts: [
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "BreadcrumbList",
+          "itemListElement": [
+            { "@type": "ListItem", "position": 1, "name": "Hadith", "item": "/hadith" },
+            { "@type": "ListItem", "position": 2, "name": "Topics", "item": "/hadith/topics" }
+          ]
+        }),
+      },
+    ],
+  }),
   loader: async ({ context }) => {
     await context.queryClient.ensureQueryData({
       queryKey: ["hadith", "topic-books"],

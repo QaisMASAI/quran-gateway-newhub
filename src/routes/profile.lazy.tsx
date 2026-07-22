@@ -215,6 +215,7 @@ function ProfilePage() {
               <Link
                 to="/surah/$id"
                 params={{ id: String(data.continueReading.surah) }}
+                search={{ q: undefined }}
                 hash={`v-${data.continueReading.ayah}`}
                 className="inline-flex min-h-11 items-center gap-2 rounded-full bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground hover:bg-primary/90"
               >
@@ -267,6 +268,7 @@ function ProfilePage() {
                     <Link
                       to="/surah/$id"
                       params={{ id: String(b.surah) }}
+                      search={{ q: undefined }}
                       hash={`v-${b.ayah}`}
                       className="block rounded-lg border border-border bg-background px-3 py-2 text-sm hover:border-primary/40"
                     >
@@ -296,6 +298,7 @@ function ProfilePage() {
                     <Link
                       to="/surah/$id"
                       params={{ id: String(n.surah) }}
+                      search={{ q: undefined }}
                       hash={`v-${n.ayah}`}
                       className="block rounded-lg border border-border bg-background px-3 py-2 text-sm hover:border-primary/40"
                     >

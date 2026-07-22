@@ -132,6 +132,20 @@ function SurahPage() {
     const cards = Array.from(document.querySelectorAll<HTMLElement>("article[id^='v-']"));
     if (cards.length === 0) return;
 
+    // Guard against accidental progress overwrite when merely opening a surah:
+    // only start persisting after explicit reader interaction/scroll intent.
+    let hasReaderInteraction = false;
+    const markInteraction = () => {
+      hasReaderInteraction = true;
+    };
+    const markInteractionOnScroll = () => {
+      if (window.scrollY > 48) hasReaderInteraction = true;
+    };
+    window.addEventListener("wheel", markInteraction, { passive: true });
+    window.addEventListener("touchmove", markInteraction, { passive: true });
+    window.addEventListener("keydown", markInteraction);
+    window.addEventListener("scroll", markInteractionOnScroll, { passive: true });
+
     let pending: number | null = null;
     let timer: ReturnType<typeof setTimeout> | null = null;
 
@@ -145,6 +159,7 @@ function SurahPage() {
         const topId = visible[0].target.id; // "v-12"
         const n = Number(topId.slice(2));
         if (!n || n === lastRecordedRef.current) return;
+        if (!hasReaderInteraction) return;
         pending = n;
         if (timer) clearTimeout(timer);
         // Debounce: only record after the reader has paused on the ayah.
@@ -162,6 +177,10 @@ function SurahPage() {
     return () => {
       observer.disconnect();
       if (timer) clearTimeout(timer);
+      window.removeEventListener("wheel", markInteraction);
+      window.removeEventListener("touchmove", markInteraction);
+      window.removeEventListener("keydown", markInteraction);
+      window.removeEventListener("scroll", markInteractionOnScroll);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [surahId, verses?.length]);
@@ -269,6 +288,7 @@ function SurahPage() {
               <Link
                 to="/surah/$id"
                 params={{ id: String(surahId - 1) }}
+                search={{ q: undefined }}
                 className={`surface-card inline-flex flex-1 items-center gap-2 px-4 py-3 text-sm hover:border-primary/40 ${isRtl ? "flex-row-reverse" : ""}`}
               >
                 {isRtl ? (
@@ -285,6 +305,7 @@ function SurahPage() {
               <Link
                 to="/surah/$id"
                 params={{ id: String(surahId + 1) }}
+                search={{ q: undefined }}
                 className={`surface-card inline-flex flex-1 items-center justify-end gap-2 px-4 py-3 text-sm hover:border-primary/40 ${isRtl ? "flex-row-reverse" : ""}`}
               >
                 <span className="text-muted-foreground">{t("common.next")}</span>

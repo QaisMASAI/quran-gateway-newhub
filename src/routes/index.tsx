@@ -183,7 +183,7 @@ function Home() {
         q,
       },
     });
-    navigate({ to: "/search", search: { q, src: "hero_input" } });
+    navigate({ to: "/search", search: { q, qState: "ok", src: "hero_input" } });
   }
   const filtered = useMemo(() => {
     if (!data) return [];
@@ -309,6 +309,7 @@ function Home() {
               </a>
               <Link
                 to="/ask"
+                search={{ q: "", qState: "missing", src: "unknown" }}
                 className="inline-flex items-center gap-2 rounded-full border border-gold/40 bg-gold px-7 py-3.5 text-sm font-bold text-primary shadow-lg transition-all hover:-translate-y-1 active:translate-y-0"
               >
                 <Sparkles className="h-4 w-4" />
@@ -316,6 +317,7 @@ function Home() {
               </Link>
               <Link
                 to="/search"
+                search={{ q: "", qState: "missing", src: "unknown" }}
                 className="inline-flex items-center gap-2 rounded-full border border-primary-foreground/30 bg-primary-foreground/10 px-7 py-3.5 text-sm font-bold text-primary-foreground backdrop-blur-md transition-colors hover:bg-primary-foreground/20"
               >
                 <SearchIcon className="h-4 w-4" />
@@ -371,7 +373,7 @@ function Home() {
               <Link
                 key={question}
                 to="/ask"
-                search={{ q: question, src: "popular_questions" }}
+                search={{ q: question, qState: "ok", src: "popular_questions" }}
                 onClick={() => {
                   void trackPrompt({
                     data: {
@@ -670,6 +672,7 @@ function Home() {
                 key={c.id}
                 to="/surah/$id"
                 params={{ id: String(c.id) }}
+                search={{ q: undefined }}
                 className={`group flex items-center gap-5 rounded-2xl border border-primary/5 bg-card p-5 transition-all hover:-translate-y-0.5 hover:border-gold hover:shadow-xl ${isRtl ? "flex-row-reverse" : ""}`}
               >
                 <div className="relative flex h-12 w-12 shrink-0 items-center justify-center">
@@ -737,7 +740,11 @@ function Home() {
               {locale === "ar" ? "اكتشف" : locale === "he" ? "גלו" : "Discover"}
             </p>
             <div className="mt-2 space-y-1.5">
-              <Link to="/search" className="block hover:text-primary">
+              <Link
+                to="/search"
+                search={{ q: "", qState: "missing", src: "unknown" }}
+                className="block hover:text-primary"
+              >
                 {locale === "ar" ? "بحث ذكي" : locale === "he" ? "חיפוש חכם" : "Intelligent search"}
               </Link>
               <Link to="/learn" className="block hover:text-primary">
@@ -759,7 +766,11 @@ function Home() {
               <Link to="/research" className="block hover:text-primary">
                 {locale === "ar" ? "بحث موثّق" : locale === "he" ? "מחקר מבוסס ציטוטים" : "Citation-first research"}
               </Link>
-              <Link to="/ask" className="block hover:text-primary">
+              <Link
+                to="/ask"
+                search={{ q: "", qState: "missing", src: "unknown" }}
+                className="block hover:text-primary"
+              >
                 {locale === "ar" ? "إجابات موثقة" : locale === "he" ? "תשובות מעוגנות" : "Grounded AI answers"}
               </Link>
             </div>

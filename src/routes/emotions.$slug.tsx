@@ -117,6 +117,7 @@ function EmotionPage() {
                   <Link
                     to="/surah/$id"
                     params={{ id: String(ref.surah) }}
+                    search={{ q: undefined }}
                     hash={`v-${ref.ayah}`}
                     className="group flex items-center justify-between gap-4 rounded-xl border border-primary/5 bg-card p-4 transition-all hover:border-gold hover:shadow-md"
                   >
