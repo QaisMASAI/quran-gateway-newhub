@@ -288,6 +288,7 @@ function SurahPage() {
               <Link
                 to="/surah/$id"
                 params={{ id: String(surahId - 1) }}
+                search={{ q: undefined }}
                 className={`surface-card inline-flex flex-1 items-center gap-2 px-4 py-3 text-sm hover:border-primary/40 ${isRtl ? "flex-row-reverse" : ""}`}
               >
                 {isRtl ? (
@@ -304,6 +305,7 @@ function SurahPage() {
               <Link
                 to="/surah/$id"
                 params={{ id: String(surahId + 1) }}
+                search={{ q: undefined }}
                 className={`surface-card inline-flex flex-1 items-center justify-end gap-2 px-4 py-3 text-sm hover:border-primary/40 ${isRtl ? "flex-row-reverse" : ""}`}
               >
                 <span className="text-muted-foreground">{t("common.next")}</span>
