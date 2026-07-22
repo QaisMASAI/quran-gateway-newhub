@@ -6,7 +6,7 @@ import { Header } from "@/components/Header";
 import { listHadithBooks, listHadithCollections } from "@/lib/hadith.functions";
 import { ChevronRight, ChevronLeft } from "lucide-react";
 
-export const Route = createFileRoute("/hadith/$collection")({
+export const Route = createFileRoute("/hadith/")({
   head: ({ params }) => {
     const label = params.collection === "bukhari" ? "Sahih al-Bukhari" : "Sahih Muslim";
     const title = `${label} — Full Collection of Books`;

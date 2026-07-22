@@ -6,7 +6,7 @@ import { useState } from "react";
 import { Header } from "@/components/Header";
 import { listHadithEntries } from "@/lib/hadith.functions";
 
-export const Route = createFileRoute("/hadith/$collection/$book")({
+export const Route = createFileRoute("/hadith/")({
   head: ({ params }) => {
     const label = params.collection === "bukhari" ? "Sahih al-Bukhari" : "Sahih Muslim";
     const title = `${label} — Book ${params.book}`;
