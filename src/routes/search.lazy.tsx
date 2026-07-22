@@ -132,6 +132,7 @@ function SearchPage() {
       to: "/search",
       search: {
         q: nextQ,
+        qState: "ok",
         src,
       },
       replace: true,
@@ -353,6 +354,7 @@ function SearchPage() {
                       <Link
                         to="/surah/$id"
                         params={{ id: String(row.surah) }}
+                        search={{ q: undefined }}
                         hash={`v-${row.ayah_start}`}
                         className="mt-2 inline-flex text-xs font-medium text-primary hover:underline"
                       >
@@ -511,6 +513,7 @@ function SearchPage() {
                       key={c.id}
                       to="/surah/$id"
                       params={{ id: String(c.id) }}
+                      search={{ q: undefined }}
                       className={`surface-card flex items-center justify-between gap-3 px-4 py-3 hover:border-primary/40 ${isRtl ? "flex-row-reverse" : ""}`}
                     >
                       <div className={`flex items-center gap-3 ${isRtl ? "flex-row-reverse" : ""}`}>
