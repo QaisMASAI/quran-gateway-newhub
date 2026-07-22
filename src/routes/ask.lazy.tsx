@@ -107,6 +107,7 @@ function AskPage() {
       to: "/ask",
       search: {
         q: trimmed,
+        qState: "ok",
         src,
       },
       replace: true,
@@ -187,7 +188,7 @@ function AskPage() {
                     setQuestion(ex);
                     void navigate({
                       to: "/ask",
-                      search: { q: ex, src: "unknown" },
+                      search: { q: ex, qState: "ok", src: "unknown" },
                       replace: true,
                     });
                     mutation.mutate(ex);
@@ -277,6 +278,7 @@ function AskPage() {
                   key={`${v.surah}-${v.ayah}`}
                   to="/surah/$id"
                   params={{ id: String(v.surah) }}
+                  search={{ q: "" }}
                   hash={`v-${v.ayah}`}
                   className="surface-card group block px-4 py-3.5 transition-colors hover:border-primary/40"
                 >
