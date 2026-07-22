@@ -198,6 +198,7 @@ function PlanPage() {
                               <Link
                                 to="/surah/$id"
                                 params={{ id: String(info.surah) }}
+                                search={{ q: undefined }}
                                 hash={`v-${info.ayah}`}
                                 className="group flex items-center justify-between gap-3 rounded-lg border border-primary/5 bg-background/60 px-3 py-2 text-sm transition-colors hover:border-gold/40 hover:bg-secondary/60"
                               >
