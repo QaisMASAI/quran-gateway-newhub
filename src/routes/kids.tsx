@@ -559,7 +559,7 @@ function QuizPlayer({
   const next = () => {
     if (idx + 1 >= total) {
       setFinished(true);
-      onComplete(correct + (selected === current?.answer && !questions[idx]?.id ? 0 : 0), total);
+      onComplete(correct, total);
       return;
     }
     setIdx(n => n + 1); setSelected(null); setLocked(false);
