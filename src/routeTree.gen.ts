@@ -14,7 +14,6 @@ import { Route as SearchRouteImport } from './routes/search'
 import { Route as ResearchRouteImport } from './routes/research'
 import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as OnboardingRouteImport } from './routes/onboarding'
-import { Route as KidsRouteImport } from './routes/kids'
 import { Route as HadithRouteImport } from './routes/hadith'
 import { Route as FavoritesRouteImport } from './routes/favorites'
 import { Route as AuthRouteImport } from './routes/auth'
@@ -88,11 +87,6 @@ const ProfileRoute = ProfileRouteImport.update({
 const OnboardingRoute = OnboardingRouteImport.update({
   id: '/onboarding',
   path: '/onboarding',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const KidsRoute = KidsRouteImport.update({
-  id: '/kids',
-  path: '/kids',
   getParentRoute: () => rootRouteImport,
 } as any)
 const HadithRoute = HadithRouteImport.update({
@@ -364,7 +358,6 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/favorites': typeof FavoritesRoute
   '/hadith': typeof HadithRouteWithChildren
-  '/kids': typeof KidsRoute
   '/onboarding': typeof OnboardingRoute
   '/profile': typeof ProfileRoute
   '/research': typeof ResearchRoute
@@ -419,7 +412,6 @@ export interface FileRoutesByTo {
   '/ask': typeof AskRoute
   '/auth': typeof AuthRoute
   '/favorites': typeof FavoritesRoute
-  '/kids': typeof KidsRoute
   '/onboarding': typeof OnboardingRoute
   '/profile': typeof ProfileRoute
   '/research': typeof ResearchRoute
@@ -477,7 +469,6 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/favorites': typeof FavoritesRoute
   '/hadith': typeof HadithRouteWithChildren
-  '/kids': typeof KidsRoute
   '/onboarding': typeof OnboardingRoute
   '/profile': typeof ProfileRoute
   '/research': typeof ResearchRoute
@@ -535,7 +526,6 @@ export interface FileRouteTypes {
     | '/auth'
     | '/favorites'
     | '/hadith'
-    | '/kids'
     | '/onboarding'
     | '/profile'
     | '/research'
@@ -590,7 +580,6 @@ export interface FileRouteTypes {
     | '/ask'
     | '/auth'
     | '/favorites'
-    | '/kids'
     | '/onboarding'
     | '/profile'
     | '/research'
@@ -647,7 +636,6 @@ export interface FileRouteTypes {
     | '/auth'
     | '/favorites'
     | '/hadith'
-    | '/kids'
     | '/onboarding'
     | '/profile'
     | '/research'
@@ -705,7 +693,6 @@ export interface RootRouteChildren {
   AuthRoute: typeof AuthRoute
   FavoritesRoute: typeof FavoritesRoute
   HadithRoute: typeof HadithRouteWithChildren
-  KidsRoute: typeof KidsRoute
   OnboardingRoute: typeof OnboardingRoute
   ProfileRoute: typeof ProfileRoute
   ResearchRoute: typeof ResearchRoute
@@ -778,13 +765,6 @@ declare module '@tanstack/react-router' {
       path: '/onboarding'
       fullPath: '/onboarding'
       preLoaderRoute: typeof OnboardingRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/kids': {
-      id: '/kids'
-      path: '/kids'
-      fullPath: '/kids'
-      preLoaderRoute: typeof KidsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/hadith': {
@@ -1205,7 +1185,6 @@ const rootRouteChildren: RootRouteChildren = {
   AuthRoute: AuthRoute,
   FavoritesRoute: FavoritesRoute,
   HadithRoute: HadithRouteWithChildren,
-  KidsRoute: KidsRoute,
   OnboardingRoute: OnboardingRoute,
   ProfileRoute: ProfileRoute,
   ResearchRoute: ResearchRoute,
