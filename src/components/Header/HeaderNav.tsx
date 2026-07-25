@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { BookOpen, Search, LogIn, Compass, BookMarked, Sparkles, Folder } from "lucide-react";
+import { BookOpen, Search, Compass, BookMarked, Sparkles, Folder, Gamepad2 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 interface NavLinkProps {
@@ -41,6 +41,7 @@ export function HeaderNav({ isAuthenticated }: HeaderNavProps) {
       <NavLink to="/learn" label={t("nav.learn")} icon={<BookMarked className="h-4 w-4" />} />
       <NavLink to="/hadith" label={t("nav.hadith")} icon={<BookMarked className="h-4 w-4" />} />
       <NavLink to="/search" label={t("nav.search")} icon={<Search className="h-4 w-4" />} />
+      <NavLink to="/kids" label="Kids" icon={<Gamepad2 className="h-4 w-4" />} />
       {isAuthenticated && (
         <NavLink
           to="/collections"
