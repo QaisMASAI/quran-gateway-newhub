@@ -43,6 +43,9 @@ export function HeaderNav({ isAuthenticated }: HeaderNavProps) {
       <NavLink to="/search" label={t("nav.search")} icon={<Search className="h-4 w-4" />} />
       <NavLink to="/kids" label="Kids" icon={<Gamepad2 className="h-4 w-4" />} />
       {isAuthenticated && (
+        <NavLink to="/admin/kids" label="Kids Q&A" icon={<Gamepad2 className="h-4 w-4" />} />
+      )}
+      {isAuthenticated && (
         <NavLink
           to="/collections"
           label={t("nav.collections")}
