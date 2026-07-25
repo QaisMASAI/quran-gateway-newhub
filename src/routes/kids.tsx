@@ -17,6 +17,7 @@ import {
   ShoppingBag,
   Sparkles,
   Star,
+  Sticker,
   Trophy,
   Unlock,
   Volume2,
@@ -926,7 +927,8 @@ function TopBar({
   onSelectProfile,
   onToggleCreateProfile,
 }: {
-  state: StateBag; setState: React.Dispatch<React.SetStateAction<StateBag>>;
+  state: StateBag;
+  setState: (updater: (prev: StateBag) => StateBag) => void;
   view: string; setView: (v: "home" | "store" | "parent" | "summary") => void;
   hasActive: boolean; onExit: () => void; user: boolean;
   profiles: ChildProfile[];
@@ -1400,7 +1402,8 @@ function RewardStore({ state, buy, onExit }: { state: StateBag; buy: (item: Rewa
 function ParentZone({
   state, setState, quizzes, onExit,
 }: {
-  state: StateBag; setState: React.Dispatch<React.SetStateAction<StateBag>>;
+  state: StateBag;
+  setState: (updater: (prev: StateBag) => StateBag) => void;
   quizzes: Quiz[]; onExit: () => void;
 }) {
   const [unlocked, setUnlocked] = useState(!state.settings.parentPinHash);
