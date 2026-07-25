@@ -1143,6 +1143,139 @@ export type Database = {
           },
         ]
       }
+      kids_pin_audit_logs: {
+        Row: {
+          attempt_type: string
+          created_at: string
+          failure_reason: string | null
+          id: string
+          ip_address: string | null
+          profile_id: string
+          success: boolean
+          user_agent: string | null
+          user_id: string
+        }
+        Insert: {
+          attempt_type: string
+          created_at?: string
+          failure_reason?: string | null
+          id?: string
+          ip_address?: string | null
+          profile_id: string
+          success: boolean
+          user_agent?: string | null
+          user_id: string
+        }
+        Update: {
+          attempt_type?: string
+          created_at?: string
+          failure_reason?: string | null
+          id?: string
+          ip_address?: string | null
+          profile_id?: string
+          success?: boolean
+          user_agent?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "kids_pin_audit_logs_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "kids_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      kids_profile_progress: {
+        Row: {
+          activity_log: Json
+          created_at: string
+          id: string
+          offline_sync_version: number
+          parent_pin_hash: string | null
+          parent_pin_recovery_hash: string | null
+          profile_id: string
+          progress: Json
+          rewards: Json
+          settings: Json
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          activity_log?: Json
+          created_at?: string
+          id?: string
+          offline_sync_version?: number
+          parent_pin_hash?: string | null
+          parent_pin_recovery_hash?: string | null
+          profile_id: string
+          progress?: Json
+          rewards?: Json
+          settings?: Json
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          activity_log?: Json
+          created_at?: string
+          id?: string
+          offline_sync_version?: number
+          parent_pin_hash?: string | null
+          parent_pin_recovery_hash?: string | null
+          profile_id?: string
+          progress?: Json
+          rewards?: Json
+          settings?: Json
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "kids_profile_progress_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: true
+            referencedRelation: "kids_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      kids_profiles: {
+        Row: {
+          age_group: string
+          avatar_emoji: string
+          created_at: string
+          difficulty_limit: number
+          id: string
+          is_active: boolean
+          name: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          age_group?: string
+          avatar_emoji?: string
+          created_at?: string
+          difficulty_limit?: number
+          id?: string
+          is_active?: boolean
+          name: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          age_group?: string
+          avatar_emoji?: string
+          created_at?: string
+          difficulty_limit?: number
+          id?: string
+          is_active?: boolean
+          name?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       kids_progress: {
         Row: {
           activity_log: Json
