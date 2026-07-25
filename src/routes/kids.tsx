@@ -30,7 +30,6 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 
@@ -854,7 +853,14 @@ function KidsPage() {
         ) : null}
 
         {view === "parent" ? (
-          <ParentZone state={state} setState={setState} quizzes={allQuizzes} onExit={() => setView("home")} />
+          <ParentZone
+            state={state}
+            setState={setState}
+            quizzes={allQuizzes}
+            profileId={selectedProfile.id}
+            onPinAudit={logPinAttempt}
+            onExit={() => setView("home")}
+          />
         ) : view === "store" ? (
           <RewardStore state={state} buy={buyReward} onExit={() => setView("home")} />
         ) : view === "summary" ? (
@@ -1400,11 +1406,24 @@ function RewardStore({ state, buy, onExit }: { state: StateBag; buy: (item: Rewa
 }
 
 function ParentZone({
-  state, setState, quizzes, onExit,
+  state,
+  setState,
+  quizzes,
+  profileId,
+  onPinAudit,
+  onExit,
 }: {
   state: StateBag;
   setState: (updater: (prev: StateBag) => StateBag) => void;
-  quizzes: Quiz[]; onExit: () => void;
+  quizzes: Quiz[];
+  profileId: string;
+  onPinAudit: (
+    profileId: string,
+    attemptType: "unlock" | "recover",
+    success: boolean,
+    failureReason?: string | null,
+  ) => void;
+  onExit: () => void;
 }) {
   const [unlocked, setUnlocked] = useState(!state.settings.parentPinHash);
   const [pinInput, setPinInput] = useState("");
@@ -1420,8 +1439,10 @@ function ParentZone({
     if (h === state.settings.parentPinHash) {
       setUnlocked(true);
       setPinError("");
+      onPinAudit(profileId, "unlock", true, null);
     } else {
       setPinError("Incorrect PIN.");
+      onPinAudit(profileId, "unlock", false, "incorrect_pin");
     }
   };
 
@@ -1447,6 +1468,7 @@ function ParentZone({
   const recoverPin = async () => {
     if (!state.settings.parentPinRecoveryHash) {
       setPinError("No recovery code set yet.");
+      onPinAudit(profileId, "recover", false, "no_recovery_code_set");
       return;
     }
     const [providedRecovery, providedPin] = await Promise.all([
@@ -1455,10 +1477,12 @@ function ParentZone({
     ]);
     if (providedRecovery !== state.settings.parentPinRecoveryHash) {
       setPinError("Recovery code is not correct.");
+      onPinAudit(profileId, "recover", false, "invalid_recovery_code");
       return;
     }
     if (recoveryNewPin.trim().length < 4) {
       setPinError("New PIN must be at least 4 digits.");
+      onPinAudit(profileId, "recover", false, "new_pin_too_short");
       return;
     }
     setState((previous) => ({
@@ -1471,6 +1495,7 @@ function ParentZone({
     setRecoveryCode("");
     setRecoveryNewPin("");
     setPinError("PIN recovered successfully.");
+    onPinAudit(profileId, "recover", true, null);
   };
 
   if (!unlocked) {
