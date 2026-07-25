@@ -1143,6 +1143,87 @@ export type Database = {
           },
         ]
       }
+      kids_progress: {
+        Row: {
+          activity_log: Json
+          parent_pin_hash: string | null
+          progress: Json
+          rewards: Json
+          settings: Json
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          activity_log?: Json
+          parent_pin_hash?: string | null
+          progress?: Json
+          rewards?: Json
+          settings?: Json
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          activity_log?: Json
+          parent_pin_hash?: string | null
+          progress?: Json
+          rewards?: Json
+          settings?: Json
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      kids_questions: {
+        Row: {
+          age_group: string
+          answer_index: number
+          category: string
+          created_at: string
+          created_by: string | null
+          difficulty: number
+          hint: string | null
+          id: string
+          language_code: string
+          options: Json
+          published: boolean
+          question: string
+          related_ref: string | null
+          updated_at: string
+        }
+        Insert: {
+          age_group: string
+          answer_index: number
+          category: string
+          created_at?: string
+          created_by?: string | null
+          difficulty?: number
+          hint?: string | null
+          id?: string
+          language_code?: string
+          options: Json
+          published?: boolean
+          question: string
+          related_ref?: string | null
+          updated_at?: string
+        }
+        Update: {
+          age_group?: string
+          answer_index?: number
+          category?: string
+          created_at?: string
+          created_by?: string | null
+          difficulty?: number
+          hint?: string | null
+          id?: string
+          language_code?: string
+          options?: Json
+          published?: boolean
+          question?: string
+          related_ref?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       knowledge_embeddings: {
         Row: {
           checksum: string | null
