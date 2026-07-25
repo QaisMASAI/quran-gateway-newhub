@@ -47,6 +47,7 @@ import { Route as HadithCollectionBookRouteImport } from './routes/hadith.$colle
 import { Route as ApiPublicSurahNamesRouteImport } from './routes/api/public/surah-names'
 import { Route as ApiPublicSeedKnowledgeRouteImport } from './routes/api/public/seed-knowledge'
 import { Route as AuthenticatedAdminSetupRouteImport } from './routes/_authenticated/admin.setup'
+import { Route as AuthenticatedAdminKidsRouteImport } from './routes/_authenticated/admin.kids'
 import { Route as AuthenticatedAdminIngestRouteImport } from './routes/_authenticated/admin.ingest'
 import { Route as AuthenticatedAdminHadithIngestRouteImport } from './routes/_authenticated/admin.hadith-ingest'
 import { Route as AuthenticatedAdminHadithApiRouteImport } from './routes/_authenticated/admin.hadith-api'
@@ -255,6 +256,11 @@ const AuthenticatedAdminSetupRoute = AuthenticatedAdminSetupRouteImport.update({
   path: '/admin/setup',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedAdminKidsRoute = AuthenticatedAdminKidsRouteImport.update({
+  id: '/admin/kids',
+  path: '/admin/kids',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedAdminIngestRoute =
   AuthenticatedAdminIngestRouteImport.update({
     id: '/admin/ingest',
@@ -392,6 +398,7 @@ export interface FileRoutesByFullPath {
   '/admin/hadith-api': typeof AuthenticatedAdminHadithApiRoute
   '/admin/hadith-ingest': typeof AuthenticatedAdminHadithIngestRoute
   '/admin/ingest': typeof AuthenticatedAdminIngestRoute
+  '/admin/kids': typeof AuthenticatedAdminKidsRoute
   '/admin/setup': typeof AuthenticatedAdminSetupRoute
   '/api/public/seed-knowledge': typeof ApiPublicSeedKnowledgeRoute
   '/api/public/surah-names': typeof ApiPublicSurahNamesRoute
@@ -447,6 +454,7 @@ export interface FileRoutesByTo {
   '/admin/hadith-api': typeof AuthenticatedAdminHadithApiRoute
   '/admin/hadith-ingest': typeof AuthenticatedAdminHadithIngestRoute
   '/admin/ingest': typeof AuthenticatedAdminIngestRoute
+  '/admin/kids': typeof AuthenticatedAdminKidsRoute
   '/admin/setup': typeof AuthenticatedAdminSetupRoute
   '/api/public/seed-knowledge': typeof ApiPublicSeedKnowledgeRoute
   '/api/public/surah-names': typeof ApiPublicSurahNamesRoute
@@ -505,6 +513,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/hadith-api': typeof AuthenticatedAdminHadithApiRoute
   '/_authenticated/admin/hadith-ingest': typeof AuthenticatedAdminHadithIngestRoute
   '/_authenticated/admin/ingest': typeof AuthenticatedAdminIngestRoute
+  '/_authenticated/admin/kids': typeof AuthenticatedAdminKidsRoute
   '/_authenticated/admin/setup': typeof AuthenticatedAdminSetupRoute
   '/api/public/seed-knowledge': typeof ApiPublicSeedKnowledgeRoute
   '/api/public/surah-names': typeof ApiPublicSurahNamesRoute
@@ -563,6 +572,7 @@ export interface FileRouteTypes {
     | '/admin/hadith-api'
     | '/admin/hadith-ingest'
     | '/admin/ingest'
+    | '/admin/kids'
     | '/admin/setup'
     | '/api/public/seed-knowledge'
     | '/api/public/surah-names'
@@ -618,6 +628,7 @@ export interface FileRouteTypes {
     | '/admin/hadith-api'
     | '/admin/hadith-ingest'
     | '/admin/ingest'
+    | '/admin/kids'
     | '/admin/setup'
     | '/api/public/seed-knowledge'
     | '/api/public/surah-names'
@@ -675,6 +686,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/hadith-api'
     | '/_authenticated/admin/hadith-ingest'
     | '/_authenticated/admin/ingest'
+    | '/_authenticated/admin/kids'
     | '/_authenticated/admin/setup'
     | '/api/public/seed-knowledge'
     | '/api/public/surah-names'
@@ -1011,6 +1023,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminSetupRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/admin/kids': {
+      id: '/_authenticated/admin/kids'
+      path: '/admin/kids'
+      fullPath: '/admin/kids'
+      preLoaderRoute: typeof AuthenticatedAdminKidsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/admin/ingest': {
       id: '/_authenticated/admin/ingest'
       path: '/admin/ingest'
@@ -1138,6 +1157,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedAdminHadithApiRoute: typeof AuthenticatedAdminHadithApiRoute
   AuthenticatedAdminHadithIngestRoute: typeof AuthenticatedAdminHadithIngestRoute
   AuthenticatedAdminIngestRoute: typeof AuthenticatedAdminIngestRoute
+  AuthenticatedAdminKidsRoute: typeof AuthenticatedAdminKidsRoute
   AuthenticatedAdminSetupRoute: typeof AuthenticatedAdminSetupRoute
   AuthenticatedCollectionsIndexRoute: typeof AuthenticatedCollectionsIndexRoute
 }
@@ -1147,6 +1167,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAdminHadithApiRoute: AuthenticatedAdminHadithApiRoute,
   AuthenticatedAdminHadithIngestRoute: AuthenticatedAdminHadithIngestRoute,
   AuthenticatedAdminIngestRoute: AuthenticatedAdminIngestRoute,
+  AuthenticatedAdminKidsRoute: AuthenticatedAdminKidsRoute,
   AuthenticatedAdminSetupRoute: AuthenticatedAdminSetupRoute,
   AuthenticatedCollectionsIndexRoute: AuthenticatedCollectionsIndexRoute,
 }
