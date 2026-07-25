@@ -1,10 +1,35 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
-  Sparkles, Star, Trophy, Award, Check, X, RotateCcw, ArrowLeft, Gamepad2,
-  Volume2, VolumeX, ZoomIn, ZoomOut, ShoppingBag, Lock, Unlock, Shield,
-  Settings, Activity, RefreshCw, Sticker, BookOpen, KeyRound,
+  Activity,
+  ArrowLeft,
+  Award,
+  BookOpen,
+  Check,
+  Gamepad2,
+  KeyRound,
+  Lock,
+  Plus,
+  RefreshCw,
+  RotateCcw,
+  Settings,
+  Shield,
+  ShoppingBag,
+  Sparkles,
+  Star,
+  Trophy,
+  Unlock,
+  Volume2,
+  VolumeX,
+  Wifi,
+  WifiOff,
+  X,
+  ZoomIn,
+  ZoomOut,
 } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 
@@ -22,9 +47,18 @@ export const Route = createFileRoute("/kids")({
   component: KidsPage,
 });
 
-// ============ Types ============
 type Difficulty = 1 | 2 | 3;
-type Question = { id?: string; q: string; options: string[]; answer: number; hint?: string; difficulty?: Difficulty };
+type QuestionKind = "mcq" | "interactive";
+type Question = {
+  id?: string;
+  q: string;
+  options: string[];
+  answer: number;
+  hint?: string;
+  difficulty?: Difficulty;
+  kind?: QuestionKind;
+  expectedAnswer?: string;
+};
 type Quiz = {
   id: string; title: string; emoji: string; age: "kids" | "young";
   color: string; description: string; questions: Question[];
@@ -32,11 +66,12 @@ type Quiz = {
 type QuizProgress = { best: number; total: number; stars: number; attempts: number };
 type Rewards = { stars: number; unlocked: string[]; spent: number };
 type Settings = {
-  fontScale: number;           // 1..1.6
-  tts: boolean;                // read aloud
+  fontScale: number;
+  tts: boolean;
   parentPinHash: string | null;
-  maxDifficulty: Difficulty;   // content restriction
-  allowedCategories: string[]; // empty = all
+  parentPinRecoveryHash: string | null;
+  maxDifficulty: Difficulty;
+  allowedCategories: string[];
 };
 type Activity = { at: number; quizId: string; correct: number; total: number };
 type StateBag = {
@@ -45,8 +80,38 @@ type StateBag = {
   settings: Settings;
   activity: Activity[];
 };
+type ChildProfile = {
+  id: string;
+  name: string;
+  avatarEmoji: string;
+  ageGroup: "kids" | "young";
+  difficultyLimit: Difficulty;
+  isActive: boolean;
+};
 
-// ============ Default question bank ============
+type PendingOperation =
+  | {
+      type: "upsert_progress";
+      profileId: string;
+      bag: StateBag;
+      queuedAt: number;
+    }
+  | {
+      type: "pin_audit";
+      profileId: string;
+      attemptType: "unlock" | "recover";
+      success: boolean;
+      failureReason?: string | null;
+      queuedAt: number;
+    };
+
+type LocalCache = {
+  profiles: ChildProfile[];
+  selectedProfileId: string | null;
+  profileBags: Record<string, StateBag>;
+  pending: PendingOperation[];
+};
+
 const BUILTIN: Quiz[] = [
   {
     id: "prophets", title: "Prophets of the Qur'an", emoji: "🕌", age: "kids",
@@ -94,7 +159,6 @@ const BUILTIN: Quiz[] = [
   },
 ];
 
-// ============ Rewards catalog ============
 type RewardItem = {
   id: string; name: string; cost: number; emoji: string; kind: "sticker" | "card";
   description: string;
@@ -133,29 +197,101 @@ const CARD_CONTENT: Record<string, { title: string; arabic: string; english: str
   },
 };
 
-// ============ Storage ============
-const STORAGE_KEY = "noor:kids:state:v2";
+const STORAGE_KEY = "noor:kids:state:v3";
+const GUEST_PROFILE_ID = "guest-profile";
+
 const defaultState: StateBag = {
   progress: {}, rewards: { stars: 0, unlocked: [], spent: 0 },
-  settings: { fontScale: 1, tts: false, parentPinHash: null, maxDifficulty: 3, allowedCategories: [] },
+  settings: {
+    fontScale: 1,
+    tts: false,
+    parentPinHash: null,
+    parentPinRecoveryHash: null,
+    maxDifficulty: 3,
+    allowedCategories: [],
+  },
   activity: [],
 };
-function loadLocal(): StateBag {
-  if (typeof window === "undefined") return defaultState;
+
+const guestProfile: ChildProfile = {
+  id: GUEST_PROFILE_ID,
+  name: "Guest Child",
+  avatarEmoji: "🧒",
+  ageGroup: "kids",
+  difficultyLimit: 3,
+  isActive: true,
+};
+
+function mergeStateBag(source?: Partial<StateBag>): StateBag {
+  return {
+    progress: source?.progress ?? {},
+    rewards: {
+      stars: source?.rewards?.stars ?? 0,
+      unlocked: source?.rewards?.unlocked ?? [],
+      spent: source?.rewards?.spent ?? 0,
+    },
+    settings: {
+      fontScale: source?.settings?.fontScale ?? 1,
+      tts: source?.settings?.tts ?? false,
+      parentPinHash: source?.settings?.parentPinHash ?? null,
+      parentPinRecoveryHash: source?.settings?.parentPinRecoveryHash ?? null,
+      maxDifficulty: source?.settings?.maxDifficulty ?? 3,
+      allowedCategories: source?.settings?.allowedCategories ?? [],
+    },
+    activity: source?.activity ?? [],
+  };
+}
+
+function loadLocalCache(): LocalCache {
+  if (typeof window === "undefined") {
+    return {
+      profiles: [guestProfile],
+      selectedProfileId: GUEST_PROFILE_ID,
+      profileBags: { [GUEST_PROFILE_ID]: defaultState },
+      pending: [],
+    };
+  }
   try {
     const raw = window.localStorage.getItem(STORAGE_KEY);
-    if (!raw) return defaultState;
-    return { ...defaultState, ...JSON.parse(raw) };
-  } catch { return defaultState; }
+    if (!raw) {
+      return {
+        profiles: [guestProfile],
+        selectedProfileId: GUEST_PROFILE_ID,
+        profileBags: { [GUEST_PROFILE_ID]: defaultState },
+        pending: [],
+      };
+    }
+    const parsed = JSON.parse(raw) as Partial<LocalCache>;
+    const profiles = parsed.profiles?.length ? parsed.profiles : [guestProfile];
+    const selectedProfileId = parsed.selectedProfileId ?? profiles[0]?.id ?? GUEST_PROFILE_ID;
+    const profileBags = Object.fromEntries(
+      profiles.map((profile) => [profile.id, mergeStateBag(parsed.profileBags?.[profile.id])]),
+    );
+    return { profiles, selectedProfileId, profileBags, pending: parsed.pending ?? [] };
+  } catch {
+    return {
+      profiles: [guestProfile],
+      selectedProfileId: GUEST_PROFILE_ID,
+      profileBags: { [GUEST_PROFILE_ID]: defaultState },
+      pending: [],
+    };
+  }
 }
-function saveLocal(s: StateBag) {
-  try { window.localStorage.setItem(STORAGE_KEY, JSON.stringify(s)); } catch { /* noop */ }
+
+function saveLocalCache(cache: LocalCache) {
+  try {
+    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(cache));
+  } catch {
+    // noop
+  }
 }
+
 async function hashPin(pin: string): Promise<string> {
   const enc = new TextEncoder().encode(`noor-kids:${pin}`);
   const buf = await crypto.subtle.digest("SHA-256", enc);
   return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, "0")).join("");
 }
+
 function speak(text: string, enabled: boolean) {
   if (!enabled || typeof window === "undefined" || !("speechSynthesis" in window)) return;
   try {
@@ -166,47 +302,250 @@ function speak(text: string, enabled: boolean) {
   } catch { /* noop */ }
 }
 
-// ============ Sync ============
-function useKidsState(userId: string | null) {
-  const [state, setState] = useState<StateBag>(defaultState);
+function useKidsPlatform(userId: string | null) {
   const [loaded, setLoaded] = useState(false);
+  const [isOnline, setIsOnline] = useState(
+    typeof navigator === "undefined" ? true : navigator.onLine,
+  );
+
+  const [profiles, setProfiles] = useState<ChildProfile[]>([guestProfile]);
+  const [selectedProfileId, setSelectedProfileId] = useState<string>(GUEST_PROFILE_ID);
+  const [profileBags, setProfileBags] = useState<Record<string, StateBag>>({
+    [GUEST_PROFILE_ID]: defaultState,
+  });
+  const [pending, setPending] = useState<PendingOperation[]>([]);
   const [customQuizzes, setCustomQuizzes] = useState<Quiz[]>([]);
-  const skipNextSync = useRef(true);
+  const initialized = useRef(false);
+
+  const saveCache = useCallback(
+    (
+      nextProfiles: ChildProfile[],
+      nextSelectedProfileId: string,
+      nextBags: Record<string, StateBag>,
+      nextPending: PendingOperation[],
+    ) => {
+      saveLocalCache({
+        profiles: nextProfiles,
+        selectedProfileId: nextSelectedProfileId,
+        profileBags: nextBags,
+        pending: nextPending,
+      });
+    },
+    [],
+  );
+
+  const queueProgressSync = useCallback(
+    (profileId: string, bag: StateBag) => {
+      setPending((previous) => {
+        const filtered = previous.filter(
+          (item) => !(item.type === "upsert_progress" && item.profileId === profileId),
+        );
+        const nextPending: PendingOperation[] = [
+          ...filtered,
+          {
+            type: "upsert_progress",
+            profileId,
+            bag,
+            queuedAt: Date.now(),
+          },
+        ];
+        saveCache(profiles, selectedProfileId, profileBags, nextPending);
+        return nextPending;
+      });
+    },
+    [profileBags, profiles, saveCache, selectedProfileId],
+  );
+
+  const queuePinAudit = useCallback(
+    (
+      profileId: string,
+      attemptType: "unlock" | "recover",
+      success: boolean,
+      failureReason?: string | null,
+    ) => {
+      setPending((previous) => {
+        const nextPending: PendingOperation[] = [
+          ...previous,
+          { type: "pin_audit", profileId, attemptType, success, failureReason: failureReason ?? null, queuedAt: Date.now() },
+        ];
+        saveCache(profiles, selectedProfileId, profileBags, nextPending);
+        return nextPending;
+      });
+    },
+    [profileBags, profiles, saveCache, selectedProfileId],
+  );
+
+  const flushPending = useCallback(async () => {
+    if (!userId || !isOnline || pending.length === 0) return;
+    const remaining: PendingOperation[] = [];
+
+    for (const operation of pending) {
+      if (operation.type === "upsert_progress") {
+        const result = await supabase.from("kids_profile_progress").upsert(
+          {
+            user_id: userId,
+            profile_id: operation.profileId,
+            progress: operation.bag.progress,
+            rewards: operation.bag.rewards,
+            settings: {
+              fontScale: operation.bag.settings.fontScale,
+              tts: operation.bag.settings.tts,
+              maxDifficulty: operation.bag.settings.maxDifficulty,
+              allowedCategories: operation.bag.settings.allowedCategories,
+            },
+            activity_log: operation.bag.activity.slice(-200),
+            parent_pin_hash: operation.bag.settings.parentPinHash,
+            parent_pin_recovery_hash: operation.bag.settings.parentPinRecoveryHash,
+          },
+          { onConflict: "profile_id" },
+        );
+        if (result.error) remaining.push(operation);
+      } else {
+        const result = await supabase.from("kids_pin_audit_logs").insert({
+          user_id: userId,
+          profile_id: operation.profileId,
+          attempt_type: operation.attemptType,
+          success: operation.success,
+          failure_reason: operation.failureReason ?? null,
+          user_agent: typeof navigator === "undefined" ? null : navigator.userAgent,
+        });
+        if (result.error) remaining.push(operation);
+      }
+    }
+
+    setPending(remaining);
+    saveCache(profiles, selectedProfileId, profileBags, remaining);
+  }, [isOnline, pending, profileBags, profiles, saveCache, selectedProfileId, userId]);
 
   useEffect(() => {
     let cancelled = false;
+
     (async () => {
-      const local = loadLocal();
-      if (userId) {
-        const { data } = await supabase.from("kids_progress").select("*").eq("user_id", userId).maybeSingle();
+      const local = loadLocalCache();
+      if (cancelled) return;
+
+      setProfiles(local.profiles);
+      setSelectedProfileId(local.selectedProfileId ?? local.profiles[0]?.id ?? GUEST_PROFILE_ID);
+      setProfileBags(local.profileBags);
+      setPending(local.pending);
+
+      if (userId && isOnline) {
+        const [{ data: profileRows }, { data: progressRows }] = await Promise.all([
+          supabase
+            .from("kids_profiles")
+            .select("id, name, avatar_emoji, age_group, difficulty_limit, is_active")
+            .order("created_at", { ascending: true }),
+          supabase
+            .from("kids_profile_progress")
+            .select(
+              "profile_id, progress, rewards, settings, activity_log, parent_pin_hash, parent_pin_recovery_hash",
+            ),
+        ]);
+
         if (cancelled) return;
-        if (data) {
-          setState({
-            progress: (data.progress as StateBag["progress"]) ?? local.progress,
-            rewards: (data.rewards as Rewards) ?? local.rewards,
-            settings: { ...local.settings, ...((data.settings as Partial<Settings>) ?? {}), parentPinHash: data.parent_pin_hash ?? local.settings.parentPinHash },
-            activity: (data.activity_log as Activity[]) ?? local.activity,
-          });
-        } else {
-          setState(local);
-          await supabase.from("kids_progress").insert({
-            user_id: userId,
-            progress: local.progress, rewards: local.rewards,
-            settings: local.settings, activity_log: local.activity,
-            parent_pin_hash: local.settings.parentPinHash,
+
+        let normalizedProfiles: ChildProfile[] =
+          profileRows?.map((profile) => ({
+            id: profile.id,
+            name: profile.name,
+            avatarEmoji: profile.avatar_emoji,
+            ageGroup: profile.age_group as "kids" | "young",
+            difficultyLimit: Math.max(1, Math.min(3, profile.difficulty_limit)) as Difficulty,
+            isActive: profile.is_active,
+          })) ?? [];
+
+        if (normalizedProfiles.length === 0) {
+          const { data: createdProfile } = await supabase
+            .from("kids_profiles")
+            .insert({
+              user_id: userId,
+              name: "Child 1",
+              avatar_emoji: "🧒",
+              age_group: "kids",
+              difficulty_limit: 2,
+              is_active: true,
+            })
+            .select("id, name, avatar_emoji, age_group, difficulty_limit, is_active")
+            .single();
+
+          if (createdProfile) {
+            normalizedProfiles = [
+              {
+                id: createdProfile.id,
+                name: createdProfile.name,
+                avatarEmoji: createdProfile.avatar_emoji,
+                ageGroup: createdProfile.age_group as "kids" | "young",
+                difficultyLimit: Math.max(1, Math.min(3, createdProfile.difficulty_limit)) as Difficulty,
+                isActive: createdProfile.is_active,
+              },
+            ];
+          }
+        }
+
+        const nextBags: Record<string, StateBag> = {};
+        for (const profile of normalizedProfiles) {
+          const row = progressRows?.find((item) => item.profile_id === profile.id);
+          const localBag = local.profileBags[profile.id];
+          nextBags[profile.id] = mergeStateBag({
+            progress: (row?.progress as StateBag["progress"] | undefined) ?? localBag?.progress,
+            rewards: (row?.rewards as Rewards | undefined) ?? localBag?.rewards,
+            settings: {
+              ...(localBag?.settings ?? defaultState.settings),
+              ...((row?.settings as Partial<Settings> | undefined) ?? {}),
+              maxDifficulty: profile.difficultyLimit,
+              parentPinHash:
+                (row?.parent_pin_hash as string | null | undefined) ??
+                localBag?.settings.parentPinHash ??
+                null,
+              parentPinRecoveryHash:
+                (row?.parent_pin_recovery_hash as string | null | undefined) ??
+                localBag?.settings.parentPinRecoveryHash ??
+                null,
+            },
+            activity: (row?.activity_log as Activity[] | undefined) ?? localBag?.activity,
           });
         }
+
+        const nextSelected =
+          normalizedProfiles.find((p) => p.id === local.selectedProfileId)?.id ??
+          normalizedProfiles[0]?.id ??
+          GUEST_PROFILE_ID;
+
+        setProfiles(normalizedProfiles);
+        setSelectedProfileId(nextSelected);
+        setProfileBags(nextBags);
+        saveCache(normalizedProfiles, nextSelected, nextBags, local.pending);
       } else {
-        setState(local);
+        const guestBags = local.profileBags[GUEST_PROFILE_ID] ?? defaultState;
+        setProfiles([guestProfile]);
+        setSelectedProfileId(GUEST_PROFILE_ID);
+        setProfileBags({ [GUEST_PROFILE_ID]: guestBags });
+        saveCache([guestProfile], GUEST_PROFILE_ID, { [GUEST_PROFILE_ID]: guestBags }, local.pending);
       }
+
       setLoaded(true);
+      initialized.current = true;
     })();
 
-    // Fetch admin-managed question bank (published only via RLS)
-    supabase.from("kids_questions").select("*").eq("published", true).then(({ data }) => {
+    supabase
+      .from("kids_questions")
+      .select("*")
+      .eq("published", true)
+      .then(({ data }) => {
       if (cancelled || !data?.length) return;
       const grouped = new Map<string, Question[]>();
-      for (const row of data as Array<{ category: string; age_group: string; difficulty: number; question: string; options: unknown; answer_index: number; hint: string | null; id: string }>) {
+      for (const row of data as Array<{
+        category: string;
+        age_group: string;
+        difficulty: number;
+        question: string;
+        options: unknown;
+        answer_index: number;
+        hint: string | null;
+        id: string;
+        question_kind: string;
+        expected_answer: string | null;
+      }>) {
         const key = `${row.category}::${row.age_group}`;
         const arr = grouped.get(key) ?? [];
         arr.push({
@@ -214,6 +553,8 @@ function useKidsState(userId: string | null) {
           options: Array.isArray(row.options) ? row.options as string[] : [],
           answer: row.answer_index, hint: row.hint ?? undefined,
           difficulty: (Math.max(1, Math.min(3, row.difficulty)) as Difficulty),
+          kind: row.question_kind === "interactive" ? "interactive" : "mcq",
+          expectedAnswer: row.expected_answer ?? undefined,
         });
         grouped.set(key, arr);
       }
@@ -230,32 +571,163 @@ function useKidsState(userId: string | null) {
     });
 
     return () => { cancelled = true; };
-  }, [userId]);
+  }, [isOnline, saveCache, userId]);
 
   useEffect(() => {
-    if (!loaded) return;
-    if (skipNextSync.current) { skipNextSync.current = false; return; }
-    saveLocal(state);
-    if (!userId) return;
-    void supabase.from("kids_progress").upsert({
-      user_id: userId,
-      progress: state.progress, rewards: state.rewards,
-      settings: { fontScale: state.settings.fontScale, tts: state.settings.tts, maxDifficulty: state.settings.maxDifficulty, allowedCategories: state.settings.allowedCategories },
-      activity_log: state.activity.slice(-100),
-      parent_pin_hash: state.settings.parentPinHash,
-    }, { onConflict: "user_id" });
-  }, [state, loaded, userId]);
+    if (!loaded || !initialized.current) return;
+    saveCache(profiles, selectedProfileId, profileBags, pending);
+  }, [loaded, pending, profileBags, profiles, saveCache, selectedProfileId]);
 
-  return { state, setState, loaded, customQuizzes };
+  useEffect(() => {
+    const onOnline = () => setIsOnline(true);
+    const onOffline = () => setIsOnline(false);
+    window.addEventListener("online", onOnline);
+    window.addEventListener("offline", onOffline);
+    return () => {
+      window.removeEventListener("online", onOnline);
+      window.removeEventListener("offline", onOffline);
+    };
+  }, []);
+
+  useEffect(() => {
+    void flushPending();
+  }, [flushPending]);
+
+  const updateProfileBag = useCallback(
+    (profileId: string, updater: (prev: StateBag) => StateBag) => {
+      setProfileBags((previous) => {
+        const current = previous[profileId] ?? defaultState;
+        const nextBag = updater(current);
+        const nextMap = { ...previous, [profileId]: nextBag };
+        if (userId) queueProgressSync(profileId, nextBag);
+        return nextMap;
+      });
+    },
+    [queueProgressSync, userId],
+  );
+
+  const createProfile = useCallback(
+    async (name: string, ageGroup: "kids" | "young", avatarEmoji: string) => {
+      if (!userId || !isOnline) return;
+      const { data } = await supabase
+        .from("kids_profiles")
+        .insert({
+          user_id: userId,
+          name,
+          age_group: ageGroup,
+          avatar_emoji: avatarEmoji,
+          difficulty_limit: ageGroup === "kids" ? 2 : 3,
+          is_active: true,
+        })
+        .select("id, name, avatar_emoji, age_group, difficulty_limit, is_active")
+        .single();
+
+      if (!data) return;
+      const profile: ChildProfile = {
+        id: data.id,
+        name: data.name,
+        avatarEmoji: data.avatar_emoji,
+        ageGroup: data.age_group as "kids" | "young",
+        difficultyLimit: Math.max(1, Math.min(3, data.difficulty_limit)) as Difficulty,
+        isActive: data.is_active,
+      };
+
+      setProfiles((previous) => [...previous, profile]);
+      setSelectedProfileId(profile.id);
+      setProfileBags((previous) => ({ ...previous, [profile.id]: mergeStateBag() }));
+      queueProgressSync(profile.id, mergeStateBag());
+    },
+    [isOnline, queueProgressSync, userId],
+  );
+
+  const updateProfile = useCallback(
+    async (profile: ChildProfile) => {
+      if (!userId || !isOnline) {
+        setProfiles((previous) => previous.map((item) => (item.id === profile.id ? profile : item)));
+        return;
+      }
+      await supabase
+        .from("kids_profiles")
+        .update({
+          name: profile.name,
+          avatar_emoji: profile.avatarEmoji,
+          age_group: profile.ageGroup,
+          difficulty_limit: profile.difficultyLimit,
+          is_active: profile.isActive,
+        })
+        .eq("id", profile.id);
+      setProfiles((previous) => previous.map((item) => (item.id === profile.id ? profile : item)));
+    },
+    [isOnline, userId],
+  );
+
+  const deleteProfile = useCallback(
+    async (profileId: string) => {
+      if (profiles.length <= 1) return;
+      if (userId && isOnline) {
+        await supabase.from("kids_profiles").delete().eq("id", profileId);
+      }
+      const nextProfiles = profiles.filter((item) => item.id !== profileId);
+      const nextSelected =
+        selectedProfileId === profileId ? nextProfiles[0]?.id ?? GUEST_PROFILE_ID : selectedProfileId;
+      const nextBags = Object.fromEntries(
+        Object.entries(profileBags).filter(([profileKey]) => profileKey !== profileId),
+      );
+      setProfiles(nextProfiles);
+      setSelectedProfileId(nextSelected);
+      setProfileBags(nextBags);
+      setPending((previous) => previous.filter((item) => item.profileId !== profileId));
+    },
+    [isOnline, profileBags, profiles, selectedProfileId, userId],
+  );
+
+  return {
+    loaded,
+    isOnline,
+    profiles,
+    selectedProfileId,
+    setSelectedProfileId,
+    profileBags,
+    updateProfileBag,
+    createProfile,
+    updateProfile,
+    deleteProfile,
+    customQuizzes,
+    pendingCount: pending.length,
+    logPinAttempt: queuePinAudit,
+  };
 }
 
-// ============ Root ============
 function KidsPage() {
   const { user } = useAuth();
   const userId = user?.id ?? null;
-  const { state, setState, loaded, customQuizzes } = useKidsState(userId);
+  const {
+    loaded,
+    isOnline,
+    profiles,
+    selectedProfileId,
+    setSelectedProfileId,
+    profileBags,
+    updateProfileBag,
+    createProfile,
+    updateProfile,
+    deleteProfile,
+    customQuizzes,
+    pendingCount,
+    logPinAttempt,
+  } = useKidsPlatform(userId);
+
   const [activeId, setActiveId] = useState<string | null>(null);
   const [view, setView] = useState<"home" | "store" | "parent" | "summary">("home");
+  const [showCreateProfile, setShowCreateProfile] = useState(false);
+  const [newChildName, setNewChildName] = useState("");
+  const [newChildAge, setNewChildAge] = useState<"kids" | "young">("kids");
+  const [newChildAvatar, setNewChildAvatar] = useState("🧒");
+
+  const selectedProfile =
+    profiles.find((profile) => profile.id === selectedProfileId) ?? profiles[0] ?? guestProfile;
+  const state = profileBags[selectedProfile.id] ?? defaultState;
+  const setState = (updater: (prev: StateBag) => StateBag) => updateProfileBag(selectedProfile.id, updater);
 
   const allQuizzes = useMemo(() => [...BUILTIN, ...customQuizzes], [customQuizzes]);
   const visibleQuizzes = useMemo(() => {
@@ -306,12 +778,79 @@ function KidsPage() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-background via-background to-secondary/30" style={{ fontSize: `${scale}rem` }}>
       <div className="mx-auto max-w-5xl px-4 py-6 sm:py-10">
+        <div className="mb-3 flex flex-wrap items-center justify-between gap-2 rounded-xl border border-border bg-card px-4 py-2 text-xs text-muted-foreground">
+          <span className="inline-flex items-center gap-1.5">
+            {isOnline ? <Wifi className="h-4 w-4 text-emerald-600" /> : <WifiOff className="h-4 w-4 text-amber-600" />}
+            {isOnline ? "Online" : "Offline"}
+          </span>
+          <span>
+            {isOnline
+              ? pendingCount > 0
+                ? `Syncing ${pendingCount} pending update(s)…`
+                : "All progress synced"
+              : `Offline mode active — ${pendingCount} update(s) queued`}
+          </span>
+        </div>
+
         <TopBar
           state={state} setState={setState}
           view={view} setView={setView}
           hasActive={!!active} onExit={() => setActiveId(null)}
           user={!!userId}
+          profiles={profiles}
+          selectedProfileId={selectedProfile.id}
+          onSelectProfile={(id) => {
+            setSelectedProfileId(id);
+            setActiveId(null);
+          }}
+          onToggleCreateProfile={() => setShowCreateProfile((prev) => !prev)}
         />
+
+        {showCreateProfile && userId ? (
+          <section className="mb-6 rounded-2xl border border-border bg-card p-4">
+            <h3 className="mb-3 text-sm font-semibold">Add child profile</h3>
+            <div className="grid gap-3 sm:grid-cols-3">
+              <Input
+                value={newChildName}
+                onChange={(event) => setNewChildName(event.target.value)}
+                placeholder="Child name"
+              />
+              <Input
+                value={newChildAvatar}
+                onChange={(event) => setNewChildAvatar(event.target.value.slice(0, 2))}
+                placeholder="Avatar emoji"
+              />
+              <select
+                value={newChildAge}
+                onChange={(event) => setNewChildAge(event.target.value as "kids" | "young")}
+                className="h-9 rounded-md border border-input bg-background px-3 text-sm"
+              >
+                <option value="kids">Kids</option>
+                <option value="young">Young</option>
+              </select>
+            </div>
+            <div className="mt-3 flex items-center gap-2">
+              <Button
+                type="button"
+                onClick={async () => {
+                  const normalizedName = newChildName.trim();
+                  if (!normalizedName) return;
+                  await createProfile(normalizedName, newChildAge, newChildAvatar.trim() || "🧒");
+                  setNewChildName("");
+                  setNewChildAvatar("🧒");
+                  setNewChildAge("kids");
+                  setShowCreateProfile(false);
+                }}
+                size="sm"
+              >
+                Save profile
+              </Button>
+              <Button type="button" variant="outline" size="sm" onClick={() => setShowCreateProfile(false)}>
+                Cancel
+              </Button>
+            </div>
+          </section>
+        ) : null}
 
         {view === "parent" ? (
           <ParentZone state={state} setState={setState} quizzes={allQuizzes} onExit={() => setView("home")} />
@@ -323,7 +862,7 @@ function KidsPage() {
           <QuizPicker state={state} quizzes={visibleQuizzes} onPick={setActiveId} onOpenStore={() => setView("store")} onOpenSummary={() => setView("summary")} />
         ) : (
           <QuizPlayer
-            key={active.id + state.settings.maxDifficulty}
+              key={`${selectedProfile.id}:${active.id}:${state.settings.maxDifficulty}`}
             quiz={active}
             maxDifficulty={state.settings.maxDifficulty}
             tts={state.settings.tts}
@@ -331,18 +870,69 @@ function KidsPage() {
             onComplete={(c, t) => applyResult(active.id, c, t)}
           />
         )}
+
+        {view === "summary" && userId ? (
+          <section className="mt-6 rounded-2xl border border-border bg-card p-4">
+            <div className="mb-3 flex items-center justify-between">
+              <h3 className="text-sm font-semibold">Parent dashboard by child</h3>
+              <span className="text-xs text-muted-foreground">Stars, progress, and unlocked content per child</span>
+            </div>
+            <div className="grid gap-3 sm:grid-cols-2">
+              {profiles.map((profile) => {
+                const bag = profileBags[profile.id] ?? defaultState;
+                const earned = bag.rewards.stars + bag.rewards.spent;
+                const done = Object.values(bag.progress).filter((item) => item.stars > 0).length;
+                return (
+                  <div key={profile.id} className="rounded-xl border border-border bg-background p-3">
+                    <div className="mb-2 flex items-center justify-between">
+                      <p className="font-semibold">{profile.avatarEmoji} {profile.name}</p>
+                      {profiles.length > 1 ? (
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={() => void deleteProfile(profile.id)}
+                        >
+                          Remove
+                        </Button>
+                      ) : null}
+                    </div>
+                    <div className="grid grid-cols-3 gap-2 text-xs">
+                      <div className="rounded-md bg-secondary px-2 py-1">Stars: {earned}</div>
+                      <div className="rounded-md bg-secondary px-2 py-1">Quizzes: {done}</div>
+                      <div className="rounded-md bg-secondary px-2 py-1">Rewards: {bag.rewards.unlocked.length}</div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </section>
+        ) : null}
       </div>
     </div>
   );
 }
 
-// ============ Top Bar ============
 function TopBar({
-  state, setState, view, setView, hasActive, onExit, user,
+  state,
+  setState,
+  view,
+  setView,
+  hasActive,
+  onExit,
+  user,
+  profiles,
+  selectedProfileId,
+  onSelectProfile,
+  onToggleCreateProfile,
 }: {
   state: StateBag; setState: React.Dispatch<React.SetStateAction<StateBag>>;
   view: string; setView: (v: "home" | "store" | "parent" | "summary") => void;
   hasActive: boolean; onExit: () => void; user: boolean;
+  profiles: ChildProfile[];
+  selectedProfileId: string;
+  onSelectProfile: (id: string) => void;
+  onToggleCreateProfile: () => void;
 }) {
   const bumpFont = (delta: number) =>
     setState(p => ({ ...p, settings: { ...p.settings, fontScale: Math.max(0.9, Math.min(1.6, +(p.settings.fontScale + delta).toFixed(2))) } }));
@@ -360,6 +950,27 @@ function TopBar({
         </div>
       </div>
       <div className="flex flex-wrap items-center gap-2" role="toolbar" aria-label="Accessibility and navigation">
+        <div className="inline-flex h-10 items-center gap-2 rounded-full border border-border bg-background px-3 text-xs">
+          <span>Child:</span>
+          <select
+            value={selectedProfileId}
+            onChange={(event) => onSelectProfile(event.target.value)}
+            className="bg-transparent text-sm"
+          >
+            {profiles.map((profile) => (
+              <option key={profile.id} value={profile.id}>
+                {profile.avatarEmoji} {profile.name}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        {user ? (
+          <Button type="button" variant="outline" size="sm" onClick={onToggleCreateProfile}>
+            <Plus className="h-4 w-4" /> Add child
+          </Button>
+        ) : null}
+
         <button type="button" onClick={() => bumpFont(-0.1)} aria-label="Decrease text size"
           className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-border bg-background hover:bg-accent">
           <ZoomOut className="h-4 w-4" />
@@ -401,7 +1012,6 @@ function TopBar({
   );
 }
 
-// ============ Picker ============
 function QuizPicker({
   state, quizzes, onPick, onOpenStore, onOpenSummary,
 }: {
@@ -508,7 +1118,6 @@ function BadgeRow({ state }: { state: StateBag }) {
   );
 }
 
-// ============ Quiz Player ============
 function QuizPlayer({
   quiz, maxDifficulty, tts, onExit, onComplete,
 }: {
@@ -524,6 +1133,7 @@ function QuizPlayer({
   const [locked, setLocked] = useState(false);
   const [correct, setCorrect] = useState(0);
   const [finished, setFinished] = useState(false);
+  const [typedAnswer, setTypedAnswer] = useState("");
   const firstOptionRef = useRef<HTMLButtonElement | null>(null);
 
   const total = questions.length;
@@ -556,15 +1166,34 @@ function QuizPlayer({
     if (isRight) setCorrect(c => c + 1);
     speak(isRight ? "Correct!" : `The correct answer is ${current.options[current.answer]}`, tts);
   };
+
+  const submitInteractive = () => {
+    if (locked || !current) return;
+    const expected = (current.expectedAnswer ?? "").trim().toLowerCase();
+    const actual = typedAnswer.trim().toLowerCase();
+    const isRight = expected.length > 0 && actual === expected;
+    setSelected(isRight ? 1 : 0);
+    setLocked(true);
+    if (isRight) setCorrect((count) => count + 1);
+    speak(isRight ? "Correct!" : "Good try. Check the guidance and continue.", tts);
+  };
+
   const next = () => {
     if (idx + 1 >= total) {
       setFinished(true);
       onComplete(correct, total);
       return;
     }
-    setIdx(n => n + 1); setSelected(null); setLocked(false);
+    setIdx(n => n + 1); setSelected(null); setLocked(false); setTypedAnswer("");
   };
-  const restart = () => { setIdx(0); setSelected(null); setLocked(false); setCorrect(0); setFinished(false); };
+  const restart = () => {
+    setIdx(0);
+    setSelected(null);
+    setLocked(false);
+    setCorrect(0);
+    setFinished(false);
+    setTypedAnswer("");
+  };
 
   if (total === 0) {
     return (
@@ -618,25 +1247,47 @@ function QuizPlayer({
       </div>
       <h2 className="text-xl font-bold sm:text-2xl">{current.q}</h2>
       <p className="mt-1 text-xs text-muted-foreground">Tip: press keys 1–{current.options.length} to answer, Enter for next, Esc to exit.</p>
-      <div className="mt-6 grid gap-3" role="radiogroup" aria-label="Answer options">
-        {current.options.map((opt, i) => {
-          const isCorrect = i === current.answer;
-          const isPicked = i === selected;
-          let cls = "flex items-center justify-between gap-3 rounded-2xl border-2 p-4 text-start text-sm font-semibold transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary";
-          if (!locked) cls += " border-border bg-background hover:border-primary/60 hover:bg-primary/5 cursor-pointer";
-          else if (isCorrect) cls += " border-emerald-500 bg-emerald-500/10 text-emerald-900 dark:text-emerald-100";
-          else if (isPicked) cls += " border-rose-500 bg-rose-500/10 text-rose-900 dark:text-rose-100";
-          else cls += " border-border bg-background/50 text-muted-foreground";
-          return (
-            <button key={i} ref={i === 0 ? firstOptionRef : undefined} type="button" role="radio"
-              aria-checked={isPicked} onClick={() => pick(i)} disabled={locked} className={cls}>
-              <span><kbd className="me-2 rounded bg-muted px-1.5 py-0.5 text-[10px]">{i + 1}</kbd>{opt}</span>
-              {locked && isCorrect && <Check className="h-5 w-5 text-emerald-600" />}
-              {locked && isPicked && !isCorrect && <X className="h-5 w-5 text-rose-600" />}
-            </button>
-          );
-        })}
-      </div>
+      {current.kind === "interactive" ? (
+        <div className="mt-6 rounded-xl border border-border bg-background p-4">
+          <label className="text-sm font-medium" htmlFor="interactive-answer">
+            Type your answer
+          </label>
+          <div className="mt-2 flex flex-wrap gap-2">
+            <Input
+              id="interactive-answer"
+              value={typedAnswer}
+              onChange={(event) => setTypedAnswer(event.target.value)}
+              placeholder="Write your answer"
+              disabled={locked}
+            />
+            {!locked ? (
+              <Button type="button" onClick={submitInteractive} disabled={!typedAnswer.trim()}>
+                Check answer
+              </Button>
+            ) : null}
+          </div>
+        </div>
+      ) : (
+        <div className="mt-6 grid gap-3" role="radiogroup" aria-label="Answer options">
+          {current.options.map((opt, i) => {
+            const isCorrect = i === current.answer;
+            const isPicked = i === selected;
+            let cls = "flex items-center justify-between gap-3 rounded-2xl border-2 p-4 text-start text-sm font-semibold transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary";
+            if (!locked) cls += " border-border bg-background hover:border-primary/60 hover:bg-primary/5 cursor-pointer";
+            else if (isCorrect) cls += " border-emerald-500 bg-emerald-500/10 text-emerald-900 dark:text-emerald-100";
+            else if (isPicked) cls += " border-rose-500 bg-rose-500/10 text-rose-900 dark:text-rose-100";
+            else cls += " border-border bg-background/50 text-muted-foreground";
+            return (
+              <button key={i} ref={i === 0 ? firstOptionRef : undefined} type="button" role="radio"
+                aria-checked={isPicked} onClick={() => pick(i)} disabled={locked} className={cls}>
+                <span><kbd className="me-2 rounded bg-muted px-1.5 py-0.5 text-[10px]">{i + 1}</kbd>{opt}</span>
+                {locked && isCorrect && <Check className="h-5 w-5 text-emerald-600" />}
+                {locked && isPicked && !isCorrect && <X className="h-5 w-5 text-rose-600" />}
+              </button>
+            );
+          })}
+        </div>
+      )}
       {locked && current.hint && selected !== current.answer && (
         <p className="mt-4 rounded-xl border border-amber-300/40 bg-amber-50 p-3 text-sm text-amber-900 dark:border-amber-500/30 dark:bg-amber-500/10 dark:text-amber-100">💡 {current.hint}</p>
       )}
@@ -658,7 +1309,6 @@ function QuizPlayer({
   );
 }
 
-// ============ Store ============
 function RewardStore({ state, buy, onExit }: { state: StateBag; buy: (item: RewardItem) => void; onExit: () => void }) {
   const [openCard, setOpenCard] = useState<string | null>(null);
   const opened = openCard ? CARD_CONTENT[openCard] : null;
@@ -747,7 +1397,6 @@ function RewardStore({ state, buy, onExit }: { state: StateBag; buy: (item: Rewa
   );
 }
 
-// ============ Parent Mode ============
 function ParentZone({
   state, setState, quizzes, onExit,
 }: {
@@ -758,20 +1407,68 @@ function ParentZone({
   const [pinInput, setPinInput] = useState("");
   const [pinError, setPinError] = useState("");
   const [newPin, setNewPin] = useState("");
+  const [newRecovery, setNewRecovery] = useState("");
+  const [recoveryCode, setRecoveryCode] = useState("");
+  const [recoveryNewPin, setRecoveryNewPin] = useState("");
 
   const tryUnlock = async () => {
     if (!state.settings.parentPinHash) { setUnlocked(true); return; }
     const h = await hashPin(pinInput);
-    if (h === state.settings.parentPinHash) { setUnlocked(true); setPinError(""); }
-    else setPinError("Incorrect PIN.");
+    if (h === state.settings.parentPinHash) {
+      setUnlocked(true);
+      setPinError("");
+    } else {
+      setPinError("Incorrect PIN.");
+    }
   };
+
   const setPin = async () => {
     if (newPin.length < 4) { setPinError("Use at least 4 digits."); return; }
-    const h = await hashPin(newPin);
-    setState(p => ({ ...p, settings: { ...p.settings, parentPinHash: h } }));
+    const [pinHash, recoveryHash] = await Promise.all([
+      hashPin(newPin),
+      newRecovery.trim() ? hashPin(newRecovery.trim()) : Promise.resolve<string | null>(null),
+    ]);
+    setState(p => ({
+      ...p,
+      settings: {
+        ...p.settings,
+        parentPinHash: pinHash,
+        parentPinRecoveryHash: recoveryHash ?? p.settings.parentPinRecoveryHash,
+      },
+    }));
     setNewPin(""); setPinError("PIN saved.");
   };
-  const clearPin = () => setState(p => ({ ...p, settings: { ...p.settings, parentPinHash: null } }));
+
+  const clearPin = () => setState(p => ({ ...p, settings: { ...p.settings, parentPinHash: null, parentPinRecoveryHash: null } }));
+
+  const recoverPin = async () => {
+    if (!state.settings.parentPinRecoveryHash) {
+      setPinError("No recovery code set yet.");
+      return;
+    }
+    const [providedRecovery, providedPin] = await Promise.all([
+      hashPin(recoveryCode.trim()),
+      hashPin(recoveryNewPin.trim()),
+    ]);
+    if (providedRecovery !== state.settings.parentPinRecoveryHash) {
+      setPinError("Recovery code is not correct.");
+      return;
+    }
+    if (recoveryNewPin.trim().length < 4) {
+      setPinError("New PIN must be at least 4 digits.");
+      return;
+    }
+    setState((previous) => ({
+      ...previous,
+      settings: {
+        ...previous.settings,
+        parentPinHash: providedPin,
+      },
+    }));
+    setRecoveryCode("");
+    setRecoveryNewPin("");
+    setPinError("PIN recovered successfully.");
+  };
 
   if (!unlocked) {
     return (
@@ -783,8 +1480,8 @@ function ParentZone({
           className="mt-4 w-full rounded-xl border border-input bg-background px-4 py-2 text-center text-lg tracking-widest" aria-label="Parent PIN" />
         {pinError && <p className="mt-2 text-sm text-rose-600">{pinError}</p>}
         <div className="mt-4 flex justify-center gap-2">
-          <button onClick={onExit} className="rounded-full border border-input bg-background px-4 py-2 text-sm">Cancel</button>
-          <button onClick={tryUnlock} className="rounded-full bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground">Unlock</button>
+          <Button type="button" variant="outline" onClick={onExit}>Cancel</Button>
+          <Button type="button" onClick={tryUnlock}>Unlock</Button>
         </div>
       </div>
     );
@@ -845,15 +1542,33 @@ function ParentZone({
 
       <section className="rounded-3xl border border-border bg-card p-6">
         <h3 className="mb-3 flex items-center gap-2 text-lg font-bold"><KeyRound className="h-5 w-5 text-primary" /> Parent PIN</h3>
-        <p className="text-sm text-muted-foreground">Set or update the PIN required to open parent mode.</p>
+        <p className="text-sm text-muted-foreground">Set or update the PIN required to open parent mode, with safe recovery code support.</p>
         <div className="mt-3 flex flex-wrap gap-2">
-          <input inputMode="numeric" type="password" placeholder="New PIN (4+ digits)" value={newPin} onChange={e => setNewPin(e.target.value)}
-            className="flex-1 rounded-xl border border-input bg-background px-4 py-2 text-sm" />
-          <button onClick={setPin} className="rounded-full bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground">Save PIN</button>
+          <Input inputMode="numeric" type="password" placeholder="New PIN (4+ digits)" value={newPin} onChange={e => setNewPin(e.target.value)} />
+          <Input placeholder="Recovery code" value={newRecovery} onChange={e => setNewRecovery(e.target.value)} />
+          <Button type="button" onClick={setPin}>Save PIN</Button>
           {state.settings.parentPinHash && (
-            <button onClick={clearPin} className="rounded-full border border-input bg-background px-4 py-2 text-sm">Remove PIN</button>
+            <Button type="button" variant="outline" onClick={clearPin}>Remove PIN</Button>
           )}
         </div>
+
+        <div className="mt-4 rounded-xl border border-border bg-background p-3">
+          <p className="text-xs text-muted-foreground">PIN recovery</p>
+          <div className="mt-2 grid gap-2 sm:grid-cols-2">
+            <Input placeholder="Recovery code" value={recoveryCode} onChange={(event) => setRecoveryCode(event.target.value)} />
+            <Input
+              inputMode="numeric"
+              type="password"
+              placeholder="New PIN"
+              value={recoveryNewPin}
+              onChange={(event) => setRecoveryNewPin(event.target.value)}
+            />
+          </div>
+          <Button type="button" variant="secondary" className="mt-2" onClick={recoverPin}>
+            Recover and reset PIN
+          </Button>
+        </div>
+
         {pinError && <p className="mt-2 text-sm text-muted-foreground">{pinError}</p>}
       </section>
 
@@ -879,13 +1594,12 @@ function ParentZone({
       <section className="rounded-3xl border border-rose-300/40 bg-rose-50/40 p-6 dark:bg-rose-500/10">
         <h3 className="mb-3 flex items-center gap-2 text-lg font-bold text-rose-700 dark:text-rose-300"><RefreshCw className="h-5 w-5" /> Reset progress</h3>
         <p className="text-sm text-muted-foreground">Clear all quiz results, stars, unlocked rewards, and activity.</p>
-        <button onClick={resetProgress} className="mt-3 rounded-full bg-rose-600 px-4 py-2 text-sm font-semibold text-white hover:bg-rose-700">Reset everything</button>
+        <Button type="button" variant="destructive" className="mt-3" onClick={resetProgress}>Reset everything</Button>
       </section>
     </div>
   );
 }
 
-// ============ Summary ============
 function SummaryScreen({ state, quizzes, onExit }: { state: StateBag; quizzes: Quiz[]; onExit: () => void }) {
   const totalStars = state.rewards.stars + state.rewards.spent;
   const completedQuizzes = Object.entries(state.progress).filter(([, p]) => (p?.stars ?? 0) > 0);
