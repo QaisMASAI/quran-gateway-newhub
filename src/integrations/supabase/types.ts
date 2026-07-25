@@ -1314,12 +1314,14 @@ export type Database = {
           created_at: string
           created_by: string | null
           difficulty: number
+          expected_answer: string | null
           hint: string | null
           id: string
           language_code: string
           options: Json
           published: boolean
           question: string
+          question_kind: string
           related_ref: string | null
           updated_at: string
         }
@@ -1330,12 +1332,14 @@ export type Database = {
           created_at?: string
           created_by?: string | null
           difficulty?: number
+          expected_answer?: string | null
           hint?: string | null
           id?: string
           language_code?: string
           options: Json
           published?: boolean
           question: string
+          question_kind?: string
           related_ref?: string | null
           updated_at?: string
         }
@@ -1346,12 +1350,14 @@ export type Database = {
           created_at?: string
           created_by?: string | null
           difficulty?: number
+          expected_answer?: string | null
           hint?: string | null
           id?: string
           language_code?: string
           options?: Json
           published?: boolean
           question?: string
+          question_kind?: string
           related_ref?: string | null
           updated_at?: string
         }
