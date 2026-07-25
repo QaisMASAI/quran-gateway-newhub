@@ -7,6 +7,7 @@
 import { defineConfig } from "@lovable.dev/vite-tanstack-config";
 import type { IncomingMessage, ServerResponse } from "node:http";
 import type { Plugin } from "vite";
+import { VitePWA } from "vite-plugin-pwa";
 
 function suppressDevErrorCollector500(): Plugin {
   const endpoint = "/__lovable/error-collector";
@@ -107,7 +108,40 @@ function suppressDevErrorCollector500(): Plugin {
 }
 
 export default defineConfig({
-  plugins: [suppressDevErrorCollector500()],
+  plugins: [
+    suppressDevErrorCollector500(),
+    VitePWA({
+      strategies: "generateSW",
+      filename: "sw.js",
+      injectRegister: null,
+      registerType: "autoUpdate",
+      devOptions: { enabled: false },
+      workbox: {
+        navigateFallbackDenylist: [/^\/~oauth/, /^\/api\//],
+        runtimeCaching: [
+          {
+            urlPattern: ({ request }) => request.mode === "navigate",
+            handler: "NetworkFirst",
+            options: {
+              cacheName: "app-html-navigation",
+              networkTimeoutSeconds: 5,
+              expiration: { maxEntries: 40, maxAgeSeconds: 60 * 60 * 24 * 2 },
+            },
+          },
+          {
+            urlPattern: ({ url }) =>
+              url.origin === self.location.origin && /\.(?:js|mjs|css|woff2?|png|jpg|jpeg|webp|svg|ico)$/.test(url.pathname),
+            handler: "CacheFirst",
+            options: {
+              cacheName: "app-built-assets",
+              expiration: { maxEntries: 200, maxAgeSeconds: 60 * 60 * 24 * 14 },
+            },
+          },
+        ],
+      },
+      manifest: false,
+    }),
+  ],
   tanstackStart: {
     // Redirect TanStack Start's bundled server entry to src/server.ts (our SSR error wrapper).
     // nitro/vite builds from this

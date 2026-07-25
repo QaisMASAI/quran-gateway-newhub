@@ -15,6 +15,7 @@ import { reportLovableError } from "../lib/lovable-error-reporting";
 import { BottomNav } from "@/components/BottomNav";
 import { DirectionProvider } from "@/components/DirectionProvider";
 import { LOCALE_DIR, DEFAULT_LOCALE } from "@/lib/i18n";
+import { registerAppServiceWorker } from "@/lib/register-app-sw";
 import "@/lib/i18n";
 
 const ROOT_META = {
@@ -270,6 +271,10 @@ function RootComponent() {
       cancelled = true;
       window.clearInterval(id);
     };
+  }, []);
+
+  useEffect(() => {
+    void registerAppServiceWorker();
   }, []);
 
   const showDevBanner =
