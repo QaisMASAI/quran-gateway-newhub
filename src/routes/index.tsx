@@ -315,7 +315,7 @@ function Home() {
             </div>
 
             <p
-              className="font-arabic text-3xl text-gold text-center sm:text-4xl"
+              className="w-full text-center font-arabic text-3xl text-gold sm:text-4xl"
               dir="rtl"
               style={{ textShadow: "0 2px 18px rgba(0,0,0,0.3)" }}
             >
