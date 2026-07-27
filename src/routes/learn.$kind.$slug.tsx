@@ -84,16 +84,19 @@ export const Route = createFileRoute("/learn/$kind/$slug")({
     const summaryText =
       pickLocale(loaderData?.entity?.summary_i18n, locale) ||
       pickLocale(loaderData?.entity?.description_i18n, locale);
-    const title = titleText
+    const rawTitle = titleText
       ? `${titleText} | ${kindLabel} | Noor Quran & Hadith`
       : `Noor Quran & Hadith | ${kindLabel}`;
-    const description =
+    const rawDescription =
       summaryText ||
       (locale === "ar"
         ? "اكتشاف قرآني موجّه مع آيات مرتبطة وتفسير وسياق نزول موثّق."
         : locale === "en"
           ? "Guided Quran discovery with connected verses, authentic tafsir, and asbab al-nuzul context."
           : "גילוי קוראני מודרך עם פסוקים קשורים, תפסיר מאומת וסיבות ירידה.");
+    const title = rawTitle.length > 60 ? `${rawTitle.slice(0, 57)}…` : rawTitle;
+    const description =
+      rawDescription.length > 160 ? `${rawDescription.slice(0, 157)}…` : rawDescription;
     const url = `/learn/${params.kind}/${params.slug}`;
 
     return {
