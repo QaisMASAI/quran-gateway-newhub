@@ -7,6 +7,7 @@ import type { AyahRef } from "@/lib/topics";
 import { useEmotionT } from "@/lib/content-i18n";
 import { SURAH_NAMES_HE } from "@/lib/surah-names-he";
 import { ArrowRight, ChevronLeft, BookOpen } from "lucide-react";
+import i18n, { normalizeLocale } from "@/lib/i18n";
 
 export const Route = createFileRoute("/emotions/$slug")({
   loader: ({ params }) => {
@@ -16,8 +17,25 @@ export const Route = createFileRoute("/emotions/$slug")({
   },
   head: ({ params, loaderData }) => {
     const e = loaderData?.emotion;
-    const title = e ? `${e.title} — פסוקים מהקוראן` : "רגש בקוראן";
-    const description = e?.description ?? "פסוקים מתוך הקוראן הקדוש המתייחסים לרגשות.";
+    const locale = normalizeLocale(i18n.resolvedLanguage) ?? "he";
+    const localizedTitle = i18n.t(`content:emotions.${params.slug}.title`, {
+      lng: locale,
+      defaultValue: e?.title ?? params.slug,
+    });
+    const localizedDescription = i18n.t(`content:emotions.${params.slug}.description`, {
+      lng: locale,
+      defaultValue:
+        e?.description ??
+        i18n.t("pages:emotions.metaDescription", {
+          lng: locale,
+          defaultValue: "Quran verses related to emotions with trusted tafsir context.",
+        }),
+    });
+    const title = `${localizedTitle} — ${i18n.t("pages:emotions.title", {
+      lng: locale,
+      defaultValue: "Quran & Emotions",
+    })}`;
+    const description = localizedDescription;
     const url = `/emotions/${params.slug}`;
     return {
       meta: [
@@ -27,6 +45,9 @@ export const Route = createFileRoute("/emotions/$slug")({
         { property: "og:description", content: description },
         { property: "og:type", content: "article" },
         { property: "og:url", content: url },
+        { name: "twitter:card", content: "summary_large_image" },
+        { name: "twitter:title", content: title },
+        { name: "twitter:description", content: description },
       ],
       links: [{ rel: "canonical", href: url }],
     };
