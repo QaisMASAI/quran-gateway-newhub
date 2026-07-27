@@ -26,6 +26,7 @@ export const Route = createFileRoute("/sitemap.xml")({
           "/prophets",
           "/plans",
           "/learn",
+          "/learn/tafsir-ibn-kathir",
           "/learn/graph",
           "/learn/journeys",
           "/explore/timeline",

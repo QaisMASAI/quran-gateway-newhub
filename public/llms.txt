@@ -8,6 +8,7 @@
 - [Search](/search): Advanced multilingual Quran search.
 - [Ask](/ask): Ask questions and get verse-grounded answers.
 - [Learn](/learn): Explore Quran entities by topics, prophets, stories, and themes.
+- [Tafsir Ibn Kathir Guide](/learn/tafsir-ibn-kathir): Practical guide to studying Ibn Kathir with source discipline.
 - [Emotions](/emotions): Emotion-centered Quran verse exploration.
 - [Topics](/topics): Thematic Quran index.
 - [Prophets](/prophets): Prophets in the Quran with verse references.
