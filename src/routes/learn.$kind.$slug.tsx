@@ -38,11 +38,98 @@ const VALID: EntityKind[] = [
 ];
 
 export const Route = createFileRoute("/learn/$kind/$slug")({
+  loader: async ({ params }) => {
+    if (!VALID.includes(params.kind as EntityKind)) throw notFound();
+    const entity = await getEntityBySlug(params.slug);
+    if (!entity) throw notFound();
+    return { entity };
+  },
+  head: ({ params, loaderData }) => {
+    const locale = (normalizeLocale(i18n.language) ?? "he") as Locale;
+    const kind = params.kind as EntityKind;
+    const kindLabel = {
+      he: {
+        topic: "נושא",
+        prophet: "נביא",
+        story: "סיפור",
+        event: "אירוע",
+        place: "מקום",
+        nation: "עם",
+        concept: "מושג",
+        theme: "תמה",
+      },
+      ar: {
+        topic: "موضوع",
+        prophet: "نبي",
+        story: "قصة",
+        event: "حدث",
+        place: "مكان",
+        nation: "أمة",
+        concept: "مفهوم",
+        theme: "محور",
+      },
+      en: {
+        topic: "Topic",
+        prophet: "Prophet",
+        story: "Story",
+        event: "Event",
+        place: "Place",
+        nation: "Nation",
+        concept: "Concept",
+        theme: "Theme",
+      },
+    }[locale][kind];
+
+    const titleText = pickLocale(loaderData?.entity?.title_i18n, locale);
+    const summaryText =
+      pickLocale(loaderData?.entity?.summary_i18n, locale) ||
+      pickLocale(loaderData?.entity?.description_i18n, locale);
+    const title = titleText
+      ? `${titleText} | ${kindLabel} | Noor Quran & Hadith`
+      : `Noor Quran & Hadith | ${kindLabel}`;
+    const description =
+      summaryText ||
+      (locale === "ar"
+        ? "اكتشاف قرآني موجّه مع آيات مرتبطة وتفسير وسياق نزول موثّق."
+        : locale === "en"
+          ? "Guided Quran discovery with connected verses, authentic tafsir, and asbab al-nuzul context."
+          : "גילוי קוראני מודרך עם פסוקים קשורים, תפסיר מאומת וסיבות ירידה.");
+    const url = `/learn/${params.kind}/${params.slug}`;
+
+    return {
+      meta: [
+        { title },
+        { name: "description", content: description },
+        { property: "og:title", content: title },
+        { property: "og:description", content: description },
+        { property: "og:type", content: "article" },
+        { property: "og:url", content: url },
+        { name: "twitter:card", content: "summary_large_image" },
+        { name: "twitter:title", content: title },
+        { name: "twitter:description", content: description },
+      ],
+      links: [{ rel: "canonical", href: url }],
+      scripts: [
+        {
+          type: "application/ld+json",
+          children: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "Article",
+            headline: titleText || title,
+            description,
+            inLanguage: locale,
+            url,
+          }),
+        },
+      ],
+    };
+  },
   component: EntityPage,
 });
 
 function EntityPage() {
   const { kind, slug } = Route.useParams();
+  const { entity: loaderEntity } = Route.useLoaderData();
   const { t, i18n } = useTranslation("pages");
   const locale = (normalizeLocale(i18n.language) ?? "he") as Locale;
   const uiClass = uiFontClass(locale);
@@ -57,6 +144,7 @@ function EntityPage() {
   const entityQ = useQuery({
     queryKey: ["entity", slug],
     queryFn: () => getEntityBySlug(slug),
+    initialData: loaderEntity,
     staleTime: 5 * 60_000,
   });
   const entity = entityQ.data;
