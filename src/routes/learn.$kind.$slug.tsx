@@ -21,7 +21,7 @@ import {
   type TafsirPassageRow,
 } from "@/lib/tafsir-content";
 import { fetchAsbabFromApi, fetchTafsirFromApi } from "@/lib/tafsir-api.functions";
-import { normalizeLocale, type Locale } from "@/lib/i18n";
+import i18n, { normalizeLocale, type Locale } from "@/lib/i18n";
 import { useMemo } from "react";
 import { localeTextDir, readingFontClass, tafsirFontClass, uiFontClass } from "@/lib/locale-ui";
 import type { ReactNode } from "react";
