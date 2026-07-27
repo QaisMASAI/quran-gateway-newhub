@@ -1,7 +1,7 @@
 // Islamic-inspired logo tailored to the site palette (olive green + gold).
 // Composition: rounded square emblem → 8-pointed Khatam star (Rub el Hizb)
 // → inner circular medallion → crescent + star, all gold on deep olive.
-export function Logo({ className = "h-5 w-5" }: { className?: string }) {
+export function Logo({ className = "h-10 w-10" }: { className?: string }) {
   return (
     <svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" className={className} aria-hidden>
       <defs>
