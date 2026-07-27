@@ -421,25 +421,6 @@ function Home() {
         </div>
       </section>
 
-      <section className="mx-auto -mt-8 grid max-w-6xl grid-cols-2 gap-3 px-4 sm:grid-cols-4 sm:px-6">
-        <StatCard icon={<BookOpen className="h-4 w-4" />} label={t("home.stat1Label")} value="114" />
-        <StatCard
-          icon={<Network className="h-4 w-4" />}
-          label={locale === "ar" ? "عُقد المعرفة" : locale === "he" ? "צמתי ידע" : "Knowledge nodes"}
-          value={String(totalEntities)}
-        />
-        <StatCard
-          icon={<Compass className="h-4 w-4" />}
-          label={locale === "ar" ? "المحاور" : locale === "he" ? "תמות" : "Themes"}
-          value={String(totalTopics)}
-        />
-        <StatCard
-          icon={<GraduationCap className="h-4 w-4" />}
-          label={locale === "ar" ? "المسارات" : locale === "he" ? "מסלולים" : "Journeys"}
-          value={String(totalJourneys)}
-        />
-      </section>
-
       <div className="mt-10">
         <ContinueReading />
       </div>
