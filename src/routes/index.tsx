@@ -197,6 +197,31 @@ function Home() {
     [locale],
   );
 
+  const popularQuestions = useMemo(
+    () =>
+      locale === "ar"
+        ? [
+            "ما الذي يقوله القرآن عن القلق؟",
+            "كيف يفهم القرآن التوبة؟",
+            "ما هي آيات العدل؟",
+            "كيف يربّي القرآن على الأمل؟",
+          ]
+        : locale === "he"
+          ? [
+              "מה הקוראן אומר על חרדה?",
+              "איך הקוראן מסביר תשובה?",
+              "מהם פסוקי הצדק?",
+              "איך הקוראן מחנך לתקווה?",
+            ]
+          : [
+              "What does the Quran say about anxiety?",
+              "How does the Quran frame repentance?",
+              "Which verses focus on justice?",
+              "How does the Quran teach hope?",
+            ],
+    [locale],
+  );
+
   const discoveryStreams = useMemo(
     () => [
       {
@@ -225,7 +250,7 @@ function Home() {
       },
       {
         label: locale === "ar" ? "المجموعات" : locale === "he" ? "אוספים" : "Collections",
-        to: "/_authenticated/collections" as const,
+        to: "/collections" as const,
         search: undefined,
         icon: Layers,
       },
@@ -243,31 +268,6 @@ function Home() {
       },
     ],
     [locale, popularQuestions],
-  );
-
-  const popularQuestions = useMemo(
-    () =>
-      locale === "ar"
-        ? [
-            "ما الذي يقوله القرآن عن القلق؟",
-            "كيف يفهم القرآن التوبة؟",
-            "ما هي آيات العدل؟",
-            "كيف يربّي القرآن على الأمل؟",
-          ]
-        : locale === "he"
-          ? [
-              "מה הקוראן אומר על חרדה?",
-              "איך הקוראן מסביר תשובה?",
-              "מהם פסוקי הצדק?",
-              "איך הקוראן מחנך לתקווה?",
-            ]
-          : [
-              "What does the Quran say about anxiety?",
-              "How does the Quran frame repentance?",
-              "Which verses focus on justice?",
-              "How does the Quran teach hope?",
-            ],
-    [locale],
   );
 
   const featuredProphets = useMemo(
