@@ -386,14 +386,15 @@ function Home() {
                 <div className="grid grid-cols-1 gap-2 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center">
                   <div className="flex min-w-0 flex-wrap gap-1.5">
                     {heroExamples.map((example) => (
-                      <button
+                      <Button
                         key={example}
                         type="button"
                         onClick={() => setAssistantPrompt(example)}
-                        className="truncate rounded-full border border-white/20 bg-white/10 px-2.5 py-1 text-[11px] text-primary-foreground/90 transition hover:bg-white/20"
+                        variant="ghost"
+                        className="h-7 truncate rounded-full border border-white/20 bg-white/10 px-2.5 text-[11px] text-primary-foreground/90 transition hover:bg-white/20 hover:text-primary-foreground"
                       >
                         {example}
-                      </button>
+                      </Button>
                     ))}
                   </div>
                   <Button type="submit" className="min-h-11 rounded-xl bg-gold px-5 text-primary hover:bg-gold/90">
