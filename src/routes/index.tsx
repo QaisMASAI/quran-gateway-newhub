@@ -3,12 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import { fetchChapters, type ApiLang } from "@/lib/quran-api";
-import {
-  surahDisplayName,
-  SURAH_NAMES_HE,
-  SURAH_NAMES_EN,
-  SURAH_NAMES_AR,
-} from "@/lib/surah-names-he";
+import { surahDisplayName, SURAH_NAMES_HE, SURAH_NAMES_EN, SURAH_NAMES_AR } from "@/lib/surah-names-he";
 import { Header } from "@/components/Header";
 import { Logo } from "@/components/Logo";
 import { DailyVerse } from "@/components/DailyVerse";
@@ -147,19 +142,9 @@ function Home() {
   const popularPrompts = useMemo(
     () =>
       locale === "ar"
-        ? [
-            "ما هي رحمة الله في القرآن؟",
-            "آيات عن الصبر وقت الابتلاء",
-            "ما معنى التوكل؟",
-            "قصص موسى في القرآن",
-          ]
+        ? ["ما هي رحمة الله في القرآن؟", "آيات عن الصبر وقت الابتلاء", "ما معنى التوكل؟", "قصص موسى في القرآن"]
         : locale === "he"
-          ? [
-              "מה הקוראן אומר על רחמים?",
-              "פסוקים על סבלנות בזמן קושי",
-              "מה משמעות התווכל?",
-              "סיפורי משה בקוראן",
-            ]
+          ? ["מה הקוראן אומר על רחמים?", "פסוקים על סבלנות בזמן קושי", "מה משמעות התווכל?", "סיפורי משה בקוראן"]
           : [
               "What does the Quran teach about mercy?",
               "Verses about patience during hardship",
@@ -172,13 +157,7 @@ function Home() {
   const heroExamples = useMemo(
     () =>
       locale === "ar"
-        ? [
-            "لماذا خُلقنا؟",
-            "ماذا يقول القرآن عن الصبر؟",
-            "احكِ لي قصة موسى.",
-            "آيات عن العدل.",
-            "اشرح سورة الفاتحة.",
-          ]
+        ? ["لماذا خُلقنا؟", "ماذا يقول القرآن عن الصبر؟", "احكِ لي قصة موسى.", "آيات عن العدل.", "اشرح سورة الفاتحة."]
         : locale === "he"
           ? [
               "למה נבראנו?",
@@ -207,12 +186,7 @@ function Home() {
             "كيف يربّي القرآن على الأمل؟",
           ]
         : locale === "he"
-          ? [
-              "מה הקוראן אומר על חרדה?",
-              "איך הקוראן מסביר תשובה?",
-              "מהם פסוקי הצדק?",
-              "איך הקוראן מחנך לתקווה?",
-            ]
+          ? ["מה הקוראן אומר על חרדה?", "איך הקוראן מסביר תשובה?", "מהם פסוקי הצדק?", "איך הקוראן מחנך לתקווה?"]
           : [
               "What does the Quran say about anxiety?",
               "How does the Quran frame repentance?",
@@ -271,17 +245,11 @@ function Home() {
   );
 
   const featuredProphets = useMemo(
-    () =>
-      (entitiesQ.data ?? [])
-        .filter((entity) => entity.kind === "prophet")
-        .slice(0, 6),
+    () => (entitiesQ.data ?? []).filter((entity) => entity.kind === "prophet").slice(0, 6),
     [entitiesQ.data],
   );
 
-  const recentlyAdded = useMemo(
-    () => (entitiesQ.data ?? []).slice(-6).reverse(),
-    [entitiesQ.data],
-  );
+  const recentlyAdded = useMemo(() => (entitiesQ.data ?? []).slice(-6).reverse(), [entitiesQ.data]);
 
   const totalEntities = entitiesQ.data?.length ?? 0;
   const totalTopics = ALL_TOPICS.length;
@@ -324,18 +292,17 @@ function Home() {
       <Header />
 
       <section className="relative overflow-hidden">
-        <div className="arabesque-bg relative px-4 pt-12 pb-16 shadow-2xl sm:px-6" style={{ background: "var(--gradient-hero)" }}>
+        <div
+          className="arabesque-bg relative px-4 pt-12 pb-16 shadow-2xl sm:px-6"
+          style={{ background: "var(--gradient-hero)" }}
+        >
           <div
             className={`pointer-events-none absolute -top-24 ${isRtl ? "-left-16" : "-right-16"} h-72 w-72 rounded-full bg-gold/20 blur-3xl`}
           />
           <div
             className={`pointer-events-none absolute -bottom-24 ${isRtl ? "-right-10" : "-left-10"} h-72 w-72 rounded-full bg-primary-foreground/10 blur-3xl`}
           />
-          <span
-            className="arabesque-corner"
-            style={{ top: 0, [isRtl ? "left" : "right"]: 0 }}
-            aria-hidden
-          />
+          <span className="arabesque-corner" style={{ top: 0, [isRtl ? "left" : "right"]: 0 }} aria-hidden />
           <span
             className="arabesque-corner"
             style={{ bottom: 0, [isRtl ? "right" : "left"]: 0, transform: "rotate(180deg)" }}
@@ -424,7 +391,10 @@ function Home() {
             </div>
 
             <div className="flex flex-wrap justify-center gap-3 pt-2">
-              <Button asChild className="min-h-11 rounded-full bg-primary-foreground px-6 text-primary hover:bg-primary-foreground/90">
+              <Button
+                asChild
+                className="min-h-11 rounded-full bg-primary-foreground px-6 text-primary hover:bg-primary-foreground/90"
+              >
                 <a href="#main">
                   <BookOpen className="h-4 w-4" />
                   {t("home.ctaStart")}
@@ -452,7 +422,7 @@ function Home() {
       </section>
 
       <section className="mx-auto -mt-8 grid max-w-6xl grid-cols-2 gap-3 px-4 sm:grid-cols-4 sm:px-6">
-        <StatCard icon={<BookOpen className="h-4 w-4" />} label={t("home.stat1Label")} value="114" />
+        <StatCard icon={<BookOpen className="h-4 w-4" />} label={t("home.stat1Label")} value="116" />
         <StatCard
           icon={<Network className="h-4 w-4" />}
           label={locale === "ar" ? "عُقد المعرفة" : locale === "he" ? "צמתי ידע" : "Knowledge nodes"}
@@ -482,7 +452,9 @@ function Home() {
         <section className="mb-10 grid gap-4 lg:grid-cols-2">
           <div className="surface-card p-5">
             <SectionHeader
-              title={locale === "ar" ? "بنية الإجابة الذكية" : locale === "he" ? "מבנה תשובת AI" : "AI Answer Structure"}
+              title={
+                locale === "ar" ? "بنية الإجابة الذكية" : locale === "he" ? "מבנה תשובת AI" : "AI Answer Structure"
+              }
               subtitle={
                 locale === "ar"
                   ? "كل جواب يُعرض كرحلة موثقة قابلة للتوسعة"
@@ -501,7 +473,10 @@ function Home() {
                 locale === "ar" ? "مصادر" : locale === "he" ? "מקורות" : "Sources",
                 locale === "ar" ? "أسئلة متابعة" : locale === "he" ? "שאלות המשך" : "Follow-ups",
               ].map((item) => (
-                <div key={item} className="rounded-lg border border-border bg-background px-3 py-2 text-xs font-medium text-foreground">
+                <div
+                  key={item}
+                  className="rounded-lg border border-border bg-background px-3 py-2 text-xs font-medium text-foreground"
+                >
                   {item}
                 </div>
               ))}
@@ -587,7 +562,7 @@ function Home() {
                 to="/ask"
                 search={{ q: question, qState: "ok", src: "popular_questions" }}
                 onClick={() => {
-                    pushRecentPrompt(question);
+                  pushRecentPrompt(question);
                   void trackPrompt({
                     data: {
                       event: "home_prompt_navigate",
@@ -642,13 +617,7 @@ function Home() {
 
         <section className="mb-10">
           <SectionHeader
-            title={
-              locale === "ar"
-                ? "أنبياء مختارون"
-                : locale === "he"
-                  ? "נביאים נבחרים"
-                  : "Featured Prophets"
-            }
+            title={locale === "ar" ? "أنبياء مختارون" : locale === "he" ? "נביאים נבחרים" : "Featured Prophets"}
             subtitle={
               locale === "ar"
                 ? "تعلّم عبر القصص والآيات المرتبطة"
@@ -715,7 +684,9 @@ function Home() {
 
           <div className="surface-card p-5">
             <SectionHeader
-              title={locale === "ar" ? "أضيف حديثًا" : locale === "he" ? "תוכן שנוסף לאחרונה" : "Recently Added Content"}
+              title={
+                locale === "ar" ? "أضيف حديثًا" : locale === "he" ? "תוכן שנוסף לאחרונה" : "Recently Added Content"
+              }
               subtitle={
                 locale === "ar"
                   ? "آخر موضوعات المعرفة الجاهزة للاستكشاف"
@@ -900,100 +871,96 @@ function Home() {
         </section>
 
         <section className="scroll-mt-20">
-        <div
-          className={`mb-10 flex flex-col gap-5 md:flex-row md:items-end md:justify-between ${isRtl ? "md:flex-row-reverse" : ""}`}
-        >
-          <div className="space-y-1.5">
-            <h2 className="font-display text-3xl font-bold text-primary sm:text-4xl">
-              {t("home.chaptersTitle")}
-            </h2>
-            <p className="text-sm text-muted-foreground">{t("home.chaptersSubtitle")}</p>
+          <div
+            className={`mb-10 flex flex-col gap-5 md:flex-row md:items-end md:justify-between ${isRtl ? "md:flex-row-reverse" : ""}`}
+          >
+            <div className="space-y-1.5">
+              <h2 className="font-display text-3xl font-bold text-primary sm:text-4xl">{t("home.chaptersTitle")}</h2>
+              <p className="text-sm text-muted-foreground">{t("home.chaptersSubtitle")}</p>
+            </div>
+            <div className="relative w-full md:w-96">
+              <input
+                value={filter}
+                onChange={(e) => setFilter(e.target.value)}
+                placeholder={t("home.filterPlaceholder")}
+                className={`w-full rounded-2xl border border-primary/10 bg-card py-3.5 ${isRtl ? "ps-12 pe-4" : "pe-12 ps-4"} text-sm shadow-sm outline-none transition-all focus:ring-2 focus:ring-gold/50 placeholder:text-muted-foreground`}
+              />
+              <SearchIcon
+                className={`absolute top-1/2 ${isRtl ? "start-4" : "end-4"} h-5 w-5 -translate-y-1/2 text-muted-foreground`}
+              />
+            </div>
           </div>
-          <div className="relative w-full md:w-96">
-            <input
-              value={filter}
-              onChange={(e) => setFilter(e.target.value)}
-              placeholder={t("home.filterPlaceholder")}
-              className={`w-full rounded-2xl border border-primary/10 bg-card py-3.5 ${isRtl ? "ps-12 pe-4" : "pe-12 ps-4"} text-sm shadow-sm outline-none transition-all focus:ring-2 focus:ring-gold/50 placeholder:text-muted-foreground`}
-            />
-            <SearchIcon
-              className={`absolute top-1/2 ${isRtl ? "start-4" : "end-4"} h-5 w-5 -translate-y-1/2 text-muted-foreground`}
-            />
-          </div>
-        </div>
 
-        {isLoading && (
-          <div className="flex items-center justify-center py-20 text-muted-foreground">
-            <Loader2 className="h-6 w-6 animate-spin" />
-          </div>
-        )}
-        {error && (
-          <p className="rounded-xl border border-destructive/30 bg-destructive/5 p-4 text-sm text-destructive">
-            {t("home.loadError")}
-          </p>
-        )}
+          {isLoading && (
+            <div className="flex items-center justify-center py-20 text-muted-foreground">
+              <Loader2 className="h-6 w-6 animate-spin" />
+            </div>
+          )}
+          {error && (
+            <p className="rounded-xl border border-destructive/30 bg-destructive/5 p-4 text-sm text-destructive">
+              {t("home.loadError")}
+            </p>
+          )}
 
-        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          {filtered.map((c) => {
-            const isMakkah = c.revelation_place === "makkah";
-            return (
-              <Link
-                key={c.id}
-                to="/surah/$id"
-                params={{ id: String(c.id) }}
-                search={{ q: undefined }}
-                className={`group flex items-center gap-5 rounded-2xl border border-primary/5 bg-card p-5 transition-all hover:-translate-y-0.5 hover:border-gold hover:shadow-xl ${isRtl ? "flex-row-reverse" : ""}`}
-              >
-                <div className="relative flex h-12 w-12 shrink-0 items-center justify-center">
-                  <div className="absolute inset-0 rotate-45 rounded-lg bg-primary/5 transition-colors group-hover:bg-gold/20" />
-                  <span className="relative text-sm font-bold text-primary transition-colors group-hover:text-gold">
-                    {c.id}
-                  </span>
-                </div>
-
-                <div className="min-w-0 flex-1">
-                  <h4 className="truncate text-base font-bold text-primary">
-                    {surahDisplayName(c.id, lang)}
-                  </h4>
-                  <div
-                    className={`mt-1 flex flex-wrap items-center gap-1.5 text-[11px] text-muted-foreground ${isRtl ? "flex-row-reverse" : ""}`}
-                  >
-                    <span
-                      className="inline-flex items-center gap-1 rounded-full px-1.5 py-0.5 font-medium"
-                      style={{
-                        background: isMakkah ? "var(--gold-soft)" : "var(--olive-soft)",
-                        color: isMakkah ? "var(--gold)" : "var(--olive)",
-                      }}
-                    >
-                      <MapPin className="h-2.5 w-2.5" />
-                      {isMakkah ? t("home.makkah") : t("home.madinah")}
-                    </span>
-                    <span className="font-medium">
-                      {c.verses_count} {t("home.verseShort")}
+          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            {filtered.map((c) => {
+              const isMakkah = c.revelation_place === "makkah";
+              return (
+                <Link
+                  key={c.id}
+                  to="/surah/$id"
+                  params={{ id: String(c.id) }}
+                  search={{ q: undefined }}
+                  className={`group flex items-center gap-5 rounded-2xl border border-primary/5 bg-card p-5 transition-all hover:-translate-y-0.5 hover:border-gold hover:shadow-xl ${isRtl ? "flex-row-reverse" : ""}`}
+                >
+                  <div className="relative flex h-12 w-12 shrink-0 items-center justify-center">
+                    <div className="absolute inset-0 rotate-45 rounded-lg bg-primary/5 transition-colors group-hover:bg-gold/20" />
+                    <span className="relative text-sm font-bold text-primary transition-colors group-hover:text-gold">
+                      {c.id}
                     </span>
                   </div>
-                </div>
 
-                <div
-                  className="text-left font-arabic text-xl text-primary transition-colors group-hover:text-gold"
-                  dir="rtl"
-                >
-                  {c.name_arabic}
-                </div>
+                  <div className="min-w-0 flex-1">
+                    <h4 className="truncate text-base font-bold text-primary">{surahDisplayName(c.id, lang)}</h4>
+                    <div
+                      className={`mt-1 flex flex-wrap items-center gap-1.5 text-[11px] text-muted-foreground ${isRtl ? "flex-row-reverse" : ""}`}
+                    >
+                      <span
+                        className="inline-flex items-center gap-1 rounded-full px-1.5 py-0.5 font-medium"
+                        style={{
+                          background: isMakkah ? "var(--gold-soft)" : "var(--olive-soft)",
+                          color: isMakkah ? "var(--gold)" : "var(--olive)",
+                        }}
+                      >
+                        <MapPin className="h-2.5 w-2.5" />
+                        {isMakkah ? t("home.makkah") : t("home.madinah")}
+                      </span>
+                      <span className="font-medium">
+                        {c.verses_count} {t("home.verseShort")}
+                      </span>
+                    </div>
+                  </div>
 
-                {isRtl ? (
-                  <ChevronRight className="h-4 w-4 shrink-0 text-muted-foreground transition-all group-hover:translate-x-0.5 group-hover:text-gold" />
-                ) : (
-                  <ChevronLeft className="h-4 w-4 shrink-0 text-muted-foreground transition-all group-hover:-translate-x-0.5 group-hover:text-gold" />
-                )}
-              </Link>
-            );
-          })}
-        </div>
+                  <div
+                    className="text-left font-arabic text-xl text-primary transition-colors group-hover:text-gold"
+                    dir="rtl"
+                  >
+                    {c.name_arabic}
+                  </div>
 
-        {filtered.length === 0 && !isLoading && (
-          <p className="py-10 text-center text-sm text-muted-foreground">{t("home.noResults")}</p>
-        )}
+                  {isRtl ? (
+                    <ChevronRight className="h-4 w-4 shrink-0 text-muted-foreground transition-all group-hover:translate-x-0.5 group-hover:text-gold" />
+                  ) : (
+                    <ChevronLeft className="h-4 w-4 shrink-0 text-muted-foreground transition-all group-hover:-translate-x-0.5 group-hover:text-gold" />
+                  )}
+                </Link>
+              );
+            })}
+          </div>
+
+          {filtered.length === 0 && !isLoading && (
+            <p className="py-10 text-center text-sm text-muted-foreground">{t("home.noResults")}</p>
+          )}
         </section>
       </main>
 
@@ -1063,15 +1030,7 @@ function Home() {
   );
 }
 
-function SectionHeader({
-  title,
-  subtitle,
-  icon,
-}: {
-  title: string;
-  subtitle: string;
-  icon: ReactNode;
-}) {
+function SectionHeader({ title, subtitle, icon }: { title: string; subtitle: string; icon: ReactNode }) {
   return (
     <div className="mb-4">
       <h2 className="flex items-center gap-2 text-lg font-semibold text-foreground">
