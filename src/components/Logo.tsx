@@ -20,8 +20,8 @@ export function Logo({ className = "h-10 w-10" }: { className?: string }) {
       <rect
         x="3.5"
         y="3.5"
-        width="57"
-        height="57"
+        width="100"
+        height="100"
         rx="12.5"
         fill="none"
         stroke="url(#logo-gold)"
