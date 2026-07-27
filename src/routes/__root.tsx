@@ -14,7 +14,7 @@ import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { BottomNav } from "@/components/BottomNav";
 import { DirectionProvider } from "@/components/DirectionProvider";
-import { LOCALE_DIR, DEFAULT_LOCALE } from "@/lib/i18n";
+import i18n, { LOCALE_DIR, DEFAULT_LOCALE, normalizeLocale } from "@/lib/i18n";
 import { registerAppServiceWorker } from "@/lib/register-app-sw";
 import "@/lib/i18n";
 
@@ -127,19 +127,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "apple-mobile-web-app-capable", content: "yes" },
       { name: "apple-mobile-web-app-title", content: "Noor Quran & Hadith" },
       { name: "apple-mobile-web-app-status-bar-style", content: "black-translucent" },
-      {
-        property: "og:image",
-        content:
-          "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/74a0abc9-e4cc-4b74-8c76-a48ecb318cad/id-preview-85576619--684dac9d-8cf9-47d7-8d1b-d26c7de3781f.lovable.app-1782305499036.png",
-      },
-      {
-        name: "twitter:image",
-        content:
-          "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/74a0abc9-e4cc-4b74-8c76-a48ecb318cad/id-preview-85576619--684dac9d-8cf9-47d7-8d1b-d26c7de3781f.lovable.app-1782305499036.png",
-      },
     ],
     links: [
-      { rel: "canonical", href: "/" },
       { rel: "alternate", hrefLang: "en", href: "/" },
       { rel: "alternate", hrefLang: "ar", href: "/" },
       { rel: "alternate", hrefLang: "he", href: "/" },
@@ -192,7 +181,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 
 function RootShell({ children }: { children: ReactNode }) {
   // Keep SSR/CSR markup stable; DirectionProvider syncs locale + dir after hydration.
-  const locale = DEFAULT_LOCALE;
+  const locale = normalizeLocale(i18n.resolvedLanguage) ?? DEFAULT_LOCALE;
   const dir = LOCALE_DIR[locale];
 
   return (
