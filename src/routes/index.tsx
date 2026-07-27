@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { useMemo, useState, type ReactNode } from "react";
+import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import { fetchChapters, type ApiLang } from "@/lib/quran-api";
 import {
@@ -14,6 +14,7 @@ import { Logo } from "@/components/Logo";
 import { DailyVerse } from "@/components/DailyVerse";
 import { ContinueReading } from "@/components/ContinueReading";
 import { TrustBadge } from "@/components/TrustBadge";
+import { Button } from "@/components/ui/button";
 import { useServerFn } from "@tanstack/react-start";
 import { searchHadith } from "@/lib/hadith.functions";
 import { trackHomePromptEvent } from "@/lib/home-prompts.functions";
@@ -33,8 +34,17 @@ import {
   Network,
   GraduationCap,
   Clock,
+  Flame,
+  ScrollText,
+  LibraryBig,
+  Brain,
+  History,
+  Quote,
+  Layers,
 } from "lucide-react";
 import i18n, { normalizeLocale } from "@/lib/i18n";
+
+const HOME_RECENT_PROMPTS_KEY = "noor:home:recent-prompts:v1";
 
 export const Route = createFileRoute("/")({
   head: () => {
@@ -46,11 +56,13 @@ export const Route = createFileRoute("/")({
           name: "description",
           content: i18n.t("pages:home.metaDescription", { lng: locale }),
         },
+        { property: "og:type", content: "website" },
         { property: "og:title", content: i18n.t("pages:home.ogTitle", { lng: locale }) },
         {
           property: "og:description",
           content: i18n.t("pages:home.ogDescription", { lng: locale }),
         },
+        { name: "twitter:card", content: "summary_large_image" },
         { property: "og:url", content: "/" },
         { name: "twitter:title", content: i18n.t("pages:home.ogTitle", { lng: locale }) },
         {
@@ -102,6 +114,35 @@ function Home() {
 
   const [filter, setFilter] = useState("");
   const [assistantPrompt, setAssistantPrompt] = useState("");
+  const [recentPrompts, setRecentPrompts] = useState<string[]>([]);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    try {
+      const raw = window.localStorage.getItem(HOME_RECENT_PROMPTS_KEY);
+      if (!raw) return;
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed)) {
+        setRecentPrompts(parsed.filter((item): item is string => typeof item === "string").slice(0, 6));
+      }
+    } catch {
+      // ignore malformed local cache
+    }
+  }, []);
+
+  const pushRecentPrompt = (prompt: string) => {
+    const trimmed = prompt.trim();
+    if (!trimmed || typeof window === "undefined") return;
+    setRecentPrompts((prev) => {
+      const next = [trimmed, ...prev.filter((p) => p !== trimmed)].slice(0, 6);
+      try {
+        window.localStorage.setItem(HOME_RECENT_PROMPTS_KEY, JSON.stringify(next));
+      } catch {
+        // ignore storage failures
+      }
+      return next;
+    });
+  };
 
   const popularPrompts = useMemo(
     () =>
@@ -124,6 +165,34 @@ function Home() {
               "Verses about patience during hardship",
               "What is tawakkul?",
               "Stories of Musa in the Quran",
+            ],
+    [locale],
+  );
+
+  const heroExamples = useMemo(
+    () =>
+      locale === "ar"
+        ? [
+            "لماذا خُلقنا؟",
+            "ماذا يقول القرآن عن الصبر؟",
+            "احكِ لي قصة موسى.",
+            "آيات عن العدل.",
+            "اشرح سورة الفاتحة.",
+          ]
+        : locale === "he"
+          ? [
+              "למה נבראנו?",
+              "מה הקוראן אומר על סבלנות?",
+              "ספר לי את סיפור משה.",
+              "פסוקים על צדק.",
+              "הסבר את סורת אל-פאתחה.",
+            ]
+          : [
+              "Why were we created?",
+              "What does the Quran say about patience?",
+              "Tell me the story of Moses.",
+              "Verses about justice.",
+              "Explain Surah Al-Fatiha.",
             ],
     [locale],
   );
@@ -153,6 +222,54 @@ function Home() {
     [locale],
   );
 
+  const discoveryStreams = useMemo(
+    () => [
+      {
+        label: locale === "ar" ? "توصيات AI" : locale === "he" ? "המלצות AI" : "AI Recommendations",
+        to: "/ask" as const,
+        search: { q: popularQuestions[0] ?? "", qState: "ok" as const, src: "home_ai_recommendations" },
+        icon: Brain,
+      },
+      {
+        label: locale === "ar" ? "المواضيع الشائعة" : locale === "he" ? "נושאים פופולריים" : "Popular Topics",
+        to: "/topics" as const,
+        search: undefined,
+        icon: Flame,
+      },
+      {
+        label: locale === "ar" ? "الأنبياء" : locale === "he" ? "נביאים" : "Prophets",
+        to: "/prophets" as const,
+        search: undefined,
+        icon: BookMarked,
+      },
+      {
+        label: locale === "ar" ? "القصص" : locale === "he" ? "סיפורים" : "Stories",
+        to: "/learn" as const,
+        search: undefined,
+        icon: ScrollText,
+      },
+      {
+        label: locale === "ar" ? "المجموعات" : locale === "he" ? "אוספים" : "Collections",
+        to: "/collections" as const,
+        search: undefined,
+        icon: Layers,
+      },
+      {
+        label: locale === "ar" ? "الحديث" : locale === "he" ? "חדית׳" : "Hadith",
+        to: "/hadith" as const,
+        search: undefined,
+        icon: LibraryBig,
+      },
+      {
+        label: locale === "ar" ? "التفسير" : locale === "he" ? "תפסיר" : "Tafsir",
+        to: "/research" as const,
+        search: undefined,
+        icon: Quote,
+      },
+    ],
+    [locale, popularQuestions],
+  );
+
   const featuredProphets = useMemo(
     () =>
       (entitiesQ.data ?? [])
@@ -175,6 +292,7 @@ function Home() {
     event.preventDefault();
     const q = assistantPrompt.trim();
     if (!q) return;
+    pushRecentPrompt(q);
     void trackPrompt({
       data: {
         event: "home_prompt_navigate",
@@ -206,10 +324,7 @@ function Home() {
       <Header />
 
       <section className="relative overflow-hidden">
-        <div
-          className="arabesque-bg relative px-6 pt-16 pb-20 text-center text-primary-foreground shadow-2xl"
-          style={{ background: "var(--gradient-hero)" }}
-        >
+        <div className="arabesque-bg relative px-4 pt-12 pb-16 shadow-2xl sm:px-6" style={{ background: "var(--gradient-hero)" }}>
           <div
             className={`pointer-events-none absolute -top-24 ${isRtl ? "-left-16" : "-right-16"} h-72 w-72 rounded-full bg-gold/20 blur-3xl`}
           />
@@ -227,7 +342,7 @@ function Home() {
             aria-hidden
           />
 
-          <div className="relative z-10 mx-auto max-w-4xl space-y-6">
+          <div className="relative z-10 mx-auto max-w-6xl space-y-6">
             <div className="mx-auto inline-flex items-center justify-center rounded-2xl border border-white/20 bg-white/10 p-3 shadow-inner backdrop-blur-sm">
               <Logo className="h-12 w-12 text-gold drop-shadow-lg" />
             </div>
@@ -244,53 +359,62 @@ function Home() {
               {t("home.badge")}
             </span>
 
-            <h1 className="font-display text-4xl font-bold leading-tight text-primary-foreground sm:text-4xl md:text-7xl">
+            <h1 className="text-center font-display text-4xl font-bold leading-tight text-primary-foreground sm:text-5xl md:text-7xl">
               {t("home.h1")}
               <span className="mt-3 block font-arabic text-3xl text-gold sm:text-4xl" dir="rtl">
                 القُرْآنُ الكَرِيمُ
               </span>
             </h1>
 
-            <p className="mx-auto max-w-2xl text-base leading-relaxed text-primary-foreground/80 sm:text-lg">
+            <p className="mx-auto max-w-3xl text-center text-base leading-relaxed text-primary-foreground/80 sm:text-lg">
               {t("home.subtitle")}
             </p>
 
-            <div className="mx-auto mt-4 max-w-3xl rounded-2xl border border-white/20 bg-black/20 p-3 backdrop-blur-sm">
-              <form onSubmit={submitAssistantSearch} className="flex flex-col gap-2 sm:flex-row sm:items-center">
-                <div className="flex flex-1 items-center gap-2 rounded-xl border border-white/15 bg-white/10 px-3 py-2">
-                  <SearchIcon className="h-4 w-4 text-white/80" />
+            <div className="mx-auto mt-4 max-w-4xl rounded-2xl border border-white/20 bg-black/20 p-4 backdrop-blur-md">
+              <form onSubmit={submitAssistantSearch} className="space-y-3">
+                <div className="flex items-center gap-2 rounded-xl border border-white/20 bg-white/10 px-3 py-3">
+                  <Sparkles className="h-5 w-5 text-gold" />
                   <input
                     value={assistantPrompt}
                     onChange={(e) => setAssistantPrompt(e.target.value)}
-                    placeholder={
-                      locale === "ar"
-                        ? "اسأل سؤالك القرآني..."
-                        : locale === "he"
-                          ? "שאל שאלה קוראנית..."
-                          : "Ask a Quran knowledge question..."
-                    }
-                    className="w-full bg-transparent text-sm text-white outline-none placeholder:text-white/60"
+                    placeholder={heroExamples[0]}
+                    className="w-full bg-transparent text-sm text-primary-foreground outline-none placeholder:text-primary-foreground/65"
                     aria-label="AI search"
                   />
                 </div>
-                <button
-                  type="submit"
-                  className="inline-flex items-center justify-center gap-2 rounded-xl bg-gold px-4 py-2 text-sm font-semibold text-primary transition hover:bg-gold/90"
-                >
-                  <Sparkles className="h-4 w-4" />
-                  {locale === "ar" ? "ابحث بذكاء" : locale === "he" ? "חיפוש חכם" : "Intelligent Search"}
-                </button>
+
+                <div className="grid grid-cols-1 gap-2 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center">
+                  <div className="flex min-w-0 flex-wrap gap-1.5">
+                    {heroExamples.map((example) => (
+                      <Button
+                        key={example}
+                        type="button"
+                        onClick={() => setAssistantPrompt(example)}
+                        variant="ghost"
+                        className="h-7 truncate rounded-full border border-white/20 bg-white/10 px-2.5 text-[11px] text-primary-foreground/90 transition hover:bg-white/20 hover:text-primary-foreground"
+                      >
+                        {example}
+                      </Button>
+                    ))}
+                  </div>
+                  <Button type="submit" className="min-h-11 rounded-xl bg-gold px-5 text-primary hover:bg-gold/90">
+                    <SearchIcon className="h-4 w-4" />
+                    {locale === "ar" ? "استكشف الآن" : locale === "he" ? "גלו עכשיו" : "Explore now"}
+                  </Button>
+                </div>
               </form>
-              <div className="mt-2 flex flex-wrap gap-1.5">
+
+              <div className="mt-3 flex flex-wrap gap-1.5">
                 {popularPrompts.map((prompt) => (
-                  <button
+                  <Button
                     key={prompt}
                     type="button"
                     onClick={() => setAssistantPrompt(prompt)}
-                    className="rounded-full border border-white/20 bg-white/10 px-2.5 py-1 text-[11px] text-white/90 hover:bg-white/20"
+                    variant="ghost"
+                    className="h-8 rounded-full border border-white/20 bg-white/10 px-2.5 text-[11px] text-primary-foreground hover:bg-white/20 hover:text-primary-foreground"
                   >
                     {prompt}
-                  </button>
+                  </Button>
                 ))}
               </div>
             </div>
@@ -299,30 +423,29 @@ function Home() {
               <TrustBadge size="md" className="border-gold/60 bg-card text-foreground shadow-sm" />
             </div>
 
-            <div className="flex flex-wrap justify-center gap-3 pt-3">
-              <a
-                href="#main"
-                className="inline-flex items-center gap-2 rounded-full border border-primary-foreground/30 bg-primary-foreground px-7 py-3.5 text-sm font-bold text-primary shadow-lg transition-all hover:-translate-y-1 active:translate-y-0"
+            <div className="flex flex-wrap justify-center gap-3 pt-2">
+              <Button asChild className="min-h-11 rounded-full bg-primary-foreground px-6 text-primary hover:bg-primary-foreground/90">
+                <a href="#main">
+                  <BookOpen className="h-4 w-4" />
+                  {t("home.ctaStart")}
+                </a>
+              </Button>
+              <Button asChild className="min-h-11 rounded-full bg-gold px-6 text-primary hover:bg-gold/90">
+                <Link to="/ask" search={{ q: "", qState: "missing", src: "unknown" }}>
+                  <Sparkles className="h-4 w-4" />
+                  {t("home.ctaAsk")}
+                </Link>
+              </Button>
+              <Button
+                asChild
+                variant="outline"
+                className="min-h-11 rounded-full border-primary-foreground/30 bg-primary-foreground/10 px-6 text-primary-foreground hover:bg-primary-foreground/20 hover:text-primary-foreground"
               >
-                <BookOpen className="h-4 w-4" />
-                {t("home.ctaStart")}
-              </a>
-              <Link
-                to="/ask"
-                search={{ q: "", qState: "missing", src: "unknown" }}
-                className="inline-flex items-center gap-2 rounded-full border border-gold/40 bg-gold px-7 py-3.5 text-sm font-bold text-primary shadow-lg transition-all hover:-translate-y-1 active:translate-y-0"
-              >
-                <Sparkles className="h-4 w-4" />
-                {t("home.ctaAsk")}
-              </Link>
-              <Link
-                to="/search"
-                search={{ q: "", qState: "missing", src: "unknown" }}
-                className="inline-flex items-center gap-2 rounded-full border border-primary-foreground/30 bg-primary-foreground/10 px-7 py-3.5 text-sm font-bold text-primary-foreground backdrop-blur-md transition-colors hover:bg-primary-foreground/20"
-              >
-                <SearchIcon className="h-4 w-4" />
-                {t("home.ctaSearch")}
-              </Link>
+                <Link to="/search" search={{ q: "", qState: "missing", src: "unknown" }}>
+                  <SearchIcon className="h-4 w-4" />
+                  {t("home.ctaSearch")}
+                </Link>
+              </Button>
             </div>
           </div>
         </div>
@@ -356,6 +479,95 @@ function Home() {
       </div>
 
       <main id="main" className="mx-auto max-w-6xl px-4 py-12 sm:px-6">
+        <section className="mb-10 grid gap-4 lg:grid-cols-2">
+          <div className="surface-card p-5">
+            <SectionHeader
+              title={locale === "ar" ? "بنية الإجابة الذكية" : locale === "he" ? "מבנה תשובת AI" : "AI Answer Structure"}
+              subtitle={
+                locale === "ar"
+                  ? "كل جواب يُعرض كرحلة موثقة قابلة للتوسعة"
+                  : locale === "he"
+                    ? "כל תשובה מוצגת כמסע מבוסס מקורות שניתן להרחיב"
+                    : "Every answer is presented as an expandable, citation-first journey"
+              }
+              icon={<Brain className="h-4 w-4" />}
+            />
+            <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+              {[
+                locale === "ar" ? "ملخص" : locale === "he" ? "סיכום" : "Summary",
+                locale === "ar" ? "آيات قرآنية" : locale === "he" ? "פסוקי קוראן" : "Relevant Verses",
+                locale === "ar" ? "تفسير موثوق" : locale === "he" ? "תפסיר מאומת" : "Trusted Tafsir",
+                locale === "ar" ? "حديث مرتبط" : locale === "he" ? "חדית׳ קשור" : "Related Hadith",
+                locale === "ar" ? "مصادر" : locale === "he" ? "מקורות" : "Sources",
+                locale === "ar" ? "أسئلة متابعة" : locale === "he" ? "שאלות המשך" : "Follow-ups",
+              ].map((item) => (
+                <div key={item} className="rounded-lg border border-border bg-background px-3 py-2 text-xs font-medium text-foreground">
+                  {item}
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="surface-card p-5">
+            <SectionHeader
+              title={locale === "ar" ? "البحث الرائج" : locale === "he" ? "חיפושים חמים" : "Trending Searches"}
+              subtitle={
+                locale === "ar"
+                  ? "اتجاهات الاستكشاف من جلساتك الأخيرة"
+                  : locale === "he"
+                    ? "מגמות הגילוי מהשימוש האחרון שלך"
+                    : "Exploration momentum from your recent activity"
+              }
+              icon={<History className="h-4 w-4" />}
+            />
+            <div className="flex flex-wrap gap-2">
+              {(recentPrompts.length > 0 ? recentPrompts : popularQuestions).slice(0, 8).map((q) => (
+                <Link
+                  key={q}
+                  to="/ask"
+                  search={{ q, qState: "ok", src: "home_trending" }}
+                  onClick={() => pushRecentPrompt(q)}
+                  className="rounded-full border border-border bg-background px-3 py-1.5 text-xs text-foreground transition hover:border-primary/40 hover:text-primary"
+                >
+                  {q}
+                </Link>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        <section className="mb-10">
+          <SectionHeader
+            title={locale === "ar" ? "رحلة الاستكشاف" : locale === "he" ? "מסע גילוי" : "Exploration Journey"}
+            subtitle={
+              locale === "ar"
+                ? "انتقل بلا انقطاع بين القرآن والتفسير والحديث والمواضيع"
+                : locale === "he"
+                  ? "נועו ברצף בין קוראן, תפסיר, חדית׳ ונושאים"
+                  : "Move seamlessly across Quran, Tafsir, Hadith, and thematic knowledge"
+            }
+            icon={<Network className="h-4 w-4" />}
+          />
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+            {discoveryStreams.map((stream) => {
+              const Icon = stream.icon;
+              return (
+                <Link
+                  key={stream.label}
+                  to={stream.to}
+                  search={stream.search}
+                  className="surface-card flex min-h-24 items-center gap-3 p-3 transition hover:border-primary/40"
+                >
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary-soft text-primary">
+                    <Icon className="h-5 w-5" />
+                  </div>
+                  <span className="min-w-0 text-sm font-medium text-foreground">{stream.label}</span>
+                </Link>
+              );
+            })}
+          </div>
+        </section>
+
         <section className="mb-10">
           <SectionHeader
             title={locale === "ar" ? "أسئلة رائجة" : locale === "he" ? "שאלות פופולריות" : "Popular Questions"}
@@ -375,6 +587,7 @@ function Home() {
                 to="/ask"
                 search={{ q: question, qState: "ok", src: "popular_questions" }}
                 onClick={() => {
+                    pushRecentPrompt(question);
                   void trackPrompt({
                     data: {
                       event: "home_prompt_navigate",
@@ -502,13 +715,7 @@ function Home() {
 
           <div className="surface-card p-5">
             <SectionHeader
-              title={
-                locale === "ar"
-                  ? "أضيف حديثًا"
-                  : locale === "he"
-                    ? "תוכן שנוסף לאחרונה"
-                    : "Recently Added Content"
-              }
+              title={locale === "ar" ? "أضيف حديثًا" : locale === "he" ? "תוכן שנוסף לאחרונה" : "Recently Added Content"}
               subtitle={
                 locale === "ar"
                   ? "آخر موضوعات المعرفة الجاهزة للاستكشاف"
@@ -532,6 +739,68 @@ function Home() {
                   <div className="line-clamp-1 text-xs text-muted-foreground" dir="auto">
                     {pickLocale(entity.summary_i18n, locale)}
                   </div>
+                </Link>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        <section className="mb-10 grid gap-4 lg:grid-cols-2">
+          <div className="surface-card p-5">
+            <SectionHeader
+              title={locale === "ar" ? "العروض المميزة" : locale === "he" ? "נושאים מובלטים" : "Featured Topics"}
+              subtitle={
+                locale === "ar"
+                  ? "مواضيع مختارة من شبكة المعرفة"
+                  : locale === "he"
+                    ? "נושאים נבחרים מתוך רשת הידע"
+                    : "Curated entry points from the knowledge graph"
+              }
+              icon={<Compass className="h-4 w-4" />}
+            />
+            <div className="space-y-2">
+              {ALL_TOPICS.slice(0, 5).map((topic) => (
+                <Link
+                  key={topic.slug}
+                  to="/learn/$kind/$slug"
+                  params={{ kind: "topic", slug: topic.slug }}
+                  className="block rounded-lg border border-border px-3 py-2 transition hover:border-primary/40"
+                >
+                  <div className="text-sm font-medium text-foreground">{topic.title}</div>
+                  <div className="line-clamp-1 text-xs text-muted-foreground">{topic.description}</div>
+                </Link>
+              ))}
+            </div>
+          </div>
+
+          <div className="surface-card p-5">
+            <SectionHeader
+              title={
+                locale === "ar"
+                  ? "أجوبة AI الأخيرة"
+                  : locale === "he"
+                    ? "תשובות AI אחרונות"
+                    : "Recently Generated AI Answers"
+              }
+              subtitle={
+                locale === "ar"
+                  ? "تابع من آخر الأسئلة التي بدأت بها"
+                  : locale === "he"
+                    ? "המשיכו מהשאלות האחרונות שהתחלתם"
+                    : "Resume exploration from your most recent prompts"
+              }
+              icon={<Sparkles className="h-4 w-4" />}
+            />
+            <div className="space-y-2">
+              {(recentPrompts.length > 0 ? recentPrompts : popularPrompts).slice(0, 5).map((prompt) => (
+                <Link
+                  key={prompt}
+                  to="/ask"
+                  search={{ q: prompt, qState: "ok", src: "home_recent_answers" }}
+                  onClick={() => pushRecentPrompt(prompt)}
+                  className="block rounded-lg border border-border px-3 py-2 transition hover:border-primary/40"
+                >
+                  <div className="text-sm text-foreground">{prompt}</div>
                 </Link>
               ))}
             </div>
