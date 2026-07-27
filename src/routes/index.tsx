@@ -422,7 +422,7 @@ function Home() {
       </section>
 
       <section className="mx-auto -mt-8 grid max-w-6xl grid-cols-2 gap-3 px-4 sm:grid-cols-4 sm:px-6">
-        <StatCard icon={<BookOpen className="h-4 w-4" />} label={t("home.stat1Label")} value="116" />
+        <StatCard icon={<BookOpen className="h-4 w-4" />} label={t("home.stat1Label")} value="114" />
         <StatCard
           icon={<Network className="h-4 w-4" />}
           label={locale === "ar" ? "عُقد المعرفة" : locale === "he" ? "צמתי ידע" : "Knowledge nodes"}
