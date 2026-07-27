@@ -11,8 +11,7 @@ interface Props {
 const COPY = {
   he: {
     blockStrong: "תכנים ממקורות מאומתים בלבד.",
-    blockBody:
-      "פסוקי הקוראן הקדוש ותפסיר אסלאמי קלאסי. ללא פרשנות AI, ללא ספקולציות — אם אין מקור, המערכת לא עונה.",
+    blockBody: "פסוקי הקוראן הקדוש ותפסיר אסלאמי קלאסי. ללא פרשנות AI, ללא ספקולציות — אם אין מקור, המערכת לא עונה.",
     inline: "מקורות מאומתים בלבד",
   },
   ar: {
@@ -52,7 +51,7 @@ export function TrustBadge({ size = "sm", variant = "inline", className = "" }: 
   const text = size === "md" ? "text-xs" : "text-[11px]";
   return (
     <span
-      className={`inline-flex items-center gap-1.5 rounded-full border border-primary/15 bg-primary/[0.04] px-2.5 py-1 ${text} font-medium text-primary/85 ${className}`}
+      className={`inline-flex items-center gap-1.5 rounded-full border border-white/60 bg-white/5 px-2.5 py-1 ${text} font-medium text-white ${className}`}
     >
       <ShieldCheck className={size === "md" ? "h-3.5 w-3.5" : "h-3 w-3"} />
       <span>{c.inline}</span>
