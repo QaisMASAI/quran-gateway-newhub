@@ -36,9 +36,9 @@ export function TrustBadge({ size = "sm", variant = "inline", className = "" }: 
   if (variant === "block") {
     return (
       <div
-        className={`flex items-start gap-3 rounded-2xl border border-primary/10 bg-primary/[0.03] px-4 py-3 ${className}`}
+        className={`flex items-start gap-3 rounded-2xl border border-white/60 bg-white/[0.03] px-4 py-3 ${className}`}
       >
-        <div className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
+        <div className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-white/5 text-white">
           <ShieldCheck className="h-4 w-4" />
         </div>
         <div className="text-[12.5px] leading-relaxed text-muted-foreground">
