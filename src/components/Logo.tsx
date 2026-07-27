@@ -16,7 +16,7 @@ export function Logo({ className = "h-10 w-10" }: { className?: string }) {
       </defs>
 
       {/* Emblem plate */}
-      <rect x="2" y="2" width="90" height="90" rx="14" fill="url(#logo-bg)" />
+      <rect x="2" y="2" width="60" height="60" rx="14" fill="url(#logo-bg)" />
       <rect
         x="3.5"
         y="3.5"
