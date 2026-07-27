@@ -963,6 +963,7 @@ function TopBar({
           <select
             value={selectedProfileId}
             onChange={(event) => onSelectProfile(event.target.value)}
+            aria-label="Select child profile"
             className="bg-transparent text-sm"
           >
             {profiles.map((profile) => (

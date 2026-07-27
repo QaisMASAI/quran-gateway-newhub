@@ -1,0 +1,25 @@
+# Noor Quran & Hadith
+
+> Multilingual Quran and Hadith learning platform with grounded citations, authenticated tafsir context, and guided discovery.
+
+## Pages
+
+- [Home](/): Main Quran and Hadith discovery hub.
+- [Search](/search): Advanced multilingual Quran search.
+- [Ask](/ask): Ask questions and get verse-grounded answers.
+- [Learn](/learn): Explore Quran entities by topics, prophets, stories, and themes.
+- [Emotions](/emotions): Emotion-centered Quran verse exploration.
+- [Topics](/topics): Thematic Quran index.
+- [Prophets](/prophets): Prophets in the Quran with verse references.
+- [Plans](/plans): Structured Quran reading plans.
+- [Surah 1](/surah/1): Representative Surah reading page.
+- [Hadith](/hadith): Hadith knowledge browsing and search.
+- [Knowledge Hadith](/knowledge/hadith): Hadith knowledge center overview.
+- [Kids Zone](/kids): Quran quizzes, rewards, and guided learning for children.
+- [Research](/research): Deeper grounded Quran research workspace.
+
+## Optional
+
+- [Explore Timeline](/explore/timeline): Quran discovery timeline view.
+- [Explore Map](/explore/map): Quran places exploration map.
+- [Learn Journeys](/learn/journeys): Guided learning journey paths.

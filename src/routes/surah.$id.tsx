@@ -44,18 +44,32 @@ export const Route = createFileRoute("/surah/$id")({
     const he = id >= 1 && id <= 114 ? surahNameHe(id) : `Surah ${params.id}`;
     const title = `Noor Al Quran | ${he}`;
     const description = `Read ${he} in the original Arabic with translations, AI explanations, occasions of revelation and recitation by Yasser Al-Dosari.`;
+    const url = `/surah/${params.id}`;
     return {
       meta: [
         { title },
         { name: "description", content: description },
         { property: "og:title", content: title },
         { property: "og:description", content: description },
-        { property: "og:url", content: `/surah/${params.id}` },
+        { property: "og:url", content: url },
         { property: "og:type", content: "article" },
+        { name: "twitter:card", content: "summary_large_image" },
         { name: "twitter:title", content: title },
         { name: "twitter:description", content: description },
       ],
-      links: [{ rel: "canonical", href: `/surah/${params.id}` }],
+      links: [{ rel: "canonical", href: url }],
+      scripts: [
+        {
+          type: "application/ld+json",
+          children: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "Article",
+            headline: he,
+            description,
+            url,
+          }),
+        },
+      ],
     };
   },
   component: SurahPage,
