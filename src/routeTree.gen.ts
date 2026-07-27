@@ -31,6 +31,7 @@ import { Route as TopicsSlugRouteImport } from './routes/topics.$slug'
 import { Route as SurahIdRouteImport } from './routes/surah.$id'
 import { Route as ProphetsSlugRouteImport } from './routes/prophets.$slug'
 import { Route as PlansSlugRouteImport } from './routes/plans.$slug'
+import { Route as LearnTafsirIbnKathirRouteImport } from './routes/learn.tafsir-ibn-kathir'
 import { Route as LearnGraphRouteImport } from './routes/learn.graph'
 import { Route as KnowledgeHadithRouteImport } from './routes/knowledge.hadith'
 import { Route as HadithTopicsRouteImport } from './routes/hadith.topics'
@@ -173,6 +174,11 @@ const ProphetsSlugRoute = ProphetsSlugRouteImport.update({
 const PlansSlugRoute = PlansSlugRouteImport.update({
   id: '/plans/$slug',
   path: '/plans/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LearnTafsirIbnKathirRoute = LearnTafsirIbnKathirRouteImport.update({
+  id: '/learn/tafsir-ibn-kathir',
+  path: '/learn/tafsir-ibn-kathir',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LearnGraphRoute = LearnGraphRouteImport.update({
@@ -384,6 +390,7 @@ export interface FileRoutesByFullPath {
   '/hadith/topics': typeof HadithTopicsRoute
   '/knowledge/hadith': typeof KnowledgeHadithRoute
   '/learn/graph': typeof LearnGraphRoute
+  '/learn/tafsir-ibn-kathir': typeof LearnTafsirIbnKathirRoute
   '/plans/$slug': typeof PlansSlugRoute
   '/prophets/$slug': typeof ProphetsSlugRoute
   '/surah/$id': typeof SurahIdRoute
@@ -440,6 +447,7 @@ export interface FileRoutesByTo {
   '/hadith/topics': typeof HadithTopicsRoute
   '/knowledge/hadith': typeof KnowledgeHadithRoute
   '/learn/graph': typeof LearnGraphRoute
+  '/learn/tafsir-ibn-kathir': typeof LearnTafsirIbnKathirRoute
   '/plans/$slug': typeof PlansSlugRoute
   '/prophets/$slug': typeof ProphetsSlugRoute
   '/surah/$id': typeof SurahIdRoute
@@ -499,6 +507,7 @@ export interface FileRoutesById {
   '/hadith/topics': typeof HadithTopicsRoute
   '/knowledge/hadith': typeof KnowledgeHadithRoute
   '/learn/graph': typeof LearnGraphRoute
+  '/learn/tafsir-ibn-kathir': typeof LearnTafsirIbnKathirRoute
   '/plans/$slug': typeof PlansSlugRoute
   '/prophets/$slug': typeof ProphetsSlugRoute
   '/surah/$id': typeof SurahIdRoute
@@ -558,6 +567,7 @@ export interface FileRouteTypes {
     | '/hadith/topics'
     | '/knowledge/hadith'
     | '/learn/graph'
+    | '/learn/tafsir-ibn-kathir'
     | '/plans/$slug'
     | '/prophets/$slug'
     | '/surah/$id'
@@ -614,6 +624,7 @@ export interface FileRouteTypes {
     | '/hadith/topics'
     | '/knowledge/hadith'
     | '/learn/graph'
+    | '/learn/tafsir-ibn-kathir'
     | '/plans/$slug'
     | '/prophets/$slug'
     | '/surah/$id'
@@ -672,6 +683,7 @@ export interface FileRouteTypes {
     | '/hadith/topics'
     | '/knowledge/hadith'
     | '/learn/graph'
+    | '/learn/tafsir-ibn-kathir'
     | '/plans/$slug'
     | '/prophets/$slug'
     | '/surah/$id'
@@ -728,6 +740,7 @@ export interface RootRouteChildren {
   ExploreTimelineRoute: typeof ExploreTimelineRoute
   KnowledgeHadithRoute: typeof KnowledgeHadithRoute
   LearnGraphRoute: typeof LearnGraphRoute
+  LearnTafsirIbnKathirRoute: typeof LearnTafsirIbnKathirRoute
   PlansSlugRoute: typeof PlansSlugRoute
   ProphetsSlugRoute: typeof ProphetsSlugRoute
   SurahIdRoute: typeof SurahIdRoute
@@ -909,6 +922,13 @@ declare module '@tanstack/react-router' {
       path: '/plans/$slug'
       fullPath: '/plans/$slug'
       preLoaderRoute: typeof PlansSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/learn/tafsir-ibn-kathir': {
+      id: '/learn/tafsir-ibn-kathir'
+      path: '/learn/tafsir-ibn-kathir'
+      fullPath: '/learn/tafsir-ibn-kathir'
+      preLoaderRoute: typeof LearnTafsirIbnKathirRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/learn/graph': {
@@ -1237,6 +1257,7 @@ const rootRouteChildren: RootRouteChildren = {
   ExploreTimelineRoute: ExploreTimelineRoute,
   KnowledgeHadithRoute: KnowledgeHadithRoute,
   LearnGraphRoute: LearnGraphRoute,
+  LearnTafsirIbnKathirRoute: LearnTafsirIbnKathirRoute,
   PlansSlugRoute: PlansSlugRoute,
   ProphetsSlugRoute: ProphetsSlugRoute,
   SurahIdRoute: SurahIdRoute,
