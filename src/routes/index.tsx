@@ -819,38 +819,6 @@ function Home() {
           </div>
         </section>
 
-        <section className="mb-10 rounded-2xl border border-border bg-card p-5">
-          <SectionHeader
-            title={locale === "ar" ? "إحصائيات المنصة" : locale === "he" ? "נתוני הפלטפורמה" : "Platform Statistics"}
-            subtitle={
-              locale === "ar"
-                ? "صورة حيّة لمحتوى المعرفة"
-                : locale === "he"
-                  ? "תמונת מצב חיה של תוכן הידע"
-                  : "A live snapshot of the knowledge platform"
-            }
-            icon={<BookOpen className="h-4 w-4" />}
-          />
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-            <StatInline
-              label={locale === "ar" ? "السور" : locale === "he" ? "סורות" : "Surahs"}
-              value={String(data?.length ?? 114)}
-            />
-            <StatInline
-              label={locale === "ar" ? "كيانات المعرفة" : locale === "he" ? "יישויות ידע" : "Knowledge entities"}
-              value={String(totalEntities)}
-            />
-            <StatInline
-              label={locale === "ar" ? "المحاور" : locale === "he" ? "תמות" : "Themes"}
-              value={String(totalTopics)}
-            />
-            <StatInline
-              label={locale === "ar" ? "المسارات" : locale === "he" ? "מסלולים" : "Journeys"}
-              value={String(totalJourneys)}
-            />
-          </div>
-        </section>
-
         <section className="scroll-mt-20">
           <div
             className={`mb-10 flex flex-col gap-5 md:flex-row md:items-end md:justify-between ${isRtl ? "md:flex-row-reverse" : ""}`}
