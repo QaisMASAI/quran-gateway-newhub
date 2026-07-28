@@ -439,59 +439,38 @@ function cleanHtml(input: string) {
     .trim();
 }
 
-async function fetchFallbackVerses(
+async function fetchLocalFallbackVerses(
   question: string,
-  language: "he" | "en" | "ar",
   k: number,
+  searchHybrid: (query: string, matchCount: number) => Promise<
+    Array<{
+      surah: number;
+      ayah: number;
+      arabic: string;
+      hebrew: string;
+      score: number;
+    }>
+  >,
 ): Promise<VerseCitation[]> {
-  try {
-    const searchRes = await fetch(
-      `https://api.quran.com/api/v4/search?q=${encodeURIComponent(question)}&size=${Math.max(4, k * 2)}&page=1&language=en`,
-    );
-    if (!searchRes.ok) return [];
-    const searchJson = (await searchRes.json()) as {
-      search?: { results?: Array<{ verse_key: string }> };
-    };
-    const keys = Array.from(
-      new Set((searchJson.search?.results ?? []).map((r) => r.verse_key).filter(Boolean)),
-    ).slice(0, k);
-    if (keys.length === 0) return [];
+  const rows = await searchHybrid(question, Math.max(k, 6));
 
-    const trId = language === "he" ? 233 : language === "en" ? 20 : 0;
-    const out: VerseCitation[] = [];
-
-    for (const key of keys) {
-      const [s, a] = key.split(":").map(Number);
-      if (!s || !a) continue;
-      const verseRes = await fetch(
-        `https://api.quran.com/api/v4/verses/by_key/${s}:${a}?words=false${trId ? `&translations=${trId}` : ""}`,
-      );
-      if (!verseRes.ok) continue;
-      const verseJson = (await verseRes.json()) as {
-        verse?: {
-          text_uthmani?: string;
-          translations?: Array<{ text: string; resource_name?: string }>;
-        };
-      };
-      const arabic = verseJson.verse?.text_uthmani ?? "";
-      const translation =
-        language === "ar"
-          ? arabic
-          : cleanHtml(verseJson.verse?.translations?.[0]?.text ?? "") || arabic;
-      out.push({
-        surah: s,
-        ayah: a,
-        arabic,
-        hebrew: translation,
-        similarity: 0.2,
-        translation_source: verseJson.verse?.translations?.[0]?.resource_name ?? null,
-      });
-    }
-
-    return out;
-  } catch {
-    return [];
-  }
+  return ((rows ?? []) as Array<{
+    surah: number;
+    ayah: number;
+    arabic: string;
+    hebrew: string;
+    score: number;
+  }>)
+    .slice(0, k)
+    .map((r) => ({
+      surah: r.surah,
+      ayah: r.ayah,
+      arabic: r.arabic,
+      hebrew: cleanHtml(r.hebrew ?? ""),
+      similarity: Math.max(0, Math.min(1, Number(r.score ?? 0))),
+      translation_source: "Local authenticated Quran dataset",
+      translator: null,
+    }));
 }
 
 function normalizeForSearch(input: string, language: "he" | "en" | "ar") {
@@ -768,7 +747,28 @@ export const askQuranResearch = createServerFn({ method: "POST" })
     }
 
     if (verses.length === 0 && tafsir.length === 0) {
-      const fallbackVerses = await fetchFallbackVerses(data.question, data.language, data.k);
+      const fallbackVerses = await fetchLocalFallbackVerses(
+        data.question,
+        data.k,
+        async (query, matchCount) => {
+          const { data: rows } = await supabaseAdmin.rpc(
+            "search_verses_hybrid" as never,
+            {
+              q: query,
+              query_embedding: null,
+              theme_filter: null,
+              match_count: matchCount,
+            } as never,
+          );
+          return ((rows ?? []) as Array<{
+            surah: number;
+            ayah: number;
+            arabic: string;
+            hebrew: string;
+            score: number;
+          }>);
+        },
+      );
       if (fallbackVerses.length > 0) {
         const surahs = [...new Set(fallbackVerses.map((v) => v.surah))];
         const { data: tafRows } = await supabaseAdmin

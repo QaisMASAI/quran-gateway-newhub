@@ -360,9 +360,10 @@ function AskPage() {
             </h3>
             <div className="space-y-2">
               {result.hadith.map((h, i) => (
-                <a
+                <Link
                   key={`${h.collection}-${h.global_id}-${i}`}
-                  href={`/hadith/${h.collection}/entry/${h.global_id}`}
+                  to="/hadith/$collection/entry/$num"
+                  params={{ collection: h.collection, num: String(h.global_id) }}
                   className="block rounded-lg border border-border bg-background px-3 py-2 hover:border-primary/40"
                 >
                   <div className="text-xs text-primary">
@@ -383,7 +384,7 @@ function AskPage() {
                   >
                     {h.arabic}
                   </p>
-                </a>
+                </Link>
               ))}
             </div>
           </div>
