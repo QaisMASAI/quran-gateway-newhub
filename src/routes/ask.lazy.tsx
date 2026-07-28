@@ -13,6 +13,9 @@ import { getNextMcpRetryDelay } from "@/lib/mcp-outage";
 import { localeTextDir, tafsirFontClass, uiFontClass } from "@/lib/locale-ui";
 import { useQueryPrefillInput } from "@/hooks/useQueryPrefillInput";
 import { trackHomePromptEvent } from "@/lib/home-prompts.functions";
+import { StructuredAnswer } from "@/components/ai/StructuredAnswer";
+import { DiscoveryRail } from "@/components/discovery/DiscoveryRail";
+import { useRecentlyViewed } from "@/lib/recently-viewed";
 
 export const Route = createLazyFileRoute("/ask")({
   component: AskPage,
@@ -34,6 +37,7 @@ function AskPage() {
   const [retryEta, setRetryEta] = useState<number | null>(null);
   const [chatTurns, setChatTurns] = useState<Array<{ question: string; answer: string }>>([]);
   const trackPrompt = useServerFn(trackHomePromptEvent);
+  const { items: recentViews } = useRecentlyViewed();
   const historyPayload = useMemo(
     () =>
       chatTurns.flatMap((turn) => [
@@ -114,6 +118,37 @@ function AskPage() {
     });
     mutation.mutate(trimmed);
   }
+
+  function submitSuggestedQuestion(nextQuestion: string) {
+    setQuestion(nextQuestion);
+    void navigate({
+      to: "/ask",
+      search: {
+        q: nextQuestion,
+        qState: "ok",
+        src,
+      },
+      replace: true,
+    });
+    mutation.mutate(nextQuestion);
+  }
+
+  const suggestedQuestions = useMemo(() => {
+    const verseSuggestion = result?.verses.slice(0, 2).map((v) =>
+      locale === "ar"
+        ? `ما تفسير ${v.surah}:${v.ayah}؟`
+        : locale === "he"
+          ? `מה ההקשר של ${v.surah}:${v.ayah}?`
+          : `What is the context of ${v.surah}:${v.ayah}?`,
+    ) ?? [];
+    const base =
+      locale === "ar"
+        ? ["ما الروابط بين هذه الآيات؟", "ما الدروس العملية اليوم؟"]
+        : locale === "he"
+          ? ["מה הקשרים בין הפסוקים האלה?", "מה היישום המעשי לימינו?"]
+          : ["What links these verses together?", "How does this apply today?"];
+    return [...base, ...verseSuggestion];
+  }, [result?.verses, locale]);
 
   return (
     <div className={`min-h-screen bg-background ${uiClass}`}>
@@ -202,23 +237,24 @@ function AskPage() {
             </div>
           </div>
         )}
-        {result && !loading && (result.answer || result.error) && (
-          <div className="mt-6 surface-card p-5">
-            <div className="mb-2 flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-primary">
-              <Sparkles className="h-3 w-3" /> {t("ask.answerLabel")}
-            </div>
-            {result.error ? (
+        {result && !loading && (result.answer || result.error) &&
+          (result.error ? (
+            <div className="mt-6 surface-card p-5">
               <p className="text-sm text-destructive">{result.error}</p>
-            ) : (
-              <div
-                className={`ai-explanation-block prose prose-sm max-w-none text-[15px] text-foreground/90 [&>p]:my-2 ${tafsirClass}`}
-                dir={textDir}
-              >
-                <ReactMarkdown skipHtml>{result.answer}</ReactMarkdown>
-              </div>
-            )}
-          </div>
-        )}
+            </div>
+          ) : (
+            <div className="mt-6">
+              <StructuredAnswer
+                answer={result.answer}
+                locale={locale}
+                versesCount={result.verses.length}
+                tafsirCount={result.tafsir.length}
+                hadithCount={result.hadith.length}
+                suggestedQuestions={suggestedQuestions}
+                onSuggestedQuestion={submitSuggestedQuestion}
+              />
+            </div>
+          ))}
 
         {result?.mcpUnavailable && !loading && (
           <div className="mt-4 rounded-xl border border-destructive/20 bg-destructive/10 p-4">
@@ -388,6 +424,26 @@ function AskPage() {
               ))}
             </div>
           </div>
+        )}
+
+        {result && (result.verses.length > 0 || result.hadith.length > 0 || recentViews.length > 0) && (
+          <DiscoveryRail
+            locale={locale}
+            relatedVerses={result.verses.slice(0, 6).map((v) => ({
+              surah: v.surah,
+              ayah: v.ayah,
+              label: `${surahDisplayName(v.surah, locale)} ${v.surah}:${v.ayah}`,
+            }))}
+            relatedHadith={result.hadith.slice(0, 4).map((h) => ({
+              collection: h.collection,
+              num: h.global_id,
+              label: `${h.collection_label} #${h.id_in_book}`,
+              subtitle: h.narrator ?? undefined,
+            }))}
+            recentViews={recentViews}
+            suggestedQuestions={suggestedQuestions}
+            onSuggestedQuestion={submitSuggestedQuestion}
+          />
         )}
       </main>
     </div>

@@ -2,7 +2,6 @@ import { createLazyFileRoute, Link } from "@tanstack/react-router";
 import { useMutation } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
-import ReactMarkdown from "react-markdown";
 import { useServerFn } from "@tanstack/react-start";
 import { Sparkles, Loader2, Send, BookOpen, ShieldCheck, ChevronLeft } from "lucide-react";
 import { askQuranResearch, type ResearchResult } from "@/lib/ai-research.functions";
@@ -11,6 +10,9 @@ import { Header } from "@/components/Header";
 import { normalizeLocale, type Locale } from "@/lib/i18n";
 import { getNextMcpRetryDelay } from "@/lib/mcp-outage";
 import { localeTextDir, tafsirFontClass, uiFontClass } from "@/lib/locale-ui";
+import { StructuredAnswer } from "@/components/ai/StructuredAnswer";
+import { DiscoveryRail } from "@/components/discovery/DiscoveryRail";
+import { useRecentlyViewed } from "@/lib/recently-viewed";
 
 export const Route = createLazyFileRoute("/research")({
   component: ResearchPage,
@@ -35,6 +37,7 @@ function ResearchPage() {
     [chatTurns],
   );
   const ask = useServerFn(askQuranResearch);
+  const { items: recentViews } = useRecentlyViewed();
   const mutation = useMutation<ResearchResult, Error, string>({
     mutationFn: (question) =>
       ask({
@@ -198,12 +201,18 @@ function ResearchPage() {
                 </h2>
                 <ConfidenceBadge confidence={result.confidence} />
               </div>
-              <div
-                className={`ai-explanation-block prose prose-sm max-w-none dark:prose-invert ${tafsirClass}`}
-                dir={textDir}
-              >
-                <ReactMarkdown skipHtml>{result.answer}</ReactMarkdown>
-              </div>
+              <StructuredAnswer
+                answer={result.answer}
+                locale={lang}
+                versesCount={result.verses.length}
+                tafsirCount={result.tafsir.length}
+                hadithCount={result.hadith.length}
+                suggestedQuestions={examples}
+                onSuggestedQuestion={(question) => {
+                  setQ(question);
+                  mutation.mutate(question);
+                }}
+              />
             </div>
 
             {result.verses.length > 0 && (
@@ -324,6 +333,27 @@ function ResearchPage() {
                 </div>
               </div>
             )}
+
+            <DiscoveryRail
+              locale={lang}
+              relatedVerses={result.verses.slice(0, 6).map((v) => ({
+                surah: v.surah,
+                ayah: v.ayah,
+                label: `${surahDisplayName(v.surah, lang)} ${v.surah}:${v.ayah}`,
+              }))}
+              relatedHadith={result.hadith.slice(0, 4).map((h) => ({
+                collection: h.collection,
+                num: h.global_id,
+                label: `${h.collection_label} #${h.id_in_book}`,
+                subtitle: h.narrator ?? undefined,
+              }))}
+              recentViews={recentViews}
+              suggestedQuestions={examples}
+              onSuggestedQuestion={(question) => {
+                setQ(question);
+                mutation.mutate(question);
+              }}
+            />
           </div>
         )}
       </div>
