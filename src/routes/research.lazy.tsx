@@ -299,9 +299,10 @@ function ResearchPage() {
                 </h3>
                 <div className="space-y-3">
                   {result.hadith.map((h, i) => (
-                    <a
+                    <Link
                       key={`${h.collection}-${h.global_id}-${i}`}
-                      href={`/hadith/${h.collection}/entry/${h.global_id}`}
+                      to="/hadith/$collection/entry/$num"
+                      params={{ collection: h.collection, num: String(h.global_id) }}
                       className="block rounded-xl border border-border bg-card p-4 hover:border-primary/40"
                     >
                       <div className="mb-1 text-xs font-medium text-primary">
@@ -318,7 +319,7 @@ function ResearchPage() {
                       >
                         {h.arabic}
                       </p>
-                    </a>
+                    </Link>
                   ))}
                 </div>
               </div>
