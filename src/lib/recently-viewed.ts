@@ -15,7 +15,10 @@ export type RecentView =
   | (BaseView & { kind: "entity"; entityKind: EntityKind; slug: string })
   | (BaseView & { kind: "hadith"; collection: string; num: number });
 
-type RecentViewInput = Omit<RecentView, "at">;
+export type RecentViewInput =
+  | { kind: "surah"; surah: number; ayah?: number; label: string; subtitle?: string }
+  | { kind: "entity"; entityKind: EntityKind; slug: string; label: string; subtitle?: string }
+  | { kind: "hadith"; collection: string; num: number; label: string; subtitle?: string };
 
 function getId(view: RecentViewInput | RecentView): string {
   if (view.kind === "surah") return `surah:${view.surah}:${view.ayah ?? ""}`;
