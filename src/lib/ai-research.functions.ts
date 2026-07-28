@@ -440,17 +440,19 @@ function cleanHtml(input: string) {
 }
 
 async function fetchLocalFallbackVerses(
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  supabaseAdmin: { rpc: (fn: string, params: Record<string, unknown>) => Promise<any> },
   question: string,
   k: number,
+  searchHybrid: (query: string, matchCount: number) => Promise<
+    Array<{
+      surah: number;
+      ayah: number;
+      arabic: string;
+      hebrew: string;
+      score: number;
+    }>
+  >,
 ): Promise<VerseCitation[]> {
-  const { data: rows } = await supabaseAdmin.rpc("search_verses_hybrid", {
-    q: question,
-    query_embedding: null,
-    theme_filter: null,
-    match_count: Math.max(k, 6),
-  });
+  const rows = await searchHybrid(question, Math.max(k, 6));
 
   return ((rows ?? []) as Array<{
     surah: number;
@@ -745,7 +747,28 @@ export const askQuranResearch = createServerFn({ method: "POST" })
     }
 
     if (verses.length === 0 && tafsir.length === 0) {
-      const fallbackVerses = await fetchLocalFallbackVerses(supabaseAdmin, data.question, data.k);
+      const fallbackVerses = await fetchLocalFallbackVerses(
+        data.question,
+        data.k,
+        async (query, matchCount) => {
+          const { data: rows } = await supabaseAdmin.rpc(
+            "search_verses_hybrid" as never,
+            {
+              q: query,
+              query_embedding: null,
+              theme_filter: null,
+              match_count: matchCount,
+            } as never,
+          );
+          return ((rows ?? []) as Array<{
+            surah: number;
+            ayah: number;
+            arabic: string;
+            hebrew: string;
+            score: number;
+          }>);
+        },
+      );
       if (fallbackVerses.length > 0) {
         const surahs = [...new Set(fallbackVerses.map((v) => v.surah))];
         const { data: tafRows } = await supabaseAdmin
