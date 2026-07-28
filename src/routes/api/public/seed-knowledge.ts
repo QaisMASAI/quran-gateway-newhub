@@ -1,9 +1,11 @@
 /**
  * One-shot knowledge seeder HTTP endpoint.
- * Gated by ?token=<QURAN_ADMIN_TOKEN>.
+ * Gated by admin authorization.
  */
 import { createFileRoute } from "@tanstack/react-router";
 import seed from "@/lib/seeds/knowledge-seed.json";
+import { z } from "zod";
+import { authorizeAdminRouteRequest } from "@/lib/admin-route-auth";
 
 type EntityKind =
   | "concept"
@@ -32,15 +34,22 @@ type Entity = {
 type VerseEntry = { slug: string; links: [number, number, number][] };
 type Relation = [string, string, RelationKind];
 
+const SeedKnowledgeBodySchema = z.object({
+  token: z.string().min(8).optional(),
+  adminUserId: z.string().uuid().optional(),
+});
+
 export const Route = createFileRoute("/api/public/seed-knowledge")({
   server: {
     handlers: {
       POST: async ({ request }) => {
-        const seedToken = process.env.QURAN_ADMIN_TOKEN;
-        const url = new URL(request.url);
-        if (!seedToken || url.searchParams.get("token") !== seedToken) {
-          return new Response("Unauthorized", { status: 401 });
-        }
+        const bodyRaw = await request.json().catch(() => ({}));
+        const parsed = SeedKnowledgeBodySchema.safeParse(bodyRaw);
+        if (!parsed.success) return new Response("Bad request", { status: 400 });
+
+        const auth = await authorizeAdminRouteRequest(request, parsed.data);
+        if (!auth.ok) return auth.response;
+
         const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
         const entities = (seed.entities as Entity[]).map((e, i) => ({
