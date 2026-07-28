@@ -394,8 +394,6 @@ function useKidsPlatform(userId: string | null) {
               allowedCategories: operation.bag.settings.allowedCategories,
             },
             activity_log: operation.bag.activity.slice(-200),
-            parent_pin_hash: operation.bag.settings.parentPinHash,
-            parent_pin_recovery_hash: operation.bag.settings.parentPinRecoveryHash,
           },
           { onConflict: "profile_id" },
         );
@@ -438,7 +436,7 @@ function useKidsPlatform(userId: string | null) {
           supabase
             .from("kids_profile_progress")
             .select(
-              "profile_id, progress, rewards, settings, activity_log, parent_pin_hash, parent_pin_recovery_hash",
+              "profile_id, progress, rewards, settings, activity_log",
             ),
         ]);
 
@@ -493,14 +491,8 @@ function useKidsPlatform(userId: string | null) {
               ...(localBag?.settings ?? defaultState.settings),
               ...((row?.settings as Partial<Settings> | undefined) ?? {}),
               maxDifficulty: profile.difficultyLimit,
-              parentPinHash:
-                (row?.parent_pin_hash as string | null | undefined) ??
-                localBag?.settings.parentPinHash ??
-                null,
-              parentPinRecoveryHash:
-                (row?.parent_pin_recovery_hash as string | null | undefined) ??
-                localBag?.settings.parentPinRecoveryHash ??
-                null,
+              parentPinHash: localBag?.settings.parentPinHash ?? null,
+              parentPinRecoveryHash: localBag?.settings.parentPinRecoveryHash ?? null,
             },
             activity: (row?.activity_log as Activity[] | undefined) ?? localBag?.activity,
           });

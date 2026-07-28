@@ -1193,8 +1193,6 @@ export type Database = {
           created_at: string
           id: string
           offline_sync_version: number
-          parent_pin_hash: string | null
-          parent_pin_recovery_hash: string | null
           profile_id: string
           progress: Json
           rewards: Json
@@ -1207,8 +1205,6 @@ export type Database = {
           created_at?: string
           id?: string
           offline_sync_version?: number
-          parent_pin_hash?: string | null
-          parent_pin_recovery_hash?: string | null
           profile_id: string
           progress?: Json
           rewards?: Json
@@ -1221,8 +1217,6 @@ export type Database = {
           created_at?: string
           id?: string
           offline_sync_version?: number
-          parent_pin_hash?: string | null
-          parent_pin_recovery_hash?: string | null
           profile_id?: string
           progress?: Json
           rewards?: Json
@@ -1279,7 +1273,6 @@ export type Database = {
       kids_progress: {
         Row: {
           activity_log: Json
-          parent_pin_hash: string | null
           progress: Json
           rewards: Json
           settings: Json
@@ -1288,7 +1281,6 @@ export type Database = {
         }
         Insert: {
           activity_log?: Json
-          parent_pin_hash?: string | null
           progress?: Json
           rewards?: Json
           settings?: Json
@@ -1297,7 +1289,6 @@ export type Database = {
         }
         Update: {
           activity_log?: Json
-          parent_pin_hash?: string | null
           progress?: Json
           rewards?: Json
           settings?: Json
