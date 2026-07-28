@@ -31,7 +31,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { TAFSIR_SOURCES_META, tafsirSourceName } from "@/lib/tafsir-sources";
 import { ShareButtons } from "./ShareButtons";
 import { NotePanel } from "./NotePanel";
-import { getAyahLinks } from "@/lib/ayah-links";
+import { getAyahLinks, getConnectedVerses } from "@/lib/ayah-links";
 import { useReadingSettings, stripArabicDiacritics } from "@/lib/reading-settings";
 import { normalizeLocale } from "@/lib/i18n";
 import {
@@ -168,6 +168,7 @@ export function AyahCard({ surah, surahName, ayah, arabic, hebrew, highlight }: 
 
   const heHighlight = useMemo(() => highlightHebrew(hebrew, highlight), [hebrew, highlight]);
   const links = useMemo(() => getAyahLinks(surah, ayah), [surah, ayah]);
+  const connectedVerses = useMemo(() => getConnectedVerses(surah, ayah, 4), [surah, ayah]);
   const [reading] = useReadingSettings();
   const displayArabic = useMemo(
     () => (reading.stripTashkil ? stripArabicDiacritics(arabic) : arabic),
@@ -309,6 +310,33 @@ export function AyahCard({ surah, surahName, ayah, arabic, hebrew, highlight }: 
               </Link>
             );
           })}
+        </div>
+      )}
+
+      {connectedVerses.length > 0 && (
+        <div className="mt-4 rounded-lg border border-border bg-secondary/30 p-3">
+          <div className="mb-2 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+            {locale === "ar"
+              ? "آيات مترابطة"
+              : locale === "he"
+                ? "פסוקים מקושרים"
+                : "Connected verses"}
+          </div>
+          <div className="flex flex-wrap gap-1.5">
+            {connectedVerses.map((v) => (
+              <Link
+                key={`${v.surah}:${v.ayah}:${v.via.kind}:${v.via.title}`}
+                to="/surah/$id"
+                params={{ id: String(v.surah) }}
+                hash={`v-${v.ayah}`}
+                search={{ q: undefined }}
+                className="inline-flex items-center gap-1 rounded-full border border-border bg-background px-2.5 py-1 text-[11px] text-foreground/90 hover:border-primary/40"
+              >
+                <span>{`${v.surahName} ${v.surah}:${v.ayah}`}</span>
+                <span className="text-muted-foreground">· {v.via.title}</span>
+              </Link>
+            ))}
+          </div>
         </div>
       )}
 
