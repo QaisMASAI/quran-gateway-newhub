@@ -160,13 +160,6 @@ function SearchPage() {
               : "The ?q value was invalid and has been sanitized. You can edit it and continue."
           : null;
 
-  useEffect(() => {
-    const normalizedQ = typeof q === "string" ? q.trim() : "";
-    if (normalizedQ && normalizedQ !== input.trim()) {
-      setInput(normalizedQ);
-    }
-  }, [q, input]);
-
   const results = useMemo(() => {
     if (!indexQ.data) return null;
     if (deferredTrimmed.length < 2) return null;
