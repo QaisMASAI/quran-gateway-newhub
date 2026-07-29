@@ -98,7 +98,7 @@ function RecentAiPage() {
             </h2>
             <div className="mt-3 grid gap-2 sm:grid-cols-2">
               {recentViews
-                .filter((item) => item.kind === "ayah")
+                .filter((item) => item.kind === "surah")
                 .slice(0, 6)
                 .map((item) => (
                   <Link
