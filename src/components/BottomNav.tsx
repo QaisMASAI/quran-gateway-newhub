@@ -12,7 +12,7 @@ export function BottomNav() {
     exact?: boolean;
   }> = [
     {
-      to: "/",
+      to: "/surahs",
       labelKey: "surahs",
       icon: <BookOpen className="h-5 w-5" aria-hidden="true" />,
       exact: true,
