@@ -10,6 +10,7 @@ import { ReadingSettings } from "@/components/ReadingSettings";
 import { ChevronRight, ChevronLeft, Loader2, Play, Pause } from "lucide-react";
 import { useReadingProgress } from "@/lib/reading-progress";
 import { normalizeLocale } from "@/lib/i18n";
+import { useRecentlyViewed } from "@/lib/recently-viewed";
 import { uiFontClass } from "@/lib/locale-ui";
 
 function SurahNotFound() {
@@ -84,6 +85,7 @@ function SurahPage() {
   const { t, i18n } = useTranslation("common");
   const lang = (normalizeLocale(i18n.language) ?? "he") as ApiLang;
   const isRtl = i18n.dir() === "rtl";
+  const { add: recordView } = useRecentlyViewed();
   const uiClass = uiFontClass(lang);
   if (!surahId || surahId < 1 || surahId > 114) throw notFound();
 
@@ -127,6 +129,15 @@ function SurahPage() {
         .catch(() => setPlaying(false));
     }
   };
+  useEffect(() => {
+    if (chapter) {
+      recordView({
+        kind: "surah",
+        surah: chapter.id,
+        label: surahDisplayName(chapter.id, lang),
+      });
+    }
+  }, [chapter, lang, recordView]);
 
   const chapter = chapterQ.data;
   const verses = versesQ.data;
