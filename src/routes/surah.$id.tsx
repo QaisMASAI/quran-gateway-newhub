@@ -129,15 +129,6 @@ function SurahPage() {
         .catch(() => setPlaying(false));
     }
   };
-  useEffect(() => {
-    if (chapter) {
-      recordView({
-        kind: "surah",
-        surah: chapter.id,
-        label: surahDisplayName(chapter.id, lang),
-      });
-    }
-  }, [chapter, lang, recordView]);
 
   const chapter = chapterQ.data;
   const verses = versesQ.data;
@@ -149,6 +140,15 @@ function SurahPage() {
   useEffect(() => {
     if (!verses || verses.length === 0) return;
     // Do NOT record the first ayah on mount — that would overwrite the user's
+  useEffect(() => {
+    if (chapter) {
+      recordView({
+        kind: "surah",
+        surah: chapter.id,
+        label: surahDisplayName(chapter.id, lang),
+      });
+    }
+  }, [chapter, lang, recordView]);
     // existing reading progress the moment they open a different surah for a
     // quick look. Progress is only advanced once the IntersectionObserver
     // detects the reader has actually paused on a verse below.
