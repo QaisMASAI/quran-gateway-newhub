@@ -277,8 +277,16 @@ function Home() {
                     onClick={() => {
                       if (typeof window === "undefined") return;
                       const speechWindow = window as Window & {
-                        SpeechRecognition?: new () => SpeechRecognition;
-                        webkitSpeechRecognition?: new () => SpeechRecognition;
+                        SpeechRecognition?: new () => {
+                          lang: string;
+                          onresult: ((event: SpeechRecognitionEvent) => void) | null;
+                          start: () => void;
+                        };
+                        webkitSpeechRecognition?: new () => {
+                          lang: string;
+                          onresult: ((event: SpeechRecognitionEvent) => void) | null;
+                          start: () => void;
+                        };
                       };
                       const Recognition = speechWindow.SpeechRecognition ?? speechWindow.webkitSpeechRecognition;
                       if (!Recognition) return;
