@@ -36,7 +36,7 @@ export function HeaderNav({ isAuthenticated }: HeaderNavProps) {
 
   return (
     <nav className="hidden items-center gap-1 sm:flex" aria-label={t("nav.surahs")}>
-      <NavLink to="/" label={t("nav.surahs")} icon={<BookOpen className="h-4 w-4" />} />
+      <NavLink to="/surahs" label={t("nav.surahs")} icon={<BookOpen className="h-4 w-4" />} />
       <NavLink to="/research" label={t("nav.research")} icon={<Sparkles className="h-4 w-4" />} />
       <NavLink to="/learn" label={t("nav.learn")} icon={<BookMarked className="h-4 w-4" />} />
       <NavLink to="/hadith" label={t("nav.hadith")} icon={<BookMarked className="h-4 w-4" />} />

@@ -19,7 +19,7 @@ function SurahNotFound() {
     <div className="flex min-h-screen items-center justify-center">
       <div className="text-center">
         <p className="text-muted-foreground">{t("errors.notFoundTitle")}</p>
-        <Link to="/" className="mt-3 inline-block text-sm text-primary">
+        <Link to="/surahs" className="mt-3 inline-block text-sm text-primary">
           {t("common.home")}
         </Link>
       </div>
@@ -216,7 +216,7 @@ function SurahPage() {
 
       <div className="mx-auto max-w-3xl px-4 py-6 sm:px-6">
         <Link
-          to="/"
+          to="/surahs"
           className={`inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-primary ${isRtl ? "flex-row-reverse" : ""}`}
         >
           {isRtl ? (

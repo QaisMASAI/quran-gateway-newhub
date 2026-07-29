@@ -196,7 +196,7 @@ function LearnIndex() {
           const list = grouped[kind];
           if (!list || list.length === 0) return null;
           return (
-            <section key={kind} className="mb-8">
+            <section key={kind} id={`${kind}-library`} className="mb-8">
               <h2 className="mb-3 flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-primary">
                 <span className="h-px flex-1 bg-gradient-to-l from-primary/30 to-transparent" />
                 <span>{sectionLabel(kind)}</span>

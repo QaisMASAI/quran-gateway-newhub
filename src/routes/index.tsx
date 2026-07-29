@@ -191,7 +191,7 @@ function Home() {
             : locale === "he"
               ? "חזרו לשאלות האחרונות שלכם"
               : "Return to your most recent prompts",
-        to: "/recent-ai" as const,
+        to: "/ask" as const,
         icon: MessageCircle,
       },
       {
@@ -202,7 +202,7 @@ function Home() {
             : locale === "he"
               ? "פסוק היום עם מעבר מהיר לקריאה"
               : "Verse of the day with a fast path to reading",
-        to: "/daily-reflections" as const,
+        to: "/surahs" as const,
         icon: BookOpen,
       },
       {
