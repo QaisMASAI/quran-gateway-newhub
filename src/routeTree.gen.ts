@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as SearchRouteImport } from './routes/search'
 import { Route as ResearchRouteImport } from './routes/research'
+import { Route as RecentAiRouteImport } from './routes/recent-ai'
 import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as OnboardingRouteImport } from './routes/onboarding'
 import { Route as KidsRouteImport } from './routes/kids'
@@ -83,6 +84,11 @@ const ResearchRoute = ResearchRouteImport.update({
   path: '/research',
   getParentRoute: () => rootRouteImport,
 } as any).lazy(() => import('./routes/research.lazy').then((d) => d.Route))
+const RecentAiRoute = RecentAiRouteImport.update({
+  id: '/recent-ai',
+  path: '/recent-ai',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ProfileRoute = ProfileRouteImport.update({
   id: '/profile',
   path: '/profile',
@@ -385,6 +391,7 @@ export interface FileRoutesByFullPath {
   '/kids': typeof KidsRoute
   '/onboarding': typeof OnboardingRoute
   '/profile': typeof ProfileRoute
+  '/recent-ai': typeof RecentAiRoute
   '/research': typeof ResearchRoute
   '/search': typeof SearchRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -443,6 +450,7 @@ export interface FileRoutesByTo {
   '/kids': typeof KidsRoute
   '/onboarding': typeof OnboardingRoute
   '/profile': typeof ProfileRoute
+  '/recent-ai': typeof RecentAiRoute
   '/research': typeof ResearchRoute
   '/search': typeof SearchRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -504,6 +512,7 @@ export interface FileRoutesById {
   '/kids': typeof KidsRoute
   '/onboarding': typeof OnboardingRoute
   '/profile': typeof ProfileRoute
+  '/recent-ai': typeof RecentAiRoute
   '/research': typeof ResearchRoute
   '/search': typeof SearchRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -565,6 +574,7 @@ export interface FileRouteTypes {
     | '/kids'
     | '/onboarding'
     | '/profile'
+    | '/recent-ai'
     | '/research'
     | '/search'
     | '/sitemap.xml'
@@ -623,6 +633,7 @@ export interface FileRouteTypes {
     | '/kids'
     | '/onboarding'
     | '/profile'
+    | '/recent-ai'
     | '/research'
     | '/search'
     | '/sitemap.xml'
@@ -683,6 +694,7 @@ export interface FileRouteTypes {
     | '/kids'
     | '/onboarding'
     | '/profile'
+    | '/recent-ai'
     | '/research'
     | '/search'
     | '/sitemap.xml'
@@ -744,6 +756,7 @@ export interface RootRouteChildren {
   KidsRoute: typeof KidsRoute
   OnboardingRoute: typeof OnboardingRoute
   ProfileRoute: typeof ProfileRoute
+  RecentAiRoute: typeof RecentAiRoute
   ResearchRoute: typeof ResearchRoute
   SearchRoute: typeof SearchRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
@@ -802,6 +815,13 @@ declare module '@tanstack/react-router' {
       path: '/research'
       fullPath: '/research'
       preLoaderRoute: typeof ResearchRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/recent-ai': {
+      id: '/recent-ai'
+      path: '/recent-ai'
+      fullPath: '/recent-ai'
+      preLoaderRoute: typeof RecentAiRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/profile': {
@@ -1269,6 +1289,7 @@ const rootRouteChildren: RootRouteChildren = {
   KidsRoute: KidsRoute,
   OnboardingRoute: OnboardingRoute,
   ProfileRoute: ProfileRoute,
+  RecentAiRoute: RecentAiRoute,
   ResearchRoute: ResearchRoute,
   SearchRoute: SearchRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
