@@ -889,14 +889,18 @@ export const listHadithTopics = createServerFn({ method: "GET" })
       if (topicRows.length === 0) return [];
       const topicIds = topicRows.map((topic) => topic.id);
 
-      const relatedRows: Array<{ entity_id: string | null; hadith: { collection_slug: string | null } | null }> = [];
+      const relatedRows: Array<{
+        entity_id: string | null;
+        hadith_id: number | null;
+        hadith: { collection_slug: string | null } | null;
+      }> = [];
       const pageSize = 1000;
       const maxRows = 50_000;
       for (let from = 0; from < maxRows; from += pageSize) {
         const to = from + pageSize - 1;
         const { data: page, error: pageError } = await supabaseAdmin
           .from("hadith_entity_links")
-          .select("entity_id,hadith:hadith_entries!inner(collection_slug)")
+          .select("entity_id,hadith_id,hadith:hadith_entries!inner(collection_slug)")
           .in("entity_id", topicIds)
           .range(from, to);
 
@@ -905,6 +909,7 @@ export const listHadithTopics = createServerFn({ method: "GET" })
         relatedRows.push(
           ...page.map((row) => ({
             entity_id: row.entity_id,
+            hadith_id: typeof row.hadith_id === "number" ? row.hadith_id : null,
             hadith: Array.isArray(row.hadith) ? (row.hadith[0] ?? null) : row.hadith,
           })),
         );
@@ -912,16 +917,16 @@ export const listHadithTopics = createServerFn({ method: "GET" })
         if (page.length < pageSize) break;
       }
 
-      const statsByTopic = new Map<string, { hadithIds: number; collections: Set<string> }>();
+      const statsByTopic = new Map<string, { hadithIds: Set<number>; collections: Set<string> }>();
       for (const topicId of topicIds) {
-        statsByTopic.set(topicId, { hadithIds: 0, collections: new Set<string>() });
+        statsByTopic.set(topicId, { hadithIds: new Set<number>(), collections: new Set<string>() });
       }
 
       for (const row of relatedRows) {
         if (!row.entity_id) continue;
         const stats = statsByTopic.get(row.entity_id);
         if (!stats) continue;
-        stats.hadithIds += 1;
+        if (row.hadith_id !== null) stats.hadithIds.add(row.hadith_id);
         if (row.hadith?.collection_slug) stats.collections.add(row.hadith.collection_slug);
       }
 
@@ -932,7 +937,7 @@ export const listHadithTopics = createServerFn({ method: "GET" })
           id: topic.id,
           slug: topic.slug,
           title_i18n: titleI18n,
-          hadith_count: stats?.hadithIds ?? 0,
+          hadith_count: stats?.hadithIds.size ?? 0,
           collections: Array.from(stats?.collections ?? []),
         };
       });
