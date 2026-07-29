@@ -1,6 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
-import { BookOpen, Search, Sparkles, Star } from "lucide-react";
+import { Compass, Search, Sparkles, Star } from "lucide-react";
 
 export function BottomNav() {
   const { t } = useTranslation("pages");
