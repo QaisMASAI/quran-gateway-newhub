@@ -10,10 +10,8 @@ export function useQueryPrefillInput({ initialQ }: Options) {
   useEffect(() => {
     const normalized = initialQ.trim();
     if (!normalized) return;
-    if (normalized !== input.trim()) {
-      setInput(normalized);
-    }
-  }, [initialQ, input]);
+    setInput(normalized);
+  }, [initialQ]);
 
   return {
     input,
