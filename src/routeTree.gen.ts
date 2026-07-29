@@ -20,7 +20,6 @@ import { Route as FavoritesRouteImport } from './routes/favorites'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AskRouteImport } from './routes/ask'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
-import { Route as IndexRouteImport } from './routes/index'
 import { Route as TopicsIndexRouteImport } from './routes/topics.index'
 import { Route as ProphetsIndexRouteImport } from './routes/prophets.index'
 import { Route as PlansIndexRouteImport } from './routes/plans.index'
@@ -119,11 +118,6 @@ const AskRoute = AskRouteImport.update({
 } as any).lazy(() => import('./routes/ask.lazy').then((d) => d.Route))
 const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
   id: '/_authenticated',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const TopicsIndexRoute = TopicsIndexRouteImport.update({
@@ -371,7 +365,7 @@ const ApiPublicAdminIngestQuranJsonIdRoute =
   } as any)
 
 export interface FileRoutesByFullPath {
-  '/': typeof IndexRoute
+  '/': typeof AuthenticatedRouteRouteWithChildren
   '/ask': typeof AskRoute
   '/auth': typeof AuthRoute
   '/favorites': typeof FavoritesRoute
@@ -429,7 +423,7 @@ export interface FileRoutesByFullPath {
   '/api/public/admin/ingest-quran-json/$id': typeof ApiPublicAdminIngestQuranJsonIdRoute
 }
 export interface FileRoutesByTo {
-  '/': typeof IndexRoute
+  '/': typeof AuthenticatedRouteRouteWithChildren
   '/ask': typeof AskRoute
   '/auth': typeof AuthRoute
   '/favorites': typeof FavoritesRoute
@@ -487,7 +481,6 @@ export interface FileRoutesByTo {
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
-  '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/ask': typeof AskRoute
   '/auth': typeof AuthRoute
@@ -663,7 +656,6 @@ export interface FileRouteTypes {
     | '/api/public/admin/ingest-quran-json/$id'
   id:
     | '__root__'
-    | '/'
     | '/_authenticated'
     | '/ask'
     | '/auth'
@@ -723,7 +715,6 @@ export interface FileRouteTypes {
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
-  IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AskRoute: typeof AskRoute
   AuthRoute: typeof AuthRoute
@@ -845,13 +836,6 @@ declare module '@tanstack/react-router' {
       path: ''
       fullPath: '/'
       preLoaderRoute: typeof AuthenticatedRouteRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/topics/': {
@@ -1240,7 +1224,6 @@ const ApiPublicAdminIngestQuranJsonRouteWithChildren =
   )
 
 const rootRouteChildren: RootRouteChildren = {
-  IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AskRoute: AskRoute,
   AuthRoute: AuthRoute,
@@ -1294,13 +1277,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
