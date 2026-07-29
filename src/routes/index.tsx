@@ -25,6 +25,7 @@ import { Button } from "@/components/ui/button";
 import { trackHomePromptEvent } from "@/lib/home-prompts.functions";
 import i18n, { normalizeLocale } from "@/lib/i18n";
 import { useReadingProgress } from "@/lib/reading-progress";
+import { useRecentlyViewed } from "@/lib/recently-viewed";
 
 const HOME_RECENT_PROMPTS_KEY = "noor:home:recent-prompts:v1";
 const HOME_RECENT_PLAN_KEY = "noor.reading-plan-progress.v1";
@@ -64,6 +65,7 @@ function Home() {
   const locale = (normalizeLocale(i18n.language) ?? "he") as "he" | "ar" | "en";
   const isRtl = i18n.dir() === "rtl";
   const navigate = useNavigate();
+  const { items: recentViews } = useRecentlyViewed();
   const { progress } = useReadingProgress();
   const trackPrompt = useServerFn(trackHomePromptEvent);
 
@@ -146,6 +148,11 @@ function Home() {
   const exploreCards = useMemo(
     () => [
       {
+        label: locale === "ar" ? "السور" : locale === "he" ? "סורות" : "Surahs",
+        to: "/surahs" as const,
+        icon: BookOpen,
+      },
+      {
         label: locale === "ar" ? "المواضيع" : locale === "he" ? "נושאים" : "Topics",
         to: "/topics" as const,
         icon: Compass,
@@ -184,7 +191,7 @@ function Home() {
             : locale === "he"
               ? "חזרו לשאלות האחרונות שלכם"
               : "Return to your most recent prompts",
-        to: "/recent-ai" as const,
+        to: "/ask" as const,
         icon: MessageCircle,
       },
       {
@@ -195,7 +202,7 @@ function Home() {
             : locale === "he"
               ? "פסוק היום עם מעבר מהיר לקריאה"
               : "Verse of the day with a fast path to reading",
-        to: "/daily-reflections" as const,
+        to: "/surahs" as const,
         icon: BookOpen,
       },
       {
@@ -416,6 +423,25 @@ function Home() {
             </div>
           </section>
         )}
+        {recentViews.length > 0 && (
+          <section className="mt-10">
+            <h2 className="mb-4 text-2xl font-semibold text-foreground">
+              {locale === "ar" ? "شوهدت مؤخراً" : locale === "he" ? "נצפו לאחרונה" : "Recently Viewed"}
+            </h2>
+            <div className="flex flex-wrap gap-2">
+              {recentViews.slice(0, 8).map((view, idx) => (
+                <Link
+                  key={`home-recent-${idx}`}
+                  to={view.kind === "surah" ? "/surah/$id" : view.kind === "entity" ? "/learn/$kind/$slug" : "/hadith/$collection/entry/$num"}
+                  params={view.kind === "surah" ? { id: String(view.surah) } : view.kind === "entity" ? { kind: view.entityKind, slug: view.slug } : { collection: view.collection, num: String(view.num) }}
+                  className="rounded-full border border-border bg-card px-4 py-1.5 text-sm font-medium hover:border-primary/40"
+                >
+                  {view.label}
+                </Link>
+              ))}
+            </div>
+          </section>
+        )}
 
         <section className="mt-12">
           <h2 className="mb-4 text-2xl font-semibold text-foreground">
@@ -428,7 +454,7 @@ function Home() {
           <h2 className="mb-4 text-2xl font-semibold text-foreground">
             {locale === "ar" ? "استكشف" : locale === "he" ? "גלו" : "Explore"}
           </h2>
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-5">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {exploreCards.map((card) => {
               const Icon = card.icon;
               return (

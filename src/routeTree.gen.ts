@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as SearchRouteImport } from './routes/search'
 import { Route as ResearchRouteImport } from './routes/research'
+import { Route as RecentAiRouteImport } from './routes/recent-ai'
 import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as OnboardingRouteImport } from './routes/onboarding'
 import { Route as KidsRouteImport } from './routes/kids'
@@ -22,6 +23,7 @@ import { Route as AskRouteImport } from './routes/ask'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as TopicsIndexRouteImport } from './routes/topics.index'
+import { Route as SurahsIndexRouteImport } from './routes/surahs.index'
 import { Route as ProphetsIndexRouteImport } from './routes/prophets.index'
 import { Route as PlansIndexRouteImport } from './routes/plans.index'
 import { Route as LearnIndexRouteImport } from './routes/learn.index'
@@ -82,6 +84,11 @@ const ResearchRoute = ResearchRouteImport.update({
   path: '/research',
   getParentRoute: () => rootRouteImport,
 } as any).lazy(() => import('./routes/research.lazy').then((d) => d.Route))
+const RecentAiRoute = RecentAiRouteImport.update({
+  id: '/recent-ai',
+  path: '/recent-ai',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ProfileRoute = ProfileRouteImport.update({
   id: '/profile',
   path: '/profile',
@@ -129,6 +136,11 @@ const IndexRoute = IndexRouteImport.update({
 const TopicsIndexRoute = TopicsIndexRouteImport.update({
   id: '/topics/',
   path: '/topics/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SurahsIndexRoute = SurahsIndexRouteImport.update({
+  id: '/surahs/',
+  path: '/surahs/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ProphetsIndexRoute = ProphetsIndexRouteImport.update({
@@ -379,6 +391,7 @@ export interface FileRoutesByFullPath {
   '/kids': typeof KidsRoute
   '/onboarding': typeof OnboardingRoute
   '/profile': typeof ProfileRoute
+  '/recent-ai': typeof RecentAiRoute
   '/research': typeof ResearchRoute
   '/search': typeof SearchRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -400,6 +413,7 @@ export interface FileRoutesByFullPath {
   '/learn/': typeof LearnIndexRoute
   '/plans/': typeof PlansIndexRoute
   '/prophets/': typeof ProphetsIndexRoute
+  '/surahs/': typeof SurahsIndexRoute
   '/topics/': typeof TopicsIndexRoute
   '/admin/backfill': typeof AuthenticatedAdminBackfillRoute
   '/admin/hadith-api': typeof AuthenticatedAdminHadithApiRoute
@@ -436,6 +450,7 @@ export interface FileRoutesByTo {
   '/kids': typeof KidsRoute
   '/onboarding': typeof OnboardingRoute
   '/profile': typeof ProfileRoute
+  '/recent-ai': typeof RecentAiRoute
   '/research': typeof ResearchRoute
   '/search': typeof SearchRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -457,6 +472,7 @@ export interface FileRoutesByTo {
   '/learn': typeof LearnIndexRoute
   '/plans': typeof PlansIndexRoute
   '/prophets': typeof ProphetsIndexRoute
+  '/surahs': typeof SurahsIndexRoute
   '/topics': typeof TopicsIndexRoute
   '/admin/backfill': typeof AuthenticatedAdminBackfillRoute
   '/admin/hadith-api': typeof AuthenticatedAdminHadithApiRoute
@@ -496,6 +512,7 @@ export interface FileRoutesById {
   '/kids': typeof KidsRoute
   '/onboarding': typeof OnboardingRoute
   '/profile': typeof ProfileRoute
+  '/recent-ai': typeof RecentAiRoute
   '/research': typeof ResearchRoute
   '/search': typeof SearchRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -517,6 +534,7 @@ export interface FileRoutesById {
   '/learn/': typeof LearnIndexRoute
   '/plans/': typeof PlansIndexRoute
   '/prophets/': typeof ProphetsIndexRoute
+  '/surahs/': typeof SurahsIndexRoute
   '/topics/': typeof TopicsIndexRoute
   '/_authenticated/admin/backfill': typeof AuthenticatedAdminBackfillRoute
   '/_authenticated/admin/hadith-api': typeof AuthenticatedAdminHadithApiRoute
@@ -556,6 +574,7 @@ export interface FileRouteTypes {
     | '/kids'
     | '/onboarding'
     | '/profile'
+    | '/recent-ai'
     | '/research'
     | '/search'
     | '/sitemap.xml'
@@ -577,6 +596,7 @@ export interface FileRouteTypes {
     | '/learn/'
     | '/plans/'
     | '/prophets/'
+    | '/surahs/'
     | '/topics/'
     | '/admin/backfill'
     | '/admin/hadith-api'
@@ -613,6 +633,7 @@ export interface FileRouteTypes {
     | '/kids'
     | '/onboarding'
     | '/profile'
+    | '/recent-ai'
     | '/research'
     | '/search'
     | '/sitemap.xml'
@@ -634,6 +655,7 @@ export interface FileRouteTypes {
     | '/learn'
     | '/plans'
     | '/prophets'
+    | '/surahs'
     | '/topics'
     | '/admin/backfill'
     | '/admin/hadith-api'
@@ -672,6 +694,7 @@ export interface FileRouteTypes {
     | '/kids'
     | '/onboarding'
     | '/profile'
+    | '/recent-ai'
     | '/research'
     | '/search'
     | '/sitemap.xml'
@@ -693,6 +716,7 @@ export interface FileRouteTypes {
     | '/learn/'
     | '/plans/'
     | '/prophets/'
+    | '/surahs/'
     | '/topics/'
     | '/_authenticated/admin/backfill'
     | '/_authenticated/admin/hadith-api'
@@ -732,6 +756,7 @@ export interface RootRouteChildren {
   KidsRoute: typeof KidsRoute
   OnboardingRoute: typeof OnboardingRoute
   ProfileRoute: typeof ProfileRoute
+  RecentAiRoute: typeof RecentAiRoute
   ResearchRoute: typeof ResearchRoute
   SearchRoute: typeof SearchRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
@@ -749,6 +774,7 @@ export interface RootRouteChildren {
   LearnIndexRoute: typeof LearnIndexRoute
   PlansIndexRoute: typeof PlansIndexRoute
   ProphetsIndexRoute: typeof ProphetsIndexRoute
+  SurahsIndexRoute: typeof SurahsIndexRoute
   TopicsIndexRoute: typeof TopicsIndexRoute
   ApiPublicSeedKnowledgeRoute: typeof ApiPublicSeedKnowledgeRoute
   ApiPublicSurahNamesRoute: typeof ApiPublicSurahNamesRoute
@@ -789,6 +815,13 @@ declare module '@tanstack/react-router' {
       path: '/research'
       fullPath: '/research'
       preLoaderRoute: typeof ResearchRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/recent-ai': {
+      id: '/recent-ai'
+      path: '/recent-ai'
+      fullPath: '/recent-ai'
+      preLoaderRoute: typeof RecentAiRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/profile': {
@@ -859,6 +892,13 @@ declare module '@tanstack/react-router' {
       path: '/topics'
       fullPath: '/topics/'
       preLoaderRoute: typeof TopicsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/surahs/': {
+      id: '/surahs/'
+      path: '/surahs'
+      fullPath: '/surahs/'
+      preLoaderRoute: typeof SurahsIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/prophets/': {
@@ -1249,6 +1289,7 @@ const rootRouteChildren: RootRouteChildren = {
   KidsRoute: KidsRoute,
   OnboardingRoute: OnboardingRoute,
   ProfileRoute: ProfileRoute,
+  RecentAiRoute: RecentAiRoute,
   ResearchRoute: ResearchRoute,
   SearchRoute: SearchRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
@@ -1266,6 +1307,7 @@ const rootRouteChildren: RootRouteChildren = {
   LearnIndexRoute: LearnIndexRoute,
   PlansIndexRoute: PlansIndexRoute,
   ProphetsIndexRoute: ProphetsIndexRoute,
+  SurahsIndexRoute: SurahsIndexRoute,
   TopicsIndexRoute: TopicsIndexRoute,
   ApiPublicSeedKnowledgeRoute: ApiPublicSeedKnowledgeRoute,
   ApiPublicSurahNamesRoute: ApiPublicSurahNamesRoute,

@@ -10,6 +10,7 @@ import { ReadingSettings } from "@/components/ReadingSettings";
 import { ChevronRight, ChevronLeft, Loader2, Play, Pause } from "lucide-react";
 import { useReadingProgress } from "@/lib/reading-progress";
 import { normalizeLocale } from "@/lib/i18n";
+import { useRecentlyViewed } from "@/lib/recently-viewed";
 import { uiFontClass } from "@/lib/locale-ui";
 
 function SurahNotFound() {
@@ -18,7 +19,7 @@ function SurahNotFound() {
     <div className="flex min-h-screen items-center justify-center">
       <div className="text-center">
         <p className="text-muted-foreground">{t("errors.notFoundTitle")}</p>
-        <Link to="/" className="mt-3 inline-block text-sm text-primary">
+        <Link to="/surahs" className="mt-3 inline-block text-sm text-primary">
           {t("common.home")}
         </Link>
       </div>
@@ -84,6 +85,7 @@ function SurahPage() {
   const { t, i18n } = useTranslation("common");
   const lang = (normalizeLocale(i18n.language) ?? "he") as ApiLang;
   const isRtl = i18n.dir() === "rtl";
+  const { add: recordView } = useRecentlyViewed();
   const uiClass = uiFontClass(lang);
   if (!surahId || surahId < 1 || surahId > 114) throw notFound();
 
@@ -138,6 +140,15 @@ function SurahPage() {
   useEffect(() => {
     if (!verses || verses.length === 0) return;
     // Do NOT record the first ayah on mount — that would overwrite the user's
+  useEffect(() => {
+    if (chapter) {
+      recordView({
+        kind: "surah",
+        surah: chapter.id,
+        label: surahDisplayName(chapter.id, lang),
+      });
+    }
+  }, [chapter, lang, recordView]);
     // existing reading progress the moment they open a different surah for a
     // quick look. Progress is only advanced once the IntersectionObserver
     // detects the reader has actually paused on a verse below.
@@ -205,7 +216,7 @@ function SurahPage() {
 
       <div className="mx-auto max-w-3xl px-4 py-6 sm:px-6">
         <Link
-          to="/"
+          to="/surahs"
           className={`inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-primary ${isRtl ? "flex-row-reverse" : ""}`}
         >
           {isRtl ? (
