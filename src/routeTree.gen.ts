@@ -15,6 +15,7 @@ import { Route as ResearchRouteImport } from './routes/research'
 import { Route as RecentAiRouteImport } from './routes/recent-ai'
 import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as OnboardingRouteImport } from './routes/onboarding'
+import { Route as LibraryRouteImport } from './routes/library'
 import { Route as KidsRouteImport } from './routes/kids'
 import { Route as HadithRouteImport } from './routes/hadith'
 import { Route as FavoritesRouteImport } from './routes/favorites'
@@ -97,6 +98,11 @@ const ProfileRoute = ProfileRouteImport.update({
 const OnboardingRoute = OnboardingRouteImport.update({
   id: '/onboarding',
   path: '/onboarding',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LibraryRoute = LibraryRouteImport.update({
+  id: '/library',
+  path: '/library',
   getParentRoute: () => rootRouteImport,
 } as any)
 const KidsRoute = KidsRouteImport.update({
@@ -389,6 +395,7 @@ export interface FileRoutesByFullPath {
   '/favorites': typeof FavoritesRoute
   '/hadith': typeof HadithRouteWithChildren
   '/kids': typeof KidsRoute
+  '/library': typeof LibraryRoute
   '/onboarding': typeof OnboardingRoute
   '/profile': typeof ProfileRoute
   '/recent-ai': typeof RecentAiRoute
@@ -448,6 +455,7 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/favorites': typeof FavoritesRoute
   '/kids': typeof KidsRoute
+  '/library': typeof LibraryRoute
   '/onboarding': typeof OnboardingRoute
   '/profile': typeof ProfileRoute
   '/recent-ai': typeof RecentAiRoute
@@ -510,6 +518,7 @@ export interface FileRoutesById {
   '/favorites': typeof FavoritesRoute
   '/hadith': typeof HadithRouteWithChildren
   '/kids': typeof KidsRoute
+  '/library': typeof LibraryRoute
   '/onboarding': typeof OnboardingRoute
   '/profile': typeof ProfileRoute
   '/recent-ai': typeof RecentAiRoute
@@ -572,6 +581,7 @@ export interface FileRouteTypes {
     | '/favorites'
     | '/hadith'
     | '/kids'
+    | '/library'
     | '/onboarding'
     | '/profile'
     | '/recent-ai'
@@ -631,6 +641,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/favorites'
     | '/kids'
+    | '/library'
     | '/onboarding'
     | '/profile'
     | '/recent-ai'
@@ -692,6 +703,7 @@ export interface FileRouteTypes {
     | '/favorites'
     | '/hadith'
     | '/kids'
+    | '/library'
     | '/onboarding'
     | '/profile'
     | '/recent-ai'
@@ -754,6 +766,7 @@ export interface RootRouteChildren {
   FavoritesRoute: typeof FavoritesRoute
   HadithRoute: typeof HadithRouteWithChildren
   KidsRoute: typeof KidsRoute
+  LibraryRoute: typeof LibraryRoute
   OnboardingRoute: typeof OnboardingRoute
   ProfileRoute: typeof ProfileRoute
   RecentAiRoute: typeof RecentAiRoute
@@ -836,6 +849,13 @@ declare module '@tanstack/react-router' {
       path: '/onboarding'
       fullPath: '/onboarding'
       preLoaderRoute: typeof OnboardingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/library': {
+      id: '/library'
+      path: '/library'
+      fullPath: '/library'
+      preLoaderRoute: typeof LibraryRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/kids': {
@@ -1287,6 +1307,7 @@ const rootRouteChildren: RootRouteChildren = {
   FavoritesRoute: FavoritesRoute,
   HadithRoute: HadithRouteWithChildren,
   KidsRoute: KidsRoute,
+  LibraryRoute: LibraryRoute,
   OnboardingRoute: OnboardingRoute,
   ProfileRoute: ProfileRoute,
   RecentAiRoute: RecentAiRoute,
@@ -1336,3 +1357,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}

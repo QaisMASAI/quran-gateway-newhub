@@ -166,17 +166,21 @@ function SearchPage() {
     return searchWithFallback(indexQ.data, deferredTrimmed, locale);
   }, [indexQ.data, deferredTrimmed, locale]);
 
-  const suggestions = t("search.suggestions", { returnObjects: true }) as string[];
+  const rawSuggestions = t("search.suggestions", { returnObjects: true }) as string[];
+  const suggestions = useMemo(
+    () => Array.from(new Set(Array.isArray(rawSuggestions) ? rawSuggestions : [])),
+    [rawSuggestions],
+  );
 
-  const quickSuggestions = useMemo(
-    () =>
+  const quickSuggestions = useMemo(() => {
+    const base =
       locale === "ar"
         ? ["الرحمة", "الصبر", "موسى", "إبراهيم", "العدل", "التوبة"]
         : locale === "he"
           ? ["רחמים", "סבלנות", "משה", "אברהם", "צדק", "תשובה"]
-          : ["mercy", "patience", "Musa", "Abraham", "justice", "repentance"],
-    [locale],
-  );
+          : ["mercy", "patience", "Musa", "Abraham", "justice", "repentance"];
+    return Array.from(new Set(base));
+  }, [locale]);
 
   const groupedResultCounts = useMemo(
     () => ({
@@ -235,7 +239,7 @@ function SearchPage() {
             </button>
             {indexQ.isFetching && <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />}
             <datalist id="search-suggestions">
-              {[...suggestions, ...quickSuggestions].map((s) => (
+              {Array.from(new Set([...suggestions, ...quickSuggestions])).map((s) => (
                 <option key={s} value={s} />
               ))}
             </datalist>

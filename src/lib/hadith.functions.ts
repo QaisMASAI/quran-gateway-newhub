@@ -1081,3 +1081,101 @@ export const getHadithTelemetrySnapshot = createServerFn({ method: "GET" })
       alerts,
     };
   });
+
+export type HadithByTopicResult = {
+  items: HadithEntry[];
+  total: number;
+  page: number;
+  pageSize: number;
+  collections: string[];
+  narrators: string[];
+};
+
+export const listHadithByTopicSlug = createServerFn({ method: "GET" })
+  .inputValidator((input: unknown) =>
+    z
+      .object({
+        slug: z.string().min(1).max(160),
+        page: z.number().int().min(1).max(200).optional().default(1),
+        pageSize: z.number().int().min(1).max(50).optional().default(10),
+        collection: z.string().max(40).optional().nullable(),
+        narrator: z.string().max(300).optional().nullable(),
+        sort: z.enum(["relevance", "narrator", "collection"]).optional().default("relevance"),
+      })
+      .parse(input ?? {}),
+  )
+  .handler(async ({ data }): Promise<HadithByTopicResult> => {
+    const empty: HadithByTopicResult = {
+      items: [],
+      total: 0,
+      page: data.page,
+      pageSize: data.pageSize,
+      collections: [],
+      narrators: [],
+    };
+    try {
+      const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+      const { data: entity } = await supabaseAdmin
+        .from("knowledge_entities")
+        .select("id")
+        .eq("slug", data.slug)
+        .maybeSingle();
+      if (!entity) return empty;
+
+      const { data: linkRows } = await supabaseAdmin
+        .from("hadith_entity_links")
+        .select("hadith_id,weight")
+        .eq("entity_id", entity.id)
+        .order("weight", { ascending: false })
+        .limit(1000);
+
+      const ids = Array.from(
+        new Set((linkRows ?? []).map((r) => r.hadith_id).filter((v): v is number => typeof v === "number")),
+      );
+      if (ids.length === 0) return empty;
+
+      let query = supabaseAdmin
+        .from("hadith_entries")
+        .select(
+          "id,collection_slug,book_id,id_in_book,global_id,narrator,arabic_text,english_text,hebrew_text",
+          { count: "exact" },
+        )
+        .in("id", ids);
+
+      const collection = data.collection ? normalizeHadithCollection(data.collection) : null;
+      if (collection) query = query.eq("collection_slug", collection);
+      if (data.narrator) query = query.eq("narrator", data.narrator);
+
+      if (data.sort === "narrator") query = query.order("narrator", { ascending: true, nullsFirst: false });
+      else if (data.sort === "collection") query = query.order("collection_slug", { ascending: true });
+      query = query.order("global_id", { ascending: true });
+
+      const from = (data.page - 1) * data.pageSize;
+      const { data: rows, count } = await query.range(from, from + data.pageSize - 1);
+
+      const { data: facetRows } = await supabaseAdmin
+        .from("hadith_entries")
+        .select("collection_slug,narrator")
+        .in("id", ids)
+        .limit(1000);
+
+      return {
+        items: (rows ?? []).map((row) => mapEntryRow(row as HadithEntryRow)),
+        total: count ?? 0,
+        page: data.page,
+        pageSize: data.pageSize,
+        collections: Array.from(new Set((facetRows ?? []).map((r) => r.collection_slug))).sort(),
+        narrators: Array.from(
+          new Set(
+            (facetRows ?? [])
+              .map((r) => r.narrator)
+              .filter((v): v is string => typeof v === "string" && v.trim().length > 0),
+          ),
+        )
+          .sort()
+          .slice(0, 60),
+      };
+    } catch {
+      return empty;
+    }
+  });
