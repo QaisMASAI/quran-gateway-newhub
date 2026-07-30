@@ -235,7 +235,7 @@ function SearchPage() {
             </button>
             {indexQ.isFetching && <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />}
             <datalist id="search-suggestions">
-              {[...suggestions, ...quickSuggestions].map((s) => (
+              {Array.from(new Set([...suggestions, ...quickSuggestions])).map((s) => (
                 <option key={s} value={s} />
               ))}
             </datalist>
