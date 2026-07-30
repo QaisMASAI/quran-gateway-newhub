@@ -13,6 +13,7 @@ import {
 } from "@/lib/knowledge";
 import { EntityCard } from "@/components/discovery/EntityCard";
 import { PassageCard } from "@/components/discovery/PassageCard";
+import { TopicHadithSection } from "@/components/hadith/TopicHadithSection";
 import {
   getAsbabForVerse,
   getTafsirForVerse,
@@ -229,6 +230,7 @@ function EntityPage() {
       { id: "verses", label: t("learn.toc.verses"), show: (versesQ.data?.length ?? 0) > 0 },
       { id: "tafsir", label: t("learn.toc.tafsir"), show: true },
       { id: "asbab", label: t("learn.toc.asbab"), show: true },
+      { id: "hadith", label: "Hadith", show: true },
       { id: "related", label: t("learn.toc.related"), show: (relatedQ.data?.length ?? 0) > 0 },
     ];
     return list.filter((s) => s.show);
@@ -407,6 +409,20 @@ function EntityPage() {
               </Section>
 
               {/* Prophet timeline placeholder section */}
+              <Section
+                id="hadith"
+                icon={<ScrollText className="h-4 w-4" />}
+                title={
+                  locale === "he"
+                    ? "חדית' קשורים"
+                    : locale === "ar"
+                      ? "أحاديث ذات صلة"
+                      : "Related Hadith"
+                }
+              >
+                <TopicHadithSection slug={slug} locale={locale} />
+              </Section>
+
               {isProphet && (
                 <Section
                   id="prophet-extras"
