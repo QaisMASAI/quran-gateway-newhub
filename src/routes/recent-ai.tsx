@@ -105,6 +105,7 @@ function RecentAiPage() {
                     key={`${item.surah}-${item.ayah}`}
                     to="/surah/$id"
                     params={{ id: String(item.surah) }}
+                    search={{ q: "" }}
                     hash={item.ayah ? `v-${item.ayah}` : undefined}
                     className="surface-card block p-3 text-sm text-foreground transition-colors hover:border-primary/40"
                   >

@@ -71,6 +71,7 @@ function SurahsIndex() {
                   key={`recent-${view.surah}`}
                   to="/surah/$id"
                   params={{ id: String(view.surah) }}
+                  search={{ q: "" }}
                   className="surface-card flex items-center justify-between p-4 hover:border-primary/40"
                 >
                   <div className="flex items-center gap-3">
@@ -114,6 +115,7 @@ function SurahsIndex() {
                 key={c.id}
                 to="/surah/$id"
                 params={{ id: String(c.id) }}
+                search={{ q: "" }}
                 className="group surface-card flex items-center justify-between p-4 transition-all hover:border-primary/40 hover:shadow-sm"
               >
                 <div className="flex items-center gap-4">

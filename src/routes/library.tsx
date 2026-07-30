@@ -101,6 +101,7 @@ function LibraryPage() {
           <Link
             to="/surah/$id"
             params={{ id: String(progress.surah) }}
+            search={{ q: "" }}
             className="surface-card mb-8 flex items-center justify-between gap-3 px-5 py-4 hover:border-primary/40"
           >
             <div className="flex items-center gap-3">
@@ -132,6 +133,7 @@ function LibraryPage() {
                   key={`r-${v.surah}-${v.ayah ?? 0}`}
                   to="/surah/$id"
                   params={{ id: String(v.surah) }}
+                  search={{ q: "" }}
                   className="rounded-full border border-border px-3 py-1.5 text-xs text-foreground hover:border-primary/40"
                 >
                   {v.label}
@@ -177,6 +179,7 @@ function LibraryPage() {
                 <Link
                   to="/surah/$id"
                   params={{ id: String(c.id) }}
+                  search={{ q: "" }}
                   className="group flex items-center justify-between gap-4 px-4 py-3 transition-colors hover:bg-secondary/50"
                 >
                   <div className="flex min-w-0 items-center gap-3">
