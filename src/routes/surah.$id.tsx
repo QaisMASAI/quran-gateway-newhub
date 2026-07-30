@@ -201,6 +201,16 @@ function SurahPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [surahId, verses?.length]);
 
+  useEffect(() => {
+    if (chapter) {
+      recordView({
+        kind: "surah",
+        surah: chapter.id,
+        label: surahDisplayName(chapter.id, lang),
+      });
+    }
+  }, [chapter, lang, recordView]);
+
   return (
     <div className={`min-h-screen bg-background ${uiClass}`} dir={isRtl ? "rtl" : "ltr"}>
       <Header />
