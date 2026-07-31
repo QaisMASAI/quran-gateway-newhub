@@ -15,7 +15,7 @@ export const Route = createFileRoute("/hadith/$collection")({
     links: [{ rel: "canonical", href: `/hadith/${params.collection}` }],
   }),
   loader: async ({ context, params }) => {
-    if (!["bukhari", "muslim"].includes(params.collection)) throw notFound();
+    if (!params.collection || params.collection.trim().length === 0) throw notFound();
     await Promise.all([
       context.queryClient.ensureQueryData({
         queryKey: ["hadith", "books", params.collection],
@@ -37,7 +37,12 @@ function HadithCollectionPage() {
   const Chev = isRtl ? ChevronLeft : ChevronRight;
   const booksFn = useServerFn(listHadithBooks);
   const collFn = useServerFn(listHadithCollections);
-  const { data: books = [], isLoading: booksLoading, isError: booksError, refetch: refetchBooks } = useQuery({
+  const {
+    data: books = [],
+    isLoading: booksLoading,
+    isError: booksError,
+    refetch: refetchBooks,
+  } = useQuery({
     queryKey: ["hadith", "books", collection],
     queryFn: () => booksFn({ data: { collection } }),
   });
@@ -65,17 +70,11 @@ function HadithCollectionPage() {
         )}
 
         <div className="mt-6 divide-y divide-border rounded-2xl border border-border bg-card">
-          {booksLoading && (
-            <div className="px-4 py-3 text-sm text-muted-foreground">Loading books…</div>
-          )}
+          {booksLoading && <div className="px-4 py-3 text-sm text-muted-foreground">Loading books…</div>}
           {(booksError || collectionsError) && (
             <div className="px-4 py-3 text-sm text-destructive">
               Failed to load this collection.
-              <button
-                type="button"
-                onClick={() => void refetchBooks()}
-                className="ms-2 underline underline-offset-2"
-              >
+              <button type="button" onClick={() => void refetchBooks()} className="ms-2 underline underline-offset-2">
                 Retry
               </button>
             </div>
