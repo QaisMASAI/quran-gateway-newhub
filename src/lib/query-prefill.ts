@@ -14,7 +14,15 @@ export type QueryPrefillResult = {
 };
 
 const MAX_QUERY_LENGTH = 240;
-const CONTROL_CHARS = /[\u0000-\u001f\u007f]/g;
+
+function stripControlChars(value: string): string {
+  return Array.from(value)
+    .filter((char) => {
+      const code = char.charCodeAt(0);
+      return code > 31 && code !== 127;
+    })
+    .join("");
+}
 
 export function parseQueryPrefill(raw: unknown): QueryPrefillResult {
   const base = parseQueryPrefillRaw(raw);
@@ -33,7 +41,7 @@ function parseQueryPrefillRaw(raw: unknown): Omit<QueryPrefillResult, "src"> {
     return { q: "", qState: "invalid" };
   }
 
-  const withoutControls = raw.replace(CONTROL_CHARS, "");
+  const withoutControls = stripControlChars(raw);
   const trimmed = withoutControls.trim();
 
   if (!trimmed) {
