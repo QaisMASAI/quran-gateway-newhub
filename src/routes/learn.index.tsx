@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
@@ -50,16 +51,7 @@ export const Route = createFileRoute("/learn/")({
   component: LearnIndex,
 });
 
-const ORDER: EntityKind[] = [
-  "topic",
-  "prophet",
-  "story",
-  "event",
-  "place",
-  "nation",
-  "concept",
-  "theme",
-];
+const ORDER: EntityKind[] = ["topic", "prophet", "story", "event", "place", "nation", "concept", "theme"];
 
 const TOPIC_ICONS = {
   heart: Heart,
@@ -84,8 +76,20 @@ function LearnIndex() {
     staleTime: 5 * 60_000,
   });
 
-  const kindLabel = (k: EntityKind) =>
-    t(`search.kind${k.charAt(0).toUpperCase()}${k.slice(1)}` as const);
+  // Handle hash deep-linking (e.g., #topics-library, #story-library, #prophet-library)
+  useEffect(() => {
+    if (typeof window !== "undefined" && window.location.hash) {
+      const id = window.location.hash.replace("#", "");
+      const elem = document.getElementById(id);
+      if (elem) {
+        setTimeout(() => {
+          elem.scrollIntoView({ behavior: "smooth", block: "start" });
+        }, 100);
+      }
+    }
+  }, []);
+
+  const kindLabel = (k: EntityKind) => t(`search.kind${k.charAt(0).toUpperCase()}${k.slice(1)}` as const);
   const sectionLabel = (k: EntityKind) => {
     if (k === "topic") return t("learn.browseTopics");
     if (k === "prophet") return t("learn.browseProphets");
@@ -182,12 +186,7 @@ function LearnIndex() {
           <p className="mb-4 text-sm text-muted-foreground">{t("topics.intro")}</p>
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {ALL_TOPICS.map((topic) => (
-              <LearnTopicCard
-                key={topic.slug}
-                slug={topic.slug}
-                icon={topic.icon}
-                refsCount={topic.refs.length}
-              />
+              <LearnTopicCard key={topic.slug} slug={topic.slug} icon={topic.icon} refsCount={topic.refs.length} />
             ))}
           </div>
         </section>
