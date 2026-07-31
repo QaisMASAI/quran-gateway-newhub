@@ -17,6 +17,7 @@ import {
 import ReactMarkdown from "react-markdown";
 import { useTranslation } from "react-i18next";
 import { useAudioPlayer } from "@/lib/audio-player-context";
+import { sanitizeArabicText } from "@/utils/text";
 import { cleanText, normalizeHebrew, RECITERS, reciterName, type ReciterKey } from "@/lib/quran-api";
 import { useFavorites } from "@/lib/favorites";
 import { useQuery } from "@tanstack/react-query";
@@ -144,7 +145,7 @@ export function AyahCard({ surah, surahName, ayah, arabic, hebrew, highlight, ma
   const connectedVerses = useMemo(() => getConnectedVerses(surah, ayah, 4), [surah, ayah]);
   const [reading] = useReadingSettings();
   const displayArabic = useMemo(
-    () => (reading.stripTashkil ? stripArabicDiacritics(arabic) : arabic),
+    () => sanitizeArabicText(reading.stripTashkil ? stripArabicDiacritics(arabic) : arabic),
     [arabic, reading.stripTashkil],
   );
   const articleRef = useRef<HTMLElement | null>(null);
@@ -219,22 +220,15 @@ export function AyahCard({ surah, surahName, ayah, arabic, hebrew, highlight, ma
           </span>
         </div>
 
-        <ActionBtn onClick={() => setHifzMasked((v) => !v)} active={hifzMasked}>
-          {hifzMasked ? <EyeOff className="h-3.5 w-3.5 text-gold" /> : <Eye className="h-3.5 w-3.5" />}
-          <span>
-            {hifzMasked
-              ? locale === "ar"
-                ? "إظهار الترجمة"
-                : locale === "he"
-                  ? "הצג תרגום"
-                  : "Show Text"
-              : locale === "ar"
-                ? "وضع الحفظ"
-                : locale === "he"
-                  ? "מצב שינון"
-                  : "Hifz Mode"}
-          </span>
-        </ActionBtn>
+        {/* Hifz Mode — hidden in Arabic UI since translation is not shown in AR */}
+        {locale !== "ar" && (
+          <ActionBtn onClick={() => setHifzMasked((v) => !v)} active={hifzMasked}>
+            {hifzMasked ? <EyeOff className="h-3.5 w-3.5 text-gold" /> : <Eye className="h-3.5 w-3.5" />}
+            <span>
+              {hifzMasked ? (locale === "he" ? "הצג תרגום" : "Show Text") : locale === "he" ? "מצב שינון" : "Hifz Mode"}
+            </span>
+          </ActionBtn>
+        )}
 
         <ActionBtn onClick={() => openPanel("tafsir")} active={panel === "tafsir"}>
           <Sparkles className="h-3.5 w-3.5" />
