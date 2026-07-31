@@ -15,7 +15,7 @@ type Props = {
 
 function stripMarkdown(input: string) {
   return input
-    .replace(/[`*_>#\[\]()!-]/g, " ")
+    .replace(/[`*_>#\\[\\]()!-]/g, " ")
     .replace(/\s+/g, " ")
     .trim();
 }
