@@ -1,260 +1,1564 @@
 {
   "entities": [
-    {"kind":"prophet","slug":"adam","title":{"he":"אדם","ar":"آدم","en":"Adam"},"summary":{"he":"האדם הראשון שנברא ולימד את שמות הדברים.","ar":"أول البشر، خلقه الله وعلّمه الأسماء.","en":"The first human, created by God and taught the names of all things."},"keywords":["adam","first human","creation"]},
-    {"kind":"prophet","slug":"nuh","title":{"he":"נח","ar":"نوح","en":"Noah"},"summary":{"he":"קרא לעמו לאמונה במשך מאות שנים ובנה את התיבה.","ar":"دعا قومه قروناً وبنى السفينة بأمر الله.","en":"Called his people to faith for centuries and built the ark by God's command."},"keywords":["noah","ark","flood"]},
-    {"kind":"prophet","slug":"ibrahim","title":{"he":"אברהם","ar":"إبراهيم","en":"Abraham"},"summary":{"he":"אבי הנביאים, שבר את האלילים והקריב מטעם אהבת האל.","ar":"خليل الرحمن وأبو الأنبياء، حطّم الأصنام وضحّى طاعةً لله.","en":"Friend of God and father of the prophets; broke the idols and offered sacrifice in obedience to God."},"keywords":["abraham","monotheism","kaaba"]},
-    {"kind":"prophet","slug":"ismail","title":{"he":"ישמעאל","ar":"إسماعيل","en":"Ishmael"},"summary":{"he":"בנו של אברהם, סייע בבניית הכעבה במכה.","ar":"ابن إبراهيم، شارك في بناء الكعبة بمكة.","en":"Son of Abraham; helped build the Kaaba in Mecca."},"keywords":["ishmael","kaaba","mecca"]},
-    {"kind":"prophet","slug":"ishaq","title":{"he":"יצחק","ar":"إسحاق","en":"Isaac"},"summary":{"he":"בנו של אברהם ומנביאי בני ישראל.","ar":"ابن إبراهيم ومن أنبياء بني إسرائيل.","en":"Son of Abraham and a prophet of the Children of Israel."},"keywords":["isaac"]},
-    {"kind":"prophet","slug":"yaqub","title":{"he":"יעקב","ar":"يعقوب","en":"Jacob"},"summary":{"he":"אבי השבטים, חיכה בסבלנות לשובו של יוסף.","ar":"أبو الأسباط، صبر حتى عاد إليه يوسف.","en":"Father of the tribes; waited patiently for the return of Joseph."},"keywords":["jacob","israel"]},
-    {"kind":"prophet","slug":"yusuf","title":{"he":"יוסף","ar":"يوسف","en":"Joseph"},"summary":{"he":"סיפור של חלום, גלות, סליחה ועלייה לשלטון במצרים.","ar":"قصة الرؤيا والغربة والعفو والتمكين في مصر.","en":"A story of a dream, exile, forgiveness, and rising to power in Egypt."},"keywords":["joseph","dreams","egypt"]},
-    {"kind":"prophet","slug":"musa","title":{"he":"משה","ar":"موسى","en":"Moses"},"summary":{"he":"הוציא את בני ישראל מעבדות במצרים ודיבר עם האל בהר סיני.","ar":"أخرج بني إسرائيل من فرعون وكلّمه الله في الطور.","en":"Led the Children of Israel out of Pharaoh's bondage and spoke with God at Mount Sinai."},"keywords":["moses","pharaoh","sinai","exodus"]},
-    {"kind":"prophet","slug":"harun","title":{"he":"אהרון","ar":"هارون","en":"Aaron"},"summary":{"he":"אחיו של משה ושותפו במשימת הקריאה לפרעה.","ar":"أخو موسى وشريكه في دعوة فرعون.","en":"Brother of Moses and his partner in the mission to Pharaoh."},"keywords":["aaron"]},
-    {"kind":"prophet","slug":"dawud","title":{"he":"דוד","ar":"داود","en":"David"},"summary":{"he":"מלך ונביא שניתנו לו ה'זבּוּר' וכוח לרכך את הברזל.","ar":"ملك ونبي أوتي الزبور وأُلين له الحديد.","en":"King and prophet given the Psalms and the power to shape iron."},"keywords":["david","psalms","zabur"]},
-    {"kind":"prophet","slug":"sulayman","title":{"he":"שלמה","ar":"سليمان","en":"Solomon"},"summary":{"he":"מלך חכם ששלט באדם, בחיות וברוחות.","ar":"ملك حكيم سُخّر له الإنس والجن والريح.","en":"A wise king who ruled over people, animals, and the unseen."},"keywords":["solomon","wisdom","jinn"]},
-    {"kind":"prophet","slug":"ayyub","title":{"he":"איוב","ar":"أيوب","en":"Job"},"summary":{"he":"דוגמה מופתית לסבלנות מול מחלה ואובדן.","ar":"مثال الصبر على المرض والبلاء.","en":"A model of patience through illness and loss."},"keywords":["job","patience","sabr"]},
-    {"kind":"prophet","slug":"yunus","title":{"he":"יונה","ar":"يونس","en":"Jonah"},"summary":{"he":"נביא שנבלע בלוויתן ויצא לאחר תפילה וחזרה בתשובה.","ar":"نبيٌّ التقمه الحوت ثم نجّاه الله بعد التسبيح والتوبة.","en":"A prophet swallowed by the great fish and saved after prayer and repentance."},"keywords":["jonah","whale","repentance"]},
-    {"kind":"prophet","slug":"zakariyya","title":{"he":"זכריה","ar":"زكريا","en":"Zechariah"},"summary":{"he":"קיבל את הבשורה על בנו יחיא בעת זקנה.","ar":"بُشّر بابنه يحيى على كِبَر.","en":"Given the good news of his son John in his old age."},"keywords":["zechariah"]},
-    {"kind":"prophet","slug":"yahya","title":{"he":"יוחנן המטביל","ar":"يحيى","en":"John the Baptist"},"summary":{"he":"נביא ירא־אל וצנוע, בנו של זכריה.","ar":"نبيٌّ تقيٌّ زاهد، ابن زكريا.","en":"A devout, humble prophet, son of Zechariah."},"keywords":["john","yahya"]},
-    {"kind":"prophet","slug":"isa","title":{"he":"ישוע","ar":"عيسى","en":"Jesus"},"summary":{"he":"בנה של מרים, חולל נסים ובישר על אחדות האל.","ar":"ابن مريم، أيّده الله بالمعجزات ودعا إلى التوحيد.","en":"Son of Mary; performed miracles and called people to the oneness of God."},"keywords":["jesus","mary","messiah"]},
-    {"kind":"prophet","slug":"muhammad","title":{"he":"מוחמד","ar":"محمد","en":"Muhammad"},"summary":{"he":"הנביא האחרון, אליו ניתן הקוראן כהדרכה לכל האנושות.","ar":"خاتم الأنبياء، أُنزل عليه القرآن هدًى للناس.","en":"The final prophet, to whom the Qur'an was revealed as guidance for all humanity."},"keywords":["muhammad","quran","seal of prophets"]},
-    {"kind":"prophet","slug":"hud","title":{"he":"הוד","ar":"هود","en":"Hud"},"summary":{"he":"נביא לעם עאד, קרא להם לעזוב את האלילות.","ar":"نبيٌّ بُعث إلى عاد ودعاهم إلى التوحيد.","en":"A prophet sent to the people of 'Ad, calling them away from idolatry."},"keywords":["hud","aad"]},
-    {"kind":"prophet","slug":"salih","title":{"he":"צאלח","ar":"صالح","en":"Salih"},"summary":{"he":"נביא לעם תַ'מוּד; הנאקה הייתה אות מהאל.","ar":"نبيٌّ بُعث إلى ثمود، وكانت الناقة آية ربه.","en":"A prophet to the people of Thamud; the she-camel was his sign from God."},"keywords":["salih","thamud","camel"]},
-    {"kind":"prophet","slug":"shuayb","title":{"he":"שוּעַייב","ar":"شعيب","en":"Shu'ayb"},"summary":{"he":"נביא למדיין שקרא ליושר במסחר ובמשקלות.","ar":"نبيٌّ بُعث إلى مدين يدعو إلى العدل في الميزان.","en":"A prophet to Midian who called for honesty in trade and measure."},"keywords":["shuayb","midian"]},
-    {"kind":"prophet","slug":"lut","title":{"he":"לוט","ar":"لوط","en":"Lot"},"summary":{"he":"קרא לעמו לזנוח את העוול והשחיתות.","ar":"دعا قومه إلى ترك الفاحشة والظلم.","en":"Called his people to abandon corruption and wrongdoing."},"keywords":["lot"]},
-    {"kind":"prophet","slug":"idris","title":{"he":"חנוך","ar":"إدريس","en":"Idris"},"summary":{"he":"איש אמת ונביא שהורם למעלה.","ar":"نبيٌّ صدّيقٌ رفعه الله مكاناً عليّاً.","en":"A truthful prophet whom God raised to a high place."},"keywords":["idris","enoch"]},
+    {
+      "kind": "prophet",
+      "slug": "adam",
+      "title": { "he": "אדם", "ar": "آدم", "en": "Adam" },
+      "summary": {
+        "he": "האדם הראשון שנברא ולימד את שמות הדברים.",
+        "ar": "أول البشر، خلقه الله وعلّمه الأسماء.",
+        "en": "The first human, created by God and taught the names of all things."
+      },
+      "keywords": ["adam", "first human", "creation"]
+    },
+    {
+      "kind": "prophet",
+      "slug": "nuh",
+      "title": { "he": "נח", "ar": "نوح", "en": "Noah" },
+      "summary": {
+        "he": "קרא לעמו לאמונה במשך מאות שנים ובנה את התיבה.",
+        "ar": "دعا قومه قروناً وبنى السفينة بأمر الله.",
+        "en": "Called his people to faith for centuries and built the ark by God's command."
+      },
+      "keywords": ["noah", "ark", "flood"]
+    },
+    {
+      "kind": "prophet",
+      "slug": "ibrahim",
+      "title": { "he": "אברהם", "ar": "إبراهيم", "en": "Abraham" },
+      "summary": {
+        "he": "אבי הנביאים, שבר את האלילים והקריב מטעם אהבת האל.",
+        "ar": "خليل الرحمن وأبو الأنبياء، حطّم الأصنام وضحّى طاعةً لله.",
+        "en": "Friend of God and father of the prophets; broke the idols and offered sacrifice in obedience to God."
+      },
+      "keywords": ["abraham", "monotheism", "kaaba"]
+    },
+    {
+      "kind": "prophet",
+      "slug": "ismail",
+      "title": { "he": "ישמעאל", "ar": "إسماعيل", "en": "Ishmael" },
+      "summary": {
+        "he": "בנו של אברהם, סייע בבניית הכעבה במכה.",
+        "ar": "ابن إبراهيم، شارك في بناء الكعبة بمكة.",
+        "en": "Son of Abraham; helped build the Kaaba in Mecca."
+      },
+      "keywords": ["ishmael", "kaaba", "mecca"]
+    },
+    {
+      "kind": "prophet",
+      "slug": "ishaq",
+      "title": { "he": "יצחק", "ar": "إسحاق", "en": "Isaac" },
+      "summary": {
+        "he": "בנו של אברהם ומנביאי בני ישראל.",
+        "ar": "ابن إبراهيم ومن أنبياء بني إسرائيل.",
+        "en": "Son of Abraham and a prophet of the Children of Israel."
+      },
+      "keywords": ["isaac"]
+    },
+    {
+      "kind": "prophet",
+      "slug": "yaqub",
+      "title": { "he": "יעקב", "ar": "يعقوب", "en": "Jacob" },
+      "summary": {
+        "he": "אבי השבטים, חיכה בסבלנות לשובו של יוסף.",
+        "ar": "أبو الأسباط، صبر حتى عاد إليه يوسف.",
+        "en": "Father of the tribes; waited patiently for the return of Joseph."
+      },
+      "keywords": ["jacob", "israel"]
+    },
+    {
+      "kind": "prophet",
+      "slug": "yusuf",
+      "title": { "he": "יוסף", "ar": "يوسف", "en": "Joseph" },
+      "summary": {
+        "he": "סיפור של חלום, גלות, סליחה ועלייה לשלטון במצרים.",
+        "ar": "قصة الرؤيا والغربة والعفو والتمكين في مصر.",
+        "en": "A story of a dream, exile, forgiveness, and rising to power in Egypt."
+      },
+      "keywords": ["joseph", "dreams", "egypt"]
+    },
+    {
+      "kind": "prophet",
+      "slug": "musa",
+      "title": { "he": "משה", "ar": "موسى", "en": "Moses" },
+      "summary": {
+        "he": "הוציא את בני ישראל מעבדות במצרים ודיבר עם האל בהר סיני.",
+        "ar": "أخرج بني إسرائيل من فرعون وكلّمه الله في الطور.",
+        "en": "Led the Children of Israel out of Pharaoh's bondage and spoke with God at Mount Sinai."
+      },
+      "keywords": ["moses", "pharaoh", "sinai", "exodus"]
+    },
+    {
+      "kind": "prophet",
+      "slug": "harun",
+      "title": { "he": "אהרון", "ar": "هارون", "en": "Aaron" },
+      "summary": {
+        "he": "אחיו של משה ושותפו במשימת הקריאה לפרעה.",
+        "ar": "أخو موسى وشريكه في دعوة فرعون.",
+        "en": "Brother of Moses and his partner in the mission to Pharaoh."
+      },
+      "keywords": ["aaron"]
+    },
+    {
+      "kind": "prophet",
+      "slug": "dawud",
+      "title": { "he": "דוד", "ar": "داود", "en": "David" },
+      "summary": {
+        "he": "מלך ונביא שניתנו לו ה'זבּוּר' וכוח לרכך את הברזל.",
+        "ar": "ملك ونبي أوتي الزبور وأُلين له الحديد.",
+        "en": "King and prophet given the Psalms and the power to shape iron."
+      },
+      "keywords": ["david", "psalms", "zabur"]
+    },
+    {
+      "kind": "prophet",
+      "slug": "sulayman",
+      "title": { "he": "שלמה", "ar": "سليمان", "en": "Solomon" },
+      "summary": {
+        "he": "מלך חכם ששלט באדם, בחיות וברוחות.",
+        "ar": "ملك حكيم سُخّر له الإنس والجن والريح.",
+        "en": "A wise king who ruled over people, animals, and the unseen."
+      },
+      "keywords": ["solomon", "wisdom", "jinn"]
+    },
+    {
+      "kind": "prophet",
+      "slug": "ayyub",
+      "title": { "he": "איוב", "ar": "أيوب", "en": "Job" },
+      "summary": {
+        "he": "דוגמה מופתית לסבלנות מול מחלה ואובדן.",
+        "ar": "مثال الصبر على المرض والبلاء.",
+        "en": "A model of patience through illness and loss."
+      },
+      "keywords": ["job", "patience", "sabr"]
+    },
+    {
+      "kind": "prophet",
+      "slug": "yunus",
+      "title": { "he": "יונה", "ar": "يونس", "en": "Jonah" },
+      "summary": {
+        "he": "נביא שנבלע בלוויתן ויצא לאחר תפילה וחזרה בתשובה.",
+        "ar": "نبيٌّ التقمه الحوت ثم نجّاه الله بعد التسبيح والتوبة.",
+        "en": "A prophet swallowed by the great fish and saved after prayer and repentance."
+      },
+      "keywords": ["jonah", "whale", "repentance"]
+    },
+    {
+      "kind": "prophet",
+      "slug": "zakariyya",
+      "title": { "he": "זכריה", "ar": "زكريا", "en": "Zechariah" },
+      "summary": {
+        "he": "קיבל את הבשורה על בנו יחיא בעת זקנה.",
+        "ar": "بُشّر بابنه يحيى على كِبَر.",
+        "en": "Given the good news of his son John in his old age."
+      },
+      "keywords": ["zechariah"]
+    },
+    {
+      "kind": "prophet",
+      "slug": "yahya",
+      "title": { "he": "יוחנן המטביל", "ar": "يحيى", "en": "John the Baptist" },
+      "summary": {
+        "he": "נביא ירא־אל וצנוע, בנו של זכריה.",
+        "ar": "نبيٌّ تقيٌّ زاهد، ابن زكريا.",
+        "en": "A devout, humble prophet, son of Zechariah."
+      },
+      "keywords": ["john", "yahya"]
+    },
+    {
+      "kind": "prophet",
+      "slug": "isa",
+      "title": { "he": "ישוע", "ar": "عيسى", "en": "Jesus" },
+      "summary": {
+        "he": "בנה של מרים, חולל נסים ובישר על אחדות האל.",
+        "ar": "ابن مريم، أيّده الله بالمعجزات ودعا إلى التوحيد.",
+        "en": "Son of Mary; performed miracles and called people to the oneness of God."
+      },
+      "keywords": ["jesus", "mary", "messiah"]
+    },
+    {
+      "kind": "prophet",
+      "slug": "muhammad",
+      "title": { "he": "מוחמד", "ar": "محمد", "en": "Muhammad" },
+      "summary": {
+        "he": "הנביא האחרון, אליו ניתן הקוראן כהדרכה לכל האנושות.",
+        "ar": "خاتم الأنبياء، أُنزل عليه القرآن هدًى للناس.",
+        "en": "The final prophet, to whom the Qur'an was revealed as guidance for all humanity."
+      },
+      "keywords": ["muhammad", "quran", "seal of prophets"]
+    },
+    {
+      "kind": "prophet",
+      "slug": "hud",
+      "title": { "he": "הוד", "ar": "هود", "en": "Hud" },
+      "summary": {
+        "he": "נביא לעם עאד, קרא להם לעזוב את האלילות.",
+        "ar": "نبيٌّ بُعث إلى عاد ودعاهم إلى التوحيد.",
+        "en": "A prophet sent to the people of 'Ad, calling them away from idolatry."
+      },
+      "keywords": ["hud", "aad"]
+    },
+    {
+      "kind": "prophet",
+      "slug": "salih",
+      "title": { "he": "צאלח", "ar": "صالح", "en": "Salih" },
+      "summary": {
+        "he": "נביא לעם תַ'מוּד; הנאקה הייתה אות מהאל.",
+        "ar": "نبيٌّ بُعث إلى ثمود، وكانت الناقة آية ربه.",
+        "en": "A prophet to the people of Thamud; the she-camel was his sign from God."
+      },
+      "keywords": ["salih", "thamud", "camel"]
+    },
+    {
+      "kind": "prophet",
+      "slug": "shuayb",
+      "title": { "he": "שוּעַייב", "ar": "شعيب", "en": "Shu'ayb" },
+      "summary": {
+        "he": "נביא למדיין שקרא ליושר במסחר ובמשקלות.",
+        "ar": "نبيٌّ بُعث إلى مدين يدعو إلى العدل في الميزان.",
+        "en": "A prophet to Midian who called for honesty in trade and measure."
+      },
+      "keywords": ["shuayb", "midian"]
+    },
+    {
+      "kind": "prophet",
+      "slug": "lut",
+      "title": { "he": "לוט", "ar": "لوط", "en": "Lot" },
+      "summary": {
+        "he": "קרא לעמו לזנוח את העוול והשחיתות.",
+        "ar": "دعا قومه إلى ترك الفاحشة والظلم.",
+        "en": "Called his people to abandon corruption and wrongdoing."
+      },
+      "keywords": ["lot"]
+    },
+    {
+      "kind": "prophet",
+      "slug": "idris",
+      "title": { "he": "חנוך", "ar": "إدريس", "en": "Idris" },
+      "summary": {
+        "he": "איש אמת ונביא שהורם למעלה.",
+        "ar": "نبيٌّ صدّيقٌ رفعه الله مكاناً عليّاً.",
+        "en": "A truthful prophet whom God raised to a high place."
+      },
+      "keywords": ["idris", "enoch"]
+    },
 
-    {"kind":"topic","slug":"tawhid","title":{"he":"ייחוד האל","ar":"التوحيد","en":"Oneness of God"},"summary":{"he":"היסוד של האסלאם — שיש רק אל אחד, ללא שותפים.","ar":"أصل الإسلام: لا إله إلا الله، لا شريك له.","en":"The core of Islam: there is only one God, with no partners."},"keywords":["tawhid","monotheism","oneness"]},
-    {"kind":"topic","slug":"prayer","title":{"he":"תפילה","ar":"الصلاة","en":"Prayer"},"summary":{"he":"חמש תפילות יומיות שמחברות בין המאמין לאל.","ar":"الصلوات الخمس التي تربط المؤمن بربه يومياً.","en":"The five daily prayers that connect a believer to God."},"keywords":["salah","prayer","worship"]},
-    {"kind":"topic","slug":"fasting","title":{"he":"צום","ar":"الصيام","en":"Fasting"},"summary":{"he":"הימנעות מאוכל ושתייה מהזריחה ועד השקיעה ברמדאן.","ar":"الإمساك عن الطعام والشراب من الفجر إلى المغرب في رمضان.","en":"Abstaining from food and drink from dawn to sunset during Ramadan."},"keywords":["sawm","fasting","ramadan"]},
-    {"kind":"topic","slug":"zakat","title":{"he":"זכאת","ar":"الزكاة","en":"Zakat"},"summary":{"he":"חובת תרומה שנתית לנזקקים — טיהור הרכוש.","ar":"حقٌّ سنويٌّ في المال للفقراء يُطهّر الرزق.","en":"An annual obligatory share of wealth given to those in need; purifies one's wealth."},"keywords":["zakat","charity","wealth"]},
-    {"kind":"topic","slug":"hajj","title":{"he":"חאג'","ar":"الحج","en":"Hajj"},"summary":{"he":"עלייה לרגל למכה, פעם בחיים למי שיכול.","ar":"حج البيت لمن استطاع إليه سبيلاً مرة في العمر.","en":"The pilgrimage to Mecca, required once in a lifetime for those able."},"keywords":["hajj","pilgrimage","mecca"]},
-    {"kind":"topic","slug":"charity","title":{"he":"צדקה","ar":"الصدقة","en":"Charity"},"summary":{"he":"נתינה התנדבותית מעבר לזכאת — סימן לחמלה.","ar":"العطاء التطوعي زيادة على الزكاة، علامة الرحمة.","en":"Voluntary giving beyond zakat — a sign of compassion."},"keywords":["sadaqah","giving"]},
-    {"kind":"topic","slug":"patience","title":{"he":"סבלנות","ar":"الصبر","en":"Patience"},"summary":{"he":"להתמודד עם קשיים מבלי לאבד אמונה.","ar":"تحمّل المصائب دون فقدان الإيمان.","en":"Enduring difficulty without losing faith."},"keywords":["sabr","patience"]},
-    {"kind":"topic","slug":"mercy","title":{"he":"רחמים","ar":"الرحمة","en":"Mercy"},"summary":{"he":"תכונת היסוד של האל ושל המאמינים.","ar":"صفة الله الأولى وخُلق المؤمنين.","en":"God's foremost attribute and the believer's character."},"keywords":["mercy","rahma"]},
-    {"kind":"topic","slug":"justice","title":{"he":"צדק","ar":"العدل","en":"Justice"},"summary":{"he":"להתייחס לכל אדם בהוגנות, גם כשזה קשה.","ar":"إنصاف الناس ولو على النفس.","en":"Treating every person fairly, even when difficult."},"keywords":["adl","justice"]},
-    {"kind":"topic","slug":"knowledge","title":{"he":"ידע","ar":"العلم","en":"Knowledge"},"summary":{"he":"לימוד והבנה — מצווה דתית ראשונה במעלה.","ar":"طلب العلم فريضة على كل مسلم.","en":"Seeking and understanding knowledge is a primary religious duty."},"keywords":["ilm","knowledge","learning"]},
-    {"kind":"topic","slug":"parents","title":{"he":"הורים","ar":"الوالدان","en":"Parents"},"summary":{"he":"כיבוד ההורים נזכר לצד עבודת האל.","ar":"بر الوالدين قُرن بعبادة الله.","en":"Honoring parents is paired with the worship of God itself."},"keywords":["parents","family"]},
-    {"kind":"topic","slug":"creation","title":{"he":"בריאה","ar":"الخلق","en":"Creation"},"summary":{"he":"הקוראן מתאר את השמיים, הארץ והאדם כסימני האל.","ar":"يشير القرآن إلى السماوات والأرض والإنسان كآيات.","en":"The Qur'an points to the heavens, earth, and humanity as signs of God."},"keywords":["creation","signs"]},
-    {"kind":"topic","slug":"afterlife","title":{"he":"חיים שלאחר המוות","ar":"الآخرة","en":"Afterlife"},"summary":{"he":"האמונה ביום הדין, בגן ובאש.","ar":"الإيمان بيوم القيامة والجنة والنار.","en":"Belief in the Day of Judgment, the Garden, and the Fire."},"keywords":["akhirah","afterlife"]},
-    {"kind":"topic","slug":"repentance","title":{"he":"חזרה בתשובה","ar":"التوبة","en":"Repentance"},"summary":{"he":"דלת פתוחה תמיד — האל אוהב את החוזרים אליו.","ar":"باب التوبة مفتوح، والله يحب التوابين.","en":"An always-open door — God loves those who turn back to Him."},"keywords":["tawba","repentance"]},
-    {"kind":"topic","slug":"gratitude","title":{"he":"הכרת הטוב","ar":"الشكر","en":"Gratitude"},"summary":{"he":"להכיר בטוב שניתן — דרך הראייה של המאמין.","ar":"شكر النعم خُلق المؤمن.","en":"Recognizing what we have been given — the believer's lens on life."},"keywords":["shukr","gratitude"]},
-    {"kind":"topic","slug":"trust-in-god","title":{"he":"ביטחון באל","ar":"التوكل","en":"Trust in God"},"summary":{"he":"לעשות את שביכולתך ולסמוך על האל בשאר.","ar":"بذل الأسباب مع الاعتماد على الله.","en":"Doing what you can and entrusting the rest to God."},"keywords":["tawakkul"]},
-    {"kind":"topic","slug":"honesty","title":{"he":"יושר","ar":"الصدق","en":"Honesty"},"summary":{"he":"דיבור אמת ועמידה בהבטחות — לב האסלאם.","ar":"الصدق في القول والوفاء بالعهد.","en":"Speaking truth and keeping promises — at the heart of the faith."},"keywords":["sidq","truthfulness"]},
-    {"kind":"topic","slug":"humility","title":{"he":"ענווה","ar":"التواضع","en":"Humility"},"summary":{"he":"לראות את עצמך כעבד האל לפני האנשים.","ar":"خفض الجناح للمؤمنين.","en":"Carrying oneself gently before God and others."},"keywords":["humility","tawadu"]},
-    {"kind":"topic","slug":"forgiveness","title":{"he":"סליחה","ar":"العفو","en":"Forgiveness"},"summary":{"he":"לוותר על עלבונות כדי לזכות בסליחת האל.","ar":"العفو عمن أساء طلباً لمغفرة الله.","en":"Letting go of grievances in hope of God's forgiveness."},"keywords":["forgiveness","afw"]},
-    {"kind":"topic","slug":"family","title":{"he":"משפחה","ar":"الأسرة","en":"Family"},"summary":{"he":"זוגיות, ילדים וקרובים — מעגל החמלה הראשון.","ar":"الزوج والأبناء والأرحام دائرة الرحمة الأولى.","en":"Spouse, children, and relatives — the first circle of compassion."},"keywords":["family","kinship"]},
-    {"kind":"topic","slug":"good-character","title":{"he":"מידות טובות","ar":"حسن الخلق","en":"Good Character"},"summary":{"he":"היחס לאחרים הוא המבחן האמיתי לאמונה.","ar":"حسن المعاملة ميزان الإيمان.","en":"How you treat others is the true measure of faith."},"keywords":["akhlaq","character"]},
-    {"kind":"topic","slug":"community","title":{"he":"קהילה","ar":"الأمة","en":"Community"},"summary":{"he":"המאמינים כגוף אחד שעוזרים זה לזה.","ar":"المؤمنون كالجسد الواحد يتعاطفون ويتعاونون.","en":"Believers as one body, supporting one another."},"keywords":["ummah","community"]},
+    {
+      "kind": "topic",
+      "slug": "tawhid",
+      "title": { "he": "ייחוד האל", "ar": "التوحيد", "en": "Oneness of God" },
+      "summary": {
+        "he": "היסוד של האסלאם — שיש רק אל אחד, ללא שותפים.",
+        "ar": "أصل الإسلام: لا إله إلا الله، لا شريك له.",
+        "en": "The core of Islam: there is only one God, with no partners."
+      },
+      "keywords": ["tawhid", "monotheism", "oneness"]
+    },
+    {
+      "kind": "topic",
+      "slug": "prayer",
+      "title": { "he": "תפילה", "ar": "الصلاة", "en": "Prayer" },
+      "summary": {
+        "he": "חמש תפילות יומיות שמחברות בין המאמין לאל.",
+        "ar": "الصلوات الخمس التي تربط المؤمن بربه يومياً.",
+        "en": "The five daily prayers that connect a believer to God."
+      },
+      "keywords": ["salah", "prayer", "worship"]
+    },
+    {
+      "kind": "topic",
+      "slug": "fasting",
+      "title": { "he": "צום", "ar": "الصيام", "en": "Fasting" },
+      "summary": {
+        "he": "הימנעות מאוכל ושתייה מהזריחה ועד השקיעה ברמדאן.",
+        "ar": "الإمساك عن الطعام والشراب من الفجر إلى المغرب في رمضان.",
+        "en": "Abstaining from food and drink from dawn to sunset during Ramadan."
+      },
+      "keywords": ["sawm", "fasting", "ramadan"]
+    },
+    {
+      "kind": "topic",
+      "slug": "zakat",
+      "title": { "he": "זכאת", "ar": "الزكاة", "en": "Zakat" },
+      "summary": {
+        "he": "חובת תרומה שנתית לנזקקים — טיהור הרכוש.",
+        "ar": "حقٌّ سنويٌّ في المال للفقراء يُطهّر الرزق.",
+        "en": "An annual obligatory share of wealth given to those in need; purifies one's wealth."
+      },
+      "keywords": ["zakat", "charity", "wealth"]
+    },
+    {
+      "kind": "topic",
+      "slug": "hajj",
+      "title": { "he": "חאג'", "ar": "الحج", "en": "Hajj" },
+      "summary": {
+        "he": "עלייה לרגל למכה, פעם בחיים למי שיכול.",
+        "ar": "حج البيت لمن استطاع إليه سبيلاً مرة في العمر.",
+        "en": "The pilgrimage to Mecca, required once in a lifetime for those able."
+      },
+      "keywords": ["hajj", "pilgrimage", "mecca"]
+    },
+    {
+      "kind": "topic",
+      "slug": "charity",
+      "title": { "he": "צדקה", "ar": "الصدقة", "en": "Charity" },
+      "summary": {
+        "he": "נתינה התנדבותית מעבר לזכאת — סימן לחמלה.",
+        "ar": "العطاء التطوعي زيادة على الزكاة، علامة الرحمة.",
+        "en": "Voluntary giving beyond zakat — a sign of compassion."
+      },
+      "keywords": ["sadaqah", "giving"]
+    },
+    {
+      "kind": "topic",
+      "slug": "patience",
+      "title": { "he": "סבלנות", "ar": "الصبر", "en": "Patience" },
+      "summary": {
+        "he": "להתמודד עם קשיים מבלי לאבד אמונה.",
+        "ar": "تحمّل المصائب دون فقدان الإيمان.",
+        "en": "Enduring difficulty without losing faith."
+      },
+      "keywords": ["sabr", "patience"]
+    },
+    {
+      "kind": "topic",
+      "slug": "mercy",
+      "title": { "he": "רחמים", "ar": "الرحمة", "en": "Mercy" },
+      "summary": {
+        "he": "תכונת היסוד של האל ושל המאמינים.",
+        "ar": "صفة الله الأولى وخُلق المؤمنين.",
+        "en": "God's foremost attribute and the believer's character."
+      },
+      "keywords": ["mercy", "rahma"]
+    },
+    {
+      "kind": "topic",
+      "slug": "justice",
+      "title": { "he": "צדק", "ar": "العدل", "en": "Justice" },
+      "summary": {
+        "he": "להתייחס לכל אדם בהוגנות, גם כשזה קשה.",
+        "ar": "إنصاف الناس ولو على النفس.",
+        "en": "Treating every person fairly, even when difficult."
+      },
+      "keywords": ["adl", "justice"]
+    },
+    {
+      "kind": "topic",
+      "slug": "knowledge",
+      "title": { "he": "ידע", "ar": "العلم", "en": "Knowledge" },
+      "summary": {
+        "he": "לימוד והבנה — מצווה דתית ראשונה במעלה.",
+        "ar": "طلب العلم فريضة على كل مسلم.",
+        "en": "Seeking and understanding knowledge is a primary religious duty."
+      },
+      "keywords": ["ilm", "knowledge", "learning"]
+    },
+    {
+      "kind": "topic",
+      "slug": "parents",
+      "title": { "he": "הורים", "ar": "الوالدان", "en": "Parents" },
+      "summary": {
+        "he": "כיבוד ההורים נזכר לצד עבודת האל.",
+        "ar": "بر الوالدين قُرن بعبادة الله.",
+        "en": "Honoring parents is paired with the worship of God itself."
+      },
+      "keywords": ["parents", "family"]
+    },
+    {
+      "kind": "topic",
+      "slug": "creation",
+      "title": { "he": "בריאה", "ar": "الخلق", "en": "Creation" },
+      "summary": {
+        "he": "הקוראן מתאר את השמיים, הארץ והאדם כסימני האל.",
+        "ar": "يشير القرآن إلى السماوات والأرض والإنسان كآيات.",
+        "en": "The Qur'an points to the heavens, earth, and humanity as signs of God."
+      },
+      "keywords": ["creation", "signs"]
+    },
+    {
+      "kind": "topic",
+      "slug": "afterlife",
+      "title": { "he": "חיים שלאחר המוות", "ar": "الآخرة", "en": "Afterlife" },
+      "summary": {
+        "he": "האמונה ביום הדין, בגן ובאש.",
+        "ar": "الإيمان بيوم القيامة والجنة والنار.",
+        "en": "Belief in the Day of Judgment, the Garden, and the Fire."
+      },
+      "keywords": ["akhirah", "afterlife"]
+    },
+    {
+      "kind": "topic",
+      "slug": "repentance",
+      "title": { "he": "חזרה בתשובה", "ar": "التوبة", "en": "Repentance" },
+      "summary": {
+        "he": "דלת פתוחה תמיד — האל אוהב את החוזרים אליו.",
+        "ar": "باب التوبة مفتوح، والله يحب التوابين.",
+        "en": "An always-open door — God loves those who turn back to Him."
+      },
+      "keywords": ["tawba", "repentance"]
+    },
+    {
+      "kind": "topic",
+      "slug": "gratitude",
+      "title": { "he": "הכרת הטוב", "ar": "الشكر", "en": "Gratitude" },
+      "summary": {
+        "he": "להכיר בטוב שניתן — דרך הראייה של המאמין.",
+        "ar": "شكر النعم خُلق المؤمن.",
+        "en": "Recognizing what we have been given — the believer's lens on life."
+      },
+      "keywords": ["shukr", "gratitude"]
+    },
+    {
+      "kind": "topic",
+      "slug": "trust-in-god",
+      "title": { "he": "ביטחון באל", "ar": "التوكل", "en": "Trust in God" },
+      "summary": {
+        "he": "לעשות את שביכולתך ולסמוך על האל בשאר.",
+        "ar": "بذل الأسباب مع الاعتماد على الله.",
+        "en": "Doing what you can and entrusting the rest to God."
+      },
+      "keywords": ["tawakkul"]
+    },
+    {
+      "kind": "topic",
+      "slug": "honesty",
+      "title": { "he": "יושר", "ar": "الصدق", "en": "Honesty" },
+      "summary": {
+        "he": "דיבור אמת ועמידה בהבטחות — לב האסלאם.",
+        "ar": "الصدق في القول والوفاء بالعهد.",
+        "en": "Speaking truth and keeping promises — at the heart of the faith."
+      },
+      "keywords": ["sidq", "truthfulness"]
+    },
+    {
+      "kind": "topic",
+      "slug": "humility",
+      "title": { "he": "ענווה", "ar": "التواضع", "en": "Humility" },
+      "summary": {
+        "he": "לראות את עצמך כעבד האל לפני האנשים.",
+        "ar": "خفض الجناح للمؤمنين.",
+        "en": "Carrying oneself gently before God and others."
+      },
+      "keywords": ["humility", "tawadu"]
+    },
+    {
+      "kind": "topic",
+      "slug": "forgiveness",
+      "title": { "he": "סליחה", "ar": "العفو", "en": "Forgiveness" },
+      "summary": {
+        "he": "לוותר על עלבונות כדי לזכות בסליחת האל.",
+        "ar": "العفو عمن أساء طلباً لمغفرة الله.",
+        "en": "Letting go of grievances in hope of God's forgiveness."
+      },
+      "keywords": ["forgiveness", "afw"]
+    },
+    {
+      "kind": "topic",
+      "slug": "family",
+      "title": { "he": "משפחה", "ar": "الأسرة", "en": "Family" },
+      "summary": {
+        "he": "זוגיות, ילדים וקרובים — מעגל החמלה הראשון.",
+        "ar": "الزوج والأبناء والأرحام دائرة الرحمة الأولى.",
+        "en": "Spouse, children, and relatives — the first circle of compassion."
+      },
+      "keywords": ["family", "kinship"]
+    },
+    {
+      "kind": "topic",
+      "slug": "good-character",
+      "title": { "he": "מידות טובות", "ar": "حسن الخلق", "en": "Good Character" },
+      "summary": {
+        "he": "היחס לאחרים הוא המבחן האמיתי לאמונה.",
+        "ar": "حسن المعاملة ميزان الإيمان.",
+        "en": "How you treat others is the true measure of faith."
+      },
+      "keywords": ["akhlaq", "character"]
+    },
+    {
+      "kind": "topic",
+      "slug": "community",
+      "title": { "he": "קהילה", "ar": "الأمة", "en": "Community" },
+      "summary": {
+        "he": "המאמינים כגוף אחד שעוזרים זה לזה.",
+        "ar": "المؤمنون كالجسد الواحد يتعاطفون ويتعاونون.",
+        "en": "Believers as one body, supporting one another."
+      },
+      "keywords": ["ummah", "community"]
+    },
 
-    {"kind":"story","slug":"creation-of-adam","title":{"he":"בריאת אדם","ar":"خلق آدم","en":"The Creation of Adam"},"summary":{"he":"האל ברא את אדם ולימד אותו את שמות הדברים — המלאכים נצטוו להשתחוות.","ar":"خلق الله آدم وعلّمه الأسماء، وأمر الملائكة بالسجود له.","en":"God created Adam, taught him the names of things, and commanded the angels to bow."},"keywords":["adam","creation","angels"]},
-    {"kind":"story","slug":"flood-of-nuh","title":{"he":"המבול של נח","ar":"طوفان نوح","en":"The Flood of Noah"},"summary":{"he":"לאחר שנים של אזהרות, המאמינים ניצלו בתיבה.","ar":"بعد سنين من الدعوة نجا المؤمنون في السفينة.","en":"After years of warnings, the believers were saved aboard the ark."},"keywords":["flood","ark","noah"]},
-    {"kind":"story","slug":"sacrifice-of-ibrahim","title":{"he":"עקדת ישמעאל","ar":"تضحية إبراهيم","en":"Abraham's Sacrifice"},"summary":{"he":"מבחן הציות — אברהם הוכן להקריב את בנו והאל פדה אותו בכבש.","ar":"اختبار الطاعة: همّ إبراهيم بذبح ابنه ففداه الله بكبش.","en":"A test of obedience — Abraham prepared to sacrifice his son and God ransomed him with a ram."},"keywords":["sacrifice","ibrahim","ismail"]},
-    {"kind":"story","slug":"yusuf-and-his-brothers","title":{"he":"יוסף ואחיו","ar":"يوسف وإخوته","en":"Joseph and His Brothers"},"summary":{"he":"חלום, בור, בית האסורים, וסופו של דבר — מחילה והתאחדות.","ar":"رؤيا وبئر وسجن ثم عفو ولقاء.","en":"A dream, a well, a prison — and finally forgiveness and reunion."},"keywords":["yusuf","joseph","forgiveness"]},
-    {"kind":"story","slug":"exodus-of-musa","title":{"he":"יציאת מצרים של משה","ar":"خروج موسى","en":"The Exodus of Moses"},"summary":{"he":"משה הוציא את עמו וקרע את הים מול פרעה.","ar":"أخرج موسى قومه وانفلق البحر أمام فرعون.","en":"Moses led his people out and the sea parted before Pharaoh."},"keywords":["moses","pharaoh","exodus","sea"]},
-    {"kind":"story","slug":"birth-of-isa","title":{"he":"לידת ישוע","ar":"ميلاد عيسى","en":"The Birth of Jesus"},"summary":{"he":"מרים זכתה ללידה ניסית בעוד היא בתולה.","ar":"وُلد عيسى من مريم العذراء بمعجزة.","en":"Mary was given a miraculous birth as a virgin mother."},"keywords":["jesus","mary","virgin birth"]},
-    {"kind":"story","slug":"cave-of-hira","title":{"he":"מערת חירא","ar":"غار حراء","en":"The Cave of Hira"},"summary":{"he":"במערה זו קיבל מוחמד את ההתגלות הראשונה.","ar":"في هذا الغار نزل الوحي أول مرة على محمد.","en":"In this cave Muhammad received the first revelation."},"keywords":["hira","revelation","first"]},
-    {"kind":"story","slug":"hijra","title":{"he":"ההיג'רה","ar":"الهجرة","en":"The Hijra"},"summary":{"he":"הגירת המאמינים ממכה למדינה — תחילת הקהילה המוסלמית.","ar":"هجرة المسلمين من مكة إلى المدينة وبداية الأمة.","en":"The migration of the believers from Mecca to Medina — the start of the Muslim community."},"keywords":["hijra","migration"]},
-    {"kind":"story","slug":"night-journey","title":{"he":"מסע הלילה","ar":"الإسراء والمعراج","en":"The Night Journey"},"summary":{"he":"מסע הנס של מוחמד למסגד אל־אקצא ולשמיים.","ar":"رحلة الإسراء والمعراج إلى المسجد الأقصى والسماوات العلا.","en":"Muhammad's miraculous journey to Jerusalem and through the heavens."},"keywords":["isra","miraj","jerusalem"]},
-    {"kind":"story","slug":"battle-of-badr","title":{"he":"קרב בדר","ar":"غزوة بدر","en":"The Battle of Badr"},"summary":{"he":"ניצחון מכריע לקהילה הצעירה במדינה.","ar":"النصر الفاصل للمجتمع المسلم الناشئ.","en":"A decisive victory for the young Medinan community."},"keywords":["badr","battle"]},
-    {"kind":"story","slug":"conquest-of-mecca","title":{"he":"כיבוש מכה","ar":"فتح مكة","en":"The Opening of Mecca"},"summary":{"he":"כניסה שקטה למכה ומחילה רחבה לתושביה.","ar":"دخل المسلمون مكة سلماً وعفا النبي عن أهلها.","en":"A peaceful entry into Mecca and a sweeping pardon for its people."},"keywords":["fath","mecca","conquest"]},
-    {"kind":"story","slug":"farewell-sermon","title":{"he":"דרשת הפרידה","ar":"خطبة الوداع","en":"The Farewell Sermon"},"summary":{"he":"הנביא נשא דרשה אחרונה על שוויון, צדק וזכויות.","ar":"خطبة النبي الأخيرة عن المساواة والعدل والحقوق.","en":"The Prophet's final sermon on equality, justice, and rights."},"keywords":["farewell","sermon"]},
+    {
+      "kind": "story",
+      "slug": "creation-of-adam",
+      "title": { "he": "בריאת אדם", "ar": "خلق آدم", "en": "The Creation of Adam" },
+      "summary": {
+        "he": "האל ברא את אדם ולימד אותו את שמות הדברים — המלאכים נצטוו להשתחוות.",
+        "ar": "خلق الله آدم وعلّمه الأسماء، وأمر الملائكة بالسجود له.",
+        "en": "God created Adam, taught him the names of things, and commanded the angels to bow."
+      },
+      "keywords": ["adam", "creation", "angels"]
+    },
+    {
+      "kind": "story",
+      "slug": "flood-of-nuh",
+      "title": { "he": "המבול של נח", "ar": "طوفان نوح", "en": "The Flood of Noah" },
+      "summary": {
+        "he": "לאחר שנים של אזהרות, המאמינים ניצלו בתיבה.",
+        "ar": "بعد سنين من الدعوة نجا المؤمنون في السفينة.",
+        "en": "After years of warnings, the believers were saved aboard the ark."
+      },
+      "keywords": ["flood", "ark", "noah"]
+    },
+    {
+      "kind": "story",
+      "slug": "sacrifice-of-ibrahim",
+      "title": { "he": "עקדת ישמעאל", "ar": "تضحية إبراهيم", "en": "Abraham's Sacrifice" },
+      "summary": {
+        "he": "מבחן הציות — אברהם הוכן להקריב את בנו והאל פדה אותו בכבש.",
+        "ar": "اختبار الطاعة: همّ إبراهيم بذبح ابنه ففداه الله بكبش.",
+        "en": "A test of obedience — Abraham prepared to sacrifice his son and God ransomed him with a ram."
+      },
+      "keywords": ["sacrifice", "ibrahim", "ismail"]
+    },
+    {
+      "kind": "story",
+      "slug": "yusuf-and-his-brothers",
+      "title": { "he": "יוסף ואחיו", "ar": "يوسف وإخوته", "en": "Joseph and His Brothers" },
+      "summary": {
+        "he": "חלום, בור, בית האסורים, וסופו של דבר — מחילה והתאחדות.",
+        "ar": "رؤيا وبئر وسجن ثم عفو ولقاء.",
+        "en": "A dream, a well, a prison — and finally forgiveness and reunion."
+      },
+      "keywords": ["yusuf", "joseph", "forgiveness"]
+    },
+    {
+      "kind": "story",
+      "slug": "exodus-of-musa",
+      "title": { "he": "יציאת מצרים של משה", "ar": "خروج موسى", "en": "The Exodus of Moses" },
+      "summary": {
+        "he": "משה הוציא את עמו וקרע את הים מול פרעה.",
+        "ar": "أخرج موسى قومه وانفلق البحر أمام فرعون.",
+        "en": "Moses led his people out and the sea parted before Pharaoh."
+      },
+      "keywords": ["moses", "pharaoh", "exodus", "sea"]
+    },
+    {
+      "kind": "story",
+      "slug": "birth-of-isa",
+      "title": { "he": "לידת ישוע", "ar": "ميلاد عيسى", "en": "The Birth of Jesus" },
+      "summary": {
+        "he": "מרים זכתה ללידה ניסית בעוד היא בתולה.",
+        "ar": "وُلد عيسى من مريم العذراء بمعجزة.",
+        "en": "Mary was given a miraculous birth as a virgin mother."
+      },
+      "keywords": ["jesus", "mary", "virgin birth"]
+    },
+    {
+      "kind": "story",
+      "slug": "cave-of-hira",
+      "title": { "he": "מערת חירא", "ar": "غار حراء", "en": "The Cave of Hira" },
+      "summary": {
+        "he": "במערה זו קיבל מוחמד את ההתגלות הראשונה.",
+        "ar": "في هذا الغار نزل الوحي أول مرة على محمد.",
+        "en": "In this cave Muhammad received the first revelation."
+      },
+      "keywords": ["hira", "revelation", "first"]
+    },
+    {
+      "kind": "story",
+      "slug": "hijra",
+      "title": { "he": "ההיג'רה", "ar": "الهجرة", "en": "The Hijra" },
+      "summary": {
+        "he": "הגירת המאמינים ממכה למדינה — תחילת הקהילה המוסלמית.",
+        "ar": "هجرة المسلمين من مكة إلى المدينة وبداية الأمة.",
+        "en": "The migration of the believers from Mecca to Medina — the start of the Muslim community."
+      },
+      "keywords": ["hijra", "migration"]
+    },
+    {
+      "kind": "story",
+      "slug": "night-journey",
+      "title": { "he": "מסע הלילה", "ar": "الإسراء والمعراج", "en": "The Night Journey" },
+      "summary": {
+        "he": "מסע הנס של מוחמד למסגד אל־אקצא ולשמיים.",
+        "ar": "رحلة الإسراء والمعراج إلى المسجد الأقصى والسماوات العلا.",
+        "en": "Muhammad's miraculous journey to Jerusalem and through the heavens."
+      },
+      "keywords": ["isra", "miraj", "jerusalem"]
+    },
+    {
+      "kind": "story",
+      "slug": "battle-of-badr",
+      "title": { "he": "קרב בדר", "ar": "غزوة بدر", "en": "The Battle of Badr" },
+      "summary": {
+        "he": "ניצחון מכריע לקהילה הצעירה במדינה.",
+        "ar": "النصر الفاصل للمجتمع المسلم الناشئ.",
+        "en": "A decisive victory for the young Medinan community."
+      },
+      "keywords": ["badr", "battle"]
+    },
+    {
+      "kind": "story",
+      "slug": "conquest-of-mecca",
+      "title": { "he": "כיבוש מכה", "ar": "فتح مكة", "en": "The Opening of Mecca" },
+      "summary": {
+        "he": "כניסה שקטה למכה ומחילה רחבה לתושביה.",
+        "ar": "دخل المسلمون مكة سلماً وعفا النبي عن أهلها.",
+        "en": "A peaceful entry into Mecca and a sweeping pardon for its people."
+      },
+      "keywords": ["fath", "mecca", "conquest"]
+    },
+    {
+      "kind": "story",
+      "slug": "farewell-sermon",
+      "title": { "he": "דרשת הפרידה", "ar": "خطبة الوداع", "en": "The Farewell Sermon" },
+      "summary": {
+        "he": "הנביא נשא דרשה אחרונה על שוויון, צדק וזכויות.",
+        "ar": "خطبة النبي الأخيرة عن المساواة والعدل والحقوق.",
+        "en": "The Prophet's final sermon on equality, justice, and rights."
+      },
+      "keywords": ["farewell", "sermon"]
+    },
+    {
+      "kind": "story",
+      "slug": "people-of-the-cave",
+      "title": { "he": "אנשי המערה", "ar": "أصحاب الكهف", "en": "The Companions of the Cave" },
+      "summary": {
+        "he": "צעירים מאמינים שמצאו מקלט במערה מול רדיפה והאל הירדם אותם למאבק שנים.",
+        "ar": "فتية آمنوا بربهم فزادهم هدى، ولجؤوا إلى الكهف فراراً بدينهم.",
+        "en": "Young believers who sought refuge in a cave to escape persecution, and God slept them for centuries."
+      },
+      "keywords": ["kahf", "cave", "sleepers"]
+    },
+    {
+      "kind": "story",
+      "slug": "dhul-qarnayn",
+      "title": { "he": "דול-קרניין והסכר", "ar": "ذو القرنين", "en": "Dhul-Qarnayn and the Great Barrier" },
+      "summary": {
+        "he": "מלך צדיק שנסע במזרח ובמערב ובנה סכר ברזל ונחושת להגן על עם מחלש.",
+        "ar": "ملك صالح طاف الأرض شرقاً وغرباً وبنى سداً لحماية القوم الضغفاء.",
+        "en": "A righteous ruler who traveled east and west, building an iron and brass wall to protect people."
+      },
+      "keywords": ["dhul-qarnayn", "wall", "gog", "magog"]
+    },
+    {
+      "kind": "story",
+      "slug": "khidr-and-musa",
+      "title": { "he": "משה ואל-ח'דר", "ar": "موسى والخضر", "en": "Moses and Al-Khidr" },
+      "summary": {
+        "he": "מסע של משה ללמוד חכמה נסתרת וסבלנות מפי עבד צדיק של האל.",
+        "ar": "رحلة موسى لطلب العلم والتحلي بالصبر مع عبد آتاه الله رحمة وعِلماً.",
+        "en": "Moses' journey to seek divine wisdom and patience from a servant blessed with special knowledge."
+      },
+      "keywords": ["khidr", "moses", "wisdom", "kahf"]
+    },
+    {
+      "kind": "story",
+      "slug": "luqman-advice",
+      "title": { "he": "עצות לוקמאן לבנו", "ar": "وصايا لقمان", "en": "Luqman's Advice to His Son" },
+      "summary": {
+        "he": "חכם שהוריש לבנו הדרכה לחיים: אמונה באל אחד, כיבוד הורים, ענווה ותפילה.",
+        "ar": "حكيم يعظ ابنه بالتوحيد وبر الوالدين وإقامة الصلاة والتواضع في المشي والقول.",
+        "en": "A wise man's timeless advice to his son: worshiping God alone, honoring parents, prayer, and humility."
+      },
+      "keywords": ["luqman", "advice", "wisdom", "father"]
+    },
+    {
+      "kind": "story",
+      "slug": "qarun-wealth",
+      "title": { "he": "קרח ועוצרו", "ar": "قارون وكنوزه", "en": "Qarun and His Treasures" },
+      "summary": {
+        "he": "איש מעם משה שהתגאה בעושרו הרב ונבלע באדמה בגלל גאוותו.",
+        "ar": "من قوم موسى آتاه الله من الكنوز ما إن مفاتحه لتنوء بالعصبة، فاستكبر فخسف الله به وبداره الأرض.",
+        "en": "A wealthy man from Moses' people who grew arrogant over his vast riches and was swallowed by the earth."
+      },
+      "keywords": ["qarun", "wealth", "pride", "punishment"]
+    },
+    {
+      "kind": "story",
+      "slug": "people-of-the-elephant",
+      "title": { "he": "אנשי הפיל", "ar": "أصحاب الفيل", "en": "The Companions of the Elephant" },
+      "summary": {
+        "he": "צבאו של אברהה שבא להרוס את הכעבה והושמד בציפורי אבאביל.",
+        "ar": "جيش أبرهة القادم لهدم الكعبة، فأرسل الله عليهم طيراً أبابيل أهلكتهم.",
+        "en": "Abrahah's army that marched to destroy the Kaaba and was wiped out by birds sending stones of baked clay."
+      },
+      "keywords": ["fil", "elephant", "mecca", "ababil"]
+    },
+    {
+      "kind": "story",
+      "slug": "story-of-maryam",
+      "title": { "he": "מרים במקדש", "ar": "قصة مريم", "en": "Mary in the Sanctuary" },
+      "summary": {
+        "he": "מרים הצדקת שגדלה בחסד האל והתברכה בנס הלידה של ישוע.",
+        "ar": "المصطفاة الطاهرة التي كفلها زكريا وبُشّرت بكلمة من الله وهو عيسى.",
+        "en": "The pure, chosen woman raised under God's grace who was blessed with the miraculous birth of Jesus."
+      },
+      "keywords": ["maryam", "mary", "sanctuary", "jesus"]
+    },
+    {
+      "kind": "story",
+      "slug": "two-gardens",
+      "title": { "he": "בעל שתי הגנות", "ar": "صاحب الجنتين", "en": "The Owner of Two Gardens" },
+      "summary": {
+        "he": "משל על אדם שהתגאה בגניו והתכחש ליום הדין, עד שגניו נהרסו.",
+        "ar": "مثل رجلين جعل الله لأحدهما جنتين فاستكبر ونسي ربه فأُحيط بثمره.",
+        "en": "A parable of a man arrogant over his prosperous gardens who forgot God until his wealth vanished."
+      },
+      "keywords": ["gardens", "arrogance", "parable", "kahf"]
+    },
 
-    {"kind":"place","slug":"mecca","title":{"he":"מכה","ar":"مكة","en":"Mecca"},"summary":{"he":"עיר הולדתו של הנביא וביתה של הכעבה.","ar":"مسقط رأس النبي وموضع الكعبة.","en":"The Prophet's birthplace and home of the Kaaba."},"keywords":["mecca","kaaba"]},
-    {"kind":"place","slug":"medina","title":{"he":"מדינה","ar":"المدينة","en":"Medina"},"summary":{"he":"העיר שקלטה את המהגרים והייתה לבירה הראשונה.","ar":"المدينة المنورة، عاصمة الإسلام الأولى.","en":"The city that received the migrants and became Islam's first capital."},"keywords":["medina"]},
-    {"kind":"place","slug":"jerusalem","title":{"he":"ירושלים","ar":"القدس","en":"Jerusalem"},"summary":{"he":"מקום מסע הלילה והכיוון הראשון לתפילה.","ar":"موضع الإسراء والقبلة الأولى للمسلمين.","en":"Site of the Night Journey and the first direction of prayer."},"keywords":["jerusalem","quds","aqsa"]},
-    {"kind":"place","slug":"sinai","title":{"he":"הר סיני","ar":"الطور","en":"Mount Sinai"},"summary":{"he":"שם דיבר האל עם משה.","ar":"حيث كلّم الله موسى.","en":"Where God spoke to Moses."},"keywords":["sinai","tur"]},
-    {"kind":"place","slug":"kaaba","title":{"he":"הכעבה","ar":"الكعبة","en":"The Kaaba"},"summary":{"he":"הבית הקדוש במכה שבנו אברהם וישמעאל.","ar":"البيت الحرام الذي رفع قواعده إبراهيم وإسماعيل.","en":"The Sacred House in Mecca built by Abraham and Ishmael."},"keywords":["kaaba","sacred house"]},
-    {"kind":"place","slug":"cave-of-thawr","title":{"he":"מערת ת'אור","ar":"غار ثور","en":"Cave of Thawr"},"summary":{"he":"במערה זו הסתתרו הנביא ואבו בכר בדרך להיג'רה.","ar":"اختبأ فيها النبي وأبو بكر أثناء الهجرة.","en":"Where the Prophet and Abu Bakr hid during the Hijra."},"keywords":["thawr","hijra"]},
-    {"kind":"place","slug":"egypt","title":{"he":"מצרים","ar":"مصر","en":"Egypt"},"summary":{"he":"זירת סיפורי יוסף ומשה בקוראן.","ar":"موطن قصة يوسف وقصة موسى وفرعون.","en":"Setting of the stories of Joseph and of Moses and Pharaoh."},"keywords":["egypt","pharaoh"]},
-    {"kind":"place","slug":"madyan","title":{"he":"מדיין","ar":"مدين","en":"Midian"},"summary":{"he":"העיר של שוּעַייב, ובה מצא משה מקלט.","ar":"بلد شعيب التي لجأ إليها موسى.","en":"The town of Shu'ayb, where Moses also took refuge."},"keywords":["midian"]},
+    {
+      "kind": "place",
+      "slug": "mecca",
+      "title": { "he": "מכה", "ar": "مكة", "en": "Mecca" },
+      "summary": {
+        "he": "עיר הולדתו של הנביא וביתה של הכעבה.",
+        "ar": "مسقط رأس النبي وموضع الكعبة.",
+        "en": "The Prophet's birthplace and home of the Kaaba."
+      },
+      "keywords": ["mecca", "kaaba"]
+    },
+    {
+      "kind": "place",
+      "slug": "medina",
+      "title": { "he": "מדינה", "ar": "المدينة", "en": "Medina" },
+      "summary": {
+        "he": "העיר שקלטה את המהגרים והייתה לבירה הראשונה.",
+        "ar": "المدينة المنورة، عاصمة الإسلام الأولى.",
+        "en": "The city that received the migrants and became Islam's first capital."
+      },
+      "keywords": ["medina"]
+    },
+    {
+      "kind": "place",
+      "slug": "jerusalem",
+      "title": { "he": "ירושלים", "ar": "القدس", "en": "Jerusalem" },
+      "summary": {
+        "he": "מקום מסע הלילה והכיוון הראשון לתפילה.",
+        "ar": "موضع الإسراء والقبلة الأولى للمسلمين.",
+        "en": "Site of the Night Journey and the first direction of prayer."
+      },
+      "keywords": ["jerusalem", "quds", "aqsa"]
+    },
+    {
+      "kind": "place",
+      "slug": "sinai",
+      "title": { "he": "הר סיני", "ar": "الطور", "en": "Mount Sinai" },
+      "summary": { "he": "שם דיבר האל עם משה.", "ar": "حيث كلّم الله موسى.", "en": "Where God spoke to Moses." },
+      "keywords": ["sinai", "tur"]
+    },
+    {
+      "kind": "place",
+      "slug": "kaaba",
+      "title": { "he": "הכעבה", "ar": "الكعبة", "en": "The Kaaba" },
+      "summary": {
+        "he": "הבית הקדוש במכה שבנו אברהם וישמעאל.",
+        "ar": "البيت الحرام الذي رفع قواعده إبراهيم وإسماعيل.",
+        "en": "The Sacred House in Mecca built by Abraham and Ishmael."
+      },
+      "keywords": ["kaaba", "sacred house"]
+    },
+    {
+      "kind": "place",
+      "slug": "cave-of-thawr",
+      "title": { "he": "מערת ת'אור", "ar": "غار ثور", "en": "Cave of Thawr" },
+      "summary": {
+        "he": "במערה זו הסתתרו הנביא ואבו בכר בדרך להיג'רה.",
+        "ar": "اختبأ فيها النبي وأبو بكر أثناء الهجرة.",
+        "en": "Where the Prophet and Abu Bakr hid during the Hijra."
+      },
+      "keywords": ["thawr", "hijra"]
+    },
+    {
+      "kind": "place",
+      "slug": "egypt",
+      "title": { "he": "מצרים", "ar": "مصر", "en": "Egypt" },
+      "summary": {
+        "he": "זירת סיפורי יוסף ומשה בקוראן.",
+        "ar": "موطن قصة يوسف وقصة موسى وفرعون.",
+        "en": "Setting of the stories of Joseph and of Moses and Pharaoh."
+      },
+      "keywords": ["egypt", "pharaoh"]
+    },
+    {
+      "kind": "place",
+      "slug": "madyan",
+      "title": { "he": "מדיין", "ar": "مدين", "en": "Midian" },
+      "summary": {
+        "he": "העיר של שוּעַייב, ובה מצא משה מקלט.",
+        "ar": "بلد شعيب التي لجأ إليها موسى.",
+        "en": "The town of Shu'ayb, where Moses also took refuge."
+      },
+      "keywords": ["midian"]
+    },
 
-    {"kind":"concept","slug":"iman","title":{"he":"אמונה","ar":"الإيمان","en":"Faith (Iman)"},"summary":{"he":"אמונה באל, במלאכים, בכתבים, בנביאים, ביום הדין ובגזירה.","ar":"الإيمان بالله وملائكته وكتبه ورسله واليوم الآخر والقدر.","en":"Belief in God, His angels, books, messengers, the Last Day, and divine decree."},"keywords":["iman","faith","beliefs"]},
-    {"kind":"concept","slug":"taqwa","title":{"he":"יראת אל","ar":"التقوى","en":"God-consciousness (Taqwa)"},"summary":{"he":"ערנות פנימית להישמר מהאסור ולעשות את הטוב.","ar":"حذرٌ من المعاصي وسعيٌ إلى الطاعات.","en":"An inner awareness that keeps one away from harm and toward good."},"keywords":["taqwa","piety"]},
-    {"kind":"concept","slug":"jannah","title":{"he":"גן עדן","ar":"الجنة","en":"Paradise (Jannah)"},"summary":{"he":"המקום שמובטח לצדיקים בעולם הבא.","ar":"الدار التي وعد الله بها الصالحين.","en":"The home promised to the righteous in the next life."},"keywords":["jannah","paradise"]},
-    {"kind":"concept","slug":"jahannam","title":{"he":"גהינום","ar":"جهنم","en":"Hell (Jahannam)"},"summary":{"he":"עונש בעולם הבא — אזהרה ולא ייאוש.","ar":"عقابُ الآخرة — تحذيرٌ لا يأس.","en":"Punishment in the next life — a warning, not despair."},"keywords":["jahannam","hell"]},
-    {"kind":"concept","slug":"qadar","title":{"he":"גזירה","ar":"القدر","en":"Divine Decree (Qadar)"},"summary":{"he":"האמונה שהכל קורה בידיעת האל.","ar":"الإيمان بأن كل شيء يجري بعلم الله.","en":"Belief that all things unfold within God's knowledge."},"keywords":["qadar","decree"]},
-    {"kind":"concept","slug":"angels","title":{"he":"מלאכים","ar":"الملائكة","en":"Angels"},"summary":{"he":"יצורי אור שמשרתים את האל ונושאים את ההתגלות.","ar":"عبادٌ مكرمون ينفذون أمر الله.","en":"Beings of light who serve God and carry revelation."},"keywords":["angels","malaika"]},
-    {"kind":"concept","slug":"books","title":{"he":"כתבי קודש","ar":"الكتب السماوية","en":"Revealed Books"},"summary":{"he":"תורת משה, זבּוּר של דוד, האונגיליון של ישוע, הקוראן.","ar":"التوراة والزبور والإنجيل والقرآن.","en":"The Torah, Psalms, Gospel, and Qur'an."},"keywords":["books","torah","gospel","quran"]},
-    {"kind":"concept","slug":"prophethood","title":{"he":"נבואה","ar":"النبوة","en":"Prophethood"},"summary":{"he":"שליחי האל לאורך הדורות נושאים את אותה הקריאה.","ar":"رسل الله عبر العصور يحملون رسالة واحدة.","en":"Messengers across the ages who carry the same call."},"keywords":["prophethood","nubuwwa"]},
-    {"kind":"concept","slug":"day-of-judgment","title":{"he":"יום הדין","ar":"يوم القيامة","en":"Day of Judgment"},"summary":{"he":"היום בו ייסגרו חשבונותינו לפני האל.","ar":"اليوم الذي تُحاسب فيه النفس عند ربها.","en":"The day when every soul will be accountable before God."},"keywords":["judgment","qiyamah"]},
-    {"kind":"concept","slug":"shirk","title":{"he":"שיתוף","ar":"الشرك","en":"Associating partners with God (Shirk)"},"summary":{"he":"החטא הכבד ביותר — לייחס לאל שותפים.","ar":"أعظم الذنوب: جعل شريك مع الله.","en":"The gravest wrong — ascribing partners to God."},"keywords":["shirk"]},
-    {"kind":"concept","slug":"halal-haram","title":{"he":"מותר ואסור","ar":"الحلال والحرام","en":"Lawful and Unlawful"},"summary":{"he":"גבולות ברורים שהאל קבע להגן על האדם.","ar":"حدود الله للحفاظ على الإنسان.","en":"Clear limits God set to protect human life and dignity."},"keywords":["halal","haram"]},
-    {"kind":"concept","slug":"dua","title":{"he":"תפילת בקשה","ar":"الدعاء","en":"Personal Prayer (Du'a)"},"summary":{"he":"שיחה אישית עם האל בכל זמן ובכל מקום.","ar":"مناجاة الله في كل وقت ومكان.","en":"A personal conversation with God, anytime and anywhere."},"keywords":["dua","supplication"]},
-    {"kind":"concept","slug":"quran","title":{"he":"הקוראן","ar":"القرآن","en":"The Qur'an"},"summary":{"he":"דבר האל שניתן למוחמד דרך גבריאל לאורך 23 שנים.","ar":"كلام الله المنزل على محمد على مدى ٢٣ عاماً عبر جبريل.","en":"God's words revealed to Muhammad through Gabriel over 23 years."},"keywords":["quran","revelation"]},
-    {"kind":"concept","slug":"sunnah","title":{"he":"סונה","ar":"السنة","en":"Sunnah"},"summary":{"he":"דרכו ומנהגיו של הנביא — דוגמה חיה לקוראן.","ar":"سيرة النبي وأقواله وأفعاله، نموذج حي للقرآن.","en":"The Prophet's example — a lived embodiment of the Qur'an."},"keywords":["sunnah","prophet's example"]},
-    {"kind":"concept","slug":"five-pillars","title":{"he":"חמשת העמודים","ar":"أركان الإسلام","en":"Five Pillars"},"summary":{"he":"עדות, תפילה, זכאת, צום, חאג'.","ar":"الشهادة والصلاة والزكاة والصوم والحج.","en":"Testimony, prayer, zakat, fasting, and pilgrimage."},"keywords":["pillars","arkan"]},
+    {
+      "kind": "concept",
+      "slug": "iman",
+      "title": { "he": "אמונה", "ar": "الإيمان", "en": "Faith (Iman)" },
+      "summary": {
+        "he": "אמונה באל, במלאכים, בכתבים, בנביאים, ביום הדין ובגזירה.",
+        "ar": "الإيمان بالله وملائكته وكتبه ورسله واليوم الآخر والقدر.",
+        "en": "Belief in God, His angels, books, messengers, the Last Day, and divine decree."
+      },
+      "keywords": ["iman", "faith", "beliefs"]
+    },
+    {
+      "kind": "concept",
+      "slug": "taqwa",
+      "title": { "he": "יראת אל", "ar": "التقوى", "en": "God-consciousness (Taqwa)" },
+      "summary": {
+        "he": "ערנות פנימית להישמר מהאסור ולעשות את הטוב.",
+        "ar": "حذرٌ من المعاصي وسعيٌ إلى الطاعات.",
+        "en": "An inner awareness that keeps one away from harm and toward good."
+      },
+      "keywords": ["taqwa", "piety"]
+    },
+    {
+      "kind": "concept",
+      "slug": "jannah",
+      "title": { "he": "גן עדן", "ar": "الجنة", "en": "Paradise (Jannah)" },
+      "summary": {
+        "he": "המקום שמובטח לצדיקים בעולם הבא.",
+        "ar": "الدار التي وعد الله بها الصالحين.",
+        "en": "The home promised to the righteous in the next life."
+      },
+      "keywords": ["jannah", "paradise"]
+    },
+    {
+      "kind": "concept",
+      "slug": "jahannam",
+      "title": { "he": "גהינום", "ar": "جهنم", "en": "Hell (Jahannam)" },
+      "summary": {
+        "he": "עונש בעולם הבא — אזהרה ולא ייאוש.",
+        "ar": "عقابُ الآخرة — تحذيرٌ لا يأس.",
+        "en": "Punishment in the next life — a warning, not despair."
+      },
+      "keywords": ["jahannam", "hell"]
+    },
+    {
+      "kind": "concept",
+      "slug": "qadar",
+      "title": { "he": "גזירה", "ar": "القدر", "en": "Divine Decree (Qadar)" },
+      "summary": {
+        "he": "האמונה שהכל קורה בידיעת האל.",
+        "ar": "الإيمان بأن كل شيء يجري بعلم الله.",
+        "en": "Belief that all things unfold within God's knowledge."
+      },
+      "keywords": ["qadar", "decree"]
+    },
+    {
+      "kind": "concept",
+      "slug": "angels",
+      "title": { "he": "מלאכים", "ar": "الملائكة", "en": "Angels" },
+      "summary": {
+        "he": "יצורי אור שמשרתים את האל ונושאים את ההתגלות.",
+        "ar": "عبادٌ مكرمون ينفذون أمر الله.",
+        "en": "Beings of light who serve God and carry revelation."
+      },
+      "keywords": ["angels", "malaika"]
+    },
+    {
+      "kind": "concept",
+      "slug": "books",
+      "title": { "he": "כתבי קודש", "ar": "الكتب السماوية", "en": "Revealed Books" },
+      "summary": {
+        "he": "תורת משה, זבּוּר של דוד, האונגיליון של ישוע, הקוראן.",
+        "ar": "التوراة والزبور والإنجيل والقرآن.",
+        "en": "The Torah, Psalms, Gospel, and Qur'an."
+      },
+      "keywords": ["books", "torah", "gospel", "quran"]
+    },
+    {
+      "kind": "concept",
+      "slug": "prophethood",
+      "title": { "he": "נבואה", "ar": "النبوة", "en": "Prophethood" },
+      "summary": {
+        "he": "שליחי האל לאורך הדורות נושאים את אותה הקריאה.",
+        "ar": "رسل الله عبر العصور يحملون رسالة واحدة.",
+        "en": "Messengers across the ages who carry the same call."
+      },
+      "keywords": ["prophethood", "nubuwwa"]
+    },
+    {
+      "kind": "concept",
+      "slug": "day-of-judgment",
+      "title": { "he": "יום הדין", "ar": "يوم القيامة", "en": "Day of Judgment" },
+      "summary": {
+        "he": "היום בו ייסגרו חשבונותינו לפני האל.",
+        "ar": "اليوم الذي تُحاسب فيه النفس عند ربها.",
+        "en": "The day when every soul will be accountable before God."
+      },
+      "keywords": ["judgment", "qiyamah"]
+    },
+    {
+      "kind": "concept",
+      "slug": "shirk",
+      "title": { "he": "שיתוף", "ar": "الشرك", "en": "Associating partners with God (Shirk)" },
+      "summary": {
+        "he": "החטא הכבד ביותר — לייחס לאל שותפים.",
+        "ar": "أعظم الذنوب: جعل شريك مع الله.",
+        "en": "The gravest wrong — ascribing partners to God."
+      },
+      "keywords": ["shirk"]
+    },
+    {
+      "kind": "concept",
+      "slug": "halal-haram",
+      "title": { "he": "מותר ואסור", "ar": "الحلال والحرام", "en": "Lawful and Unlawful" },
+      "summary": {
+        "he": "גבולות ברורים שהאל קבע להגן על האדם.",
+        "ar": "حدود الله للحفاظ على الإنسان.",
+        "en": "Clear limits God set to protect human life and dignity."
+      },
+      "keywords": ["halal", "haram"]
+    },
+    {
+      "kind": "concept",
+      "slug": "dua",
+      "title": { "he": "תפילת בקשה", "ar": "الدعاء", "en": "Personal Prayer (Du'a)" },
+      "summary": {
+        "he": "שיחה אישית עם האל בכל זמן ובכל מקום.",
+        "ar": "مناجاة الله في كل وقت ومكان.",
+        "en": "A personal conversation with God, anytime and anywhere."
+      },
+      "keywords": ["dua", "supplication"]
+    },
+    {
+      "kind": "concept",
+      "slug": "quran",
+      "title": { "he": "הקוראן", "ar": "القرآن", "en": "The Qur'an" },
+      "summary": {
+        "he": "דבר האל שניתן למוחמד דרך גבריאל לאורך 23 שנים.",
+        "ar": "كلام الله المنزل على محمد على مدى ٢٣ عاماً عبر جبريل.",
+        "en": "God's words revealed to Muhammad through Gabriel over 23 years."
+      },
+      "keywords": ["quran", "revelation"]
+    },
+    {
+      "kind": "concept",
+      "slug": "sunnah",
+      "title": { "he": "סונה", "ar": "السنة", "en": "Sunnah" },
+      "summary": {
+        "he": "דרכו ומנהגיו של הנביא — דוגמה חיה לקוראן.",
+        "ar": "سيرة النبي وأقواله وأفعاله، نموذج حي للقرآن.",
+        "en": "The Prophet's example — a lived embodiment of the Qur'an."
+      },
+      "keywords": ["sunnah", "prophet's example"]
+    },
+    {
+      "kind": "concept",
+      "slug": "five-pillars",
+      "title": { "he": "חמשת העמודים", "ar": "أركان الإسلام", "en": "Five Pillars" },
+      "summary": {
+        "he": "עדות, תפילה, זכאת, צום, חאג'.",
+        "ar": "الشهادة والصلاة والزكاة والصوم والحج.",
+        "en": "Testimony, prayer, zakat, fasting, and pilgrimage."
+      },
+      "keywords": ["pillars", "arkan"]
+    },
 
-    {"kind":"event","slug":"first-revelation","title":{"he":"ההתגלות הראשונה","ar":"بدء الوحي","en":"The First Revelation"},"summary":{"he":"גבריאל ניצב מול מוחמד במערת חירא ואמר: 'קרא'.","ar":"جاء جبريل النبي في غار حراء وقال: \"اقرأ\".","en":"Gabriel appeared to Muhammad in Hira and said: 'Read.'"},"keywords":["iqra","revelation"]},
-    {"kind":"event","slug":"laylat-al-qadr","title":{"he":"ליל הגזירה","ar":"ليلة القدر","en":"The Night of Decree"},"summary":{"he":"לילה אחד בחודש רמדאן ששקול לאלף חודשים.","ar":"ليلة في رمضان خير من ألف شهر.","en":"A night in Ramadan better than a thousand months."},"keywords":["laylat al-qadr","ramadan"]},
-    {"kind":"event","slug":"year-of-elephant","title":{"he":"שנת הפיל","ar":"عام الفيل","en":"The Year of the Elephant"},"summary":{"he":"השנה בה הצבא של אברהה בא לכבוש את מכה ונכשל.","ar":"السنة التي قَدِم فيها جيش أبرهة ليهدم الكعبة فأهلكه الله.","en":"The year an invading army came to destroy the Kaaba and was turned back."},"keywords":["fil","elephant"]}
+    {
+      "kind": "event",
+      "slug": "first-revelation",
+      "title": { "he": "ההתגלות הראשונה", "ar": "بدء الوحي", "en": "The First Revelation" },
+      "summary": {
+        "he": "גבריאל ניצב מול מוחמד במערת חירא ואמר: 'קרא'.",
+        "ar": "جاء جبريل النبي في غار حراء وقال: \"اقرأ\".",
+        "en": "Gabriel appeared to Muhammad in Hira and said: 'Read.'"
+      },
+      "keywords": ["iqra", "revelation"]
+    },
+    {
+      "kind": "event",
+      "slug": "laylat-al-qadr",
+      "title": { "he": "ליל הגזירה", "ar": "ليلة القدر", "en": "The Night of Decree" },
+      "summary": {
+        "he": "לילה אחד בחודש רמדאן ששקול לאלף חודשים.",
+        "ar": "ليلة في رمضان خير من ألف شهر.",
+        "en": "A night in Ramadan better than a thousand months."
+      },
+      "keywords": ["laylat al-qadr", "ramadan"]
+    },
+    {
+      "kind": "event",
+      "slug": "year-of-elephant",
+      "title": { "he": "שנת הפיל", "ar": "عام الفيل", "en": "The Year of the Elephant" },
+      "summary": {
+        "he": "השנה בה הצבא של אברהה בא לכבוש את מכה ונכשל.",
+        "ar": "السنة التي قَدِم فيها جيش أبرهة ليهدم الكعبة فأهلكه الله.",
+        "en": "The year an invading army came to destroy the Kaaba and was turned back."
+      },
+      "keywords": ["fil", "elephant"]
+    }
   ],
 
   "verses": [
-    {"slug":"tawhid","links":[[112,1,4],[2,255,255]]},
-    {"slug":"prayer","links":[[2,238,238],[20,14,14],[29,45,45]]},
-    {"slug":"fasting","links":[[2,183,185]]},
-    {"slug":"zakat","links":[[2,267,267],[9,60,60]]},
-    {"slug":"hajj","links":[[2,196,197],[3,97,97],[22,27,29]]},
-    {"slug":"charity","links":[[2,261,261],[2,274,274]]},
-    {"slug":"patience","links":[[2,153,153],[2,155,157]]},
-    {"slug":"mercy","links":[[1,1,3],[7,156,156]]},
-    {"slug":"justice","links":[[4,135,135],[5,8,8],[16,90,90]]},
-    {"slug":"knowledge","links":[[20,114,114],[39,9,9],[96,1,5]]},
-    {"slug":"parents","links":[[17,23,24],[31,14,15],[46,15,15]]},
-    {"slug":"creation","links":[[2,164,164],[30,20,25],[55,1,13]]},
-    {"slug":"afterlife","links":[[75,1,15],[99,1,8],[101,1,11]]},
-    {"slug":"repentance","links":[[2,222,222],[39,53,53],[66,8,8]]},
-    {"slug":"gratitude","links":[[14,7,7],[2,152,152]]},
-    {"slug":"trust-in-god","links":[[3,159,159],[65,3,3]]},
-    {"slug":"honesty","links":[[9,119,119],[33,70,70]]},
-    {"slug":"humility","links":[[25,63,63],[31,18,19]]},
-    {"slug":"forgiveness","links":[[3,134,134],[42,40,40]]},
-    {"slug":"family","links":[[30,21,21],[25,74,74]]},
-    {"slug":"good-character","links":[[68,4,4],[49,11,13]]},
-    {"slug":"community","links":[[3,103,104],[49,10,10]]},
+    {
+      "slug": "tawhid",
+      "links": [
+        [112, 1, 4],
+        [2, 255, 255]
+      ]
+    },
+    {
+      "slug": "prayer",
+      "links": [
+        [2, 238, 238],
+        [20, 14, 14],
+        [29, 45, 45]
+      ]
+    },
+    { "slug": "fasting", "links": [[2, 183, 185]] },
+    {
+      "slug": "zakat",
+      "links": [
+        [2, 267, 267],
+        [9, 60, 60]
+      ]
+    },
+    {
+      "slug": "hajj",
+      "links": [
+        [2, 196, 197],
+        [3, 97, 97],
+        [22, 27, 29]
+      ]
+    },
+    {
+      "slug": "charity",
+      "links": [
+        [2, 261, 261],
+        [2, 274, 274]
+      ]
+    },
+    {
+      "slug": "patience",
+      "links": [
+        [2, 153, 153],
+        [2, 155, 157]
+      ]
+    },
+    {
+      "slug": "mercy",
+      "links": [
+        [1, 1, 3],
+        [7, 156, 156]
+      ]
+    },
+    {
+      "slug": "justice",
+      "links": [
+        [4, 135, 135],
+        [5, 8, 8],
+        [16, 90, 90]
+      ]
+    },
+    {
+      "slug": "knowledge",
+      "links": [
+        [20, 114, 114],
+        [39, 9, 9],
+        [96, 1, 5]
+      ]
+    },
+    {
+      "slug": "parents",
+      "links": [
+        [17, 23, 24],
+        [31, 14, 15],
+        [46, 15, 15]
+      ]
+    },
+    {
+      "slug": "creation",
+      "links": [
+        [2, 164, 164],
+        [30, 20, 25],
+        [55, 1, 13]
+      ]
+    },
+    {
+      "slug": "afterlife",
+      "links": [
+        [75, 1, 15],
+        [99, 1, 8],
+        [101, 1, 11]
+      ]
+    },
+    {
+      "slug": "repentance",
+      "links": [
+        [2, 222, 222],
+        [39, 53, 53],
+        [66, 8, 8]
+      ]
+    },
+    {
+      "slug": "gratitude",
+      "links": [
+        [14, 7, 7],
+        [2, 152, 152]
+      ]
+    },
+    {
+      "slug": "trust-in-god",
+      "links": [
+        [3, 159, 159],
+        [65, 3, 3]
+      ]
+    },
+    {
+      "slug": "honesty",
+      "links": [
+        [9, 119, 119],
+        [33, 70, 70]
+      ]
+    },
+    {
+      "slug": "humility",
+      "links": [
+        [25, 63, 63],
+        [31, 18, 19]
+      ]
+    },
+    {
+      "slug": "forgiveness",
+      "links": [
+        [3, 134, 134],
+        [42, 40, 40]
+      ]
+    },
+    {
+      "slug": "family",
+      "links": [
+        [30, 21, 21],
+        [25, 74, 74]
+      ]
+    },
+    {
+      "slug": "good-character",
+      "links": [
+        [68, 4, 4],
+        [49, 11, 13]
+      ]
+    },
+    {
+      "slug": "community",
+      "links": [
+        [3, 103, 104],
+        [49, 10, 10]
+      ]
+    },
 
-    {"slug":"adam","links":[[2,30,38],[7,11,25]]},
-    {"slug":"nuh","links":[[11,25,49],[71,1,28]]},
-    {"slug":"ibrahim","links":[[2,124,132],[21,51,73],[37,99,113]]},
-    {"slug":"ismail","links":[[2,127,129],[37,99,113]]},
-    {"slug":"ishaq","links":[[11,71,73],[37,112,113]]},
-    {"slug":"yaqub","links":[[12,68,87]]},
-    {"slug":"yusuf","links":[[12,1,111]]},
-    {"slug":"musa","links":[[20,9,98],[28,3,46]]},
-    {"slug":"harun","links":[[20,29,36]]},
-    {"slug":"dawud","links":[[2,251,251],[34,10,11]]},
-    {"slug":"sulayman","links":[[27,15,44],[34,12,14]]},
-    {"slug":"ayyub","links":[[21,83,84],[38,41,44]]},
-    {"slug":"yunus","links":[[10,98,98],[21,87,88],[37,139,148]]},
-    {"slug":"zakariyya","links":[[3,38,41],[19,2,11]]},
-    {"slug":"yahya","links":[[3,39,39],[19,12,15]]},
-    {"slug":"isa","links":[[3,45,55],[5,110,118],[19,16,35]]},
-    {"slug":"muhammad","links":[[33,40,40],[48,29,29],[93,1,11]]},
-    {"slug":"hud","links":[[11,50,60]]},
-    {"slug":"salih","links":[[7,73,79],[11,61,68]]},
-    {"slug":"shuayb","links":[[7,85,93],[11,84,95]]},
-    {"slug":"lut","links":[[7,80,84],[11,77,83]]},
-    {"slug":"idris","links":[[19,56,57],[21,85,86]]},
+    {
+      "slug": "adam",
+      "links": [
+        [2, 30, 38],
+        [7, 11, 25]
+      ]
+    },
+    {
+      "slug": "nuh",
+      "links": [
+        [11, 25, 49],
+        [71, 1, 28]
+      ]
+    },
+    {
+      "slug": "ibrahim",
+      "links": [
+        [2, 124, 132],
+        [21, 51, 73],
+        [37, 99, 113]
+      ]
+    },
+    {
+      "slug": "ismail",
+      "links": [
+        [2, 127, 129],
+        [37, 99, 113]
+      ]
+    },
+    {
+      "slug": "ishaq",
+      "links": [
+        [11, 71, 73],
+        [37, 112, 113]
+      ]
+    },
+    { "slug": "yaqub", "links": [[12, 68, 87]] },
+    { "slug": "yusuf", "links": [[12, 1, 111]] },
+    {
+      "slug": "musa",
+      "links": [
+        [20, 9, 98],
+        [28, 3, 46]
+      ]
+    },
+    { "slug": "harun", "links": [[20, 29, 36]] },
+    {
+      "slug": "dawud",
+      "links": [
+        [2, 251, 251],
+        [34, 10, 11]
+      ]
+    },
+    {
+      "slug": "sulayman",
+      "links": [
+        [27, 15, 44],
+        [34, 12, 14]
+      ]
+    },
+    {
+      "slug": "ayyub",
+      "links": [
+        [21, 83, 84],
+        [38, 41, 44]
+      ]
+    },
+    {
+      "slug": "yunus",
+      "links": [
+        [10, 98, 98],
+        [21, 87, 88],
+        [37, 139, 148]
+      ]
+    },
+    {
+      "slug": "zakariyya",
+      "links": [
+        [3, 38, 41],
+        [19, 2, 11]
+      ]
+    },
+    {
+      "slug": "yahya",
+      "links": [
+        [3, 39, 39],
+        [19, 12, 15]
+      ]
+    },
+    {
+      "slug": "isa",
+      "links": [
+        [3, 45, 55],
+        [5, 110, 118],
+        [19, 16, 35]
+      ]
+    },
+    {
+      "slug": "muhammad",
+      "links": [
+        [33, 40, 40],
+        [48, 29, 29],
+        [93, 1, 11]
+      ]
+    },
+    { "slug": "hud", "links": [[11, 50, 60]] },
+    {
+      "slug": "salih",
+      "links": [
+        [7, 73, 79],
+        [11, 61, 68]
+      ]
+    },
+    {
+      "slug": "shuayb",
+      "links": [
+        [7, 85, 93],
+        [11, 84, 95]
+      ]
+    },
+    {
+      "slug": "lut",
+      "links": [
+        [7, 80, 84],
+        [11, 77, 83]
+      ]
+    },
+    {
+      "slug": "idris",
+      "links": [
+        [19, 56, 57],
+        [21, 85, 86]
+      ]
+    },
 
-    {"slug":"creation-of-adam","links":[[2,30,38],[15,28,42]]},
-    {"slug":"flood-of-nuh","links":[[11,25,49]]},
-    {"slug":"sacrifice-of-ibrahim","links":[[37,99,113]]},
-    {"slug":"yusuf-and-his-brothers","links":[[12,1,111]]},
-    {"slug":"exodus-of-musa","links":[[26,52,67]]},
-    {"slug":"birth-of-isa","links":[[19,16,35]]},
-    {"slug":"cave-of-hira","links":[[96,1,5]]},
-    {"slug":"hijra","links":[[9,40,40]]},
-    {"slug":"night-journey","links":[[17,1,1],[53,1,18]]},
-    {"slug":"battle-of-badr","links":[[3,123,127],[8,5,19]]},
-    {"slug":"conquest-of-mecca","links":[[48,1,3],[110,1,3]]},
-    {"slug":"farewell-sermon","links":[[5,3,3]]},
+    {
+      "slug": "creation-of-adam",
+      "links": [
+        [2, 30, 38],
+        [15, 28, 42]
+      ]
+    },
+    { "slug": "flood-of-nuh", "links": [[11, 25, 49]] },
+    { "slug": "sacrifice-of-ibrahim", "links": [[37, 99, 113]] },
+    { "slug": "yusuf-and-his-brothers", "links": [[12, 1, 111]] },
+    { "slug": "exodus-of-musa", "links": [[26, 52, 67]] },
+    { "slug": "birth-of-isa", "links": [[19, 16, 35]] },
+    { "slug": "cave-of-hira", "links": [[96, 1, 5]] },
+    { "slug": "hijra", "links": [[9, 40, 40]] },
+    {
+      "slug": "night-journey",
+      "links": [
+        [17, 1, 1],
+        [53, 1, 18]
+      ]
+    },
+    {
+      "slug": "battle-of-badr",
+      "links": [
+        [3, 123, 127],
+        [8, 5, 19]
+      ]
+    },
+    {
+      "slug": "conquest-of-mecca",
+      "links": [
+        [48, 1, 3],
+        [110, 1, 3]
+      ]
+    },
+    { "slug": "farewell-sermon", "links": [[5, 3, 3]] },
+    { "slug": "people-of-the-cave", "links": [[18, 9, 26]] },
+    { "slug": "dhul-qarnayn", "links": [[18, 83, 98]] },
+    { "slug": "khidr-and-musa", "links": [[18, 60, 82]] },
+    { "slug": "luqman-advice", "links": [[31, 12, 19]] },
+    { "slug": "qarun-wealth", "links": [[28, 76, 82]] },
+    { "slug": "people-of-the-elephant", "links": [[105, 1, 5]] },
+    {
+      "slug": "story-of-maryam",
+      "links": [
+        [3, 35, 48],
+        [19, 16, 34]
+      ]
+    },
+    { "slug": "two-gardens", "links": [[18, 32, 44]] },
 
-    {"slug":"mecca","links":[[3,96,97],[14,35,37]]},
-    {"slug":"medina","links":[[9,101,101],[33,60,60]]},
-    {"slug":"jerusalem","links":[[17,1,1]]},
-    {"slug":"sinai","links":[[19,52,53],[20,80,80],[95,1,3]]},
-    {"slug":"kaaba","links":[[2,125,127],[5,97,97]]},
-    {"slug":"cave-of-thawr","links":[[9,40,40]]},
-    {"slug":"egypt","links":[[10,87,87],[12,21,21]]},
-    {"slug":"madyan","links":[[7,85,85],[28,22,28]]},
+    {
+      "slug": "mecca",
+      "links": [
+        [3, 96, 97],
+        [14, 35, 37]
+      ]
+    },
+    {
+      "slug": "medina",
+      "links": [
+        [9, 101, 101],
+        [33, 60, 60]
+      ]
+    },
+    { "slug": "jerusalem", "links": [[17, 1, 1]] },
+    {
+      "slug": "sinai",
+      "links": [
+        [19, 52, 53],
+        [20, 80, 80],
+        [95, 1, 3]
+      ]
+    },
+    {
+      "slug": "kaaba",
+      "links": [
+        [2, 125, 127],
+        [5, 97, 97]
+      ]
+    },
+    { "slug": "cave-of-thawr", "links": [[9, 40, 40]] },
+    {
+      "slug": "egypt",
+      "links": [
+        [10, 87, 87],
+        [12, 21, 21]
+      ]
+    },
+    {
+      "slug": "madyan",
+      "links": [
+        [7, 85, 85],
+        [28, 22, 28]
+      ]
+    },
 
-    {"slug":"iman","links":[[2,177,177],[2,285,285]]},
-    {"slug":"taqwa","links":[[2,2,5],[49,13,13]]},
-    {"slug":"jannah","links":[[55,46,78],[76,12,22]]},
-    {"slug":"jahannam","links":[[78,21,30]]},
-    {"slug":"qadar","links":[[54,49,49],[97,1,5]]},
-    {"slug":"angels","links":[[2,30,34],[35,1,1]]},
-    {"slug":"books","links":[[2,4,4],[5,44,48]]},
-    {"slug":"prophethood","links":[[33,40,40],[42,13,13]]},
-    {"slug":"day-of-judgment","links":[[75,1,15],[82,1,19]]},
-    {"slug":"shirk","links":[[4,48,48],[31,13,13]]},
-    {"slug":"halal-haram","links":[[2,168,173],[5,87,88]]},
-    {"slug":"dua","links":[[2,186,186],[40,60,60]]},
-    {"slug":"quran","links":[[2,2,2],[15,9,9],[17,9,9]]},
-    {"slug":"sunnah","links":[[33,21,21],[59,7,7]]},
-    {"slug":"five-pillars","links":[[2,3,5]]},
+    {
+      "slug": "iman",
+      "links": [
+        [2, 177, 177],
+        [2, 285, 285]
+      ]
+    },
+    {
+      "slug": "taqwa",
+      "links": [
+        [2, 2, 5],
+        [49, 13, 13]
+      ]
+    },
+    {
+      "slug": "jannah",
+      "links": [
+        [55, 46, 78],
+        [76, 12, 22]
+      ]
+    },
+    { "slug": "jahannam", "links": [[78, 21, 30]] },
+    {
+      "slug": "qadar",
+      "links": [
+        [54, 49, 49],
+        [97, 1, 5]
+      ]
+    },
+    {
+      "slug": "angels",
+      "links": [
+        [2, 30, 34],
+        [35, 1, 1]
+      ]
+    },
+    {
+      "slug": "books",
+      "links": [
+        [2, 4, 4],
+        [5, 44, 48]
+      ]
+    },
+    {
+      "slug": "prophethood",
+      "links": [
+        [33, 40, 40],
+        [42, 13, 13]
+      ]
+    },
+    {
+      "slug": "day-of-judgment",
+      "links": [
+        [75, 1, 15],
+        [82, 1, 19]
+      ]
+    },
+    {
+      "slug": "shirk",
+      "links": [
+        [4, 48, 48],
+        [31, 13, 13]
+      ]
+    },
+    {
+      "slug": "halal-haram",
+      "links": [
+        [2, 168, 173],
+        [5, 87, 88]
+      ]
+    },
+    {
+      "slug": "dua",
+      "links": [
+        [2, 186, 186],
+        [40, 60, 60]
+      ]
+    },
+    {
+      "slug": "quran",
+      "links": [
+        [2, 2, 2],
+        [15, 9, 9],
+        [17, 9, 9]
+      ]
+    },
+    {
+      "slug": "sunnah",
+      "links": [
+        [33, 21, 21],
+        [59, 7, 7]
+      ]
+    },
+    { "slug": "five-pillars", "links": [[2, 3, 5]] },
 
-    {"slug":"first-revelation","links":[[96,1,5]]},
-    {"slug":"laylat-al-qadr","links":[[97,1,5]]},
-    {"slug":"year-of-elephant","links":[[105,1,5]]}
+    { "slug": "first-revelation", "links": [[96, 1, 5]] },
+    { "slug": "laylat-al-qadr", "links": [[97, 1, 5]] },
+    { "slug": "year-of-elephant", "links": [[105, 1, 5]] }
   ],
 
   "relations": [
-    ["ibrahim","ismail","child_of"],
-    ["ibrahim","ishaq","child_of"],
-    ["ishaq","yaqub","child_of"],
-    ["yaqub","yusuf","child_of"],
-    ["zakariyya","yahya","child_of"],
-    ["musa","harun","related"],
-    ["dawud","sulayman","child_of"],
+    ["ibrahim", "ismail", "child_of"],
+    ["ibrahim", "ishaq", "child_of"],
+    ["ishaq", "yaqub", "child_of"],
+    ["yaqub", "yusuf", "child_of"],
+    ["zakariyya", "yahya", "child_of"],
+    ["musa", "harun", "related"],
+    ["dawud", "sulayman", "child_of"],
 
-    ["ibrahim","kaaba","involves"],
-    ["ismail","kaaba","involves"],
-    ["muhammad","mecca","happened_in"],
-    ["muhammad","medina","happened_in"],
-    ["musa","sinai","happened_in"],
-    ["musa","egypt","happened_in"],
-    ["yusuf","egypt","happened_in"],
-    ["shuayb","madyan","happened_in"],
-    ["musa","madyan","happened_in"],
+    ["ibrahim", "kaaba", "involves"],
+    ["ismail", "kaaba", "involves"],
+    ["muhammad", "mecca", "happened_in"],
+    ["muhammad", "medina", "happened_in"],
+    ["musa", "sinai", "happened_in"],
+    ["musa", "egypt", "happened_in"],
+    ["yusuf", "egypt", "happened_in"],
+    ["shuayb", "madyan", "happened_in"],
+    ["musa", "madyan", "happened_in"],
 
-    ["creation-of-adam","adam","involves"],
-    ["flood-of-nuh","nuh","involves"],
-    ["sacrifice-of-ibrahim","ibrahim","involves"],
-    ["sacrifice-of-ibrahim","ismail","involves"],
-    ["yusuf-and-his-brothers","yusuf","involves"],
-    ["yusuf-and-his-brothers","yaqub","involves"],
-    ["exodus-of-musa","musa","involves"],
-    ["exodus-of-musa","egypt","happened_in"],
-    ["birth-of-isa","isa","involves"],
-    ["cave-of-hira","muhammad","involves"],
-    ["cave-of-hira","mecca","happened_in"],
-    ["hijra","muhammad","involves"],
-    ["hijra","cave-of-thawr","happened_in"],
-    ["night-journey","muhammad","involves"],
-    ["night-journey","jerusalem","happened_in"],
-    ["battle-of-badr","muhammad","involves"],
-    ["battle-of-badr","medina","happened_in"],
-    ["conquest-of-mecca","muhammad","involves"],
-    ["conquest-of-mecca","mecca","happened_in"],
-    ["farewell-sermon","muhammad","involves"],
+    ["creation-of-adam", "adam", "involves"],
+    ["flood-of-nuh", "nuh", "involves"],
+    ["sacrifice-of-ibrahim", "ibrahim", "involves"],
+    ["sacrifice-of-ibrahim", "ismail", "involves"],
+    ["yusuf-and-his-brothers", "yusuf", "involves"],
+    ["yusuf-and-his-brothers", "yaqub", "involves"],
+    ["exodus-of-musa", "musa", "involves"],
+    ["exodus-of-musa", "egypt", "happened_in"],
+    ["birth-of-isa", "isa", "involves"],
+    ["cave-of-hira", "muhammad", "involves"],
+    ["cave-of-hira", "mecca", "happened_in"],
+    ["hijra", "muhammad", "involves"],
+    ["hijra", "cave-of-thawr", "happened_in"],
+    ["night-journey", "muhammad", "involves"],
+    ["night-journey", "jerusalem", "happened_in"],
+    ["battle-of-badr", "muhammad", "involves"],
+    ["battle-of-badr", "medina", "happened_in"],
+    ["conquest-of-mecca", "muhammad", "involves"],
+    ["conquest-of-mecca", "mecca", "happened_in"],
+    ["farewell-sermon", "muhammad", "involves"],
 
-    ["first-revelation","cave-of-hira","happened_in"],
-    ["first-revelation","muhammad","involves"],
-    ["laylat-al-qadr","quran","mentions"],
-    ["year-of-elephant","mecca","happened_in"],
+    ["first-revelation", "cave-of-hira", "happened_in"],
+    ["first-revelation", "muhammad", "involves"],
+    ["laylat-al-qadr", "quran", "mentions"],
+    ["year-of-elephant", "mecca", "happened_in"],
 
-    ["five-pillars","prayer","part_of"],
-    ["five-pillars","fasting","part_of"],
-    ["five-pillars","zakat","part_of"],
-    ["five-pillars","hajj","part_of"],
-    ["five-pillars","tawhid","part_of"],
+    ["five-pillars", "prayer", "part_of"],
+    ["five-pillars", "fasting", "part_of"],
+    ["five-pillars", "zakat", "part_of"],
+    ["five-pillars", "hajj", "part_of"],
+    ["five-pillars", "tawhid", "part_of"],
 
-    ["iman","tawhid","teaches"],
-    ["iman","angels","teaches"],
-    ["iman","books","teaches"],
-    ["iman","prophethood","teaches"],
-    ["iman","day-of-judgment","teaches"],
-    ["iman","qadar","teaches"],
+    ["iman", "tawhid", "teaches"],
+    ["iman", "angels", "teaches"],
+    ["iman", "books", "teaches"],
+    ["iman", "prophethood", "teaches"],
+    ["iman", "day-of-judgment", "teaches"],
+    ["iman", "qadar", "teaches"],
 
-    ["prayer","dua","related"],
-    ["taqwa","good-character","related"],
-    ["mercy","forgiveness","related"],
-    ["patience","trust-in-god","related"],
-    ["charity","zakat","related"],
-    ["honesty","good-character","related"],
-    ["humility","good-character","related"],
-    ["parents","family","related"],
-    ["community","family","related"],
+    ["prayer", "dua", "related"],
+    ["taqwa", "good-character", "related"],
+    ["mercy", "forgiveness", "related"],
+    ["patience", "trust-in-god", "related"],
+    ["charity", "zakat", "related"],
+    ["honesty", "good-character", "related"],
+    ["humility", "good-character", "related"],
+    ["parents", "family", "related"],
+    ["community", "family", "related"],
 
-    ["quran","sunnah","related"],
-    ["quran","books","part_of"],
-    ["muhammad","sunnah","involves"],
-    ["muhammad","quran","involves"],
+    ["quran", "sunnah", "related"],
+    ["quran", "books", "part_of"],
+    ["muhammad", "sunnah", "involves"],
+    ["muhammad", "quran", "involves"],
 
-    ["jannah","afterlife","part_of"],
-    ["jahannam","afterlife","part_of"],
-    ["day-of-judgment","afterlife","part_of"],
-    ["shirk","tawhid","related"]
+    ["jannah", "afterlife", "part_of"],
+    ["jahannam", "afterlife", "part_of"],
+    ["day-of-judgment", "afterlife", "part_of"],
+    ["shirk", "tawhid", "related"]
   ]
 }
