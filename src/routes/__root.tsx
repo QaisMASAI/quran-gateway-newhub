@@ -1,12 +1,5 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import {
-  Outlet,
-  Link,
-  createRootRouteWithContext,
-  useRouter,
-  HeadContent,
-  Scripts,
-} from "@tanstack/react-router";
+import { Outlet, Link, createRootRouteWithContext, useRouter, HeadContent, Scripts } from "@tanstack/react-router";
 import { useEffect, useState, type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 
@@ -24,8 +17,7 @@ const ROOT_META = {
   title: "Noor Quran & Hadith | Jalalayn Knowledge Hub",
   description:
     "Explore Quran and Sahih Hadith with grounded citations, Jalalayn-only tafsir, knowledge graph discovery, and multilingual AI research.",
-  socialDescription:
-    "Grounded Quran + Hadith learning with Jalalayn-only tafsir and citation-first AI research.",
+  socialDescription: "Grounded Quran + Hadith learning with Jalalayn-only tafsir and citation-first AI research.",
 };
 
 function NotFoundComponent() {
@@ -33,10 +25,7 @@ function NotFoundComponent() {
   const isRtl = i18n.dir() === "rtl";
 
   return (
-    <div
-      className="flex min-h-screen items-center justify-center bg-background px-4"
-      dir={isRtl ? "rtl" : "ltr"}
-    >
+    <div className="flex min-h-screen items-center justify-center bg-background px-4" dir={isRtl ? "rtl" : "ltr"}>
       <div className="max-w-md text-center">
         <h1 className="font-display text-7xl font-bold text-primary">404</h1>
         <p className="mt-3 font-arabic text-2xl text-gold" dir="rtl" lang="ar">
@@ -68,17 +57,12 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
   }, [error]);
 
   return (
-    <div
-      className="flex min-h-screen items-center justify-center bg-background px-4"
-      dir={isRtl ? "rtl" : "ltr"}
-    >
+    <div className="flex min-h-screen items-center justify-center bg-background px-4" dir={isRtl ? "rtl" : "ltr"}>
       <div className="max-w-md text-center">
         <p className="font-arabic text-2xl text-gold" dir="rtl" lang="ar">
           إِنَّا لِلَّهِ وَإِنَّا إِلَيْهِ رَاجِعُونَ
         </p>
-        <h1 className="mt-4 text-xl font-semibold tracking-tight text-foreground">
-          {t("errors.genericTitle")}
-        </h1>
+        <h1 className="mt-4 text-xl font-semibold tracking-tight text-foreground">{t("errors.genericTitle")}</h1>
         <p className="mt-2 text-sm text-muted-foreground">{t("errors.genericBody")}</p>
         <div className="mt-6 flex flex-wrap justify-center gap-2">
           <button
@@ -269,9 +253,7 @@ function RootComponent() {
   }, []);
 
   const showDevBanner =
-    import.meta.env.DEV &&
-    !!devErrorStatus &&
-    (devErrorStatus.interceptedCount > 0 || !!devErrorStatus.lastViteError);
+    import.meta.env.DEV && !!devErrorStatus && (devErrorStatus.interceptedCount > 0 || !!devErrorStatus.lastViteError);
 
   return (
     <QueryClientProvider client={queryClient}>
