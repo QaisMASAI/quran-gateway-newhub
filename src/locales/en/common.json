@@ -1,9 +1,9 @@
 {
   "site": {
-    "name": "Noor Quran & Hadith",
-    "tagline": "Jalalayn Knowledge Hub",
-    "longTagline": "Explore • Learn • Understand",
-    "description": "Noor Quran & Hadith is a multilingual educational platform for grounded Quran and Sahih Hadith learning with Jalalayn-only tafsir."
+    "name": "Noor Al-Huda",
+    "tagline": "Quran & Sunnah Knowledge Hub",
+    "longTagline": "Explore • Learn • Discover Islamic Knowledge",
+    "description": "Noor Al-Huda is an international Islamic knowledge platform for Quran, Sahih Hadith, authenticated Tafsir, and interactive learning."
   },
   "nav": {
     "surahs": "Surahs",
@@ -14,7 +14,7 @@
     "plans": "Reading plans",
     "search": "Search",
     "favorites": "Favorites",
-    "ask": "Ask Noor Quran & Hadith",
+    "ask": "Ask Noor Al-Huda AI",
     "glossary": "Glossary",
     "learn": "Learn",
     "research": "Research",
