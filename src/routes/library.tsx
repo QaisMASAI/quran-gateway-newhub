@@ -11,26 +11,26 @@ import { useReadingProgress } from "@/lib/reading-progress";
 import { normalizeLocale } from "@/lib/i18n";
 import { uiFontClass } from "@/lib/locale-ui";
 
-export const Route = createFileRoute("/library")({
+export const Route = createFileRoute("/surahs")({
   head: () => ({
     meta: [
-      { title: "Surah Library — Browse All 114 Chapters" },
+      { title: "Surahs — Browse All 114 Chapters" },
       {
         name: "description",
         content:
           "Browse the complete Surah library: search all 114 chapters, filter by Meccan or Medinan revelation, revisit recently opened surahs, and continue reading.",
       },
-      { property: "og:title", content: "Surah Library — Browse All 114 Chapters" },
+      { property: "og:title", content: "Surahs — Browse All 114 Chapters" },
       {
         property: "og:description",
         content: "Search, filter and continue reading across all 114 chapters of the Quran.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
-      { name: "twitter:title", content: "Surah Library" },
+      { name: "twitter:title", content: "Surahs" },
       { name: "twitter:description", content: "Search and filter all 114 Quran chapters." },
     ],
-    links: [{ rel: "canonical", href: "/library" }],
+    links: [{ rel: "canonical", href: "/surahs" }],
   }),
   component: LibraryPage,
 });
@@ -90,7 +90,7 @@ function LibraryPage() {
       <div className="border-b border-border bg-gradient-to-b from-primary-soft/40 to-transparent">
         <div className="mx-auto max-w-5xl px-4 pt-8 pb-4 sm:px-6">
           <h1 className="text-3xl font-bold text-foreground">
-            {locale === "ar" ? "مكتبة السور" : locale === "he" ? "ספריית הסורות" : "Surah Library"}
+            {locale === "ar" ? "السور" : locale === "he" ? "סורות" : "Surahs"}
           </h1>
           <p className="mt-2 text-sm text-muted-foreground">{t("home.chaptersSubtitle")}</p>
         </div>
