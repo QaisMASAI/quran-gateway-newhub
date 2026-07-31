@@ -11,7 +11,7 @@ import { useReadingProgress } from "@/lib/reading-progress";
 import { normalizeLocale } from "@/lib/i18n";
 import { uiFontClass } from "@/lib/locale-ui";
 
-export const Route = createFileRoute("/surahs")({
+export const Route = createFileRoute("/library")({
   head: () => ({
     meta: [
       { title: "Surahs — Browse All 114 Chapters" },
