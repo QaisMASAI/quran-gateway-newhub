@@ -14,7 +14,7 @@ import { registerAppServiceWorker } from "@/lib/register-app-sw";
 import "@/lib/i18n";
 
 const ROOT_META = {
-  title: "Noor Quran & Hadith | Jalalayn Knowledge Hub",
+  title: "Noor Al-Huda AI | Quran & Sunnah Knowledge Hub",
   description:
     "Explore Quran and Sahih Hadith with grounded citations, Jalalayn-only tafsir, knowledge graph discovery, and multilingual AI research.",
   socialDescription: "Grounded Quran + Hadith learning with Jalalayn-only tafsir and citation-first AI research.",
