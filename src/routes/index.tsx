@@ -265,6 +265,14 @@ export function Home() {
           <span className="arabesque-corner bottom-0 right-0 rotate-180" aria-hidden />
 
           <div className="mx-auto max-w-3xl text-center relative z-10">
+            {/* Prominent Featured Brand Logo Emblem */}
+            <div className="mb-6 flex justify-center">
+              <div className="relative group">
+                <div className="absolute -inset-1 rounded-full bg-gradient-to-r from-gold/40 via-primary/30 to-gold/40 blur-lg opacity-70 group-hover:opacity-100 transition duration-500" />
+                <Logo className="relative h-24 w-24 sm:h-28 sm:w-28 drop-shadow-2xl transition-transform duration-500 group-hover:scale-110" />
+              </div>
+            </div>
+
             {/* Arabic Basmala Calligraphy Badge */}
             <div className="mx-auto inline-flex items-center gap-2 rounded-full border border-gold/30 bg-gold/10 px-4 py-1.5 backdrop-blur-md shadow-xs">
               <Sparkles className="h-4 w-4 text-gold animate-pulse" />
