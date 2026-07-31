@@ -1,6 +1,6 @@
 {
-  "name": "Noor Al-Huda Gateway",
-  "description": "Noor Al-Huda international Islamic knowledge platform for Holy Quran, Sahih Hadith, authentic Tafsir, and interactive learning.",
+  "name": "Noor Al-Huda AI",
+  "description": "Noor Al-Huda AI international Islamic knowledge platform for Holy Quran, Sahih Hadith, authentic Tafsir, and interactive learning.",
   "requestFramePermissions": ["geolocation"],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }
