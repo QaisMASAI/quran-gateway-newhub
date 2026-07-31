@@ -1,6 +1,9 @@
 import { Link } from "@tanstack/react-router";
 import { BookOpen, Search, Compass, BookMarked, Sparkles, Folder, Gamepad2, Library } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { useQuery } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
+import { getUiVisibilitySettings } from "@/lib/ui-visibility.functions";
 
 interface NavLinkProps {
   to: string;
@@ -33,36 +36,53 @@ interface HeaderNavProps {
 
 export function HeaderNav({ isAuthenticated }: HeaderNavProps) {
   const { t } = useTranslation("common");
+  const visibilityFn = useServerFn(getUiVisibilitySettings);
+  const { data: visibility } = useQuery({
+    queryKey: ["ui-visibility"],
+    queryFn: () => visibilityFn(),
+    staleTime: 60_000,
+  });
+
+  const hidden = new Set(visibility?.hiddenNav ?? []);
 
   return (
     <nav className="hidden items-center gap-1 sm:flex" aria-label={t("nav.surahs")}>
-      <NavLink to="/surahs" label={t("nav.surahs")} icon={<BookOpen className="h-4 w-4" />} />
-      <NavLink to="/library" label="Library" icon={<Library className="h-4 w-4" />} />
-      <NavLink to="/research" label={t("nav.research")} icon={<Sparkles className="h-4 w-4" />} />
-      <NavLink to="/learn" label={t("nav.learn")} icon={<BookMarked className="h-4 w-4" />} />
-      <NavLink to="/hadith" label={t("nav.hadith")} icon={<BookMarked className="h-4 w-4" />} />
-      <NavLink to="/search" label={t("nav.search")} icon={<Search className="h-4 w-4" />} />
-      <NavLink to="/kids" label="Kids" icon={<Gamepad2 className="h-4 w-4" />} />
-      {isAuthenticated && (
+      {!hidden.has("surahs") && (
+        <NavLink to="/surahs" label={t("nav.surahs")} icon={<BookOpen className="h-4 w-4" />} />
+      )}
+      {!hidden.has("research") && (
+        <NavLink to="/research" label={t("nav.research")} icon={<Sparkles className="h-4 w-4" />} />
+      )}
+      {!hidden.has("learn") && (
+        <NavLink to="/learn" label={t("nav.learn")} icon={<BookMarked className="h-4 w-4" />} />
+      )}
+      {!hidden.has("hadith") && (
+        <NavLink to="/hadith" label={t("nav.hadith")} icon={<Library className="h-4 w-4" />} />
+      )}
+      {!hidden.has("search") && (
+        <NavLink to="/search" label={t("nav.search")} icon={<Search className="h-4 w-4" />} />
+      )}
+      {!hidden.has("kids") && <NavLink to="/kids" label="Kids" icon={<Gamepad2 className="h-4 w-4" />} />}
+      {isAuthenticated && !hidden.has("admin_kids") && (
         <NavLink to="/admin/kids" label="Kids Q&A" icon={<Gamepad2 className="h-4 w-4" />} />
       )}
-      {isAuthenticated && (
+      {isAuthenticated && !hidden.has("collections") && (
         <NavLink
           to="/collections"
           label={t("nav.collections")}
           icon={<Folder className="h-4 w-4" />}
         />
       )}
-      {isAuthenticated && (
+      {isAuthenticated && !hidden.has("admin_setup") && (
         <NavLink to="/admin/setup" label="Admin setup" icon={<Compass className="h-4 w-4" />} />
       )}
-      {isAuthenticated && (
+      {isAuthenticated && !hidden.has("admin_backfill") && (
         <NavLink to="/admin/backfill" label="Admin" icon={<Sparkles className="h-4 w-4" />} />
       )}
-      {isAuthenticated && (
+      {isAuthenticated && !hidden.has("admin_hadith_api") && (
         <NavLink to="/admin/hadith-api" label="Hadith API" icon={<BookMarked className="h-4 w-4" />} />
       )}
-      {isAuthenticated && (
+      {isAuthenticated && !hidden.has("admin_hadith_ingest") && (
         <NavLink to="/admin/hadith-ingest" label="Hadith Import" icon={<Compass className="h-4 w-4" />} />
       )}
     </nav>

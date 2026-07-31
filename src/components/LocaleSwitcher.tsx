@@ -1,14 +1,26 @@
 import { useEffect, useRef, useState } from "react";
 import { Globe, Check } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { useQuery } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
 import { SUPPORTED_LOCALES, LOCALE_LABEL } from "@/lib/i18n";
 import { useLocale } from "@/hooks/useLocale";
+import { getUiVisibilitySettings } from "@/lib/ui-visibility.functions";
 
 export function LocaleSwitcher() {
   const { t } = useTranslation("common");
   const { current, changeLocale } = useLocale();
+  const visibilityFn = useServerFn(getUiVisibilitySettings);
+  const { data: visibility } = useQuery({
+    queryKey: ["ui-visibility"],
+    queryFn: () => visibilityFn(),
+    staleTime: 60_000,
+  });
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement | null>(null);
+  const enabledLocales = visibility?.enabledLocales?.length
+    ? visibility.enabledLocales
+    : SUPPORTED_LOCALES;
 
   useEffect(() => {
     if (!open) return;
@@ -46,7 +58,7 @@ export function LocaleSwitcher() {
           aria-label={t("common.language")}
           className="absolute end-0 mt-2 w-44 rounded-xl border border-border bg-background p-1 shadow-soft z-50"
         >
-          {SUPPORTED_LOCALES.map((loc) => {
+          {enabledLocales.map((loc) => {
             const active = loc === current;
             return (
               <li key={loc}>
