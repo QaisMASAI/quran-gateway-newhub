@@ -1,18 +1,28 @@
 import { useState, useRef, useEffect, useMemo, type ReactNode } from "react";
 import { Link } from "@tanstack/react-router";
-import { Play, Pause, Sparkles, BookText, Star, Loader2, NotebookPen, User, Tag, HeartHandshake } from "lucide-react";
+import {
+  Play,
+  Pause,
+  Sparkles,
+  BookText,
+  Star,
+  Loader2,
+  NotebookPen,
+  User,
+  Tag,
+  HeartHandshake,
+  Eye,
+  EyeOff,
+} from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import { useTranslation } from "react-i18next";
+import { useAudioPlayer } from "@/lib/audio-player-context";
 import {
-  ayahAudioUrl,
   cleanText,
   normalizeHebrew,
   RECITERS,
   reciterName,
-  getStoredReciter,
-  getStoredAudioQuality,
   type ReciterKey,
-  type AudioQualityKey,
 } from "@/lib/quran-api";
 import { useFavorites } from "@/lib/favorites";
 import { useQuery } from "@tanstack/react-query";
@@ -38,6 +48,7 @@ interface Props {
   arabic: string;
   hebrew: string;
   highlight?: string;
+  maxAyahInSurah?: number;
 }
 
 function highlightHebrew(text: string, term?: string): ReactNode | null {
@@ -72,17 +83,31 @@ function highlightHebrew(text: string, term?: string): ReactNode | null {
   }
 }
 
-export function AyahCard({ surah, surahName, ayah, arabic, hebrew, highlight }: Props) {
+export function AyahCard({
+  surah,
+  surahName,
+  ayah,
+  arabic,
+  hebrew,
+  highlight,
+  maxAyahInSurah,
+}: Props) {
   const { isFav, toggle } = useFavorites();
   const fav = isFav(surah, ayah);
   const { t, i18n } = useTranslation("common");
   const locale = (normalizeLocale(i18n.language) ?? "he") as "he" | "ar" | "en";
 
-  const [playing, setPlaying] = useState(false);
-  const audioRef = useRef<HTMLAudioElement | null>(null);
-  const [reciter, setReciter] = useState<ReciterKey>(() => getStoredReciter());
-  const [audioQuality] = useState<AudioQualityKey>(() => getStoredAudioQuality());
+  const {
+    activeTrack,
+    isPlaying,
+    playTrack,
+    togglePlay: toggleGlobalPlay,
+    reciter,
+  } = useAudioPlayer();
+  const isCurrentPlayingTrack = activeTrack?.surah === surah && activeTrack?.ayah === ayah;
+  const isThisPlaying = isCurrentPlayingTrack && isPlaying;
 
+  const [hifzMasked, setHifzMasked] = useState(false);
   const [panel, setPanel] = useState<null | "tafsir" | "sabab">(null);
   const [showNote, setShowNote] = useState(false);
   const [tafsirSource] = useState<(typeof TAFSIR_SOURCES_META)[number]["key"]>("jalalayn");
@@ -111,39 +136,18 @@ export function AyahCard({ surah, surahName, ayah, arabic, hebrew, highlight }: 
     staleTime: 15 * 60_000,
   });
 
-  // Sync reciter across cards
-  useEffect(() => {
-    const onChange = (e: Event) => {
-      const detail = (e as CustomEvent<ReciterKey>).detail;
-      if (detail) setReciter(detail);
-    };
-    window.addEventListener("qc:reciter-change", onChange as EventListener);
-    return () => window.removeEventListener("qc:reciter-change", onChange as EventListener);
-  }, []);
-
-  // Reset audio when reciter changes
-  useEffect(() => {
-    if (audioRef.current) {
-      audioRef.current.pause();
-      audioRef.current = null;
-      setPlaying(false);
-    }
-  }, [reciter]);
-
-  const togglePlay = () => {
-    if (!audioRef.current) {
-      audioRef.current = new Audio(ayahAudioUrl(surah, ayah, reciter, audioQuality));
-      audioRef.current.addEventListener("ended", () => setPlaying(false));
-      audioRef.current.addEventListener("error", () => setPlaying(false));
-    }
-    if (playing) {
-      audioRef.current.pause();
-      setPlaying(false);
+  const handlePlayToggle = () => {
+    if (isCurrentPlayingTrack) {
+      toggleGlobalPlay();
     } else {
-      audioRef.current
-        .play()
-        .then(() => setPlaying(true))
-        .catch(() => setPlaying(false));
+      playTrack({
+        surah,
+        surahName,
+        ayah,
+        maxAyahInSurah,
+        arabicText: arabic,
+        translationText: hebrew,
+      });
     }
   };
 
@@ -196,7 +200,9 @@ export function AyahCard({ surah, surahName, ayah, arabic, hebrew, highlight }: 
 
       {/* Translation in the active UI language (hidden for Arabic UI) */}
       {locale !== "ar" && (
-        <div className="mt-4 border-t border-border pt-4">
+        <div
+          className={`mt-4 border-t border-border pt-4 transition-all duration-300 ${hifzMasked ? "blur-md select-none opacity-40 hover:blur-none" : ""}`}
+        >
           {(() => {
             const isHe = locale === "he";
             const translationClass = isHe
@@ -218,9 +224,9 @@ export function AyahCard({ surah, surahName, ayah, arabic, hebrew, highlight }: 
 
       {/* Actions */}
       <div className="mt-5 flex flex-wrap items-center gap-2">
-        <ActionBtn onClick={togglePlay} active={playing}>
-          {playing ? <Pause className="h-3.5 w-3.5" /> : <Play className="h-3.5 w-3.5" />}
-          <span>{playing ? t("ui.ayah.pause") : t("ui.ayah.play")}</span>
+        <ActionBtn onClick={handlePlayToggle} active={isThisPlaying}>
+          {isThisPlaying ? <Pause className="h-3.5 w-3.5" /> : <Play className="h-3.5 w-3.5" />}
+          <span>{isThisPlaying ? t("ui.ayah.pause") : t("ui.ayah.play")}</span>
         </ActionBtn>
 
         <div className="inline-flex items-center gap-1.5 rounded-full border border-primary/30 bg-primary/10 px-3 py-1.5 text-xs font-medium text-primary">
@@ -232,6 +238,27 @@ export function AyahCard({ surah, surahName, ayah, arabic, hebrew, highlight }: 
             })()}
           </span>
         </div>
+
+        <ActionBtn onClick={() => setHifzMasked((v) => !v)} active={hifzMasked}>
+          {hifzMasked ? (
+            <EyeOff className="h-3.5 w-3.5 text-gold" />
+          ) : (
+            <Eye className="h-3.5 w-3.5" />
+          )}
+          <span>
+            {hifzMasked
+              ? locale === "ar"
+                ? "إظهار الترجمة"
+                : locale === "he"
+                  ? "הצג תרגום"
+                  : "Show Text"
+              : locale === "ar"
+                ? "وضع الحفظ"
+                : locale === "he"
+                  ? "מצב שינון"
+                  : "Hifz Mode"}
+          </span>
+        </ActionBtn>
 
         <ActionBtn onClick={() => openPanel("tafsir")} active={panel === "tafsir"}>
           <Sparkles className="h-3.5 w-3.5" />
@@ -305,7 +332,11 @@ export function AyahCard({ surah, surahName, ayah, arabic, hebrew, highlight }: 
       {connectedVerses.length > 0 && (
         <div className="mt-4 rounded-lg border border-border bg-secondary/30 p-3">
           <div className="mb-2 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
-            {locale === "ar" ? "آيات مترابطة" : locale === "he" ? "פסוקים מקושרים" : "Connected verses"}
+            {locale === "ar"
+              ? "آيات مترابطة"
+              : locale === "he"
+                ? "פסוקים מקושרים"
+                : "Connected verses"}
           </div>
           <div className="flex flex-wrap gap-1.5">
             {connectedVerses.map((v) => (
@@ -326,7 +357,13 @@ export function AyahCard({ surah, surahName, ayah, arabic, hebrew, highlight }: 
       )}
 
       <div className="mt-4 border-t border-border pt-3">
-        <ShareButtons surah={surah} ayah={ayah} surahName={surahName} arabic={arabic} hebrew={cleanText(hebrew)} />
+        <ShareButtons
+          surah={surah}
+          ayah={ayah}
+          surahName={surahName}
+          arabic={arabic}
+          hebrew={cleanText(hebrew)}
+        />
       </div>
 
       {/* Tafsir/Asbab panel */}
@@ -337,7 +374,11 @@ export function AyahCard({ surah, surahName, ayah, arabic, hebrew, highlight }: 
           return (
             <div className="mt-4 rounded-xl border border-border bg-secondary/40 px-4 py-3.5">
               <div className="mb-2 flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-primary">
-                {panel === "tafsir" ? <Sparkles className="h-3 w-3" /> : <BookText className="h-3 w-3" />}
+                {panel === "tafsir" ? (
+                  <Sparkles className="h-3 w-3" />
+                ) : (
+                  <BookText className="h-3 w-3" />
+                )}
                 {panel === "tafsir" ? t("ui.ayah.tafsirTitle") : t("ui.ayah.sababTitle")}
               </div>
 
@@ -345,7 +386,8 @@ export function AyahCard({ surah, surahName, ayah, arabic, hebrew, highlight }: 
                 <div className="mb-3 flex flex-wrap gap-1.5 border-b border-border/60 pb-2.5">
                   <span className="rounded-full border border-primary/40 bg-primary/10 px-3 py-1 text-[11.5px] font-medium text-primary">
                     {tafsirSourceName(
-                      TAFSIR_SOURCES_META.find((s) => s.key === "jalalayn") ?? TAFSIR_SOURCES_META[0],
+                      TAFSIR_SOURCES_META.find((s) => s.key === "jalalayn") ??
+                        TAFSIR_SOURCES_META[0],
                       locale,
                     )}
                   </span>
@@ -369,11 +411,16 @@ export function AyahCard({ surah, surahName, ayah, arabic, hebrew, highlight }: 
                   </div>
                 </div>
               )}
-              {!isLoading && hasError && <p className="text-sm text-destructive">{t("ui.ayah.networkError")}</p>}
+              {!isLoading && hasError && (
+                <p className="text-sm text-destructive">{t("ui.ayah.networkError")}</p>
+              )}
               {!isLoading && panel === "tafsir" && tafsirQ.data && tafsirQ.data.length > 0 && (
                 <div className="space-y-3">
                   {tafsirQ.data.slice(0, 3).map((row) => (
-                    <div key={row.id} className="rounded-lg border border-border/70 bg-background/60 p-3">
+                    <div
+                      key={row.id}
+                      className="rounded-lg border border-border/70 bg-background/60 p-3"
+                    >
                       <div className="prose prose-sm max-w-none text-[14.5px] text-foreground/90 [&>p]:my-1.5 [&>h1]:text-base [&>h2]:text-base [&>h3]:text-sm [&>ul]:my-1 [&>ol]:my-1">
                         <div
                           className={`ai-explanation-block ${row.lang === "ar" ? "font-tafsir-hadith-ar" : row.lang === "en" ? "font-tafsir-hadith-en" : "font-tafsir-hadith-he"}`}
@@ -386,7 +433,9 @@ export function AyahCard({ surah, surahName, ayah, arabic, hebrew, highlight }: 
                         <BookText className="h-3 w-3" />
                         <span>
                           {t("ui.ayah.source")}{" "}
-                          <strong className="text-foreground/80">{sourceName(row.source, locale)}</strong>
+                          <strong className="text-foreground/80">
+                            {sourceName(row.source, locale)}
+                          </strong>
                         </span>
                       </div>
                     </div>
@@ -396,7 +445,10 @@ export function AyahCard({ surah, surahName, ayah, arabic, hebrew, highlight }: 
               {!isLoading && panel === "sabab" && asbabQ.data && asbabQ.data.length > 0 && (
                 <div className="space-y-3">
                   {asbabQ.data.slice(0, 2).map((row) => (
-                    <div key={row.id} className="rounded-lg border border-border/70 bg-background/60 p-3">
+                    <div
+                      key={row.id}
+                      className="rounded-lg border border-border/70 bg-background/60 p-3"
+                    >
                       <div className="prose prose-sm max-w-none text-[14.5px] text-foreground/90 [&>p]:my-1.5 [&>h1]:text-base [&>h2]:text-base [&>h3]:text-sm [&>ul]:my-1 [&>ol]:my-1">
                         <div
                           className={`ai-explanation-block ${row.lang === "ar" ? "font-tafsir-hadith-ar" : row.lang === "en" ? "font-tafsir-hadith-en" : "font-tafsir-hadith-he"}`}
@@ -409,7 +461,9 @@ export function AyahCard({ surah, surahName, ayah, arabic, hebrew, highlight }: 
                         <BookText className="h-3 w-3" />
                         <span>
                           {t("ui.ayah.source")}{" "}
-                          <strong className="text-foreground/80">{sourceName(row.source, locale)}</strong>
+                          <strong className="text-foreground/80">
+                            {sourceName(row.source, locale)}
+                          </strong>
                         </span>
                       </div>
                     </div>
@@ -440,7 +494,8 @@ function ActionBtn({
   active?: boolean;
   tone?: "default" | "gold";
 }) {
-  const base = "inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium transition-colors";
+  const base =
+    "inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium transition-colors";
   const styles = active
     ? tone === "gold"
       ? "border-gold/40 bg-gold/15 text-foreground"
