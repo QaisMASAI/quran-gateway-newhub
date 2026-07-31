@@ -2,7 +2,13 @@ import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { fetchChapter, fetchVerses, surahAudioUrl, surahAudioUrls, type ApiLang } from "@/lib/quran-api";
+import {
+  fetchChapter,
+  fetchVerses,
+  surahAudioUrl,
+  surahAudioUrls,
+  type ApiLang,
+} from "@/lib/quran-api";
 import { surahDisplayName, surahNameHe, loadSurahNamesFromDb } from "@/lib/surah-names-he";
 import { Header } from "@/components/Header";
 import { AyahCard } from "@/components/AyahCard";
@@ -88,6 +94,8 @@ function SurahPage() {
   const { add: recordView } = useRecentlyViewed();
   const uiClass = uiFontClass(lang);
   if (!surahId || surahId < 1 || surahId > 114) throw notFound();
+
+  const [viewMode, setViewMode] = useState<"card" | "mushaf">("card");
 
   const chapterQ = useQuery({
     queryKey: ["chapter", surahId, lang],
@@ -252,7 +260,11 @@ function SurahPage() {
           to="/surahs"
           className={`inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-primary ${isRtl ? "flex-row-reverse" : ""}`}
         >
-          {isRtl ? <ChevronLeft className="h-3.5 w-3.5" /> : <ChevronRight className="h-3.5 w-3.5" />}
+          {isRtl ? (
+            <ChevronLeft className="h-3.5 w-3.5" />
+          ) : (
+            <ChevronRight className="h-3.5 w-3.5" />
+          )}
           {t("common.back")}
         </Link>
 
@@ -276,12 +288,17 @@ function SurahPage() {
                 <h1 className="font-quran text-5xl font-semibold leading-none" dir="rtl">
                   {chapter.name_arabic}
                 </h1>
-                <div className="text-lg font-semibold text-white/95" dir={lang === "en" ? "ltr" : "rtl"}>
+                <div
+                  className="text-lg font-semibold text-white/95"
+                  dir={lang === "en" ? "ltr" : "rtl"}
+                >
                   {surahDisplayName(chapter.id, lang)}
                 </div>
                 <div className="text-sm text-white/80">
                   {chapter.verses_count} •{" "}
-                  {chapter.revelation_place === "makkah" ? t("ui.surah.makkah") : t("ui.surah.madinah")}
+                  {chapter.revelation_place === "makkah"
+                    ? t("ui.surah.makkah")
+                    : t("ui.surah.madinah")}
                 </div>
 
                 <button
@@ -310,27 +327,73 @@ function SurahPage() {
           </div>
         )}
 
-        <div className={`mt-4 flex items-center ${isRtl ? "justify-start" : "justify-end"}`}>
+        <div className={`mt-4 flex flex-wrap items-center justify-between gap-2`}>
+          <div className="flex items-center gap-1 rounded-full border border-border bg-card p-1 text-xs">
+            <button
+              type="button"
+              onClick={() => setViewMode("card")}
+              className={`rounded-full px-3 py-1 font-semibold transition-all ${
+                viewMode === "card"
+                  ? "bg-primary text-primary-foreground shadow-xs"
+                  : "text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              {lang === "ar" ? "بطاقات دراسية" : lang === "he" ? "תצוגת כרטיסים" : "Study Cards"}
+            </button>
+            <button
+              type="button"
+              onClick={() => setViewMode("mushaf")}
+              className={`rounded-full px-3 py-1 font-semibold transition-all ${
+                viewMode === "mushaf"
+                  ? "bg-primary text-primary-foreground shadow-xs"
+                  : "text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              {lang === "ar" ? "قراءة مصحف" : lang === "he" ? "קריאת מצחף" : "Mushaf View"}
+            </button>
+          </div>
           <ReadingSettings />
         </div>
 
-        <div className="mt-3 space-y-4">
-          {verses?.map((v) => (
-            <AyahCard
-              key={v.id}
-              surah={surahId}
-              surahName={chapter?.name_arabic ?? ""}
-              ayah={v.verse_number}
-              arabic={v.text_uthmani}
-              hebrew={v.translations?.[0]?.text ?? ""}
-              highlight={q}
-            />
-          ))}
-        </div>
+        {viewMode === "mushaf" ? (
+          <div className="mt-6 rounded-3xl border border-gold/30 bg-card/90 p-6 sm:p-10 shadow-xl backdrop-blur-xl">
+            <div
+              className="font-quran text-2xl sm:text-3xl leading-[2.6] text-foreground text-justify"
+              dir="rtl"
+              lang="ar"
+            >
+              {verses?.map((v) => (
+                <span key={`mushaf-${v.id}`} className="inline">
+                  {v.text_uthmani}{" "}
+                  <span className="inline-flex h-7 w-7 items-center justify-center rounded-full border border-gold/40 bg-gold/10 font-sans text-xs font-bold text-gold mx-1 align-middle">
+                    {v.verse_number}
+                  </span>{" "}
+                </span>
+              ))}
+            </div>
+          </div>
+        ) : (
+          <div className="mt-3 space-y-4">
+            {verses?.map((v) => (
+              <AyahCard
+                key={v.id}
+                surah={surahId}
+                surahName={chapter?.name_arabic ?? ""}
+                ayah={v.verse_number}
+                arabic={v.text_uthmani}
+                hebrew={v.translations?.[0]?.text ?? ""}
+                highlight={q}
+                maxAyahInSurah={chapter?.verses_count}
+              />
+            ))}
+          </div>
+        )}
 
         {/* Bottom nav */}
         {chapter && (
-          <div className={`mt-8 flex items-center justify-between gap-2 ${isRtl ? "flex-row-reverse" : ""}`}>
+          <div
+            className={`mt-8 flex items-center justify-between gap-2 ${isRtl ? "flex-row-reverse" : ""}`}
+          >
             {surahId > 1 ? (
               <Link
                 to="/surah/$id"
