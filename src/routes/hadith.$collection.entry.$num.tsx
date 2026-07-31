@@ -3,10 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useTranslation } from "react-i18next";
 import { Header } from "@/components/Header";
-import {
-  generateHadithStudySummary,
-  getHadithKnowledgeBundle,
-} from "@/lib/hadith.functions";
+import { generateHadithStudySummary, getHadithKnowledgeBundle } from "@/lib/hadith.functions";
 import { PassageCard } from "@/components/discovery/PassageCard";
 import { EntityCard } from "@/components/discovery/EntityCard";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
@@ -58,18 +55,18 @@ export const Route = createFileRoute("/hadith/$collection/entry/$num")({
           children: JSON.stringify({
             "@context": "https://schema.org",
             "@type": "BreadcrumbList",
-            "itemListElement": [
-              { "@type": "ListItem", "position": 1, "name": "Hadith", "item": "/hadith" },
-              { "@type": "ListItem", "position": 2, "name": label, "item": `/hadith/${params.collection}` },
-              { "@type": "ListItem", "position": 3, "name": `Hadith #${params.num}`, "item": canonical }
-            ]
+            itemListElement: [
+              { "@type": "ListItem", position: 1, name: "Hadith", item: "/hadith" },
+              { "@type": "ListItem", position: 2, name: label, item: `/hadith/${params.collection}` },
+              { "@type": "ListItem", position: 3, name: `Hadith #${params.num}`, item: canonical },
+            ],
           }),
         },
       ],
     };
   },
   loader: async ({ context, params }) => {
-    if (!["bukhari", "muslim"].includes(params.collection)) throw notFound();
+    if (!params.collection || params.collection.trim().length === 0) throw notFound();
     const num = Number(params.num);
     if (!Number.isFinite(num) || num < 1) throw notFound();
     const bundle = await context.queryClient.ensureQueryData({
@@ -144,9 +141,7 @@ function HadithDetailPage() {
     return (
       <div className="min-h-screen bg-background">
         <Header />
-        <main className="mx-auto max-w-3xl px-4 py-10 text-sm text-destructive">
-          Failed to load this hadith entry.
-        </main>
+        <main className="mx-auto max-w-3xl px-4 py-10 text-sm text-destructive">Failed to load this hadith entry.</main>
       </div>
     );
   }
@@ -205,11 +200,7 @@ function HadithDetailPage() {
         )}
 
         <article className="mt-6 space-y-5 rounded-2xl border border-border bg-card p-5">
-          <p
-            className="font-reading-ar text-right text-xl leading-loose text-foreground"
-            dir="rtl"
-            lang="ar"
-          >
+          <p className="font-reading-ar text-right text-xl leading-loose text-foreground" dir="rtl" lang="ar">
             {h.arabic_text}
           </p>
           {h.english_text && (
@@ -276,11 +267,7 @@ function HadithDetailPage() {
             </AccordionItem>
             <AccordionItem value="narrated">
               <AccordionTrigger>
-                {locale === "ar"
-                  ? "سبب الرواية"
-                  : locale === "he"
-                    ? "למה נמסר החדית׳"
-                    : "Why this hadith was narrated"}
+                {locale === "ar" ? "سبب الرواية" : locale === "he" ? "למה נמסר החדית׳" : "Why this hadith was narrated"}
               </AccordionTrigger>
               <AccordionContent>
                 <p className="text-sm leading-relaxed text-foreground/90">
@@ -471,7 +458,9 @@ function HadithDetailPage() {
               {locale === "ar" ? "الاستشهادات" : locale === "he" ? "ציטוטים" : "Citations"}
             </h2>
             <ul className="list-disc space-y-1 ps-5 text-xs text-muted-foreground">
-              {studySummaryQ.data?.citations?.map((c) => <li key={c}>{c}</li>)}
+              {studySummaryQ.data?.citations?.map((c) => (
+                <li key={c}>{c}</li>
+              ))}
             </ul>
           </section>
         )}
