@@ -14,7 +14,10 @@ type Props = {
 };
 
 function stripMarkdown(input: string) {
-  return input.replace(/[`*_>#\[\]()!-]/g, " ").replace(/\s+/g, " ").trim();
+  return input
+    .replace(/[`*_>#\[\]()!-]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
 }
 
 function quickSummary(answer: string) {
