@@ -74,6 +74,7 @@ export function GlobalAudioPlayer() {
           <Link
             to="/surah/$id"
             params={{ id: String(activeTrack.surah) }}
+            search={{ q: undefined }}
             hash={`v-${activeTrack.ayah}`}
             className="flex items-center gap-2.5 min-w-0 group"
           >
@@ -171,7 +172,11 @@ export function GlobalAudioPlayer() {
                   {locale === "ar" ? "القارئ:" : locale === "he" ? "מקריא:" : "Reciter:"}
                 </span>
                 <span className="inline-flex items-center rounded-full border border-primary/30 bg-primary/10 px-2.5 py-0.5 text-xs font-semibold text-primary">
-                  {locale === "ar" ? "ياسر الدوسري" : locale === "he" ? "יאסר א-דוסרי" : "Yasser Al-Dosari"}
+                  {locale === "ar"
+                    ? "ياسر الدوسري"
+                    : locale === "he"
+                      ? "יאסר א-דוסרי"
+                      : "Yasser Al-Dosari"}
                 </span>
               </div>
 
@@ -181,7 +186,9 @@ export function GlobalAudioPlayer() {
                   type="button"
                   onClick={toggleLoop}
                   className={`inline-flex items-center gap-1 rounded-full border px-2.5 py-1 text-xs font-medium transition-colors ${
-                    isLooping ? "border-gold/40 bg-gold/15 text-gold" : "border-border text-muted-foreground"
+                    isLooping
+                      ? "border-gold/40 bg-gold/15 text-gold"
+                      : "border-border text-muted-foreground"
                   }`}
                 >
                   <Repeat className="h-3 w-3" />

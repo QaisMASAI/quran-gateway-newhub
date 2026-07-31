@@ -22,7 +22,8 @@ export const Route = createFileRoute("/hadith/$collection/$book")({
     if (!Number.isFinite(book) || book < 1) throw notFound();
     await context.queryClient.ensureQueryData({
       queryKey: ["hadith", "entries", params.collection, book, 0],
-      queryFn: () => listHadithEntries({ data: { collection: params.collection, book, page: 0, pageSize: 40 } }),
+      queryFn: () =>
+        listHadithEntries({ data: { collection: params.collection, book, page: 0, pageSize: 40 } }),
     });
   },
   component: HadithBookPage,
@@ -62,7 +63,11 @@ function HadithBookPage() {
           {isError && (
             <li className="rounded-lg border border-destructive/30 bg-destructive/5 p-3 text-sm text-destructive">
               Failed to load hadith entries.
-              <button type="button" onClick={() => void refetch()} className="ms-2 underline underline-offset-2">
+              <button
+                type="button"
+                onClick={() => void refetch()}
+                className="ms-2 underline underline-offset-2"
+              >
                 Retry
               </button>
             </li>
@@ -86,14 +91,20 @@ function HadithBookPage() {
                   {h.english_text.length > 320 ? "…" : ""}
                 </p>
               )}
-              <p className="font-reading-ar mt-2 text-right text-base text-foreground" dir="rtl" lang="ar">
+              <p
+                className="font-reading-ar mt-2 text-right text-base text-foreground"
+                dir="rtl"
+                lang="ar"
+              >
                 {h.arabic_text.slice(0, 300)}
                 {h.arabic_text.length > 300 ? "…" : ""}
               </p>
             </li>
           ))}
           {!isLoading && !isError && items.length === 0 && (
-            <li className="text-sm text-muted-foreground">No hadith entries were found for this book.</li>
+            <li className="text-sm text-muted-foreground">
+              No hadith entries were found for this book.
+            </li>
           )}
         </ol>
 

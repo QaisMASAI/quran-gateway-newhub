@@ -180,7 +180,9 @@ function EntityPage() {
     queryFn: async () => {
       const out: TafsirPassageRow[] = [];
       for (const v of anchorVerses) {
-        const rows = await tafsirApiFn({ data: { surah: v.surah, ayah: v.ayah_start, lang: locale } });
+        const rows = await tafsirApiFn({
+          data: { surah: v.surah, ayah: v.ayah_start, lang: locale },
+        });
         if ((rows ?? []).length > 0) {
           out.push(...rows);
           continue;
@@ -204,7 +206,9 @@ function EntityPage() {
     queryFn: async () => {
       const out: AsbabRow[] = [];
       for (const v of anchorVerses) {
-        const rows = await asbabApiFn({ data: { surah: v.surah, ayah: v.ayah_start, lang: locale } });
+        const rows = await asbabApiFn({
+          data: { surah: v.surah, ayah: v.ayah_start, lang: locale },
+        });
         if ((rows ?? []).length > 0) {
           out.push(...rows);
           continue;

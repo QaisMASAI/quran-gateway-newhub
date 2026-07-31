@@ -69,7 +69,11 @@ export async function runHadithImportStep(args: {
     .eq("id", jobId)
     .single();
 
-  const checkpoint = (jobRow?.checkpoint ?? {}) as { bookOffset?: number; page?: number; totalBooks?: number };
+  const checkpoint = (jobRow?.checkpoint ?? {}) as {
+    bookOffset?: number;
+    page?: number;
+    totalBooks?: number;
+  };
   const stats = (jobRow?.stats ?? {}) as {
     rowsReceived?: number;
     rowsWritten?: number;
@@ -77,7 +81,9 @@ export async function runHadithImportStep(args: {
     booksProcessed?: number;
     totalBooks?: number;
   };
-  const failedBatches = Array.isArray((jobRow as { failed_batches?: unknown } | null)?.failed_batches)
+  const failedBatches = Array.isArray(
+    (jobRow as { failed_batches?: unknown } | null)?.failed_batches,
+  )
     ? ((jobRow as { failed_batches?: HadithImportReport["failedBatches"] }).failed_batches ?? [])
     : [];
 
@@ -108,7 +114,7 @@ export async function runHadithImportStep(args: {
       for (let bIndex = 0; bIndex < slice.length; bIndex += 1) {
         const book = slice[bIndex];
         const bookOffset = currentBookOffset + bIndex;
-        const startPage = bIndex === 0 ? checkpoint.page ?? 0 : 0;
+        const startPage = bIndex === 0 ? (checkpoint.page ?? 0) : 0;
         for (let page = startPage; page < startPage + args.maxPagesPerBook; page += 1) {
           let items: Awaited<ReturnType<(typeof provider)["listBookEntries"]>>["items"] = [];
           let total = 0;
@@ -171,7 +177,13 @@ export async function runHadithImportStep(args: {
 
           const payload = items
             .map((i, idx) => {
-              if (!i.collection_slug || !i.book_id || !i.id_in_book || !i.global_id || !i.arabic_text) {
+              if (
+                !i.collection_slug ||
+                !i.book_id ||
+                !i.id_in_book ||
+                !i.global_id ||
+                !i.arabic_text
+              ) {
                 failedRows += 1;
                 appendFailed({
                   phase: "validate",
@@ -199,14 +211,17 @@ export async function runHadithImportStep(args: {
                 chain_text: i.chain_text,
                 reference_text: i.reference_text,
                 api_source: provider.id,
-                source_payload: i.source_payload as unknown as Database["public"]["Tables"]["hadith_entries"]["Insert"]["source_payload"],
+                source_payload:
+                  i.source_payload as unknown as Database["public"]["Tables"]["hadith_entries"]["Insert"]["source_payload"],
                 import_run_id: jobId,
               };
             })
             .filter((row): row is NonNullable<typeof row> => row !== null);
 
           const dedupedPayload = Array.from(
-            new Map(payload.map((row) => [`${row.collection_slug}:${row.global_id}`, row])).values(),
+            new Map(
+              payload.map((row) => [`${row.collection_slug}:${row.global_id}`, row]),
+            ).values(),
           );
 
           if (dedupedPayload.length === 0) {

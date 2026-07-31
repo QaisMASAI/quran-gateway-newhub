@@ -442,7 +442,10 @@ function cleanHtml(input: string) {
 async function fetchLocalFallbackVerses(
   question: string,
   k: number,
-  searchHybrid: (query: string, matchCount: number) => Promise<
+  searchHybrid: (
+    query: string,
+    matchCount: number,
+  ) => Promise<
     Array<{
       surah: number;
       ayah: number;
@@ -454,13 +457,15 @@ async function fetchLocalFallbackVerses(
 ): Promise<VerseCitation[]> {
   const rows = await searchHybrid(question, Math.max(k, 6));
 
-  return ((rows ?? []) as Array<{
-    surah: number;
-    ayah: number;
-    arabic: string;
-    hebrew: string;
-    score: number;
-  }>)
+  return (
+    (rows ?? []) as Array<{
+      surah: number;
+      ayah: number;
+      arabic: string;
+      hebrew: string;
+      score: number;
+    }>
+  )
     .slice(0, k)
     .map((r) => ({
       surah: r.surah,
@@ -760,13 +765,13 @@ export const askQuranResearch = createServerFn({ method: "POST" })
               match_count: matchCount,
             } as never,
           );
-          return ((rows ?? []) as Array<{
+          return (rows ?? []) as Array<{
             surah: number;
             ayah: number;
             arabic: string;
             hebrew: string;
             score: number;
-          }>);
+          }>;
         },
       );
       if (fallbackVerses.length > 0) {

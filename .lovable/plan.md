@@ -1,9 +1,11 @@
 # Website Upgrade Plan (Content-first, reliability-first, multilingual)
 
 ## Goal
+
 Upgrade the product into a stable, content-rich Quran knowledge experience with strong **he/ar/en parity**, while improving speed and reducing empty-state failures.
 
 ## Phase 1 — Content backbone hardening (highest priority)
+
 - Audit all content surfaces that currently show empty/partial output:
   - Learn page and its subpages
   - Prophets and Topics overviews/details
@@ -22,6 +24,7 @@ Upgrade the product into a stable, content-rich Quran knowledge experience with 
 **Deliverable:** no empty core pages, complete content flow from DB-first pipeline, consistent authenticated-source behavior.
 
 ## Phase 2 — Multilingual UX parity (he/ar/en)
+
 - Run a localization parity pass on all navigation and page labels:
   - header, bottom nav, learn entry points, map/research/timeline labels, CTAs
 - Fix language-direction correctness globally:
@@ -38,6 +41,7 @@ Upgrade the product into a stable, content-rich Quran knowledge experience with 
 **Deliverable:** feature-parity UX in all three languages with correct directionality and translations.
 
 ## Phase 3 — Reliability and retrieval correctness
+
 - Stabilize verse retrieval stack:
   - verify Arabic verse rendering across all consumers
   - validate DB translation source mapping and source-id resolution
@@ -54,6 +58,7 @@ Upgrade the product into a stable, content-rich Quran knowledge experience with 
 **Deliverable:** reliable verse/tafsir rendering and grounded AI retrieval in all languages.
 
 ## Phase 4 — Performance improvements (without redesign)
+
 - Reduce repeated remote fetches by tightening client-side caching and request deduplication in translation/knowledge loaders.
 - Minimize over-fetch in list/detail pages (query only needed columns/rows; avoid duplicate calls between route and component).
 - Improve perceived performance:
@@ -67,6 +72,7 @@ Upgrade the product into a stable, content-rich Quran knowledge experience with 
 **Deliverable:** faster, more stable content rendering with lower failure rates and better responsiveness.
 
 ## Phase 5 — QA + release hardening
+
 - Create a multilingual verification matrix (he/ar/en) across:
   - Home, Learn, Topic, Prophet, Surah, Map, Timeline, Research, Ask/Search
 - Validate high-priority scenarios:
@@ -82,6 +88,7 @@ Upgrade the product into a stable, content-rich Quran knowledge experience with 
 ---
 
 ## Technical implementation notes
+
 - Keep TanStack route patterns and existing design identity intact.
 - Prefer patching existing data pipeline modules over broad refactors.
 - Maintain DB-first architecture; use seed corpus only as controlled fallback.
@@ -89,6 +96,7 @@ Upgrade the product into a stable, content-rich Quran knowledge experience with 
 - Execute in small PR-style slices to minimize risk and credits.
 
 ## Success criteria
+
 - No empty core pages.
 - Tafsir/Asbab render from database-backed sources with citations.
 - Learn/Prophets/Topics show rich, multilingual content.

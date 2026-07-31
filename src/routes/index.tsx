@@ -87,7 +87,9 @@ export function Home() {
       if (!raw) return;
       const parsed = JSON.parse(raw);
       if (Array.isArray(parsed)) {
-        setRecentPrompts(parsed.filter((item): item is string => typeof item === "string").slice(0, 6));
+        setRecentPrompts(
+          parsed.filter((item): item is string => typeof item === "string").slice(0, 6),
+        );
       }
     } catch {
       // ignore malformed local cache
@@ -100,7 +102,9 @@ export function Home() {
       const raw = window.localStorage.getItem(HOME_RECENT_PLAN_KEY);
       if (!raw) return;
       const parsed = JSON.parse(raw) as Record<string, number[]>;
-      const slug = Object.entries(parsed).find(([, days]) => Array.isArray(days) && days.length > 0)?.[0] ?? null;
+      const slug =
+        Object.entries(parsed).find(([, days]) => Array.isArray(days) && days.length > 0)?.[0] ??
+        null;
       setRecentPlanSlug(slug);
     } catch {
       setRecentPlanSlug(null);
@@ -138,9 +142,19 @@ export function Home() {
   const suggestedQuestions = useMemo(
     () =>
       locale === "ar"
-        ? ["ما هي رحمة الله في القرآن؟", "آيات عن الصبر وقت الابتلاء", "ما معنى التوكل؟", "قصص موسى في القرآن"]
+        ? [
+            "ما هي رحمة الله في القرآن؟",
+            "آيات عن الصبر وقت الابتلاء",
+            "ما معنى التوكل؟",
+            "قصص موسى في القرآن",
+          ]
         : locale === "he"
-          ? ["מה הקוראן אומר על רחמים?", "פסוקים על סבלנות בזמן קושי", "מה משמעות התווכל?", "סיפורי משה בקוראן"]
+          ? [
+              "מה הקוראן אומר על רחמים?",
+              "פסוקים על סבלנות בזמן קושי",
+              "מה משמעות התווכל?",
+              "סיפורי משה בקוראן",
+            ]
           : [
               "What does the Quran teach about mercy?",
               "Verses about patience during hardship",
@@ -194,7 +208,12 @@ export function Home() {
   const discoverCards = useMemo(
     () => [
       {
-        label: locale === "ar" ? "المحادثات الأخيرة" : locale === "he" ? "שיחות אחרונות" : "Recent AI Conversations",
+        label:
+          locale === "ar"
+            ? "المحادثات الأخيرة"
+            : locale === "he"
+              ? "שיחות אחרונות"
+              : "Recent AI Conversations",
         description:
           locale === "ar"
             ? "ارجع إلى آخر الأسئلة التي طرحتها"
@@ -205,7 +224,8 @@ export function Home() {
         icon: MessageCircle,
       },
       {
-        label: locale === "ar" ? "التأمل اليومي" : locale === "he" ? "השראה יומית" : "Daily Reflections",
+        label:
+          locale === "ar" ? "التأمل اليومي" : locale === "he" ? "השראה יומית" : "Daily Reflections",
         description:
           locale === "ar"
             ? "آية اليوم مع انتقال مباشر للقراءة"
@@ -249,7 +269,10 @@ export function Home() {
   }
 
   return (
-    <div className="min-h-screen bg-background relative overflow-x-hidden" dir={isRtl ? "rtl" : "ltr"}>
+    <div
+      className="min-h-screen bg-background relative overflow-x-hidden"
+      dir={isRtl ? "rtl" : "ltr"}
+    >
       <Header />
 
       {/* Hero Ambient Background Lighting */}
@@ -311,7 +334,13 @@ export function Home() {
                       type="button"
                       variant="ghost"
                       size="icon"
-                      aria-label={locale === "ar" ? "بحث صوتي" : locale === "he" ? "חיפוש קולי" : "Voice search"}
+                      aria-label={
+                        locale === "ar"
+                          ? "بحث صوتي"
+                          : locale === "he"
+                            ? "חיפוש קולי"
+                            : "Voice search"
+                      }
                       className="h-8 w-8 rounded-lg text-muted-foreground hover:text-primary hover:bg-primary-soft/50"
                       onClick={() => {
                         if (typeof window === "undefined") return;
@@ -327,7 +356,8 @@ export function Home() {
                             start: () => void;
                           };
                         };
-                        const Recognition = speechWindow.SpeechRecognition ?? speechWindow.webkitSpeechRecognition;
+                        const Recognition =
+                          speechWindow.SpeechRecognition ?? speechWindow.webkitSpeechRecognition;
                         if (!Recognition) return;
                         const recognition = new Recognition();
                         recognition.lang = locale === "ar" ? "ar" : locale === "he" ? "he" : "en";
@@ -427,7 +457,11 @@ export function Home() {
               >
                 <Link to="/hadith">
                   <LibraryBig className="h-4 w-4 text-olive" />
-                  {locale === "ar" ? "مكتبة الحديث" : locale === "he" ? "ספריית החדית'" : "Hadith Library"}
+                  {locale === "ar"
+                    ? "مكتبة الحديث"
+                    : locale === "he"
+                      ? "ספריית החדית'"
+                      : "Hadith Library"}
                 </Link>
               </Button>
 
@@ -435,9 +469,13 @@ export function Home() {
                 asChild
                 className="rounded-full bg-gradient-to-r from-primary to-olive px-5 font-semibold text-primary-foreground shadow-md hover:opacity-95"
               >
-                <Link to="/ask">
+                <Link to="/ask" search={{ q: undefined, qState: "missing", src: "unknown" }}>
                   <Sparkles className="h-4 w-4 text-gold" />
-                  {locale === "ar" ? "مساعد AI" : locale === "he" ? "סייען AI" : "Grounded AI Research"}
+                  {locale === "ar"
+                    ? "مساعد AI"
+                    : locale === "he"
+                      ? "סייען AI"
+                      : "Grounded AI Research"}
                 </Link>
               </Button>
             </div>
@@ -452,7 +490,11 @@ export function Home() {
             <div className="flex items-center justify-between">
               <h2 className="text-xl font-bold tracking-tight text-foreground flex items-center gap-2">
                 <Clock className="h-5 w-5 text-primary" />
-                {locale === "ar" ? "تابع من حيث توقفت" : locale === "he" ? "המשך מהנקודה האחרונה" : "Continue Activity"}
+                {locale === "ar"
+                  ? "تابع من حيث توقفت"
+                  : locale === "he"
+                    ? "המשך מהנקודה האחרונה"
+                    : "Continue Activity"}
               </h2>
             </div>
 
@@ -471,7 +513,11 @@ export function Home() {
                     </div>
                     <div>
                       <p className="text-[11px] font-semibold uppercase tracking-wider text-primary">
-                        {locale === "ar" ? "متابعة القراءة" : locale === "he" ? "המשך קريאה" : "Continue Reading"}
+                        {locale === "ar"
+                          ? "متابعة القراءة"
+                          : locale === "he"
+                            ? "המשך קريאה"
+                            : "Continue Reading"}
                       </p>
                       <p className="mt-0.5 text-sm font-bold text-foreground">
                         {locale === "ar"
@@ -502,7 +548,11 @@ export function Home() {
                     </div>
                     <div>
                       <p className="text-[11px] font-semibold uppercase tracking-wider text-gold">
-                        {locale === "ar" ? "متابعة الخطة" : locale === "he" ? "המשך מסלול" : "Learning Journey"}
+                        {locale === "ar"
+                          ? "متابعة الخطة"
+                          : locale === "he"
+                            ? "המשך מסלול"
+                            : "Learning Journey"}
                       </p>
                       <p className="mt-0.5 text-sm font-bold text-foreground capitalize">
                         {recentPlanSlug.replace(/-/g, " ")}
@@ -529,9 +579,15 @@ export function Home() {
                     </div>
                     <div>
                       <p className="text-[11px] font-semibold uppercase tracking-wider text-primary">
-                        {locale === "ar" ? "متابعة البحث" : locale === "he" ? "המשך שיחת AI" : "AI Research Prompt"}
+                        {locale === "ar"
+                          ? "متابعة البحث"
+                          : locale === "he"
+                            ? "המשך שיחת AI"
+                            : "AI Research Prompt"}
                       </p>
-                      <p className="mt-0.5 line-clamp-1 text-sm font-bold text-foreground">{recentPrompts[0]}</p>
+                      <p className="mt-0.5 line-clamp-1 text-sm font-bold text-foreground">
+                        {recentPrompts[0]}
+                      </p>
                     </div>
                   </div>
                   {isRtl ? (
@@ -549,7 +605,11 @@ export function Home() {
         {recentViews.length > 0 && (
           <section className="mt-8">
             <h3 className="mb-3 text-xs font-bold uppercase tracking-wider text-muted-foreground">
-              {locale === "ar" ? "نصفي حديثاً" : locale === "he" ? "נצפו לאחרונה" : "Recently Opened"}
+              {locale === "ar"
+                ? "نصفي حديثاً"
+                : locale === "he"
+                  ? "נצפו לאחרונה"
+                  : "Recently Opened"}
             </h3>
             <div className="flex flex-wrap gap-2">
               {recentViews.slice(0, 8).map((view, idx) => (
@@ -584,7 +644,11 @@ export function Home() {
             <div>
               <h2 className="text-2xl font-extrabold tracking-tight text-foreground flex items-center gap-2">
                 <Sparkles className="h-5 w-5 text-gold" />
-                {locale === "ar" ? "إلهام آية اليوم" : locale === "he" ? "השראת היום" : "Verse of the Day"}
+                {locale === "ar"
+                  ? "إلهام آية اليوم"
+                  : locale === "he"
+                    ? "השראת היום"
+                    : "Verse of the Day"}
               </h2>
               <p className="text-xs text-muted-foreground mt-0.5">
                 {locale === "ar"
@@ -709,7 +773,9 @@ export function Home() {
                     <h3 className="text-sm font-bold text-foreground group-hover:text-gold transition-colors">
                       {card.label}
                     </h3>
-                    <p className="mt-1 text-xs text-muted-foreground leading-relaxed">{card.description}</p>
+                    <p className="mt-1 text-xs text-muted-foreground leading-relaxed">
+                      {card.description}
+                    </p>
                   </div>
                 </Link>
               );

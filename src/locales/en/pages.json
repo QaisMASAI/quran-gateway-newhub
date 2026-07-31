@@ -92,7 +92,16 @@
     "loadingIndex": "Loading local search index...",
     "indexError": "Failed to load the search index.",
     "suggestionsLabel": "Search suggestions",
-    "suggestions": ["mercy", "Abraham", "prayer", "charity", "patience", "faith", "الرحمن", "Moses"],
+    "suggestions": [
+      "mercy",
+      "Abraham",
+      "prayer",
+      "charity",
+      "patience",
+      "faith",
+      "الرحمن",
+      "Moses"
+    ],
     "chapterMatches": "Matching surahs",
     "noResultsFor": "No results for \"{{q}}\".",
     "foundVersesInSurahs": "Found {{total}} verses across {{groups}} surahs",
@@ -172,11 +181,26 @@
     "exploreTitle": "How to explore",
     "exploreBody": "Five ways to find what speaks to you, from the very first visit.",
     "explore": {
-      "topics": { "title": "Topics", "body": "Mercy, prayer, justice, patience — start where you're curious." },
-      "prophets": { "title": "Prophets", "body": "Moses, Jesus, Abraham, Muhammad — and the lessons of their lives." },
-      "stories": { "title": "Stories", "body": "Narratives that thread through the Quran with historical context." },
-      "search": { "title": "Search", "body": "Look up a word, phrase, or surah across three languages." },
-      "ask": { "title": "Ask the Quran", "body": "Get answers grounded only in verses and authentic Tafsir." }
+      "topics": {
+        "title": "Topics",
+        "body": "Mercy, prayer, justice, patience — start where you're curious."
+      },
+      "prophets": {
+        "title": "Prophets",
+        "body": "Moses, Jesus, Abraham, Muhammad — and the lessons of their lives."
+      },
+      "stories": {
+        "title": "Stories",
+        "body": "Narratives that thread through the Quran with historical context."
+      },
+      "search": {
+        "title": "Search",
+        "body": "Look up a word, phrase, or surah across three languages."
+      },
+      "ask": {
+        "title": "Ask the Quran",
+        "body": "Get answers grounded only in verses and authentic Tafsir."
+      }
     },
     "interestsTitle": "What interests you most?",
     "interestsBody": "Pick any that speak to you — we'll use these to suggest a starting path.",
@@ -199,14 +223,38 @@
     "pathTitle": "Your starting path",
     "pathBody": "A short list of places to begin, based on what you picked.",
     "rec": {
-      "prophets": { "title": "Meet the Prophets", "body": "Browse the prophets named in the Quran." },
-      "stories": { "title": "Stories & Discovery", "body": "Topics, prophets, and stories woven together." },
-      "prayer": { "title": "Topics on prayer & spirit", "body": "Explore worship, reflection, and inner life." },
-      "family": { "title": "Family & relationships", "body": "Verses about parents, spouses, and children." },
-      "ethics": { "title": "Ethics & justice", "body": "Mercy, fairness, kindness, and accountability." },
-      "interfaith": { "title": "Ask the Quran", "body": "Ask about other faiths — answers from verses only." },
-      "ask": { "title": "Ask the Quran", "body": "Type a question and get a verse-grounded answer." },
-      "surahs": { "title": "Browse the surahs", "body": "All 114 chapters, sortable and searchable." }
+      "prophets": {
+        "title": "Meet the Prophets",
+        "body": "Browse the prophets named in the Quran."
+      },
+      "stories": {
+        "title": "Stories & Discovery",
+        "body": "Topics, prophets, and stories woven together."
+      },
+      "prayer": {
+        "title": "Topics on prayer & spirit",
+        "body": "Explore worship, reflection, and inner life."
+      },
+      "family": {
+        "title": "Family & relationships",
+        "body": "Verses about parents, spouses, and children."
+      },
+      "ethics": {
+        "title": "Ethics & justice",
+        "body": "Mercy, fairness, kindness, and accountability."
+      },
+      "interfaith": {
+        "title": "Ask the Quran",
+        "body": "Ask about other faiths — answers from verses only."
+      },
+      "ask": {
+        "title": "Ask the Quran",
+        "body": "Type a question and get a verse-grounded answer."
+      },
+      "surahs": {
+        "title": "Browse the surahs",
+        "body": "All 114 chapters, sortable and searchable."
+      }
     }
   },
   "journeys": {

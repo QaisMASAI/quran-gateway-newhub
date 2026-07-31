@@ -53,11 +53,7 @@ function suppressDevErrorCollector500(): Plugin {
         return originalLoggerError(msg, options);
       };
 
-      const middleware = (
-        req: IncomingMessage,
-        res: ServerResponse,
-        next: () => void,
-      ) => {
+      const middleware = (req: IncomingMessage, res: ServerResponse, next: () => void) => {
         if (req.method === "GET" && req.url?.startsWith(debugEndpoint)) {
           if (!res.writableEnded) {
             res.statusCode = 200;
@@ -130,7 +126,8 @@ export default defineConfig({
           },
           {
             urlPattern: ({ url }) =>
-              url.origin === self.location.origin && /\.(?:js|mjs|css|woff2?|png|jpg|jpeg|webp|svg|ico)$/.test(url.pathname),
+              url.origin === self.location.origin &&
+              /\.(?:js|mjs|css|woff2?|png|jpg|jpeg|webp|svg|ico)$/.test(url.pathname),
             handler: "CacheFirst",
             options: {
               cacheName: "app-built-assets",

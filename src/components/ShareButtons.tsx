@@ -1,7 +1,12 @@
 import { Share2, Copy, Check, ImageDown, Loader2, ChevronDown, Palette } from "lucide-react";
 import { useState, useCallback, useMemo } from "react";
 import { useTranslation } from "react-i18next";
-import { renderVerseImage, type VerseImageFormat, type VerseImageTheme, THEMES_META } from "@/lib/verse-image";
+import {
+  renderVerseImage,
+  type VerseImageFormat,
+  type VerseImageTheme,
+  THEMES_META,
+} from "@/lib/verse-image";
 
 interface Props {
   surah: number;
@@ -169,7 +174,7 @@ export function ShareButtons(props: Props) {
         </button>
         {openTheme && (
           <div
-            className="absolute z-20 mt-1 min-w-[170px] rounded-xl border border-border bg-popover p-1 text-start shadow-lg"
+            className="absolute bottom-full z-[60] mb-1 min-w-[170px] rounded-xl border border-border bg-popover p-1 text-start shadow-lg"
             onMouseLeave={() => setOpenTheme(false)}
           >
             {THEMES.map((thKey) => {
@@ -216,7 +221,7 @@ export function ShareButtons(props: Props) {
         </button>
         {openFormat && (
           <div
-            className="absolute z-20 mt-1 min-w-[200px] rounded-xl border border-border bg-popover p-1 text-start shadow-lg"
+            className="absolute bottom-full z-[60] mb-1 min-w-[200px] rounded-xl border border-border bg-popover p-1 text-start shadow-lg"
             onMouseLeave={() => setOpenFormat(false)}
           >
             {FORMATS.map((f) => (
@@ -266,7 +271,11 @@ export function ShareButtons(props: Props) {
         onClick={() => copy("link")}
         className="inline-flex items-center gap-1 rounded-full border border-border bg-background px-2.5 py-1 text-[11px] font-medium text-foreground/80 hover:border-primary/40 hover:text-primary"
       >
-        {copied === "link" ? <Check className="h-3 w-3 text-emerald-500" /> : <Copy className="h-3 w-3" />}
+        {copied === "link" ? (
+          <Check className="h-3 w-3 text-emerald-500" />
+        ) : (
+          <Copy className="h-3 w-3" />
+        )}
         {copied === "link" ? t("ui.share.copied") : t("ui.share.copyLink")}
       </button>
 
@@ -346,7 +355,8 @@ export function ShareButtons(props: Props) {
                 }}
                 className="w-full flex items-center justify-center gap-2 p-2.5 rounded-xl border border-primary/30 bg-primary/10 text-primary text-xs font-medium hover:bg-primary/20"
               >
-                <ImageDown className="h-3.5 w-3.5" /> {t("common.save")} ({themeLabel(theme)} · {formatLabel(format)})
+                <ImageDown className="h-3.5 w-3.5" /> {t("common.save")} ({themeLabel(theme)} ·{" "}
+                {formatLabel(format)})
               </button>
             </div>
           </div>

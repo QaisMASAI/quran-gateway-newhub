@@ -632,7 +632,11 @@
     {
       "kind": "story",
       "slug": "dhul-qarnayn",
-      "title": { "he": "דול-קרניין והסכר", "ar": "ذو القرنين", "en": "Dhul-Qarnayn and the Great Barrier" },
+      "title": {
+        "he": "דול-קרניין והסכר",
+        "ar": "ذو القرنين",
+        "en": "Dhul-Qarnayn and the Great Barrier"
+      },
       "summary": {
         "he": "מלך צדיק שנסע במזרח ובמערב ובנה סכר ברזל ונחושת להגן על עם מחלש.",
         "ar": "ملك صالح طاف الأرض شرقاً وغرباً وبنى سداً لحماية القوم الضغفاء.",
@@ -654,7 +658,11 @@
     {
       "kind": "story",
       "slug": "luqman-advice",
-      "title": { "he": "עצות לוקמאן לבנו", "ar": "وصايا لقمان", "en": "Luqman's Advice to His Son" },
+      "title": {
+        "he": "עצות לוקמאן לבנו",
+        "ar": "وصايا لقمان",
+        "en": "Luqman's Advice to His Son"
+      },
       "summary": {
         "he": "חכם שהוריש לבנו הדרכה לחיים: אמונה באל אחד, כיבוד הורים, ענווה ותפילה.",
         "ar": "حكيم يعظ ابنه بالتوحيد وبر الوالدين وإقامة الصلاة والتواضع في المشي والقول.",
@@ -744,7 +752,11 @@
       "kind": "place",
       "slug": "sinai",
       "title": { "he": "הר סיני", "ar": "الطور", "en": "Mount Sinai" },
-      "summary": { "he": "שם דיבר האל עם משה.", "ar": "حيث كلّم الله موسى.", "en": "Where God spoke to Moses." },
+      "summary": {
+        "he": "שם דיבר האל עם משה.",
+        "ar": "حيث كلّم الله موسى.",
+        "en": "Where God spoke to Moses."
+      },
       "keywords": ["sinai", "tur"]
     },
     {

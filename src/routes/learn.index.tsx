@@ -51,7 +51,16 @@ export const Route = createFileRoute("/learn/")({
   component: LearnIndex,
 });
 
-const ORDER: EntityKind[] = ["topic", "prophet", "story", "event", "place", "nation", "concept", "theme"];
+const ORDER: EntityKind[] = [
+  "topic",
+  "prophet",
+  "story",
+  "event",
+  "place",
+  "nation",
+  "concept",
+  "theme",
+];
 
 const TOPIC_ICONS = {
   heart: Heart,
@@ -89,7 +98,8 @@ function LearnIndex() {
     }
   }, []);
 
-  const kindLabel = (k: EntityKind) => t(`search.kind${k.charAt(0).toUpperCase()}${k.slice(1)}` as const);
+  const kindLabel = (k: EntityKind) =>
+    t(`search.kind${k.charAt(0).toUpperCase()}${k.slice(1)}` as const);
   const sectionLabel = (k: EntityKind) => {
     if (k === "topic") return t("learn.browseTopics");
     if (k === "prophet") return t("learn.browseProphets");
@@ -186,7 +196,12 @@ function LearnIndex() {
           <p className="mb-4 text-sm text-muted-foreground">{t("topics.intro")}</p>
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {ALL_TOPICS.map((topic) => (
-              <LearnTopicCard key={topic.slug} slug={topic.slug} icon={topic.icon} refsCount={topic.refs.length} />
+              <LearnTopicCard
+                key={topic.slug}
+                slug={topic.slug}
+                icon={topic.icon}
+                refsCount={topic.refs.length}
+              />
             ))}
           </div>
         </section>
@@ -261,7 +276,10 @@ function LearnTopicCard({
             {topic.subtitle}
           </p>
         )}
-        <p className="mt-2 line-clamp-2 text-xs sm:text-sm text-muted-foreground leading-relaxed" dir="auto">
+        <p
+          className="mt-2 line-clamp-2 text-xs sm:text-sm text-muted-foreground leading-relaxed"
+          dir="auto"
+        >
           {topic.description}
         </p>
       </div>

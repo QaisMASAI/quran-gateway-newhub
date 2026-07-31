@@ -2,7 +2,7 @@ import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { fetchChapter, fetchVerses, surahAudioUrl, surahAudioUrls, type ApiLang } from "@/lib/quran-api";
+import { fetchChapter, fetchVerses, surahAudioUrls, type ApiLang } from "@/lib/quran-api";
 import { surahDisplayName, surahNameHe, loadSurahNamesFromDb } from "@/lib/surah-names-he";
 import { Header } from "@/components/Header";
 import { AyahCard } from "@/components/AyahCard";
@@ -113,6 +113,7 @@ function SurahPage() {
   const urlIndexRef = useRef(0);
 
   useEffect(() => {
+    urlIndexRef.current = 0;
     return () => {
       audioRef.current?.pause();
       audioRef.current = null;
@@ -254,7 +255,11 @@ function SurahPage() {
           to="/surahs"
           className={`inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-primary ${isRtl ? "flex-row-reverse" : ""}`}
         >
-          {isRtl ? <ChevronLeft className="h-3.5 w-3.5" /> : <ChevronRight className="h-3.5 w-3.5" />}
+          {isRtl ? (
+            <ChevronLeft className="h-3.5 w-3.5" />
+          ) : (
+            <ChevronRight className="h-3.5 w-3.5" />
+          )}
           {t("common.back")}
         </Link>
 
@@ -278,12 +283,17 @@ function SurahPage() {
                 <h1 className="font-quran text-5xl font-semibold leading-none" dir="rtl">
                   {chapter.name_arabic}
                 </h1>
-                <div className="text-lg font-semibold text-white/95" dir={lang === "en" ? "ltr" : "rtl"}>
+                <div
+                  className="text-lg font-semibold text-white/95"
+                  dir={lang === "en" ? "ltr" : "rtl"}
+                >
                   {surahDisplayName(chapter.id, lang)}
                 </div>
                 <div className="text-sm text-white/80">
                   {chapter.verses_count} •{" "}
-                  {chapter.revelation_place === "makkah" ? t("ui.surah.makkah") : t("ui.surah.madinah")}
+                  {chapter.revelation_place === "makkah"
+                    ? t("ui.surah.makkah")
+                    : t("ui.surah.madinah")}
                 </div>
 
                 <button
@@ -376,7 +386,9 @@ function SurahPage() {
 
         {/* Bottom nav */}
         {chapter && (
-          <div className={`mt-8 flex items-center justify-between gap-2 ${isRtl ? "flex-row-reverse" : ""}`}>
+          <div
+            className={`mt-8 flex items-center justify-between gap-2 ${isRtl ? "flex-row-reverse" : ""}`}
+          >
             {surahId > 1 ? (
               <Link
                 to="/surah/$id"

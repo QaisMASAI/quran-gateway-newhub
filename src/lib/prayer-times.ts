@@ -209,7 +209,7 @@ export function calculatePrayerTimes(date: Date, lat: number, lng: number): Pray
   const ishaMinutes = solarNoonLocalMinutes + haIsha * 4;
 
   const formatMin = (mins: number) => {
-    let normalized = (mins + 1440) % 1440;
+    const normalized = (mins + 1440) % 1440;
     const h = Math.floor(normalized / 60);
     const m = Math.floor(normalized % 60);
     const pad = (n: number) => String(n).padStart(2, "0");

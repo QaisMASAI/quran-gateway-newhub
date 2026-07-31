@@ -15,7 +15,17 @@ export type Topic = {
   title: string;
   subtitle?: string;
   description: string;
-  icon: "heart" | "scale" | "book" | "sun" | "moon" | "shield" | "users" | "sparkles" | "hand" | "star";
+  icon:
+    | "heart"
+    | "scale"
+    | "book"
+    | "sun"
+    | "moon"
+    | "shield"
+    | "users"
+    | "sparkles"
+    | "hand"
+    | "star";
   refs: AyahRef[];
 };
 
@@ -188,10 +198,9 @@ type SeedTopic = {
 };
 
 const seedTopicLinks = new Map(
-  ((seed.verses as Array<{ slug: string; links: [number, number, number][] }> | undefined) ?? []).map((v) => [
-    v.slug,
-    v.links,
-  ]),
+  (
+    (seed.verses as Array<{ slug: string; links: [number, number, number][] }> | undefined) ?? []
+  ).map((v) => [v.slug, v.links]),
 );
 
 const seedTopics: Topic[] = ((seed.entities as SeedTopic[] | undefined) ?? [])

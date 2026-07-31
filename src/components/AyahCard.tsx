@@ -18,7 +18,13 @@ import ReactMarkdown from "react-markdown";
 import { useTranslation } from "react-i18next";
 import { useAudioPlayer } from "@/lib/audio-player-context";
 import { sanitizeArabicText } from "@/utils/text";
-import { cleanText, normalizeHebrew, RECITERS, reciterName, type ReciterKey } from "@/lib/quran-api";
+import {
+  cleanText,
+  normalizeHebrew,
+  RECITERS,
+  reciterName,
+  type ReciterKey,
+} from "@/lib/quran-api";
 import { useFavorites } from "@/lib/favorites";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
@@ -78,13 +84,27 @@ function highlightHebrew(text: string, term?: string): ReactNode | null {
   }
 }
 
-export function AyahCard({ surah, surahName, ayah, arabic, hebrew, highlight, maxAyahInSurah }: Props) {
+export function AyahCard({
+  surah,
+  surahName,
+  ayah,
+  arabic,
+  hebrew,
+  highlight,
+  maxAyahInSurah,
+}: Props) {
   const { isFav, toggle } = useFavorites();
   const fav = isFav(surah, ayah);
   const { t, i18n } = useTranslation("common");
   const locale = (normalizeLocale(i18n.language) ?? "he") as "he" | "ar" | "en";
 
-  const { activeTrack, isPlaying, playTrack, togglePlay: toggleGlobalPlay, reciter } = useAudioPlayer();
+  const {
+    activeTrack,
+    isPlaying,
+    playTrack,
+    togglePlay: toggleGlobalPlay,
+    reciter,
+  } = useAudioPlayer();
   const isCurrentPlayingTrack = activeTrack?.surah === surah && activeTrack?.ayah === ayah;
   const isThisPlaying = isCurrentPlayingTrack && isPlaying;
 
@@ -141,8 +161,11 @@ export function AyahCard({ surah, surahName, ayah, arabic, hebrew, highlight, ma
   };
 
   const heHighlight = useMemo(() => highlightHebrew(hebrew, highlight), [hebrew, highlight]);
-  const links = useMemo(() => getAyahLinks(surah, ayah), [surah, ayah]);
-  const connectedVerses = useMemo(() => getConnectedVerses(surah, ayah, 4), [surah, ayah]);
+  const links = useMemo(() => getAyahLinks(surah, ayah, locale), [surah, ayah, locale]);
+  const connectedVerses = useMemo(
+    () => getConnectedVerses(surah, ayah, 4, locale),
+    [surah, ayah, locale],
+  );
   const [reading] = useReadingSettings();
   const displayArabic = useMemo(
     () => sanitizeArabicText(reading.stripTashkil ? stripArabicDiacritics(arabic) : arabic),
@@ -223,9 +246,19 @@ export function AyahCard({ surah, surahName, ayah, arabic, hebrew, highlight, ma
         {/* Hifz Mode — hidden in Arabic UI since translation is not shown in AR */}
         {locale !== "ar" && (
           <ActionBtn onClick={() => setHifzMasked((v) => !v)} active={hifzMasked}>
-            {hifzMasked ? <EyeOff className="h-3.5 w-3.5 text-gold" /> : <Eye className="h-3.5 w-3.5" />}
+            {hifzMasked ? (
+              <EyeOff className="h-3.5 w-3.5 text-gold" />
+            ) : (
+              <Eye className="h-3.5 w-3.5" />
+            )}
             <span>
-              {hifzMasked ? (locale === "he" ? "הצג תרגום" : "Show Text") : locale === "he" ? "מצב שינון" : "Hifz Mode"}
+              {hifzMasked
+                ? locale === "he"
+                  ? "הצג תרגום"
+                  : "Show Text"
+                : locale === "he"
+                  ? "מצב שינון"
+                  : "Hifz Mode"}
             </span>
           </ActionBtn>
         )}
@@ -302,7 +335,11 @@ export function AyahCard({ surah, surahName, ayah, arabic, hebrew, highlight, ma
       {connectedVerses.length > 0 && (
         <div className="mt-4 rounded-lg border border-border bg-secondary/30 p-3">
           <div className="mb-2 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
-            {locale === "ar" ? "آيات مترابطة" : locale === "he" ? "פסוקים מקושרים" : "Connected verses"}
+            {locale === "ar"
+              ? "آيات مترابطة"
+              : locale === "he"
+                ? "פסוקים מקושרים"
+                : "Connected verses"}
           </div>
           <div className="flex flex-wrap gap-1.5">
             {connectedVerses.map((v) => (
@@ -315,7 +352,6 @@ export function AyahCard({ surah, surahName, ayah, arabic, hebrew, highlight, ma
                 className="inline-flex items-center gap-1 rounded-full border border-border bg-background px-2.5 py-1 text-[11px] text-foreground/90 hover:border-primary/40"
               >
                 <span>{`${v.surahName} ${v.surah}:${v.ayah}`}</span>
-                <span className="text-muted-foreground">· {v.via.title}</span>
               </Link>
             ))}
           </div>
@@ -323,7 +359,13 @@ export function AyahCard({ surah, surahName, ayah, arabic, hebrew, highlight, ma
       )}
 
       <div className="mt-4 border-t border-border pt-3">
-        <ShareButtons surah={surah} ayah={ayah} surahName={surahName} arabic={arabic} hebrew={cleanText(hebrew)} />
+        <ShareButtons
+          surah={surah}
+          ayah={ayah}
+          surahName={surahName}
+          arabic={arabic}
+          hebrew={cleanText(hebrew)}
+        />
       </div>
 
       {/* Tafsir/Asbab panel */}
@@ -334,7 +376,11 @@ export function AyahCard({ surah, surahName, ayah, arabic, hebrew, highlight, ma
           return (
             <div className="mt-4 rounded-xl border border-border bg-secondary/40 px-4 py-3.5">
               <div className="mb-2 flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-primary">
-                {panel === "tafsir" ? <Sparkles className="h-3 w-3" /> : <BookText className="h-3 w-3" />}
+                {panel === "tafsir" ? (
+                  <Sparkles className="h-3 w-3" />
+                ) : (
+                  <BookText className="h-3 w-3" />
+                )}
                 {panel === "tafsir" ? t("ui.ayah.tafsirTitle") : t("ui.ayah.sababTitle")}
               </div>
 
@@ -342,7 +388,8 @@ export function AyahCard({ surah, surahName, ayah, arabic, hebrew, highlight, ma
                 <div className="mb-3 flex flex-wrap gap-1.5 border-b border-border/60 pb-2.5">
                   <span className="rounded-full border border-primary/40 bg-primary/10 px-3 py-1 text-[11.5px] font-medium text-primary">
                     {tafsirSourceName(
-                      TAFSIR_SOURCES_META.find((s) => s.key === "jalalayn") ?? TAFSIR_SOURCES_META[0],
+                      TAFSIR_SOURCES_META.find((s) => s.key === "jalalayn") ??
+                        TAFSIR_SOURCES_META[0],
                       locale,
                     )}
                   </span>
@@ -366,11 +413,16 @@ export function AyahCard({ surah, surahName, ayah, arabic, hebrew, highlight, ma
                   </div>
                 </div>
               )}
-              {!isLoading && hasError && <p className="text-sm text-destructive">{t("ui.ayah.networkError")}</p>}
+              {!isLoading && hasError && (
+                <p className="text-sm text-destructive">{t("ui.ayah.networkError")}</p>
+              )}
               {!isLoading && panel === "tafsir" && tafsirQ.data && tafsirQ.data.length > 0 && (
                 <div className="space-y-3">
                   {tafsirQ.data.slice(0, 3).map((row) => (
-                    <div key={row.id} className="rounded-lg border border-border/70 bg-background/60 p-3">
+                    <div
+                      key={row.id}
+                      className="rounded-lg border border-border/70 bg-background/60 p-3"
+                    >
                       <div className="prose prose-sm max-w-none text-[14.5px] text-foreground/90 [&>p]:my-1.5 [&>h1]:text-base [&>h2]:text-base [&>h3]:text-sm [&>ul]:my-1 [&>ol]:my-1">
                         <div
                           className={`ai-explanation-block ${row.lang === "ar" ? "font-tafsir-hadith-ar" : row.lang === "en" ? "font-tafsir-hadith-en" : "font-tafsir-hadith-he"}`}
@@ -383,7 +435,9 @@ export function AyahCard({ surah, surahName, ayah, arabic, hebrew, highlight, ma
                         <BookText className="h-3 w-3" />
                         <span>
                           {t("ui.ayah.source")}{" "}
-                          <strong className="text-foreground/80">{sourceName(row.source, locale)}</strong>
+                          <strong className="text-foreground/80">
+                            {sourceName(row.source, locale)}
+                          </strong>
                         </span>
                       </div>
                     </div>
@@ -393,7 +447,10 @@ export function AyahCard({ surah, surahName, ayah, arabic, hebrew, highlight, ma
               {!isLoading && panel === "sabab" && asbabQ.data && asbabQ.data.length > 0 && (
                 <div className="space-y-3">
                   {asbabQ.data.slice(0, 2).map((row) => (
-                    <div key={row.id} className="rounded-lg border border-border/70 bg-background/60 p-3">
+                    <div
+                      key={row.id}
+                      className="rounded-lg border border-border/70 bg-background/60 p-3"
+                    >
                       <div className="prose prose-sm max-w-none text-[14.5px] text-foreground/90 [&>p]:my-1.5 [&>h1]:text-base [&>h2]:text-base [&>h3]:text-sm [&>ul]:my-1 [&>ol]:my-1">
                         <div
                           className={`ai-explanation-block ${row.lang === "ar" ? "font-tafsir-hadith-ar" : row.lang === "en" ? "font-tafsir-hadith-en" : "font-tafsir-hadith-he"}`}
@@ -406,7 +463,9 @@ export function AyahCard({ surah, surahName, ayah, arabic, hebrew, highlight, ma
                         <BookText className="h-3 w-3" />
                         <span>
                           {t("ui.ayah.source")}{" "}
-                          <strong className="text-foreground/80">{sourceName(row.source, locale)}</strong>
+                          <strong className="text-foreground/80">
+                            {sourceName(row.source, locale)}
+                          </strong>
                         </span>
                       </div>
                     </div>
@@ -437,7 +496,8 @@ function ActionBtn({
   active?: boolean;
   tone?: "default" | "gold";
 }) {
-  const base = "inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium transition-colors";
+  const base =
+    "inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium transition-colors";
   const styles = active
     ? tone === "gold"
       ? "border-gold/40 bg-gold/15 text-foreground"

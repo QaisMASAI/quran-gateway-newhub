@@ -115,7 +115,10 @@ function TafsirIbnKathirPage() {
         <p className="mt-4 text-base leading-relaxed text-muted-foreground">{copy.intro}</p>
         <ul className="mt-6 space-y-3">
           {copy.bullets.map((item) => (
-            <li key={item} className="rounded-lg border border-border bg-card px-4 py-3 text-sm text-foreground">
+            <li
+              key={item}
+              className="rounded-lg border border-border bg-card px-4 py-3 text-sm text-foreground"
+            >
               {item}
             </li>
           ))}

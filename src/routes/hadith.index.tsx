@@ -18,13 +18,18 @@ export const Route = createFileRoute("/hadith/")({
       { property: "og:title", content: "Hadith Library" },
       {
         property: "og:description",
-        content: "Sahih al-Bukhari and Sahih Muslim in one searchable library with Quranic connections.",
+        content:
+          "Sahih al-Bukhari and Sahih Muslim in one searchable library with Quranic connections.",
       },
       { property: "og:url", content: "/hadith" },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:title", content: "Hadith Library" },
-      { name: "twitter:description", content: "Browse Sahih al-Bukhari and Sahih Muslim with full Arabic text and English translation." },
+      {
+        name: "twitter:description",
+        content:
+          "Browse Sahih al-Bukhari and Sahih Muslim with full Arabic text and English translation.",
+      },
     ],
     links: [{ rel: "canonical", href: "/hadith" }],
     scripts: [
@@ -33,9 +38,7 @@ export const Route = createFileRoute("/hadith/")({
         children: JSON.stringify({
           "@context": "https://schema.org",
           "@type": "BreadcrumbList",
-          "itemListElement": [
-            { "@type": "ListItem", "position": 1, "name": "Hadith", "item": "/hadith" }
-          ]
+          itemListElement: [{ "@type": "ListItem", position: 1, name: "Hadith", item: "/hadith" }],
         }),
       },
     ],

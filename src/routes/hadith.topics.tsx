@@ -3,7 +3,11 @@ import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useTranslation } from "react-i18next";
 import { Header } from "@/components/Header";
-import { listHadithTopicBooks, listHadithTopics, trackHadithTelemetryEvent } from "@/lib/hadith.functions";
+import {
+  listHadithTopicBooks,
+  listHadithTopics,
+  trackHadithTelemetryEvent,
+} from "@/lib/hadith.functions";
 import { pickLocale } from "@/lib/knowledge";
 import { normalizeLocale } from "@/lib/i18n";
 
@@ -11,9 +15,16 @@ export const Route = createFileRoute("/hadith/topics")({
   head: () => ({
     meta: [
       { title: "Hadith Topics — Sahih al-Bukhari & Sahih Muslim" },
-      { name: "description", content: "Explore Hadiths categorized by topic and theme across Sahih al-Bukhari and Sahih Muslim collections." },
+      {
+        name: "description",
+        content:
+          "Explore Hadiths categorized by topic and theme across Sahih al-Bukhari and Sahih Muslim collections.",
+      },
       { property: "og:title", content: "Hadith Topics" },
-      { property: "og:description", content: "Browse Hadith collections by topic to find relevant authenticated traditions." },
+      {
+        property: "og:description",
+        content: "Browse Hadith collections by topic to find relevant authenticated traditions.",
+      },
       { property: "og:url", content: "/hadith/topics" },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
@@ -27,10 +38,10 @@ export const Route = createFileRoute("/hadith/topics")({
         children: JSON.stringify({
           "@context": "https://schema.org",
           "@type": "BreadcrumbList",
-          "itemListElement": [
-            { "@type": "ListItem", "position": 1, "name": "Hadith", "item": "/hadith" },
-            { "@type": "ListItem", "position": 2, "name": "Topics", "item": "/hadith/topics" }
-          ]
+          itemListElement: [
+            { "@type": "ListItem", position: 1, name: "Hadith", item: "/hadith" },
+            { "@type": "ListItem", position: 2, name: "Topics", item: "/hadith/topics" },
+          ],
         }),
       },
     ],
@@ -51,7 +62,12 @@ function HadithTopicsPage() {
   const fn = useServerFn(listHadithTopicBooks);
   const topicsFn = useServerFn(listHadithTopics);
   const trackTelemetry = useServerFn(trackHadithTelemetryEvent);
-  const { data = [], isLoading: booksLoading, isError: booksError, refetch: refetchBooks } = useQuery({
+  const {
+    data = [],
+    isLoading: booksLoading,
+    isError: booksError,
+    refetch: refetchBooks,
+  } = useQuery({
     queryKey: ["hadith", "topic-books"],
     queryFn: () => fn({ data: { limitPerCollection: 10 } }),
   });
@@ -119,7 +135,13 @@ function HadithTopicsPage() {
                   to="/learn/$kind/$slug"
                   params={{ kind: "topic", slug: topic.slug }}
                   onClick={() => {
-                    void trackTelemetry({ data: { event: "topic_card_click", slug: topic.slug, route: "/hadith/topics" } });
+                    void trackTelemetry({
+                      data: {
+                        event: "topic_card_click",
+                        slug: topic.slug,
+                        route: "/hadith/topics",
+                      },
+                    });
                   }}
                   className="surface-card block p-4 transition-colors hover:border-primary/40"
                 >

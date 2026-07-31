@@ -44,7 +44,10 @@ function SurahsIndex() {
   }, [chapters, filter]);
 
   return (
-    <div className={`min-h-screen bg-background relative overflow-x-hidden ${uiClass}`} dir={isRtl ? "rtl" : "ltr"}>
+    <div
+      className={`min-h-screen bg-background relative overflow-x-hidden ${uiClass}`}
+      dir={isRtl ? "rtl" : "ltr"}
+    >
       <Header />
 
       {/* Ambient Radial Accent */}
@@ -58,13 +61,19 @@ function SurahsIndex() {
           <div className="flex items-center gap-2">
             <BookOpen className="h-6 w-6 text-primary" />
             <span className="text-xs font-bold uppercase tracking-widest text-primary">
-              {locale === "ar" ? "القرآن الكريم" : locale === "he" ? "הקוראן הקדוש" : "The Holy Quran"}
+              {locale === "ar"
+                ? "القرآن الكريم"
+                : locale === "he"
+                  ? "הקוראן הקדוש"
+                  : "The Holy Quran"}
             </span>
           </div>
           <h1 className="mt-2 text-3xl sm:text-4xl font-extrabold tracking-tight text-foreground">
             {t("home.chaptersTitle")}
           </h1>
-          <p className="mt-2 text-sm text-muted-foreground max-w-2xl">{t("home.chaptersSubtitle")}</p>
+          <p className="mt-2 text-sm text-muted-foreground max-w-2xl">
+            {t("home.chaptersSubtitle")}
+          </p>
         </div>
         <div className="mosque-arch" aria-hidden />
       </div>
@@ -74,7 +83,11 @@ function SurahsIndex() {
           <section className="mb-10">
             <h2 className="mb-4 flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-primary">
               <Clock className="h-4 w-4" />
-              {locale === "ar" ? "شوهدت مؤخراً" : locale === "he" ? "נצפו לאחרונה" : "Recently Viewed"}
+              {locale === "ar"
+                ? "شوهدت مؤخراً"
+                : locale === "he"
+                  ? "נצפו לאחרונה"
+                  : "Recently Viewed"}
             </h2>
             <div className="grid grid-cols-1 gap-3.5 sm:grid-cols-2 lg:grid-cols-3">
               {recentSurahs.slice(0, 3).map((view) => (
@@ -148,7 +161,8 @@ function SurahsIndex() {
                         {c.translated_name.name}
                       </h3>
                       <p className="mt-0.5 text-xs text-muted-foreground">
-                        {c.verses_count} {locale === "ar" ? "آية" : locale === "he" ? "פסוקים" : "Verses"} •{" "}
+                        {c.verses_count}{" "}
+                        {locale === "ar" ? "آية" : locale === "he" ? "פסוקים" : "Verses"} •{" "}
                         {c.revelation_place === "makkah" ? t("home.makkah") : t("home.madinah")}
                       </p>
                     </div>
@@ -169,7 +183,9 @@ function SurahsIndex() {
         )}
 
         {filteredChapters.length === 0 && !isLoading && (
-          <p className="py-20 text-center text-muted-foreground font-medium">{t("home.noResults")}</p>
+          <p className="py-20 text-center text-muted-foreground font-medium">
+            {t("home.noResults")}
+          </p>
         )}
       </main>
     </div>
