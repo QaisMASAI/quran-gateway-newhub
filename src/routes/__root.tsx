@@ -10,6 +10,8 @@ import {
 import { useEffect, useState, type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 
+import { AudioPlayerProvider } from "@/lib/audio-player-context";
+import { GlobalAudioPlayer } from "@/components/GlobalAudioPlayer";
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { BottomNav } from "@/components/BottomNav";
@@ -273,21 +275,25 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <DirectionProvider>
-        {showDevBanner ? (
-          <div className="sticky top-0 z-50 border-b border-warning/40 bg-warning-soft px-4 py-2 text-xs text-warning-foreground">
-            <strong>Dev middleware active:</strong> intercepted /__lovable/error-collector {devErrorStatus?.interceptedCount ?? 0} time(s).
-            {devErrorStatus?.lastViteError ? (
-              <span className="ml-2">Latest Vite error: {devErrorStatus.lastViteError}</span>
-            ) : (
-              <span className="ml-2">No underlying Vite transform/build error captured yet.</span>
-            )}
-          </div>
-        ) : null}
-        {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
-        <Outlet />
-        <BottomNav />
-      </DirectionProvider>
+      <AudioPlayerProvider>
+        <DirectionProvider>
+          {showDevBanner ? (
+            <div className="sticky top-0 z-50 border-b border-warning/40 bg-warning-soft px-4 py-2 text-xs text-warning-foreground">
+              <strong>Dev middleware active:</strong> intercepted /__lovable/error-collector{" "}
+              {devErrorStatus?.interceptedCount ?? 0} time(s).
+              {devErrorStatus?.lastViteError ? (
+                <span className="ml-2">Latest Vite error: {devErrorStatus.lastViteError}</span>
+              ) : (
+                <span className="ml-2">No underlying Vite transform/build error captured yet.</span>
+              )}
+            </div>
+          ) : null}
+          {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
+          <Outlet />
+          <GlobalAudioPlayer />
+          <BottomNav />
+        </DirectionProvider>
+      </AudioPlayerProvider>
     </QueryClientProvider>
   );
 }
