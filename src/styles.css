@@ -46,19 +46,20 @@
   --font-reading-en: "Merriweather", "Times New Roman", Georgia, "Noto Serif", serif;
   --font-reading-he: "Heebo", "Arial Hebrew", "Noto Sans Hebrew", "Segoe UI", sans-serif;
   --font-reading-ar: "Noto Naskh Arabic", "Amiri", "Scheherazade New", "IBM Plex Sans Arabic", "Geeza Pro", serif;
-  --font-quran: "KFGQPC Uthmanic Script HAFS", "UthmanicHafs", "Noto Naskh Arabic", "Amiri Quran", "Scheherazade New", serif;
+  --font-quran:
+    "KFGQPC Uthmanic Script HAFS", "UthmanicHafs", "Noto Naskh Arabic", "Amiri Quran", "Scheherazade New", serif;
   --font-tafsir-hadith-ar: var(--font-reading-ar);
   --font-tafsir-hadith-he: var(--font-reading-he);
   --font-tafsir-hadith-en: var(--font-reading-en);
   --font-display: var(--font-ui-en);
 
-  --gradient-hero: linear-gradient(180deg,
-      oklch(0.32 0.07 160) 0%,
-      oklch(0.42 0.09 162) 60%,
-      oklch(0.48 0.09 165) 100%);
-  --gradient-hero-soft: linear-gradient(160deg,
-      oklch(0.97 0.025 110) 0%,
-      oklch(0.95 0.04 150) 100%);
+  --gradient-hero: linear-gradient(
+    180deg,
+    oklch(0.32 0.07 160) 0%,
+    oklch(0.42 0.09 162) 60%,
+    oklch(0.48 0.09 165) 100%
+  );
+  --gradient-hero-soft: linear-gradient(160deg, oklch(0.97 0.025 110) 0%, oklch(0.95 0.04 150) 100%);
   --gradient-primary: linear-gradient(135deg, oklch(0.32 0.07 160), oklch(0.48 0.09 165));
   --gradient-olive: linear-gradient(135deg, oklch(0.48 0.09 165), oklch(0.55 0.08 160));
   --gradient-gold: linear-gradient(135deg, oklch(0.78 0.13 80), oklch(0.7 0.14 60));
@@ -157,10 +158,14 @@
 }
 
 @layer base {
-  * { border-color: var(--color-border); }
+  * {
+    border-color: var(--color-border);
+  }
 
   /* Default: let the HTML dir attribute control layout. Use :dir selectors for direction-specific tweaks. */
-  html { direction: ltr; }
+  html {
+    direction: ltr;
+  }
 
   body {
     background-color: var(--color-background);
@@ -171,8 +176,12 @@
     position: relative;
   }
 
-  html[lang="he"] body { font-family: var(--font-ui-he); }
-  html[lang="ar"] body { font-family: var(--font-ui-ar); }
+  html[lang="he"] body {
+    font-family: var(--font-ui-he);
+  }
+  html[lang="ar"] body {
+    font-family: var(--font-ui-ar);
+  }
 
   /* Islamic Khatam watermark — 8-pointed star (two overlapping squares)
      with octagons and interlocking circles. Strictly NO 6-pointed star
@@ -184,8 +193,7 @@
     pointer-events: none;
     z-index: 0;
     opacity: 0.05;
-    background-image:
-      url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160' viewBox='0 0 160 160'><g fill='none' stroke='%23064e3b' stroke-width='1' stroke-linejoin='round[...]");
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160' viewBox='0 0 160 160'><g fill='none' stroke='%23064e3b' stroke-width='1' stroke-linejoin='round[...]");
     background-size: 160px 160px;
     background-repeat: repeat;
   }
@@ -199,8 +207,7 @@
     z-index: 9999;
     opacity: 0.03;
     mix-blend-mode: multiply;
-    background-image:
-      url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160' viewBox='0 0 160 160'><g fill='none' stroke='%23064e3b' stroke-width='1' stroke-linejoin='round[...]");
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160' viewBox='0 0 160 160'><g fill='none' stroke='%23064e3b' stroke-width='1' stroke-linejoin='round[...]");
     background-size: 160px 160px;
     background-repeat: repeat;
   }
@@ -209,17 +216,18 @@
      stays visible on the deep emerald background. */
   .dark body::before {
     opacity: 0.07;
-    background-image:
-      url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160' viewBox='0 0 160 160'><g fill='none' stroke='%23c9a84c' stroke-width='1' stroke-linejoin='round[...]");
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160' viewBox='0 0 160 160'><g fill='none' stroke='%23c9a84c' stroke-width='1' stroke-linejoin='round[...]");
   }
   .dark body::after {
     opacity: 0.04;
     mix-blend-mode: screen;
-    background-image:
-      url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160' viewBox='0 0 160 160'><g fill='none' stroke='%23c9a84c' stroke-width='1' stroke-linejoin='round[...]");
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160' viewBox='0 0 160 160'><g fill='none' stroke='%23c9a84c' stroke-width='1' stroke-linejoin='round[...]");
   }
 
-  body > * { position: relative; z-index: 1; }
+  body > * {
+    position: relative;
+    z-index: 1;
+  }
 
   .font-arabic {
     font-family: var(--font-reading-ar);
@@ -228,29 +236,65 @@
     letter-spacing: 0;
   }
 
-  .font-ui-en { font-family: var(--font-ui-en); }
-  .font-ui-he { font-family: var(--font-ui-he); direction: rtl; letter-spacing: 0; }
-  .font-ui-ar { font-family: var(--font-ui-ar); direction: rtl; letter-spacing: 0; }
+  .font-ui-en {
+    font-family: var(--font-ui-en);
+  }
+  .font-ui-he {
+    font-family: var(--font-ui-he);
+    direction: rtl;
+    letter-spacing: 0;
+  }
+  .font-ui-ar {
+    font-family: var(--font-ui-ar);
+    direction: rtl;
+    letter-spacing: 0;
+  }
 
   .font-arabic-ui {
     font-family: var(--font-ui-ar);
     direction: rtl;
   }
 
-  .font-reading-en { font-family: var(--font-reading-en); }
-  .font-reading-he { font-family: var(--font-reading-he); direction: rtl; line-height: 1.9; letter-spacing: 0; }
-  .font-reading-ar { font-family: var(--font-reading-ar); direction: rtl; line-height: 2.1; letter-spacing: 0; }
+  .font-reading-en {
+    font-family: var(--font-reading-en);
+  }
+  .font-reading-he {
+    font-family: var(--font-reading-he);
+    direction: rtl;
+    line-height: 1.9;
+    letter-spacing: 0;
+  }
+  .font-reading-ar {
+    font-family: var(--font-reading-ar);
+    direction: rtl;
+    line-height: 2.1;
+    letter-spacing: 0;
+  }
 
-  .font-tafsir-hadith-en { font-family: var(--font-tafsir-hadith-en); }
-  .font-tafsir-hadith-he { font-family: var(--font-tafsir-hadith-he); direction: rtl; line-height: 1.95; letter-spacing: 0; }
-  .font-tafsir-hadith-ar { font-family: var(--font-tafsir-hadith-ar); direction: rtl; line-height: 2.1; letter-spacing: 0; }
+  .font-tafsir-hadith-en {
+    font-family: var(--font-tafsir-hadith-en);
+  }
+  .font-tafsir-hadith-he {
+    font-family: var(--font-tafsir-hadith-he);
+    direction: rtl;
+    line-height: 1.95;
+    letter-spacing: 0;
+  }
+  .font-tafsir-hadith-ar {
+    font-family: var(--font-tafsir-hadith-ar);
+    direction: rtl;
+    line-height: 2.1;
+    letter-spacing: 0;
+  }
 
   .font-quran {
     font-family: var(--font-quran);
     direction: rtl;
     line-height: 2.45;
     letter-spacing: 0;
-    font-feature-settings: "liga" 1, "calt" 1;
+    font-feature-settings:
+      "liga" 1,
+      "calt" 1;
   }
 
   .font-display {
@@ -294,8 +338,12 @@
     font-family: var(--font-reading-en);
   }
 
-  html[lang="he"] .prose { font-family: var(--font-reading-he); }
-  html[lang="ar"] .prose { font-family: var(--font-reading-ar); }
+  html[lang="he"] .prose {
+    font-family: var(--font-reading-he);
+  }
+  html[lang="ar"] .prose {
+    font-family: var(--font-reading-ar);
+  }
 
   mark.search-hit {
     background: oklch(0.95 0.13 85);
@@ -304,15 +352,25 @@
     padding: 0 2px;
   }
 
-  ::-webkit-scrollbar { width: 10px; height: 10px; }
-  ::-webkit-scrollbar-thumb { background: var(--color-border); border-radius: 8px; }
-  ::-webkit-scrollbar-thumb:hover { background: var(--color-muted-foreground); }
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: var(--color-border);
+    border-radius: 8px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--color-muted-foreground);
+  }
 }
 
 @font-face {
   font-family: "KFGQPC Uthmanic Script HAFS";
-  src: local("KFGQPC Uthmanic Script HAFS"),
-    url("https://cdn.jsdelivr.net/gh/mustafa0x/qpc-fonts@f93bf5f3/various-woff2/UthmanicHafs1%20Ver09.woff2") format("woff2");
+  src:
+    local("KFGQPC Uthmanic Script HAFS"),
+    url("https://cdn.jsdelivr.net/gh/mustafa0x/qpc-fonts@f93bf5f3/various-woff2/UthmanicHafs1%20Ver09.woff2")
+      format("woff2");
   font-weight: 400;
   font-style: normal;
   font-display: swap;
@@ -323,6 +381,36 @@
   border: 1px solid var(--color-border);
   border-radius: var(--radius-xl);
   box-shadow: var(--shadow-card);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@utility glass-panel {
+  background: oklch(from var(--color-card) l c h / 0.85);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid oklch(from var(--color-border) l c h / 0.7);
+  border-radius: var(--radius-2xl);
+  box-shadow: 0 8px 32px -8px oklch(0.2 0.05 160 / 0.08);
+}
+
+@utility glow-gold {
+  box-shadow: 0 0 35px -5px oklch(0.78 0.13 85 / 0.25);
+}
+
+@utility glow-emerald {
+  box-shadow: 0 0 35px -5px oklch(0.34 0.07 160 / 0.25);
+}
+
+@utility gradient-text-gold {
+  background: linear-gradient(135deg, oklch(0.85 0.14 85) 0%, oklch(0.68 0.15 65) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+@utility gradient-text-emerald {
+  background: linear-gradient(135deg, oklch(0.48 0.09 165) 0%, oklch(0.32 0.07 160) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
 /* Arabesque pattern overlay for hero gradients (white pattern over dark hero) */
@@ -330,7 +418,7 @@
   background-image:
     radial-gradient(circle at 20% 20%, oklch(1 0 0 / 0.08) 0%, transparent 35%),
     radial-gradient(circle at 80% 80%, oklch(1 0 0 / 0.06) 0%, transparent 40%),
-    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='80' height='80' viewBox='0 0 80 80'><g fill='none' stroke='white' stroke-opacity='0.08' stroke-width='1'><path d='M[...]");
+    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='80' height='80' viewBox='0 0 80 80'><g fill='none' stroke='white' stroke-opacity='0.08' stroke-width='1'><path d='M0 0h80v80H0z'/></g></svg>");
 }
 
 /* Subtle mosque arch — decorative svg block usable in section headers */
@@ -341,7 +429,7 @@
   background-repeat: repeat-x;
   background-position: center bottom;
   background-size: 80px 28px;
-  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='80' height='28' viewBox='0 0 80 28'><path d='M0 28 L0 14 Q0 0 14 0 L26 0 Q40 0 40 14 L40 28 Z M40 2[...]");
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='80' height='28' viewBox='0 0 80 28'><path d='M0 28 L0 14 Q0 0 14 0 L26 0 Q40 0 40 14 L40 28 Z' fill='none' stroke='%23064e3b' stroke-opacity='0.15' stroke-width='1.5'/></svg>");
   opacity: 0.7;
 }
 
@@ -353,5 +441,5 @@
   background-repeat: no-repeat;
   pointer-events: none;
   opacity: 0.18;
-  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='96' height='96' viewBox='0 0 96 96'><g fill='none' stroke='%23c9a84c' stroke-width='1'><path d='M0 [...]");
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='96' height='96' viewBox='0 0 96 96'><g fill='none' stroke='%23c9a84c' stroke-width='1'><path d='M0 0 L48 0 L48 48 L0 48 Z'/></g></svg>");
 }
