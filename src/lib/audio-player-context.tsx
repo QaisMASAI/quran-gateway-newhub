@@ -1,0 +1,215 @@
+import React, { createContext, useContext, useEffect, useRef, useState } from "react";
+import {
+  ayahAudioUrl,
+  RECITERS,
+  reciterName,
+  getStoredReciter,
+  setStoredReciter,
+  type ReciterKey,
+  type AudioQualityKey,
+  getStoredAudioQuality,
+} from "@/lib/quran-api";
+
+export interface ActiveTrack {
+  surah: number;
+  surahName: string;
+  ayah: number;
+  maxAyahInSurah?: number;
+  arabicText?: string;
+  translationText?: string;
+}
+
+interface AudioContextType {
+  activeTrack: ActiveTrack | null;
+  isPlaying: boolean;
+  reciter: ReciterKey;
+  playbackSpeed: number;
+  isLooping: boolean;
+  duration: number;
+  currentTime: number;
+  playTrack: (track: ActiveTrack) => void;
+  pauseTrack: () => void;
+  resumeTrack: () => void;
+  togglePlay: () => void;
+  setReciter: (r: ReciterKey) => void;
+  setSpeed: (speed: number) => void;
+  toggleLoop: () => void;
+  seekTo: (seconds: number) => void;
+  playNextAyah: () => void;
+  playPrevAyah: () => void;
+}
+
+const AudioPlayerContext = createContext<AudioContextType | null>(null);
+
+export function AudioPlayerProvider({ children }: { children: React.ReactNode }) {
+  const [activeTrack, setActiveTrack] = useState<ActiveTrack | null>(null);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [reciter, setReciterState] = useState<ReciterKey>(() => getStoredReciter());
+  const [playbackSpeed, setPlaybackSpeedState] = useState(1);
+  const [isLooping, setIsLooping] = useState(false);
+  const [duration, setDuration] = useState(0);
+  const [currentTime, setCurrentTime] = useState(0);
+
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+
+  useEffect(() => {
+    const audio = new Audio();
+    audioRef.current = audio;
+
+    const onTimeUpdate = () => setCurrentTime(audio.currentTime);
+    const onLoadedMetadata = () => setDuration(audio.duration || 0);
+    const onEnded = () => {
+      setIsPlaying(false);
+      // Auto-play next verse if available
+      setActiveTrack((current) => {
+        if (!current) return null;
+        if (isLooping) {
+          audio.currentTime = 0;
+          audio
+            .play()
+            .then(() => setIsPlaying(true))
+            .catch(() => {});
+          return current;
+        }
+        if (current.maxAyahInSurah && current.ayah < current.maxAyahInSurah) {
+          const nextAyah = current.ayah + 1;
+          const nextTrack = { ...current, ayah: nextAyah };
+          const quality: AudioQualityKey = getStoredAudioQuality();
+          audio.src = ayahAudioUrl(current.surah, nextAyah, reciter, quality);
+          audio
+            .play()
+            .then(() => setIsPlaying(true))
+            .catch(() => {});
+          return nextTrack;
+        }
+        return current;
+      });
+    };
+
+    audio.addEventListener("timeupdate", onTimeUpdate);
+    audio.addEventListener("loadedmetadata", onLoadedMetadata);
+    audio.addEventListener("ended", onEnded);
+
+    return () => {
+      audio.removeEventListener("timeupdate", onTimeUpdate);
+      audio.removeEventListener("loadedmetadata", onLoadedMetadata);
+      audio.removeEventListener("ended", onEnded);
+      audio.pause();
+    };
+  }, [reciter, isLooping]);
+
+  const playTrack = (track: ActiveTrack) => {
+    setActiveTrack(track);
+    if (!audioRef.current) return;
+    const quality: AudioQualityKey = getStoredAudioQuality();
+    const url = ayahAudioUrl(track.surah, track.ayah, reciter, quality);
+    audioRef.current.src = url;
+    audioRef.current.playbackRate = playbackSpeed;
+    audioRef.current
+      .play()
+      .then(() => setIsPlaying(true))
+      .catch(() => setIsPlaying(false));
+  };
+
+  const pauseTrack = () => {
+    if (audioRef.current) {
+      audioRef.current.pause();
+      setIsPlaying(false);
+    }
+  };
+
+  const resumeTrack = () => {
+    if (audioRef.current && activeTrack) {
+      audioRef.current
+        .play()
+        .then(() => setIsPlaying(true))
+        .catch(() => setIsPlaying(false));
+    }
+  };
+
+  const togglePlay = () => {
+    if (isPlaying) pauseTrack();
+    else resumeTrack();
+  };
+
+  const setReciter = (r: ReciterKey) => {
+    setReciterState(r);
+    setStoredReciter(r);
+    if (activeTrack && audioRef.current) {
+      const wasPlaying = isPlaying;
+      const quality: AudioQualityKey = getStoredAudioQuality();
+      audioRef.current.src = ayahAudioUrl(activeTrack.surah, activeTrack.ayah, r, quality);
+      if (wasPlaying) {
+        audioRef.current
+          .play()
+          .then(() => setIsPlaying(true))
+          .catch(() => setIsPlaying(false));
+      }
+    }
+  };
+
+  const setSpeed = (speed: number) => {
+    setPlaybackSpeedState(speed);
+    if (audioRef.current) {
+      audioRef.current.playbackRate = speed;
+    }
+  };
+
+  const toggleLoop = () => setIsLooping((prev) => !prev);
+
+  const seekTo = (seconds: number) => {
+    if (audioRef.current) {
+      audioRef.current.currentTime = seconds;
+      setCurrentTime(seconds);
+    }
+  };
+
+  const playNextAyah = () => {
+    if (!activeTrack) return;
+    const max = activeTrack.maxAyahInSurah ?? 286;
+    if (activeTrack.ayah < max) {
+      playTrack({ ...activeTrack, ayah: activeTrack.ayah + 1 });
+    }
+  };
+
+  const playPrevAyah = () => {
+    if (!activeTrack) return;
+    if (activeTrack.ayah > 1) {
+      playTrack({ ...activeTrack, ayah: activeTrack.ayah - 1 });
+    }
+  };
+
+  return (
+    <AudioPlayerContext.Provider
+      value={{
+        activeTrack,
+        isPlaying,
+        reciter,
+        playbackSpeed,
+        isLooping,
+        duration,
+        currentTime,
+        playTrack,
+        pauseTrack,
+        resumeTrack,
+        togglePlay,
+        setReciter,
+        setSpeed,
+        toggleLoop,
+        seekTo,
+        playNextAyah,
+        playPrevAyah,
+      }}
+    >
+      {children}
+    </AudioPlayerContext.Provider>
+  );
+}
+
+export function useAudioPlayer() {
+  const context = useContext(AudioPlayerContext);
+  if (!context) {
+    throw new Error("useAudioPlayer must be used within an AudioPlayerProvider");
+  }
+  return context;
+}
