@@ -469,7 +469,6 @@ export function Home() {
                 asChild
                 className="rounded-full bg-gradient-to-r from-primary to-olive px-5 font-semibold text-primary-foreground shadow-md hover:opacity-95"
               >
-                <Link to="/ask">
                 <Link to="/ask" search={{ q: undefined, qState: "missing", src: "unknown" }}>
                   <Sparkles className="h-4 w-4 text-gold" />
                   {locale === "ar"
