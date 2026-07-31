@@ -298,7 +298,12 @@ export const listHadithEntries = createServerFn({ method: "GET" })
 
     try {
       const { value } = await runWithProviderFallback((p) =>
-        p.listBookEntries({ collection, book: data.book, page: data.page, pageSize: data.pageSize }),
+        p.listBookEntries({
+          collection,
+          book: data.book,
+          page: data.page,
+          pageSize: data.pageSize,
+        }),
       );
       if (value && value.items.length > 0) {
         return {
@@ -462,7 +467,13 @@ export const getHadithKnowledgeBundle = createServerFn({ method: "GET" })
               .from("hadith_narrators")
               .select("narrator,hadith_count,collections")
               .eq("narrator", entry.narrator)
-          : Promise.resolve({ data: [] as Array<{ narrator: string; hadith_count: number; collections: string[] }> }),
+          : Promise.resolve({
+              data: [] as Array<{
+                narrator: string;
+                hadith_count: number;
+                collections: string[];
+              }>,
+            }),
         supabaseAdmin
           .from("hadith_entity_links")
           .select("entity_id,surah,ayah,weight")
@@ -472,7 +483,11 @@ export const getHadithKnowledgeBundle = createServerFn({ method: "GET" })
       ]);
 
       const verseRows = (links ?? []).filter((r) => r.surah !== null && r.ayah !== null);
-      const relatedVerses = verseRows.map((r) => ({ surah: r.surah!, ayah: r.ayah!, weight: r.weight }));
+      const relatedVerses = verseRows.map((r) => ({
+        surah: r.surah!,
+        ayah: r.ayah!,
+        weight: r.weight,
+      }));
 
       const entityIds = (links ?? []).map((r) => r.entity_id).filter((v): v is string => !!v);
       const { data: entities } = entityIds.length
@@ -480,7 +495,15 @@ export const getHadithKnowledgeBundle = createServerFn({ method: "GET" })
             .from("knowledge_entities")
             .select("id,slug,kind,title_i18n,summary_i18n")
             .in("id", entityIds)
-        : { data: [] as Array<{ id: string; slug: string; kind: string; title_i18n: any; summary_i18n: any }> };
+        : {
+            data: [] as Array<{
+              id: string;
+              slug: string;
+              kind: string;
+              title_i18n: Record<string, string>;
+              summary_i18n: Record<string, string>;
+            }>,
+          };
 
       const relatedEntities: HadithEntityLite[] = (entities ?? []).map((e) => ({
         id: e.id,
@@ -861,7 +884,12 @@ export const retryHadithImportJob = createServerFn({ method: "POST" })
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     await supabaseAdmin
       .from("import_jobs")
-      .update({ status: "queued", error_message: null, cancelled_at: null, updated_at: new Date().toISOString() })
+      .update({
+        status: "queued",
+        error_message: null,
+        cancelled_at: null,
+        updated_at: new Date().toISOString(),
+      })
       .eq("id", data.id)
       .ilike("job_name", "hadith_import:%");
     return { ok: true as const };
@@ -885,7 +913,11 @@ export const runHadithEmbeddingsWorker = createServerFn({ method: "POST" })
     });
     if (!isAdmin) throw new Error("Forbidden");
     const { embedHadithBatchJob } = await import("@/lib/hadith-graph.server");
-    return embedHadithBatchJob({ batch: data.batch, untilDone: data.untilDone, maxRuns: data.maxRuns });
+    return embedHadithBatchJob({
+      batch: data.batch,
+      untilDone: data.untilDone,
+      maxRuns: data.maxRuns,
+    });
   });
 
 export const getHadithAdminDashboard = createServerFn({ method: "GET" })
