@@ -31,6 +31,7 @@ interface AudioContextType {
   pauseTrack: () => void;
   resumeTrack: () => void;
   togglePlay: () => void;
+  closeTrack: () => void;
   setReciter: (r: ReciterKey) => void;
   setSpeed: (speed: number) => void;
   toggleLoop: () => void;
@@ -44,7 +45,7 @@ const AudioPlayerContext = createContext<AudioContextType | null>(null);
 export function AudioPlayerProvider({ children }: { children: React.ReactNode }) {
   const [activeTrack, setActiveTrack] = useState<ActiveTrack | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
-  const [reciter, setReciterState] = useState<ReciterKey>(() => getStoredReciter());
+  const [reciter, setReciterState] = useState<ReciterKey>("yasser-ad-dussary");
   const [playbackSpeed, setPlaybackSpeedState] = useState(1);
   const [isLooping, setIsLooping] = useState(false);
   const [duration, setDuration] = useState(0);
@@ -58,6 +59,10 @@ export function AudioPlayerProvider({ children }: { children: React.ReactNode })
 
     const onTimeUpdate = () => setCurrentTime(audio.currentTime);
     const onLoadedMetadata = () => setDuration(audio.duration || 0);
+    const onError = (e: Event) => {
+      console.warn("Audio playback error:", e);
+      setIsPlaying(false);
+    };
     const onEnded = () => {
       setIsPlaying(false);
       // Auto-play next verse if available
@@ -68,18 +73,18 @@ export function AudioPlayerProvider({ children }: { children: React.ReactNode })
           audio
             .play()
             .then(() => setIsPlaying(true))
-            .catch(() => {});
+            .catch(() => setIsPlaying(false));
           return current;
         }
         if (current.maxAyahInSurah && current.ayah < current.maxAyahInSurah) {
           const nextAyah = current.ayah + 1;
           const nextTrack = { ...current, ayah: nextAyah };
           const quality: AudioQualityKey = getStoredAudioQuality();
-          audio.src = ayahAudioUrl(current.surah, nextAyah, reciter, quality);
+          audio.src = ayahAudioUrl(current.surah, nextAyah, "yasser-ad-dussary", quality);
           audio
             .play()
             .then(() => setIsPlaying(true))
-            .catch(() => {});
+            .catch(() => setIsPlaying(false));
           return nextTrack;
         }
         return current;
@@ -89,41 +94,53 @@ export function AudioPlayerProvider({ children }: { children: React.ReactNode })
     audio.addEventListener("timeupdate", onTimeUpdate);
     audio.addEventListener("loadedmetadata", onLoadedMetadata);
     audio.addEventListener("ended", onEnded);
+    audio.addEventListener("error", onError);
 
     return () => {
       audio.removeEventListener("timeupdate", onTimeUpdate);
       audio.removeEventListener("loadedmetadata", onLoadedMetadata);
       audio.removeEventListener("ended", onEnded);
+      audio.removeEventListener("error", onError);
       audio.pause();
     };
-  }, [reciter, isLooping]);
+  }, [isLooping]);
 
   const playTrack = (track: ActiveTrack) => {
     setActiveTrack(track);
     if (!audioRef.current) return;
     const quality: AudioQualityKey = getStoredAudioQuality();
-    const url = ayahAudioUrl(track.surah, track.ayah, reciter, quality);
+    const url = ayahAudioUrl(track.surah, track.ayah, "yasser-ad-dussary", quality);
     audioRef.current.src = url;
     audioRef.current.playbackRate = playbackSpeed;
     audioRef.current
       .play()
       .then(() => setIsPlaying(true))
-      .catch(() => setIsPlaying(false));
+      .catch((err) => {
+        console.warn("Play track failed:", err);
+        setIsPlaying(false);
+      });
   };
 
   const pauseTrack = () => {
     if (audioRef.current) {
       audioRef.current.pause();
-      setIsPlaying(false);
     }
+    setIsPlaying(false);
   };
 
   const resumeTrack = () => {
     if (audioRef.current && activeTrack) {
+      if (!audioRef.current.src) {
+        const quality: AudioQualityKey = getStoredAudioQuality();
+        audioRef.current.src = ayahAudioUrl(activeTrack.surah, activeTrack.ayah, "yasser-ad-dussary", quality);
+      }
       audioRef.current
         .play()
         .then(() => setIsPlaying(true))
-        .catch(() => setIsPlaying(false));
+        .catch((err) => {
+          console.warn("Resume track failed:", err);
+          setIsPlaying(false);
+        });
     }
   };
 
@@ -132,20 +149,22 @@ export function AudioPlayerProvider({ children }: { children: React.ReactNode })
     else resumeTrack();
   };
 
-  const setReciter = (r: ReciterKey) => {
-    setReciterState(r);
-    setStoredReciter(r);
-    if (activeTrack && audioRef.current) {
-      const wasPlaying = isPlaying;
-      const quality: AudioQualityKey = getStoredAudioQuality();
-      audioRef.current.src = ayahAudioUrl(activeTrack.surah, activeTrack.ayah, r, quality);
-      if (wasPlaying) {
-        audioRef.current
-          .play()
-          .then(() => setIsPlaying(true))
-          .catch(() => setIsPlaying(false));
-      }
+  const closeTrack = () => {
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current.currentTime = 0;
+      audioRef.current.src = "";
     }
+    setIsPlaying(false);
+    setActiveTrack(null);
+    setCurrentTime(0);
+    setDuration(0);
+  };
+
+  const setReciter = (r: ReciterKey) => {
+    // Lock to Yasser Al-Dosari
+    setReciterState("yasser-ad-dussary");
+    setStoredReciter("yasser-ad-dussary");
   };
 
   const setSpeed = (speed: number) => {
@@ -193,6 +212,7 @@ export function AudioPlayerProvider({ children }: { children: React.ReactNode })
         pauseTrack,
         resumeTrack,
         togglePlay,
+        closeTrack,
         setReciter,
         setSpeed,
         toggleLoop,
