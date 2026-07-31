@@ -223,41 +223,56 @@ function LearnTopicCard({
   icon: keyof typeof TOPIC_ICONS;
   refsCount: number;
 }) {
-  const Icon = TOPIC_ICONS[icon];
-  const { t } = useTranslation("pages");
+  const Icon = TOPIC_ICONS[icon] ?? BookOpen;
+  const { t, i18n } = useTranslation("pages");
   const topic = useTopicT(slug);
+  const locale = i18n.language || "en";
 
   return (
     <Link
       to="/learn/$kind/$slug"
       params={{ kind: "topic", slug }}
-      className="group surface-card flex flex-col gap-3 p-4 transition hover:border-primary/40 hover:shadow-md"
+      className="group relative flex flex-col justify-between overflow-hidden rounded-2xl border border-border/80 bg-gradient-to-br from-card/90 via-card to-secondary/30 p-4 sm:p-5 shadow-xs transition-all duration-300 hover:border-primary/50 hover:shadow-md hover:-translate-y-0.5"
     >
       <div className="flex items-start justify-between gap-3">
-        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary transition-colors group-hover:bg-gold/10 group-hover:text-gold">
-          <Icon className="h-5 w-5" aria-hidden="true" />
+        <div className="flex items-center gap-2">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary transition-colors group-hover:bg-gold/15 group-hover:text-gold shadow-2xs">
+            <Icon className="h-5 w-5" aria-hidden="true" />
+          </div>
+          <span className="rounded-full border border-primary/20 bg-primary-soft/50 px-2.5 py-0.5 text-[10.5px] font-semibold text-primary">
+            {t("search.kindTopic", "Topic")}
+          </span>
         </div>
         <ChevronLeft
-          className="mt-1 h-4 w-4 shrink-0 text-muted-foreground transition-all group-hover:-translate-x-0.5 group-hover:text-gold ltr:rotate-180"
+          className="h-4 w-4 shrink-0 text-muted-foreground transition-all group-hover:-translate-x-0.5 group-hover:text-gold ltr:rotate-180"
           aria-hidden="true"
         />
       </div>
 
-      <div className="min-w-0">
-        <h3 className="line-clamp-1 font-display text-lg font-bold text-primary" dir="auto">
+      <div className="mt-3 min-w-0">
+        <h3
+          className="line-clamp-1 font-display text-base sm:text-lg font-bold text-foreground group-hover:text-primary transition-colors"
+          dir="auto"
+        >
           {topic.title}
         </h3>
         {topic.subtitle && (
-          <p className="mt-0.5 text-xs text-muted-foreground" dir="auto">
+          <p className="mt-0.5 text-xs font-arabic font-medium text-gold truncate" dir="auto">
             {topic.subtitle}
           </p>
         )}
-        <p className="mt-2 line-clamp-2 text-sm text-muted-foreground" dir="auto">
+        <p className="mt-2 line-clamp-2 text-xs sm:text-sm text-muted-foreground leading-relaxed" dir="auto">
           {topic.description}
         </p>
-        <p className="mt-3 text-[11px] font-medium text-gold">
+      </div>
+
+      <div className="mt-4 flex items-center justify-between border-t border-border/60 pt-2.5 text-[11px] font-medium text-muted-foreground">
+        <span className="text-gold font-semibold">
           {refsCount} {t("topics.refsLabel")}
-        </p>
+        </span>
+        <span className="text-primary group-hover:underline">
+          {locale === "ar" ? "عرض الموضوع ←" : locale === "he" ? "הצג נושא ←" : "Explore →"}
+        </span>
       </div>
     </Link>
   );
