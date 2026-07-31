@@ -74,6 +74,7 @@ export function GlobalAudioPlayer() {
           <Link
             to="/surah/$id"
             params={{ id: String(activeTrack.surah) }}
+            search={{ q: undefined }}
             hash={`v-${activeTrack.ayah}`}
             className="flex items-center gap-2.5 min-w-0 group"
           >
