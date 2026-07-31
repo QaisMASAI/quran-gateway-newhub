@@ -1,6 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import { BookOpen, Compass, Search, Sparkles, Star } from "lucide-react";
+import type { ReactNode } from "react";
 
 export function BottomNav() {
   const { t } = useTranslation("pages");
@@ -8,7 +9,7 @@ export function BottomNav() {
     to: string;
     hash?: string;
     labelKey: string;
-    icon: React.ReactNode;
+    icon: ReactNode;
     exact?: boolean;
     isCenter?: boolean;
   }> = [
