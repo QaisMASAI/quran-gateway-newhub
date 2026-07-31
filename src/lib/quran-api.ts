@@ -159,11 +159,7 @@ const sourceIdCache = new Map<string, string>();
 async function resolveSourceId(code: string): Promise<string | null> {
   const cached = sourceIdCache.get(code);
   if (cached) return cached;
-  const { data } = await supabase
-    .from("translation_sources")
-    .select("id")
-    .eq("code", code)
-    .maybeSingle();
+  const { data } = await supabase.from("translation_sources").select("id").eq("code", code).maybeSingle();
   if (!data?.id) return null;
   sourceIdCache.set(code, data.id);
   return data.id;
@@ -180,9 +176,7 @@ function translationIdFor(lang: ApiLang): number {
 export async function fetchChapters(lang: ApiLang = "he"): Promise<Chapter[]> {
   const { data: dbRows } = await supabase
     .from("quran_chapters" as never)
-    .select(
-      "chapter_number,name_ar,name_simple_en,name_translated_en,name_he,revelation_place,verses_count",
-    )
+    .select("chapter_number,name_ar,name_simple_en,name_translated_en,name_he,revelation_place,verses_count")
     .order("chapter_number", { ascending: true });
 
   const rows = (dbRows as unknown as ChapterRow[] | null) ?? [];
@@ -192,12 +186,7 @@ export async function fetchChapters(lang: ApiLang = "he"): Promise<Chapter[]> {
       name_arabic: r.name_ar,
       name_simple: r.name_simple_en,
       translated_name: {
-        name:
-          lang === "he"
-            ? (r.name_he ?? r.name_simple_en)
-            : lang === "ar"
-              ? r.name_ar
-              : r.name_simple_en,
+        name: lang === "he" ? (r.name_he ?? r.name_simple_en) : lang === "ar" ? r.name_ar : r.name_simple_en,
       },
       verses_count: r.verses_count,
       revelation_place: r.revelation_place ?? "makkah",
@@ -242,17 +231,25 @@ export async function fetchVerses(chapterId: number, lang: ApiLang = "he"): Prom
       {
         id: translationIdFor(lang),
         text: lang === "ar" ? "" : row.translation,
-        resource_name:
-          lang === "he" ? "Ben Shemesh" : lang === "en" ? "Sahih International" : "Arabic Original",
+        resource_name: lang === "he" ? "Ben Shemesh" : lang === "en" ? "Sahih International" : "Arabic Original",
       },
     ],
   }));
 }
 
-// Yasser Al-Dossari full-surah recitation via mp3quran.net
-export function surahAudioUrl(surahId: number): string {
+// Full-surah recitation audio mirrors (Quranicaudio CDN + mp3quran)
+export function surahAudioUrls(surahId: number): string[] {
   const n = String(surahId).padStart(3, "0");
-  return `https://server11.mp3quran.net/yasser/${n}.mp3`;
+  return [
+    `https://download.quranicaudio.com/qdc/mishari_al_afasy/murattal/${surahId}.mp3`,
+    `https://server11.mp3quran.net/yasser/${n}.mp3`,
+    `https://server8.mp3quran.net/afs/${n}.mp3`,
+    `https://cdn.islamic.network/quran/audio-surah/128/ar.alafasy/${surahId}.mp3`,
+  ];
+}
+
+export function surahAudioUrl(surahId: number): string {
+  return surahAudioUrls(surahId)[0];
 }
 
 // ============================================================
@@ -637,9 +634,7 @@ function highlight(text: string, term: string, normalize: (s: string) => string)
   const before = (start > 0 ? "… " : "") + text.slice(start, m.index);
   const hit = text.slice(m.index, m.index + m[0].length);
   const after = text.slice(m.index + m[0].length, end) + (end < text.length ? " …" : "");
-  return (
-    escapeHtml(before) + `<mark class="search-hit">${escapeHtml(hit)}</mark>` + escapeHtml(after)
-  );
+  return escapeHtml(before) + `<mark class="search-hit">${escapeHtml(hit)}</mark>` + escapeHtml(after);
 }
 
 function escapeHtml(s: string): string {
@@ -688,8 +683,7 @@ export function searchIndex(idx: QuranIndex, rawQuery: string, limit = 500): Sea
   const arTerms = normAr.split(" ").filter((t) => t.length >= 2);
   const enTerms = normEn.split(" ").filter((t) => t.length >= 2);
 
-  const includesAny = (haystack: string, terms: string[]) =>
-    terms.some((term) => haystack.includes(term));
+  const includesAny = (haystack: string, terms: string[]) => terms.some((term) => haystack.includes(term));
 
   // Chapter matches (Hebrew + Arabic + English simple name)
   const chapterMatches: SurahMeta[] = [];
@@ -725,14 +719,8 @@ export function searchIndex(idx: QuranIndex, rawQuery: string, limit = 500): Sea
 
     const chapter = idx.chapters[v.surah - 1];
     if (!chapter) continue;
-    const snippetSource =
-      matched === "hebrew" ? v.hebrew : matched === "english" ? v.english : v.arabic;
-    const normFn =
-      matched === "hebrew"
-        ? normalizeHebrew
-        : matched === "english"
-          ? normalizeEnglish
-          : normalizeArabic;
+    const snippetSource = matched === "hebrew" ? v.hebrew : matched === "english" ? v.english : v.arabic;
+    const normFn = matched === "hebrew" ? normalizeHebrew : matched === "english" ? normalizeEnglish : normalizeArabic;
     const snippet = highlight(snippetSource, q, normFn);
     hits.push({ verse: v, chapter, matchedIn: matched, snippet });
     if (hits.length >= limit) break;
