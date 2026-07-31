@@ -54,7 +54,7 @@ export function HeaderNav({ isAuthenticated }: HeaderNavProps) {
         <NavLink to="/surahs" label={t("nav.surahs")} icon={<BookOpen className="h-4 w-4" />} />
       )}
       {!hidden.has("stories") && (
-        <NavLink to="/learn" label={t("nav.stories")} icon={<ScrollText className="h-4 w-4" />} />
+        <NavLink to="/learn" hash="story-library" label={t("nav.stories")} icon={<ScrollText className="h-4 w-4" />} />
       )}
       {!hidden.has("research") && (
         <NavLink to="/research" label={t("nav.research")} icon={<Sparkles className="h-4 w-4" />} />
