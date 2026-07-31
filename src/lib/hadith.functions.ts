@@ -223,7 +223,9 @@ export const listHadithCollections = createServerFn({ method: "GET" }).handler(
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { data, error } = await supabaseAdmin
       .from("hadith_collections")
-      .select("slug,title_ar,title_en,title_he,author_ar,author_en,total_hadith,total_books,sort_order")
+      .select(
+        "slug,title_ar,title_en,title_he,author_ar,author_en,total_hadith,total_books,sort_order",
+      )
       .order("sort_order", { ascending: true })
       .order("slug", { ascending: true });
     if (error || !data) {
@@ -235,7 +237,9 @@ export const listHadithCollections = createServerFn({ method: "GET" }).handler(
 );
 
 export const listHadithBooks = createServerFn({ method: "GET" })
-  .inputValidator((input: unknown) => z.object({ collection: z.string().min(1).max(40) }).parse(input))
+  .inputValidator((input: unknown) =>
+    z.object({ collection: z.string().min(1).max(40) }).parse(input),
+  )
   .handler(async ({ data }): Promise<HadithBook[]> => {
     const collection = normalizeHadithCollection(data.collection);
     if (!collection) return [];
@@ -281,9 +285,12 @@ export const listHadithEntries = createServerFn({ method: "GET" })
       count,
     } = await supabaseAdmin
       .from("hadith_entries")
-      .select("id,collection_slug,book_id,id_in_book,global_id,narrator,arabic_text,english_text,hebrew_text", {
-        count: "exact",
-      })
+      .select(
+        "id,collection_slug,book_id,id_in_book,global_id,narrator,arabic_text,english_text,hebrew_text",
+        {
+          count: "exact",
+        },
+      )
       .eq("collection_slug", collection)
       .eq("book_id", data.book)
       .order("id_in_book", { ascending: true })
@@ -344,7 +351,9 @@ export const getHadithEntry = createServerFn({ method: "GET" })
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { data: row, error } = await supabaseAdmin
       .from("hadith_entries")
-      .select("id,collection_slug,book_id,id_in_book,global_id,narrator,arabic_text,english_text,hebrew_text")
+      .select(
+        "id,collection_slug,book_id,id_in_book,global_id,narrator,arabic_text,english_text,hebrew_text",
+      )
       .eq("collection_slug", collection)
       .or(`global_id.eq.${data.num},id_in_book.eq.${data.num}`)
       .limit(1)
@@ -410,7 +419,9 @@ export const getHadithKnowledgeBundle = createServerFn({ method: "GET" })
 
       const { data: entryRow } = await supabaseAdmin
         .from("hadith_entries")
-        .select("id,collection_slug,book_id,id_in_book,global_id,narrator,arabic_text,english_text,hebrew_text")
+        .select(
+          "id,collection_slug,book_id,id_in_book,global_id,narrator,arabic_text,english_text,hebrew_text",
+        )
         .eq("collection_slug", collection)
         .or(`global_id.eq.${data.num},id_in_book.eq.${data.num}`)
         .limit(1)
@@ -424,7 +435,9 @@ export const getHadithKnowledgeBundle = createServerFn({ method: "GET" })
         try {
           const { value } = await runWithProviderFallback(async (p) => {
             const res = await p.listBookEntries({ collection, book: 1, page: 0, pageSize: 50 });
-            return res.items.find((i) => i.global_id === data.num || i.id_in_book === data.num) ?? null;
+            return (
+              res.items.find((i) => i.global_id === data.num || i.id_in_book === data.num) ?? null
+            );
           });
           if (!value) return null;
           entry = {
@@ -456,31 +469,35 @@ export const getHadithKnowledgeBundle = createServerFn({ method: "GET" })
         if (t.language_code === "ar" && t.body) entry.arabic_translation = t.body;
       }
 
-      const [{ data: collectionMeta }, { data: narratorRows }, { data: links }] = await Promise.all([
-        supabaseAdmin
-          .from("hadith_collections")
-          .select("slug,title_ar,title_en,title_he,author_ar,author_en,total_hadith,total_books,sort_order")
-          .eq("slug", entry.collection_slug)
-          .maybeSingle(),
-        entry.narrator
-          ? supabaseAdmin
-              .from("hadith_narrators")
-              .select("narrator,hadith_count,collections")
-              .eq("narrator", entry.narrator)
-          : Promise.resolve({
-              data: [] as Array<{
-                narrator: string;
-                hadith_count: number;
-                collections: string[];
-              }>,
-            }),
-        supabaseAdmin
-          .from("hadith_entity_links")
-          .select("entity_id,surah,ayah,weight")
-          .eq("hadith_id", entry.id)
-          .order("weight", { ascending: false })
-          .limit(40),
-      ]);
+      const [{ data: collectionMeta }, { data: narratorRows }, { data: links }] = await Promise.all(
+        [
+          supabaseAdmin
+            .from("hadith_collections")
+            .select(
+              "slug,title_ar,title_en,title_he,author_ar,author_en,total_hadith,total_books,sort_order",
+            )
+            .eq("slug", entry.collection_slug)
+            .maybeSingle(),
+          entry.narrator
+            ? supabaseAdmin
+                .from("hadith_narrators")
+                .select("narrator,hadith_count,collections")
+                .eq("narrator", entry.narrator)
+            : Promise.resolve({
+                data: [] as Array<{
+                  narrator: string;
+                  hadith_count: number;
+                  collections: string[];
+                }>,
+              }),
+          supabaseAdmin
+            .from("hadith_entity_links")
+            .select("entity_id,surah,ayah,weight")
+            .eq("hadith_id", entry.id)
+            .order("weight", { ascending: false })
+            .limit(40),
+        ],
+      );
 
       const verseRows = (links ?? []).filter((r) => r.surah !== null && r.ayah !== null);
       const relatedVerses = verseRows.map((r) => ({
@@ -535,7 +552,9 @@ export const getHadithKnowledgeBundle = createServerFn({ method: "GET" })
       const { data: relatedHadithRows } = entry.narrator
         ? await supabaseAdmin
             .from("hadith_entries")
-            .select("id,collection_slug,book_id,id_in_book,global_id,narrator,arabic_text,english_text,hebrew_text")
+            .select(
+              "id,collection_slug,book_id,id_in_book,global_id,narrator,arabic_text,english_text,hebrew_text",
+            )
             .eq("narrator", entry.narrator)
             .neq("id", entry.id)
             .order("global_id", { ascending: false })
@@ -604,9 +623,15 @@ export const generateHadithStudySummary = createServerFn({ method: "POST" })
       `Arabic text:\n${data.arabicText}`,
       data.translationText ? `Translation:\n${data.translationText}` : "",
       data.verseRefs.length ? `Related Quran references: ${data.verseRefs.join(", ")}` : "",
-      data.tafsirSnippets.length ? `Related tafsir evidence:\n- ${data.tafsirSnippets.join("\n- ")}` : "",
-      data.relatedHadithSnippets.length ? `Related hadith snippets:\n- ${data.relatedHadithSnippets.join("\n- ")}` : "",
-      data.citations.length ? `Citations you must ground on:\n- ${data.citations.join("\n- ")}` : "",
+      data.tafsirSnippets.length
+        ? `Related tafsir evidence:\n- ${data.tafsirSnippets.join("\n- ")}`
+        : "",
+      data.relatedHadithSnippets.length
+        ? `Related hadith snippets:\n- ${data.relatedHadithSnippets.join("\n- ")}`
+        : "",
+      data.citations.length
+        ? `Citations you must ground on:\n- ${data.citations.join("\n- ")}`
+        : "",
       "Return strict JSON only.",
     ]
       .filter(Boolean)
@@ -720,7 +745,9 @@ export const searchHadith = createServerFn({ method: "POST" })
     if (typoTokens.length > 0) {
       let fallbackQuery = supabaseAdmin
         .from("hadith_entries")
-        .select("id,collection_slug,book_id,id_in_book,global_id,narrator,arabic_text,english_text,hebrew_text")
+        .select(
+          "id,collection_slug,book_id,id_in_book,global_id,narrator,arabic_text,english_text,hebrew_text",
+        )
         .order("global_id", { ascending: false })
         .limit(40);
 
@@ -753,24 +780,30 @@ export const searchHadith = createServerFn({ method: "POST" })
 
 export const listTopNarrators = createServerFn({ method: "GET" })
   .inputValidator((input: unknown) =>
-    z.object({ limit: z.number().int().min(1).max(500).optional().default(100) }).parse(input ?? {}),
+    z
+      .object({ limit: z.number().int().min(1).max(500).optional().default(100) })
+      .parse(input ?? {}),
   )
-  .handler(async ({ data }): Promise<Array<{ narrator: string; hadith_count: number; collections: string[] }>> => {
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { data: rows, error } = await supabaseAdmin
-      .from("hadith_narrators")
-      .select("narrator,hadith_count,collections")
-      .order("hadith_count", { ascending: false })
-      .limit(data.limit);
-    if (error || !rows) return [];
-    return rows
-      .filter((row) => typeof row.narrator === "string" && row.narrator.trim().length > 0)
-      .map((row) => ({
-        narrator: row.narrator!,
-        hadith_count: row.hadith_count ?? 0,
-        collections: row.collections ?? [],
-      }));
-  });
+  .handler(
+    async ({
+      data,
+    }): Promise<Array<{ narrator: string; hadith_count: number; collections: string[] }>> => {
+      const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+      const { data: rows, error } = await supabaseAdmin
+        .from("hadith_narrators")
+        .select("narrator,hadith_count,collections")
+        .order("hadith_count", { ascending: false })
+        .limit(data.limit);
+      if (error || !rows) return [];
+      return rows
+        .filter((row) => typeof row.narrator === "string" && row.narrator.trim().length > 0)
+        .map((row) => ({
+          narrator: row.narrator!,
+          hadith_count: row.hadith_count ?? 0,
+          collections: row.collections ?? [],
+        }));
+    },
+  );
 
 export const listHadithTopicBooks = createServerFn({ method: "GET" })
   .inputValidator((input: unknown) =>
@@ -930,25 +963,29 @@ export const getHadithAdminDashboard = createServerFn({ method: "GET" })
     if (!isAdmin) throw new Error("Forbidden");
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
-    const [{ data: imports }, { count: total }, { count: embedded }, { data: latestEmbedded }] = await Promise.all([
-      supabaseAdmin
-        .from("import_jobs")
-        .select(
-          "id,job_name,status,checkpoint,stats,failed_batches,error_message,created_at,updated_at,started_at,finished_at",
-        )
-        .ilike("job_name", "hadith_import:%")
-        .order("created_at", { ascending: false })
-        .limit(50),
-      supabaseAdmin.from("hadith_entries").select("id", { count: "exact", head: true }),
-      supabaseAdmin.from("hadith_entries").select("id", { count: "exact", head: true }).not("embedding", "is", null),
-      supabaseAdmin
-        .from("hadith_entries")
-        .select("embedded_at")
-        .not("embedded_at", "is", null)
-        .order("embedded_at", { ascending: false })
-        .limit(1)
-        .maybeSingle(),
-    ]);
+    const [{ data: imports }, { count: total }, { count: embedded }, { data: latestEmbedded }] =
+      await Promise.all([
+        supabaseAdmin
+          .from("import_jobs")
+          .select(
+            "id,job_name,status,checkpoint,stats,failed_batches,error_message,created_at,updated_at,started_at,finished_at",
+          )
+          .ilike("job_name", "hadith_import:%")
+          .order("created_at", { ascending: false })
+          .limit(50),
+        supabaseAdmin.from("hadith_entries").select("id", { count: "exact", head: true }),
+        supabaseAdmin
+          .from("hadith_entries")
+          .select("id", { count: "exact", head: true })
+          .not("embedding", "is", null),
+        supabaseAdmin
+          .from("hadith_entries")
+          .select("embedded_at")
+          .not("embedded_at", "is", null)
+          .order("embedded_at", { ascending: false })
+          .limit(1)
+          .maybeSingle(),
+      ]);
 
     const totalRows = total ?? 0;
     const embeddedRows = embedded ?? 0;
@@ -1239,23 +1276,32 @@ export const listHadithByTopicSlug = createServerFn({ method: "GET" })
         .limit(1000);
 
       const ids = Array.from(
-        new Set((linkRows ?? []).map((r) => r.hadith_id).filter((v): v is number => typeof v === "number")),
+        new Set(
+          (linkRows ?? [])
+            .map((r) => r.hadith_id)
+            .filter((v): v is number => typeof v === "number"),
+        ),
       );
       if (ids.length === 0) return empty;
 
       let query = supabaseAdmin
         .from("hadith_entries")
-        .select("id,collection_slug,book_id,id_in_book,global_id,narrator,arabic_text,english_text,hebrew_text", {
-          count: "exact",
-        })
+        .select(
+          "id,collection_slug,book_id,id_in_book,global_id,narrator,arabic_text,english_text,hebrew_text",
+          {
+            count: "exact",
+          },
+        )
         .in("id", ids);
 
       const collection = data.collection ? normalizeHadithCollection(data.collection) : null;
       if (collection) query = query.eq("collection_slug", collection);
       if (data.narrator) query = query.eq("narrator", data.narrator);
 
-      if (data.sort === "narrator") query = query.order("narrator", { ascending: true, nullsFirst: false });
-      else if (data.sort === "collection") query = query.order("collection_slug", { ascending: true });
+      if (data.sort === "narrator")
+        query = query.order("narrator", { ascending: true, nullsFirst: false });
+      else if (data.sort === "collection")
+        query = query.order("collection_slug", { ascending: true });
       query = query.order("global_id", { ascending: true });
 
       const from = (data.page - 1) * data.pageSize;

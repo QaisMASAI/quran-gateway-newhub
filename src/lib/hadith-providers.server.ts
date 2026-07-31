@@ -61,7 +61,10 @@ const KNOWN_COLLECTIONS = [
 ];
 
 function normalizeCollectionSlug(input: string): string {
-  const s = input.trim().toLowerCase().replace(/[^a-z0-9]+/g, "");
+  const s = input
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "");
   if (!s) return "unknown";
   if (s.includes("bukh")) return "bukhari";
   if (s.includes("muslim")) return "muslim";
@@ -81,7 +84,11 @@ function parseIntSafe(value: unknown, fallback = 0): number {
 
 function extractNarrator(englishText: string | null | undefined): string | null {
   if (!englishText) return null;
-  const line = englishText.trim().split("\n").find((v) => v.trim().length > 0) ?? "";
+  const line =
+    englishText
+      .trim()
+      .split("\n")
+      .find((v) => v.trim().length > 0) ?? "";
   const match = line.match(/^Narrated\s+([^:]{2,160}):/i);
   return match ? match[1].replace(/\s+/g, " ").trim() : null;
 }
@@ -106,7 +113,8 @@ async function providerFetch(
     try {
       const headers: Record<string, string> = { Accept: "application/json" };
       if (options?.apiKey) {
-        if (options.authHeader === "authorization") headers.Authorization = `Bearer ${options.apiKey}`;
+        if (options.authHeader === "authorization")
+          headers.Authorization = `Bearer ${options.apiKey}`;
         else headers["x-api-key"] = options.apiKey;
       }
       const res = await fetch(url.toString(), { method: "GET", headers });
@@ -178,7 +186,9 @@ function createUmmahApiProvider(): HadithProvider {
       if (rows.length === 0) return KNOWN_COLLECTIONS.map((k) => toCollectionFallback(k.slug));
       return rows
         .map((row) => {
-          const slug = normalizeCollectionSlug(String(row.slug ?? row.name ?? row.collection ?? ""));
+          const slug = normalizeCollectionSlug(
+            String(row.slug ?? row.name ?? row.collection ?? ""),
+          );
           const fallback = toCollectionFallback(slug);
           return {
             ...fallback,
@@ -203,8 +213,18 @@ function createUmmahApiProvider(): HadithProvider {
         .map((row) => ({
           collection_slug: collection,
           book_id: parseIntSafe(row.book_id ?? row.bookNumber, 0),
-          name_ar: String(row.title_ar ?? row.name_ar ?? row.book_title_ar ?? `كتاب ${row.book_id ?? row.bookNumber ?? ""}`),
-          name_en: String(row.title_en ?? row.name_en ?? row.book_title_en ?? `Book ${row.book_id ?? row.bookNumber ?? ""}`),
+          name_ar: String(
+            row.title_ar ??
+              row.name_ar ??
+              row.book_title_ar ??
+              `كتاب ${row.book_id ?? row.bookNumber ?? ""}`,
+          ),
+          name_en: String(
+            row.title_en ??
+              row.name_en ??
+              row.book_title_en ??
+              `Book ${row.book_id ?? row.bookNumber ?? ""}`,
+          ),
           name_he: null,
           hadith_count: parseIntSafe(row.hadith_count ?? row.numberOfHadith, 0),
         }))
@@ -221,7 +241,9 @@ function createUmmahApiProvider(): HadithProvider {
       const body = res.json as { data?: Array<Record<string, unknown>>; total?: number };
       const rows = Array.isArray(body?.data) ? body.data : [];
       const items = rows.map((row) => {
-        const hadith = (Array.isArray(row.hadith) ? row.hadith : []) as Array<Record<string, unknown>>;
+        const hadith = (Array.isArray(row.hadith) ? row.hadith : []) as Array<
+          Record<string, unknown>
+        >;
         const ar =
           String(
             hadith.find((h) => String(h.lang ?? "").startsWith("ar"))?.body ??
@@ -253,7 +275,10 @@ function createUmmahApiProvider(): HadithProvider {
           source_payload: row,
         } satisfies ProviderEntry;
       });
-      return { items: items.filter((i) => i.global_id > 0 && i.arabic_text.length > 0), total: parseIntSafe(body.total, items.length) };
+      return {
+        items: items.filter((i) => i.global_id > 0 && i.arabic_text.length > 0),
+        total: parseIntSafe(body.total, items.length),
+      };
     },
   };
 }
@@ -319,11 +344,15 @@ function createIslamicAppProvider(): HadithProvider {
         .sort((a, b) => a.book_id - b.book_id);
     },
     listBookEntries: async ({ collection, book, page, pageSize }) => {
-      const res = await providerFetch(baseUrl, `/hadith/collections/${collection}/books/${book}/hadiths`, {
-        apiKey,
-        authHeader: "authorization",
-        searchParams: { page: page + 1, limit: pageSize },
-      });
+      const res = await providerFetch(
+        baseUrl,
+        `/hadith/collections/${collection}/books/${book}/hadiths`,
+        {
+          apiKey,
+          authHeader: "authorization",
+          searchParams: { page: page + 1, limit: pageSize },
+        },
+      );
       if (res.status < 200 || res.status >= 300) return { items: [], total: 0 };
       const body = res.json as { data?: Array<Record<string, unknown>>; total?: number };
       const rows = Array.isArray(body?.data) ? body.data : [];
@@ -347,7 +376,10 @@ function createIslamicAppProvider(): HadithProvider {
           source_payload: row,
         } satisfies ProviderEntry;
       });
-      return { items: items.filter((i) => i.global_id > 0 && i.arabic_text.length > 0), total: parseIntSafe(body.total, items.length) };
+      return {
+        items: items.filter((i) => i.global_id > 0 && i.arabic_text.length > 0),
+        total: parseIntSafe(body.total, items.length),
+      };
     },
   };
 }

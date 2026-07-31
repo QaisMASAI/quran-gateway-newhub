@@ -43,7 +43,9 @@ function HadithIngestAdminPage() {
     queryFn: () => dashboardFn(),
     refetchInterval: (q) => {
       const imports = q.state.data?.imports ?? [];
-      return imports.some((job) => job.status === "running" || job.status === "queued" || job.status === "retrying")
+      return imports.some(
+        (job) => job.status === "running" || job.status === "queued" || job.status === "retrying",
+      )
         ? 2500
         : 15_000;
     },
@@ -90,7 +92,8 @@ function HadithIngestAdminPage() {
       <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6">
         <h1 className="text-2xl font-bold text-foreground">Hadith importer</h1>
         <p className="mt-1 text-sm text-muted-foreground">
-          Run resumable imports, monitor per-batch failures, and keep multilingual embeddings up to date.
+          Run resumable imports, monitor per-batch failures, and keep multilingual embeddings up to
+          date.
         </p>
 
         <section className="mt-6 grid gap-4 lg:grid-cols-[1.1fr_1fr]">
@@ -105,7 +108,13 @@ function HadithIngestAdminPage() {
                 <option value="bukhari">Sahih al-Bukhari</option>
                 <option value="muslim">Sahih Muslim</option>
               </select>
-              <NumberField label="Books per run" value={maxBooks} onChange={setMaxBooks} min={1} max={20} />
+              <NumberField
+                label="Books per run"
+                value={maxBooks}
+                onChange={setMaxBooks}
+                min={1}
+                max={20}
+              />
               <NumberField
                 label="Pages per book"
                 value={maxPagesPerBook}
@@ -113,7 +122,13 @@ function HadithIngestAdminPage() {
                 min={1}
                 max={20}
               />
-              <NumberField label="Page size" value={pageSize} onChange={setPageSize} min={10} max={200} />
+              <NumberField
+                label="Page size"
+                value={pageSize}
+                onChange={setPageSize}
+                min={10}
+                max={200}
+              />
             </div>
             <div className="mt-3 flex flex-wrap gap-2">
               <button
@@ -122,7 +137,11 @@ function HadithIngestAdminPage() {
                 disabled={runImportM.isPending}
                 className="inline-flex min-h-11 items-center gap-1.5 rounded-md bg-primary px-3 py-2 text-sm font-medium text-primary-foreground disabled:opacity-60"
               >
-                {runImportM.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Play className="h-4 w-4" />}
+                {runImportM.isPending ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <Play className="h-4 w-4" />
+                )}
                 Run import step
               </button>
               <button
@@ -148,7 +167,10 @@ function HadithIngestAdminPage() {
             ) : (
               <div className="mt-3 space-y-3">
                 <div className="h-2 overflow-hidden rounded-full bg-secondary">
-                  <div className="h-full bg-primary transition-all" style={{ width: `${embeddingProgress}%` }} />
+                  <div
+                    className="h-full bg-primary transition-all"
+                    style={{ width: `${embeddingProgress}%` }}
+                  />
                 </div>
                 <div className="grid grid-cols-2 gap-2 text-xs sm:grid-cols-4">
                   <Metric label="Total" value={String(embeddings.total)} />
@@ -156,7 +178,11 @@ function HadithIngestAdminPage() {
                   <Metric label="Pending" value={String(embeddings.pending)} />
                   <Metric
                     label="Latest run"
-                    value={embeddings.latestEmbeddedAt ? new Date(embeddings.latestEmbeddedAt).toLocaleString() : "—"}
+                    value={
+                      embeddings.latestEmbeddedAt
+                        ? new Date(embeddings.latestEmbeddedAt).toLocaleString()
+                        : "—"
+                    }
                   />
                 </div>
               </div>
@@ -190,14 +216,21 @@ function HadithIngestAdminPage() {
                 <tbody>
                   {jobs.map((job) => {
                     const stats = asObject(job.stats);
-                    const failedBatches = Array.isArray(job.failed_batches) ? job.failed_batches : [];
+                    const failedBatches = Array.isArray(job.failed_batches)
+                      ? job.failed_batches
+                      : [];
                     const canRetry = job.status === "failed" || job.status === "cancelled";
-                    const canCancel = job.status === "running" || job.status === "queued" || job.status === "retrying";
+                    const canCancel =
+                      job.status === "running" ||
+                      job.status === "queued" ||
+                      job.status === "retrying";
 
                     return (
                       <tr key={job.id} className="border-b border-border/70 align-top">
                         <td className="px-2 py-2">
-                          <p className="font-medium text-foreground">{job.job_name.replace("hadith_import:", "")}</p>
+                          <p className="font-medium text-foreground">
+                            {job.job_name.replace("hadith_import:", "")}
+                          </p>
                           <p className="font-mono text-[11px] text-muted-foreground">{job.id}</p>
                           {job.error_message ? (
                             <p className="mt-1 text-[11px] text-destructive">{job.error_message}</p>

@@ -4,7 +4,7 @@
 
 1. Open **/research** and ask the same question twice (example: `patience`).
 2. Confirm the second response is fast (cache hit behavior).
-3. Open **/_authenticated/admin/backfill**.
+3. Open **/\_authenticated/admin/backfill**.
 4. Change **TTL (minutes)** to a small value (for example 5) and save.
 5. Click **Invalidate cache now** (increments cache version).
 6. Return to **/research** and ask the same question again.
@@ -13,9 +13,9 @@
 ## 2) Admin authorization + validation
 
 1. Sign in as a user with `admin` role in `public.user_roles`.
-2. Open **/_authenticated/admin/backfill** and run one safe job (for example `backfill-quran-chapters`).
+2. Open **/\_authenticated/admin/backfill** and run one safe job (for example `backfill-quran-chapters`).
 3. Confirm the run appears in **Recent runs** with status updates.
-4. Sign in as a non-admin user and open **/_authenticated/admin/backfill**.
+4. Sign in as a non-admin user and open **/\_authenticated/admin/backfill**.
 5. Confirm job actions fail with forbidden behavior (no successful run creation).
 6. Call an admin API without auth token and confirm `401`.
 7. Call an admin API with token but non-admin `adminUserId` and confirm `403`.
@@ -34,7 +34,7 @@
 
 ## 4) Surah + DailyVerse locale regression
 
-Run locale checks from **/_authenticated/admin/backfill** via **Run regression** and verify:
+Run locale checks from **/\_authenticated/admin/backfill** via **Run regression** and verify:
 
 - `en`: Arabic + English translation
 - `he`: Arabic + Hebrew translation

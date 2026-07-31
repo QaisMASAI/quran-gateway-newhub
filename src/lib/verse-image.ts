@@ -188,7 +188,14 @@ function fitFont(
   return { size: minSize, lines: wrap(ctx, text, maxWidth) };
 }
 
-function roundRect(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, r: number) {
+function roundRect(
+  ctx: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  w: number,
+  h: number,
+  r: number,
+) {
   ctx.beginPath();
   ctx.moveTo(x + r, y);
   ctx.arcTo(x + w, y, x + w, y + h, r);
@@ -343,7 +350,11 @@ export async function renderVerseImage(input: VerseImageInput): Promise<Blob> {
 
   // Translation (English, Hebrew, or provided translation)
   const translationText =
-    input.translation || (input.locale === "en" ? input.english : input.hebrew) || input.english || input.hebrew || "";
+    input.translation ||
+    (input.locale === "en" ? input.english : input.hebrew) ||
+    input.english ||
+    input.hebrew ||
+    "";
 
   if (translationText) {
     const transStart = Math.round(Math.min(W, H) * (landscape ? 0.04 : 0.04));

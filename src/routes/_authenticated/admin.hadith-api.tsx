@@ -2,10 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { Header } from "@/components/Header";
-import {
-  getHadithDiagnostics,
-  getHadithTelemetrySnapshot,
-} from "@/lib/hadith.functions";
+import { getHadithDiagnostics, getHadithTelemetrySnapshot } from "@/lib/hadith.functions";
 
 export const Route = createFileRoute("/_authenticated/admin/hadith-api")({
   component: AdminHadithApiPage,
@@ -54,8 +51,11 @@ function AdminHadithApiPage() {
           ) : (
             <>
               <p className="mt-2 text-sm text-muted-foreground">
-                API key configured: <strong>{diagnostics.apiConfigured ? "Yes" : "No"}</strong> · Connection:
-                <strong className={diagnostics.connectionOk ? "text-emerald-600" : "text-destructive"}>
+                API key configured: <strong>{diagnostics.apiConfigured ? "Yes" : "No"}</strong> ·
+                Connection:
+                <strong
+                  className={diagnostics.connectionOk ? "text-emerald-600" : "text-destructive"}
+                >
                   {diagnostics.connectionOk ? " OK" : " Failed"}
                 </strong>
               </p>
@@ -74,7 +74,9 @@ function AdminHadithApiPage() {
                       <tr key={row.endpoint} className="border-t border-border align-top">
                         <td className="py-2 pe-3 font-medium">{row.endpoint}</td>
                         <td className="py-2 pe-3">{row.status || "-"}</td>
-                        <td className="py-2 pe-3 text-xs text-muted-foreground">{row.requestId || "-"}</td>
+                        <td className="py-2 pe-3 text-xs text-muted-foreground">
+                          {row.requestId || "-"}
+                        </td>
                         <td className="py-2 text-xs text-muted-foreground">{row.error || "-"}</td>
                       </tr>
                     ))}

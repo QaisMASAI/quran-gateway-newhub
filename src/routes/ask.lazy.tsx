@@ -134,13 +134,16 @@ function AskPage() {
   }
 
   const suggestedQuestions = useMemo(() => {
-    const verseSuggestion = result?.verses.slice(0, 2).map((v) =>
-      locale === "ar"
-        ? `ما تفسير ${v.surah}:${v.ayah}؟`
-        : locale === "he"
-          ? `מה ההקשר של ${v.surah}:${v.ayah}?`
-          : `What is the context of ${v.surah}:${v.ayah}?`,
-    ) ?? [];
+    const verseSuggestion =
+      result?.verses
+        .slice(0, 2)
+        .map((v) =>
+          locale === "ar"
+            ? `ما تفسير ${v.surah}:${v.ayah}؟`
+            : locale === "he"
+              ? `מה ההקשר של ${v.surah}:${v.ayah}?`
+              : `What is the context of ${v.surah}:${v.ayah}?`,
+        ) ?? [];
     const base =
       locale === "ar"
         ? ["ما الروابط بين هذه الآيات؟", "ما الدروس العملية اليوم؟"]
@@ -203,11 +206,11 @@ function AskPage() {
             <span>{t("ask.send")}</span>
           </button>
         </form>
-          {prefillMessage ? (
-            <p className="mt-3 rounded-lg border border-border bg-card px-3 py-2 text-xs text-muted-foreground">
-              {prefillMessage}
-            </p>
-          ) : null}
+        {prefillMessage ? (
+          <p className="mt-3 rounded-lg border border-border bg-card px-3 py-2 text-xs text-muted-foreground">
+            {prefillMessage}
+          </p>
+        ) : null}
 
         {!result && !loading && (
           <div className="mt-5">
@@ -237,7 +240,9 @@ function AskPage() {
             </div>
           </div>
         )}
-        {result && !loading && (result.answer || result.error) &&
+        {result &&
+          !loading &&
+          (result.answer || result.error) &&
           (result.error ? (
             <div className="mt-6 surface-card p-5">
               <p className="text-sm text-destructive">{result.error}</p>
@@ -426,25 +431,26 @@ function AskPage() {
           </div>
         )}
 
-        {result && (result.verses.length > 0 || result.hadith.length > 0 || recentViews.length > 0) && (
-          <DiscoveryRail
-            locale={locale}
-            relatedVerses={result.verses.slice(0, 6).map((v) => ({
-              surah: v.surah,
-              ayah: v.ayah,
-              label: `${surahDisplayName(v.surah, locale)} ${v.surah}:${v.ayah}`,
-            }))}
-            relatedHadith={result.hadith.slice(0, 4).map((h) => ({
-              collection: h.collection,
-              num: h.global_id,
-              label: `${h.collection_label} #${h.id_in_book}`,
-              subtitle: h.narrator ?? undefined,
-            }))}
-            recentViews={recentViews}
-            suggestedQuestions={suggestedQuestions}
-            onSuggestedQuestion={submitSuggestedQuestion}
-          />
-        )}
+        {result &&
+          (result.verses.length > 0 || result.hadith.length > 0 || recentViews.length > 0) && (
+            <DiscoveryRail
+              locale={locale}
+              relatedVerses={result.verses.slice(0, 6).map((v) => ({
+                surah: v.surah,
+                ayah: v.ayah,
+                label: `${surahDisplayName(v.surah, locale)} ${v.surah}:${v.ayah}`,
+              }))}
+              relatedHadith={result.hadith.slice(0, 4).map((h) => ({
+                collection: h.collection,
+                num: h.global_id,
+                label: `${h.collection_label} #${h.id_in_book}`,
+                subtitle: h.narrator ?? undefined,
+              }))}
+              recentViews={recentViews}
+              suggestedQuestions={suggestedQuestions}
+              onSuggestedQuestion={submitSuggestedQuestion}
+            />
+          )}
       </main>
     </div>
   );

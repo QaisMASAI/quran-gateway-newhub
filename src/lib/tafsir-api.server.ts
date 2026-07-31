@@ -82,7 +82,11 @@ async function fetchJson(url: string): Promise<unknown | null> {
   }
 }
 
-async function translateAcademic(text: string, targetLang: Locale, sourceName: string): Promise<string | null> {
+async function translateAcademic(
+  text: string,
+  targetLang: Locale,
+  sourceName: string,
+): Promise<string | null> {
   if (!text.trim()) return null;
   const key = process.env.LOVABLE_API_KEY;
   if (!key) return null;
@@ -135,12 +139,7 @@ export async function fetchJalalaynForVerse(args: {
   const arabic = await fetchJalalaynRaw(surah, ayah, "ar-tafsir-al-jalalayn");
   const english = await fetchJalalaynRaw(surah, ayah, "en-al-jalalayn");
 
-  const direct =
-    lang === "ar"
-      ? arabic
-      : lang === "en"
-        ? english
-        : null;
+  const direct = lang === "ar" ? arabic : lang === "en" ? english : null;
 
   if (direct) {
     return {

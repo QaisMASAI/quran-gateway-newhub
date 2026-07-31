@@ -42,7 +42,9 @@ function RecentAiPage() {
       const raw = window.localStorage.getItem(HOME_RECENT_PROMPTS_KEY);
       const parsed = raw ? JSON.parse(raw) : [];
       if (!Array.isArray(parsed)) return [];
-      return parsed.filter((item): item is string => typeof item === "string" && item.trim().length > 0).slice(0, 8);
+      return parsed
+        .filter((item): item is string => typeof item === "string" && item.trim().length > 0)
+        .slice(0, 8);
     } catch {
       return [];
     }
@@ -53,7 +55,11 @@ function RecentAiPage() {
       <Header />
       <main id="main" className="mx-auto max-w-4xl px-4 py-8 sm:px-6">
         <h1 className="text-2xl font-bold text-foreground">
-          {locale === "ar" ? "جلسات AI الأخيرة" : locale === "he" ? "שיחות AI אחרונות" : "Recent AI Sessions"}
+          {locale === "ar"
+            ? "جلسات AI الأخيرة"
+            : locale === "he"
+              ? "שיחות AI אחרונות"
+              : "Recent AI Sessions"}
         </h1>
         <p className="mt-1 text-sm text-muted-foreground">
           {locale === "ar"
@@ -66,7 +72,11 @@ function RecentAiPage() {
         {recentPrompts.length > 0 ? (
           <section className="mt-6">
             <h2 className="text-sm font-semibold text-foreground">
-              {locale === "ar" ? "أسئلة حديثة" : locale === "he" ? "שאלות אחרונות" : "Recent prompts"}
+              {locale === "ar"
+                ? "أسئلة حديثة"
+                : locale === "he"
+                  ? "שאלות אחרונות"
+                  : "Recent prompts"}
             </h2>
             <div className="mt-3 space-y-2">
               {recentPrompts.map((prompt) => (
@@ -94,7 +104,11 @@ function RecentAiPage() {
         {recentViews.length > 0 && (
           <section className="mt-8">
             <h2 className="text-sm font-semibold text-foreground">
-              {locale === "ar" ? "آيات عُدت إليها" : locale === "he" ? "פסוקים שחזרת אליהם" : "Recently revisited verses"}
+              {locale === "ar"
+                ? "آيات عُدت إليها"
+                : locale === "he"
+                  ? "פסוקים שחזרת אליהם"
+                  : "Recently revisited verses"}
             </h2>
             <div className="mt-3 grid gap-2 sm:grid-cols-2">
               {recentViews

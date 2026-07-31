@@ -11,7 +11,11 @@ const TafsirInput = z.object({
 export const fetchTafsirFromApi = createServerFn({ method: "GET" })
   .inputValidator((input: unknown) => TafsirInput.parse(input))
   .handler(async ({ data }) => {
-    const row = await fetchJalalaynForVerse({ surah: data.surah, ayah: data.ayah, lang: data.lang });
+    const row = await fetchJalalaynForVerse({
+      surah: data.surah,
+      ayah: data.ayah,
+      lang: data.lang,
+    });
     if (!row) return [];
     return [
       {
@@ -38,7 +42,11 @@ export const fetchTafsirFromApi = createServerFn({ method: "GET" })
 export const fetchAsbabFromApi = createServerFn({ method: "GET" })
   .inputValidator((input: unknown) => TafsirInput.parse(input))
   .handler(async ({ data }) => {
-    const row = await fetchAsbabForVerseFromApi({ surah: data.surah, ayah: data.ayah, lang: data.lang });
+    const row = await fetchAsbabForVerseFromApi({
+      surah: data.surah,
+      ayah: data.ayah,
+      lang: data.lang,
+    });
     if (!row) return [];
     return [
       {

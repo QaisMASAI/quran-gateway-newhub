@@ -1,6 +1,18 @@
 import ReactMarkdown from "react-markdown";
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { BadgeCheck, BookOpen, Brain, Library, MessageCircleQuestion, ScrollText } from "lucide-react";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
+import {
+  BadgeCheck,
+  BookOpen,
+  Brain,
+  Library,
+  MessageCircleQuestion,
+  ScrollText,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 type Props = {
@@ -24,7 +36,11 @@ function quickSummary(answer: string) {
   const plain = stripMarkdown(answer);
   if (plain.length <= 220) return plain;
   const clipped = plain.slice(0, 220);
-  const lastDot = Math.max(clipped.lastIndexOf("."), clipped.lastIndexOf("؟"), clipped.lastIndexOf("!"));
+  const lastDot = Math.max(
+    clipped.lastIndexOf("."),
+    clipped.lastIndexOf("؟"),
+    clipped.lastIndexOf("!"),
+  );
   return (lastDot > 80 ? clipped.slice(0, lastDot + 1) : clipped).trim();
 }
 

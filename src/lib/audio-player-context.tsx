@@ -132,7 +132,12 @@ export function AudioPlayerProvider({ children }: { children: React.ReactNode })
     if (audioRef.current && activeTrack) {
       if (!audioRef.current.src) {
         const quality: AudioQualityKey = getStoredAudioQuality();
-        audioRef.current.src = ayahAudioUrl(activeTrack.surah, activeTrack.ayah, "yasser-ad-dussary", quality);
+        audioRef.current.src = ayahAudioUrl(
+          activeTrack.surah,
+          activeTrack.ayah,
+          "yasser-ad-dussary",
+          quality,
+        );
       }
       audioRef.current
         .play()

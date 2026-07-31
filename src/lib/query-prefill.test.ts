@@ -31,7 +31,9 @@ describe("query prefill parsing", () => {
 
 describe("/search validateSearch", () => {
   it("prefills q from valid query param", () => {
-    const validateSearch = SearchRoute.options.validateSearch as (input: Record<string, unknown>) => unknown;
+    const validateSearch = SearchRoute.options.validateSearch as (
+      input: Record<string, unknown>,
+    ) => unknown;
     const parsed = validateSearch({
       q: "  what is tawakkul  ",
       src: "hero_input",
@@ -44,7 +46,9 @@ describe("/search validateSearch", () => {
   });
 
   it("marks non-string q as invalid", () => {
-    const validateSearch = SearchRoute.options.validateSearch as (input: Record<string, unknown>) => unknown;
+    const validateSearch = SearchRoute.options.validateSearch as (
+      input: Record<string, unknown>,
+    ) => unknown;
     const parsed = validateSearch({ q: 42 });
     expect(parsed).toEqual({
       q: "",
@@ -56,7 +60,9 @@ describe("/search validateSearch", () => {
 
 describe("/ask validateSearch", () => {
   it("prefills q from popular questions link", () => {
-    const validateSearch = AskRoute.options.validateSearch as (input: Record<string, unknown>) => unknown;
+    const validateSearch = AskRoute.options.validateSearch as (
+      input: Record<string, unknown>,
+    ) => unknown;
     const parsed = validateSearch({
       q: "How does the Quran teach hope?",
       src: "popular_questions",
@@ -69,7 +75,9 @@ describe("/ask validateSearch", () => {
   });
 
   it("normalizes empty q to empty state", () => {
-    const validateSearch = AskRoute.options.validateSearch as (input: Record<string, unknown>) => unknown;
+    const validateSearch = AskRoute.options.validateSearch as (
+      input: Record<string, unknown>,
+    ) => unknown;
     const parsed = validateSearch({ q: "   " });
     expect(parsed).toEqual({
       q: "",

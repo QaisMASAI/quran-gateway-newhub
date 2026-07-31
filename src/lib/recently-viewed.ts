@@ -59,7 +59,10 @@ export function useRecentlyViewed(current?: RecentViewInput) {
     const nextView: RecentView = { ...view, at: Date.now() } as RecentView;
     setItems((prev) => {
       const id = getId(nextView);
-      const next = [nextView, ...prev.filter((item) => getId(item) !== id)].slice(0, RECENT_VIEWS_LIMIT);
+      const next = [nextView, ...prev.filter((item) => getId(item) !== id)].slice(
+        0,
+        RECENT_VIEWS_LIMIT,
+      );
       writeRecentViews(next);
       return next;
     });

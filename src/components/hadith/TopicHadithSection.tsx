@@ -111,9 +111,7 @@ export function TopicHadithSection({ slug, locale }: { slug: string; locale: Loc
               <div className="text-[10px] font-semibold uppercase tracking-wider text-primary">
                 {COLLECTION_LABEL[h.collection_slug] ?? h.collection_slug} · #{h.id_in_book}
               </div>
-              {h.narrator && (
-                <div className="mt-1 text-xs text-muted-foreground">{h.narrator}</div>
-              )}
+              {h.narrator && <div className="mt-1 text-xs text-muted-foreground">{h.narrator}</div>}
               <p
                 className={`mt-2 line-clamp-3 text-sm text-foreground/90 ${tafsirFontClass(locale)}`}
                 dir={locale === "en" ? "ltr" : "rtl"}

@@ -6,7 +6,12 @@ import { Header } from "@/components/Header";
 import { generateHadithStudySummary, getHadithKnowledgeBundle } from "@/lib/hadith.functions";
 import { PassageCard } from "@/components/discovery/PassageCard";
 import { EntityCard } from "@/components/discovery/EntityCard";
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 import { normalizeLocale } from "@/lib/i18n";
 import { pickLocale, type EntityKind } from "@/lib/knowledge";
 
@@ -57,7 +62,12 @@ export const Route = createFileRoute("/hadith/$collection/entry/$num")({
             "@type": "BreadcrumbList",
             itemListElement: [
               { "@type": "ListItem", position: 1, name: "Hadith", item: "/hadith" },
-              { "@type": "ListItem", position: 2, name: label, item: `/hadith/${params.collection}` },
+              {
+                "@type": "ListItem",
+                position: 2,
+                name: label,
+                item: `/hadith/${params.collection}`,
+              },
               { "@type": "ListItem", position: 3, name: `Hadith #${params.num}`, item: canonical },
             ],
           }),
@@ -98,7 +108,8 @@ function HadithDetailPage() {
 
   const h = bundle?.entry;
   const collectionLabel =
-    bundle?.collection?.title_en ?? (collection === "bukhari" ? "Sahih al-Bukhari" : "Sahih Muslim");
+    bundle?.collection?.title_en ??
+    (collection === "bukhari" ? "Sahih al-Bukhari" : "Sahih Muslim");
 
   const studySummaryQ = useQuery({
     queryKey: ["hadith", "study-summary", collection, numId, locale],
@@ -120,7 +131,9 @@ function HadithDetailPage() {
           citations: [
             `${collectionLabel}, Book ${h?.book_id ?? ""}, Hadith ${h?.id_in_book ?? numId}`,
             ...(bundle?.relatedVerses ?? []).map((v) => `Quran ${v.surah}:${v.ayah}`),
-            ...(bundle?.relatedTafsir ?? []).map((t) => `${t.source_name} ${t.surah}:${t.ayah_start}`),
+            ...(bundle?.relatedTafsir ?? []).map(
+              (t) => `${t.source_name} ${t.surah}:${t.ayah_start}`,
+            ),
             ...(bundle?.relatedAsbab ?? []).map((a) => `Asbab ${a.surah}:${a.ayah_start}`),
           ],
           lang: locale,
@@ -132,7 +145,9 @@ function HadithDetailPage() {
     return (
       <div className="min-h-screen bg-background">
         <Header />
-        <main className="mx-auto max-w-3xl px-4 py-10 text-sm text-muted-foreground">Loading hadith…</main>
+        <main className="mx-auto max-w-3xl px-4 py-10 text-sm text-muted-foreground">
+          Loading hadith…
+        </main>
       </div>
     );
   }
@@ -141,7 +156,9 @@ function HadithDetailPage() {
     return (
       <div className="min-h-screen bg-background">
         <Header />
-        <main className="mx-auto max-w-3xl px-4 py-10 text-sm text-destructive">Failed to load this hadith entry.</main>
+        <main className="mx-auto max-w-3xl px-4 py-10 text-sm text-destructive">
+          Failed to load this hadith entry.
+        </main>
       </div>
     );
   }
@@ -195,12 +212,17 @@ function HadithDetailPage() {
 
         {bundle?.collection && (
           <p className="mt-1 text-xs text-muted-foreground">
-            {bundle.collection.total_hadith.toLocaleString()} hadith · {bundle.collection.total_books} books
+            {bundle.collection.total_hadith.toLocaleString()} hadith ·{" "}
+            {bundle.collection.total_books} books
           </p>
         )}
 
         <article className="mt-6 space-y-5 rounded-2xl border border-border bg-card p-5">
-          <p className="font-reading-ar text-right text-xl leading-loose text-foreground" dir="rtl" lang="ar">
+          <p
+            className="font-reading-ar text-right text-xl leading-loose text-foreground"
+            dir="rtl"
+            lang="ar"
+          >
             {h.arabic_text}
           </p>
           {h.english_text && (
@@ -232,7 +254,11 @@ function HadithDetailPage() {
 
         <section className="mt-6 rounded-2xl border border-border bg-card p-5">
           <h2 className="text-base font-semibold text-foreground">
-            {locale === "ar" ? "مركز دراسة الحديث" : locale === "he" ? "מרכז לימוד חדית׳" : "Hadith Study Center"}
+            {locale === "ar"
+              ? "مركز دراسة الحديث"
+              : locale === "he"
+                ? "מרכז לימוד חדית׳"
+                : "Hadith Study Center"}
           </h2>
           <Accordion type="multiple" className="mt-3">
             <AccordionItem value="explanation">
@@ -252,7 +278,11 @@ function HadithDetailPage() {
             </AccordionItem>
             <AccordionItem value="context">
               <AccordionTrigger>
-                {locale === "ar" ? "السياق التاريخي" : locale === "he" ? "הקשר היסטורי" : "Historical context"}
+                {locale === "ar"
+                  ? "السياق التاريخي"
+                  : locale === "he"
+                    ? "הקשר היסטורי"
+                    : "Historical context"}
               </AccordionTrigger>
               <AccordionContent>
                 <p className="text-sm leading-relaxed text-foreground/90">
@@ -267,7 +297,11 @@ function HadithDetailPage() {
             </AccordionItem>
             <AccordionItem value="narrated">
               <AccordionTrigger>
-                {locale === "ar" ? "سبب الرواية" : locale === "he" ? "למה נמסר החדית׳" : "Why this hadith was narrated"}
+                {locale === "ar"
+                  ? "سبب الرواية"
+                  : locale === "he"
+                    ? "למה נמסר החדית׳"
+                    : "Why this hadith was narrated"}
               </AccordionTrigger>
               <AccordionContent>
                 <p className="text-sm leading-relaxed text-foreground/90">
@@ -282,7 +316,11 @@ function HadithDetailPage() {
             </AccordionItem>
             <AccordionItem value="lessons">
               <AccordionTrigger>
-                {locale === "ar" ? "الدروس الرئيسية" : locale === "he" ? "לקחים מרכזיים" : "Main lessons"}
+                {locale === "ar"
+                  ? "الدروس الرئيسية"
+                  : locale === "he"
+                    ? "לקחים מרכזיים"
+                    : "Main lessons"}
               </AccordionTrigger>
               <AccordionContent>
                 <p className="text-sm leading-relaxed text-foreground/90">
@@ -301,7 +339,11 @@ function HadithDetailPage() {
         {(bundle?.relatedVerses?.length ?? 0) > 0 && (
           <section className="mt-6">
             <h2 className="mb-3 text-sm font-semibold text-foreground">
-              {locale === "ar" ? "آيات مرتبطة" : locale === "he" ? "פסוקים קשורים" : "Related Quran verses"}
+              {locale === "ar"
+                ? "آيات مرتبطة"
+                : locale === "he"
+                  ? "פסוקים קשורים"
+                  : "Related Quran verses"}
             </h2>
             <div className="space-y-3">
               {bundle?.relatedVerses.map((v) => (
@@ -324,7 +366,10 @@ function HadithDetailPage() {
             </h2>
             <div className="space-y-3">
               {bundle?.relatedTafsir.map((t) => (
-                <article key={t.id} className="rounded-lg border border-border bg-background px-3 py-2">
+                <article
+                  key={t.id}
+                  className="rounded-lg border border-border bg-background px-3 py-2"
+                >
                   <p className="text-xs text-primary">
                     {t.source_name} · {t.surah}:{t.ayah_start}
                     {t.ayah_end !== t.ayah_start ? `-${t.ayah_end}` : ""}
@@ -342,11 +387,18 @@ function HadithDetailPage() {
         {(bundle?.relatedAsbab?.length ?? 0) > 0 && (
           <section className="mt-6 rounded-2xl border border-border bg-card p-5">
             <h2 className="mb-3 text-sm font-semibold text-foreground">
-              {locale === "ar" ? "أسباب النزول" : locale === "he" ? "אסבאב אל־נוזול" : "Asbab al-Nuzul"}
+              {locale === "ar"
+                ? "أسباب النزول"
+                : locale === "he"
+                  ? "אסבאב אל־נוזול"
+                  : "Asbab al-Nuzul"}
             </h2>
             <div className="space-y-3">
               {bundle.relatedAsbab.map((a) => (
-                <article key={a.id} className="rounded-lg border border-border bg-background px-3 py-2">
+                <article
+                  key={a.id}
+                  className="rounded-lg border border-border bg-background px-3 py-2"
+                >
                   <p className="text-xs text-primary">
                     {a.surah}:{a.ayah_start}
                     {a.ayah_end !== a.ayah_start ? `-${a.ayah_end}` : ""}
@@ -364,7 +416,11 @@ function HadithDetailPage() {
         {(bundle?.relatedTopics?.length ?? 0) > 0 && (
           <section className="mt-6">
             <h2 className="mb-3 text-sm font-semibold text-foreground">
-              {locale === "ar" ? "موضوعات مرتبطة" : locale === "he" ? "נושאים קשורים" : "Related topics"}
+              {locale === "ar"
+                ? "موضوعات مرتبطة"
+                : locale === "he"
+                  ? "נושאים קשורים"
+                  : "Related topics"}
             </h2>
             <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
               {bundle?.relatedTopics.map((e) => (
@@ -389,7 +445,11 @@ function HadithDetailPage() {
         {(bundle?.relatedProphets?.length ?? 0) > 0 && (
           <section className="mt-6">
             <h2 className="mb-3 text-sm font-semibold text-foreground">
-              {locale === "ar" ? "أنبياء مرتبطون" : locale === "he" ? "נביאים קשורים" : "Related prophets"}
+              {locale === "ar"
+                ? "أنبياء مرتبطون"
+                : locale === "he"
+                  ? "נביאים קשורים"
+                  : "Related prophets"}
             </h2>
             <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
               {bundle?.relatedProphets.map((e) => (
@@ -414,7 +474,11 @@ function HadithDetailPage() {
         {(bundle?.relatedHadith?.length ?? 0) > 0 && (
           <section className="mt-6 rounded-2xl border border-border bg-card p-5">
             <h2 className="mb-3 text-sm font-semibold text-foreground">
-              {locale === "ar" ? "أحاديث مشابهة" : locale === "he" ? "חדית׳ דומה" : "Related hadith"}
+              {locale === "ar"
+                ? "أحاديث مشابهة"
+                : locale === "he"
+                  ? "חדית׳ דומה"
+                  : "Related hadith"}
             </h2>
             <div className="space-y-3">
               {bundle?.relatedHadith.map((rh) => (
@@ -425,9 +489,12 @@ function HadithDetailPage() {
                   className="block rounded-lg border border-border bg-background px-3 py-2 hover:border-primary/40"
                 >
                   <p className="text-xs text-primary">
-                    {rh.collection_slug === "bukhari" ? "Sahih al-Bukhari" : "Sahih Muslim"} · #{rh.id_in_book}
+                    {rh.collection_slug === "bukhari" ? "Sahih al-Bukhari" : "Sahih Muslim"} · #
+                    {rh.id_in_book}
                   </p>
-                  {rh.narrator ? <p className="text-[11px] italic text-muted-foreground">{rh.narrator}</p> : null}
+                  {rh.narrator ? (
+                    <p className="text-[11px] italic text-muted-foreground">{rh.narrator}</p>
+                  ) : null}
                   {rh.english_text ? (
                     <p className="mt-1 text-xs text-foreground/85">
                       {rh.english_text.slice(0, 230)}

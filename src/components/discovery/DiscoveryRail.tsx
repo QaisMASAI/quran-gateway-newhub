@@ -82,7 +82,9 @@ export function DiscoveryRail({
               className="rounded-lg border border-border bg-background px-3 py-2 text-sm hover:border-primary/40"
             >
               <div className="font-medium text-foreground">{entity.label}</div>
-              {entity.subtitle && <div className="text-xs text-muted-foreground">{entity.subtitle}</div>}
+              {entity.subtitle && (
+                <div className="text-xs text-muted-foreground">{entity.subtitle}</div>
+              )}
             </Link>
           ))}
           {relatedVerses.slice(0, 4).map((verse) => (
@@ -95,7 +97,9 @@ export function DiscoveryRail({
               className="rounded-lg border border-border bg-background px-3 py-2 text-sm hover:border-primary/40"
             >
               <div className="font-medium text-foreground">{verse.label}</div>
-              {verse.subtitle && <div className="text-xs text-muted-foreground">{verse.subtitle}</div>}
+              {verse.subtitle && (
+                <div className="text-xs text-muted-foreground">{verse.subtitle}</div>
+              )}
             </Link>
           ))}
         </div>
@@ -114,7 +118,9 @@ export function DiscoveryRail({
                     className="block rounded-lg border border-border bg-background px-3 py-2 text-sm hover:border-primary/40"
                   >
                     <div className="font-medium text-foreground">{hadith.label}</div>
-                    {hadith.subtitle && <div className="text-xs text-muted-foreground">{hadith.subtitle}</div>}
+                    {hadith.subtitle && (
+                      <div className="text-xs text-muted-foreground">{hadith.subtitle}</div>
+                    )}
                   </Link>
                 ))}
               </div>
@@ -132,7 +138,9 @@ export function DiscoveryRail({
                     className="block rounded-lg border border-border bg-background px-3 py-2 text-sm hover:border-primary/40"
                   >
                     <div className="font-medium text-foreground">{journey.label}</div>
-                    {journey.subtitle && <div className="text-xs text-muted-foreground">{journey.subtitle}</div>}
+                    {journey.subtitle && (
+                      <div className="text-xs text-muted-foreground">{journey.subtitle}</div>
+                    )}
                   </Link>
                 ))}
               </div>

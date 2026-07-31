@@ -20,7 +20,7 @@ const NavKeySchema = z.enum([
 
 const UiVisibilitySchema = z.object({
   hiddenNav: z.array(NavKeySchema).default([]),
-  enabledLocales: z.array(z.enum(["he", "ar", "en"])) .default(["he", "ar", "en"]),
+  enabledLocales: z.array(z.enum(["he", "ar", "en"])).default(["he", "ar", "en"]),
 });
 
 export type UiVisibilitySettings = z.infer<typeof UiVisibilitySchema>;

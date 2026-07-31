@@ -175,7 +175,12 @@ export function getAyahLinks(surah: number, ayah: number, locale: UiLocale = "he
  * topics first (denser semantic links), then emotions, then prophets.
  * Each result carries the group it came from so the UI can label "מתוך: …".
  */
-export function getConnectedVerses(surah: number, ayah: number, limit = 4, locale: UiLocale = "he"): ConnectedVerse[] {
+export function getConnectedVerses(
+  surah: number,
+  ayah: number,
+  limit = 4,
+  locale: UiLocale = "he",
+): ConnectedVerse[] {
   const bySurah = INDEX.get(surah);
   const b = bySurah?.get(ayah);
   if (!b) return [];
