@@ -18,11 +18,14 @@ function NavLink({ to, hash, label, icon }: NavLinkProps) {
       to={to}
       hash={hash}
       activeOptions={{ exact: to === "/" }}
-      activeProps={{ className: "bg-secondary text-foreground", "aria-current": "page" }}
-      inactiveProps={{
-        className: "text-muted-foreground hover:bg-secondary/60 hover:text-foreground",
+      activeProps={{
+        className: "bg-primary/10 text-primary font-semibold shadow-xs ring-1 ring-primary/20",
+        "aria-current": "page",
       }}
-      className="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-medium transition-colors"
+      inactiveProps={{
+        className: "text-muted-foreground hover:bg-secondary/70 hover:text-foreground",
+      }}
+      className="inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium transition-all duration-200"
     >
       {icon}
       <span>{label}</span>
