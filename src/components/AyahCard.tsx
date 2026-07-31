@@ -141,8 +141,8 @@ export function AyahCard({ surah, surahName, ayah, arabic, hebrew, highlight, ma
   };
 
   const heHighlight = useMemo(() => highlightHebrew(hebrew, highlight), [hebrew, highlight]);
-  const links = useMemo(() => getAyahLinks(surah, ayah), [surah, ayah]);
-  const connectedVerses = useMemo(() => getConnectedVerses(surah, ayah, 4), [surah, ayah]);
+  const links = useMemo(() => getAyahLinks(surah, ayah, locale), [surah, ayah, locale]);
+  const connectedVerses = useMemo(() => getConnectedVerses(surah, ayah, 4, locale), [surah, ayah, locale]);
   const [reading] = useReadingSettings();
   const displayArabic = useMemo(
     () => sanitizeArabicText(reading.stripTashkil ? stripArabicDiacritics(arabic) : arabic),
@@ -315,7 +315,6 @@ export function AyahCard({ surah, surahName, ayah, arabic, hebrew, highlight, ma
                 className="inline-flex items-center gap-1 rounded-full border border-border bg-background px-2.5 py-1 text-[11px] text-foreground/90 hover:border-primary/40"
               >
                 <span>{`${v.surahName} ${v.surah}:${v.ayah}`}</span>
-                <span className="text-muted-foreground">· {v.via.title}</span>
               </Link>
             ))}
           </div>

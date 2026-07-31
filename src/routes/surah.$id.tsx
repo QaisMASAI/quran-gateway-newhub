@@ -2,7 +2,7 @@ import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { fetchChapter, fetchVerses, surahAudioUrl, surahAudioUrls, type ApiLang } from "@/lib/quran-api";
+import { fetchChapter, fetchVerses, surahAudioUrls, type ApiLang } from "@/lib/quran-api";
 import { surahDisplayName, surahNameHe, loadSurahNamesFromDb } from "@/lib/surah-names-he";
 import { Header } from "@/components/Header";
 import { AyahCard } from "@/components/AyahCard";
@@ -113,6 +113,7 @@ function SurahPage() {
   const urlIndexRef = useRef(0);
 
   useEffect(() => {
+    urlIndexRef.current = 0;
     return () => {
       audioRef.current?.pause();
       audioRef.current = null;

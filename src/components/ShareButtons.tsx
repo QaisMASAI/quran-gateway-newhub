@@ -169,7 +169,7 @@ export function ShareButtons(props: Props) {
         </button>
         {openTheme && (
           <div
-            className="absolute z-20 mt-1 min-w-[170px] rounded-xl border border-border bg-popover p-1 text-start shadow-lg"
+            className="absolute bottom-full z-[60] mb-1 min-w-[170px] rounded-xl border border-border bg-popover p-1 text-start shadow-lg"
             onMouseLeave={() => setOpenTheme(false)}
           >
             {THEMES.map((thKey) => {
@@ -216,7 +216,7 @@ export function ShareButtons(props: Props) {
         </button>
         {openFormat && (
           <div
-            className="absolute z-20 mt-1 min-w-[200px] rounded-xl border border-border bg-popover p-1 text-start shadow-lg"
+            className="absolute bottom-full z-[60] mb-1 min-w-[200px] rounded-xl border border-border bg-popover p-1 text-start shadow-lg"
             onMouseLeave={() => setOpenFormat(false)}
           >
             {FORMATS.map((f) => (

@@ -6,7 +6,9 @@
 import { PROPHETS, type Prophet } from "./prophets";
 import { TOPICS, type Topic } from "./topics";
 import { EMOTIONS } from "./emotions";
-import { SURAH_NAMES_HE } from "./surah-names-he";
+import { SURAH_NAMES_AR, SURAH_NAMES_EN, SURAH_NAMES_HE } from "./surah-names-he";
+
+type UiLocale = "he" | "ar" | "en";
 
 export type AyahLink =
   | { kind: "prophet"; slug: string; title: string }
@@ -91,15 +93,79 @@ function build() {
 
 build();
 
-export function getAyahLinks(surah: number, ayah: number): AyahLink[] {
+function hasHebrewLetters(value: string): boolean {
+  return /[\u0590-\u05FF]/.test(value);
+}
+
+function slugToReadable(slug: string): string {
+  return slug
+    .split("-")
+    .map((part) => (part ? part.charAt(0).toUpperCase() + part.slice(1) : ""))
+    .join(" ")
+    .trim();
+}
+
+function topicTitleForLocale(topic: Topic, locale: UiLocale): string {
+  if (locale === "he") return topic.title;
+
+  if (locale === "ar" && topic.subtitle && !hasHebrewLetters(topic.subtitle)) {
+    return topic.subtitle;
+  }
+
+  return slugToReadable(topic.slug);
+}
+
+function prophetTitleForLocale(prophet: Prophet, locale: UiLocale): string {
+  if (locale === "ar") return prophet.nameAr;
+  if (locale === "he") return prophet.nameHe;
+  return slugToReadable(prophet.slug);
+}
+
+function emotionTitleForLocale(emotion: (typeof EMOTIONS)[number], locale: UiLocale): string {
+  if (locale === "he") return emotion.title;
+  return slugToReadable(emotion.slug);
+}
+
+function surahNameForLocale(surah: number, locale: UiLocale): string {
+  if (locale === "ar") return SURAH_NAMES_AR[surah] ?? `سورة ${surah}`;
+  if (locale === "en") return SURAH_NAMES_EN[surah] ?? `Surah ${surah}`;
+  return SURAH_NAMES_HE[surah] ?? `סורה ${surah}`;
+}
+
+export function getAyahLinks(surah: number, ayah: number, locale: UiLocale = "he"): AyahLink[] {
   const bySurah = INDEX.get(surah);
   if (!bySurah) return [];
   const b = bySurah.get(ayah);
   if (!b) return [];
   const out: AyahLink[] = [];
-  for (const [slug, title] of b.prophets) out.push({ kind: "prophet", slug, title });
-  for (const [slug, title] of b.topics) out.push({ kind: "topic", slug, title });
-  for (const [slug, title] of b.emotions) out.push({ kind: "emotion", slug, title });
+
+  for (const [slug] of b.prophets) {
+    const prophet = PROPHETS.find((p) => p.slug === slug);
+    out.push({
+      kind: "prophet",
+      slug,
+      title: prophet ? prophetTitleForLocale(prophet, locale) : slugToReadable(slug),
+    });
+  }
+
+  for (const [slug] of b.topics) {
+    const topic = TOPICS.find((t) => t.slug === slug);
+    out.push({
+      kind: "topic",
+      slug,
+      title: topic ? topicTitleForLocale(topic, locale) : slugToReadable(slug),
+    });
+  }
+
+  for (const [slug] of b.emotions) {
+    const emotion = EMOTIONS.find((e) => e.slug === slug);
+    out.push({
+      kind: "emotion",
+      slug,
+      title: emotion ? emotionTitleForLocale(emotion, locale) : slugToReadable(slug),
+    });
+  }
+
   return out;
 }
 
@@ -109,7 +175,7 @@ export function getAyahLinks(surah: number, ayah: number): AyahLink[] {
  * topics first (denser semantic links), then emotions, then prophets.
  * Each result carries the group it came from so the UI can label "מתוך: …".
  */
-export function getConnectedVerses(surah: number, ayah: number, limit = 4): ConnectedVerse[] {
+export function getConnectedVerses(surah: number, ayah: number, limit = 4, locale: UiLocale = "he"): ConnectedVerse[] {
   const bySurah = INDEX.get(surah);
   const b = bySurah?.get(ayah);
   if (!b) return [];
@@ -135,7 +201,7 @@ export function getConnectedVerses(surah: number, ayah: number, limit = 4): Conn
       out.push({
         surah: m.surah,
         ayah: m.ayah,
-        surahName: SURAH_NAMES_HE[m.surah] ?? `סורה ${m.surah}`,
+        surahName: surahNameForLocale(m.surah, locale),
         via: meta,
       });
     }

@@ -22,8 +22,17 @@ jobs:
       - name: Run Vitest
         run: bunx vitest run
 
+      - name: Run ESLint
+        run: bun run lint
+
       - name: Typecheck
-        run: bunx tsc --noEmit
+        run: bun run typecheck
+
+      - name: Typecheck Vite config
+        run: bun run typecheck:vite
+
+      - name: Security audit (high/critical)
+        run: bun audit --audit-level=high
 
       - name: Build
         run: bun run build

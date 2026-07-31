@@ -241,9 +241,9 @@ export async function fetchVerses(chapterId: number, lang: ApiLang = "he"): Prom
 export function surahAudioUrls(surahId: number): string[] {
   const n = String(surahId).padStart(3, "0");
   return [
-    `https://download.quranicaudio.com/qdc/mishari_al_afasy/murattal/${surahId}.mp3`,
     `https://server11.mp3quran.net/yasser/${n}.mp3`,
     `https://server8.mp3quran.net/afs/${n}.mp3`,
+    `https://download.quranicaudio.com/qdc/mishari_al_afasy/murattal/${surahId}.mp3`,
     `https://cdn.islamic.network/quran/audio-surah/128/ar.alafasy/${surahId}.mp3`,
   ];
 }
