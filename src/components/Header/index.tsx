@@ -23,8 +23,8 @@ export function Header() {
         <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-2.5 sm:px-6">
           <Link to="/" className="flex items-center gap-3 group" aria-label={t("site.name")}>
             <div className="relative">
-              <Logo className="h-9 w-9 drop-shadow transition-transform duration-300 group-hover:scale-105 group-hover:rotate-6" />
-              <span className="absolute -bottom-0.5 -right-0.5 h-2.5 w-2.5 rounded-full bg-gold shadow-sm ring-2 ring-background" />
+              <Logo className="h-11 w-11 drop-shadow-md transition-transform duration-300 group-hover:scale-105 group-hover:rotate-6" />
+              <span className="absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full bg-gold shadow-sm ring-2 ring-background" />
             </div>
             <div className="leading-tight">
               <div className="text-[15px] font-bold tracking-tight text-foreground flex items-center gap-1.5">
