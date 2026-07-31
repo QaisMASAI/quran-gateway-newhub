@@ -1,6 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { useAuth } from "@/hooks/useAuth";
 import { useTranslation } from "react-i18next";
+import { Search, Sparkles } from "lucide-react";
 import { Logo } from "@/components/Logo";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { LocaleSwitcher } from "@/components/LocaleSwitcher";
@@ -12,19 +13,44 @@ export function Header() {
   const { t } = useTranslation("common");
 
   return (
-    <header className="sticky top-0 z-30 border-b border-border bg-background/85 backdrop-blur-md">
-      <div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-3 sm:px-6">
-        <Link to="/" className="flex items-center gap-2.5 group" aria-label={t("site.name")}>
-          <Logo className="h-10 w-10 drop-shadow-sm transition-transform group-hover:rotate-[8deg]" />
+    <header className="sticky top-0 z-40 border-b border-border/60 bg-background/80 backdrop-blur-xl transition-all">
+      <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-2.5 sm:px-6">
+        <Link to="/" className="flex items-center gap-3 group" aria-label={t("site.name")}>
+          <div className="relative">
+            <Logo className="h-9 w-9 drop-shadow transition-transform duration-300 group-hover:scale-105 group-hover:rotate-6" />
+            <span className="absolute -bottom-0.5 -right-0.5 h-2.5 w-2.5 rounded-full bg-gold shadow-sm ring-2 ring-background" />
+          </div>
           <div className="leading-tight">
-            <div className="text-[15px] font-semibold text-foreground">{t("site.name")}</div>
-            <div className="text-[11px] text-muted-foreground">{t("site.tagline")}</div>
+            <div className="text-[15px] font-bold tracking-tight text-foreground flex items-center gap-1.5">
+              <span>{t("site.name")}</span>
+            </div>
+            <div className="text-[10.5px] font-medium text-muted-foreground/90">{t("site.tagline")}</div>
           </div>
         </Link>
 
         <HeaderNav isAuthenticated={isAuthenticated} />
 
-        <div className="flex items-center gap-1.5">
+        <div className="flex items-center gap-2">
+          <Link
+            to="/search"
+            className="hidden items-center gap-2 rounded-full border border-border/70 bg-secondary/50 px-3 py-1.5 text-xs font-medium text-muted-foreground transition-all hover:border-primary/40 hover:bg-secondary hover:text-foreground md:flex"
+            aria-label={t("nav.search")}
+          >
+            <Search className="h-3.5 w-3.5 text-primary" />
+            <span>{t("nav.search")}</span>
+            <kbd className="inline-flex h-4 items-center rounded border border-border bg-background px-1 text-[9.5px] font-mono text-muted-foreground">
+              /
+            </kbd>
+          </Link>
+
+          <Link
+            to="/ask"
+            className="flex items-center gap-1.5 rounded-full bg-gradient-to-r from-primary-soft to-accent px-3 py-1.5 text-xs font-semibold text-primary transition-all hover:scale-105 hover:shadow-sm"
+          >
+            <Sparkles className="h-3.5 w-3.5 text-gold" />
+            <span className="hidden sm:inline">{t("nav.ask") ?? "Ask AI"}</span>
+          </Link>
+
           <LocaleSwitcher />
           <ThemeToggle />
           <HeaderUser isAuthenticated={isAuthenticated} user={user} onSignOut={signOut} />
