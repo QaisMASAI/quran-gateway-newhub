@@ -36,6 +36,7 @@ export function GlobalAudioPlayer() {
     playNextAyah,
     playPrevAyah,
     pauseTrack,
+    closeTrack,
   } = useAudioPlayer();
 
   const { i18n } = useTranslation("common");
@@ -137,7 +138,7 @@ export function GlobalAudioPlayer() {
               type="button"
               variant="ghost"
               size="icon"
-              onClick={pauseTrack}
+              onClick={closeTrack}
               className="h-8 w-8 text-muted-foreground hover:text-destructive"
               aria-label="Close audio player"
             >
@@ -169,17 +170,9 @@ export function GlobalAudioPlayer() {
                 <span className="text-[11px] font-semibold text-muted-foreground">
                   {locale === "ar" ? "القارئ:" : locale === "he" ? "מקריא:" : "Reciter:"}
                 </span>
-                <select
-                  value={reciter}
-                  onChange={(e) => setReciter(e.target.value as any)}
-                  className="rounded-lg border border-border/80 bg-background px-2 py-1 text-xs font-medium text-foreground outline-none focus:border-primary"
-                >
-                  {RECITERS.map((r) => (
-                    <option key={r.key} value={r.key}>
-                      {reciterName(r, locale)}
-                    </option>
-                  ))}
-                </select>
+                <span className="inline-flex items-center rounded-full border border-primary/30 bg-primary/10 px-2.5 py-0.5 text-xs font-semibold text-primary">
+                  {locale === "ar" ? "ياسر الدوسري" : locale === "he" ? "יאסר א-דוסרי" : "Yasser Al-Dosari"}
+                </span>
               </div>
 
               <div className="flex items-center gap-2">
@@ -188,9 +181,7 @@ export function GlobalAudioPlayer() {
                   type="button"
                   onClick={toggleLoop}
                   className={`inline-flex items-center gap-1 rounded-full border px-2.5 py-1 text-xs font-medium transition-colors ${
-                    isLooping
-                      ? "border-gold/40 bg-gold/15 text-gold"
-                      : "border-border text-muted-foreground"
+                    isLooping ? "border-gold/40 bg-gold/15 text-gold" : "border-border text-muted-foreground"
                   }`}
                 >
                   <Repeat className="h-3 w-3" />
