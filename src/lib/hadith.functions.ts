@@ -5,7 +5,7 @@ import { generateText } from "ai";
 import { createLovableAiGatewayProvider } from "@/lib/ai-gateway.server";
 import type { Database, Json } from "@/integrations/supabase/types";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import { probeHadithProviders } from "@/lib/hadith-providers.server";
+import { probeHadithProviders, runWithProviderFallback } from "@/lib/hadith-providers.server";
 import { runHadithImportStep, type HadithImportReport } from "@/lib/hadith-ingest.server";
 
 export type HadithCollection = {

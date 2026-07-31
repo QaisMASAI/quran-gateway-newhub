@@ -4,6 +4,7 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
 const NavKeySchema = z.enum([
   "surahs",
+  "stories",
   "research",
   "learn",
   "hadith",
