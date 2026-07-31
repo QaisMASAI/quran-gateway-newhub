@@ -15,17 +15,7 @@ export type Topic = {
   title: string;
   subtitle?: string;
   description: string;
-  icon:
-    | "heart"
-    | "scale"
-    | "book"
-    | "sun"
-    | "moon"
-    | "shield"
-    | "users"
-    | "sparkles"
-    | "hand"
-    | "star";
+  icon: "heart" | "scale" | "book" | "sun" | "moon" | "shield" | "users" | "sparkles" | "hand" | "star";
   refs: AyahRef[];
 };
 
@@ -198,25 +188,36 @@ type SeedTopic = {
 };
 
 const seedTopicLinks = new Map(
-  (
-    (seed.verses as Array<{ slug: string; links: [number, number, number][] }> | undefined) ?? []
-  ).map((v) => [v.slug, v.links]),
+  ((seed.verses as Array<{ slug: string; links: [number, number, number][] }> | undefined) ?? []).map((v) => [
+    v.slug,
+    v.links,
+  ]),
 );
 
 const seedTopics: Topic[] = ((seed.entities as SeedTopic[] | undefined) ?? [])
   .filter((e) => e.kind === "topic")
-  .map((e) => ({
-    slug: e.slug,
-    title: e.title.he ?? e.title.en ?? e.slug,
-    subtitle: e.title.ar,
-    description: e.summary.he ?? e.summary.en ?? e.summary.ar ?? "",
-    icon: "book" as const,
-    refs: (seedTopicLinks.get(e.slug) ?? []).map(([surah, ayah, to]) => ({
-      surah,
-      ayah,
-      to,
-    })),
-  }))
+  .map((e) => {
+    const titleEn = e.title.en ? e.title.en.charAt(0).toUpperCase() + e.title.en.slice(1) : "";
+    const titleHe = e.title.he ?? titleEn ?? e.slug;
+    const desc =
+      e.summary.he ??
+      e.summary.en ??
+      e.summary.ar ??
+      "Explore key Quranic verses and authenticated tafsir related to this topic.";
+
+    return {
+      slug: e.slug,
+      title: titleHe,
+      subtitle: e.title.ar ?? titleEn,
+      description: desc,
+      icon: "book" as const,
+      refs: (seedTopicLinks.get(e.slug) ?? []).map(([surah, ayah, to]) => ({
+        surah,
+        ayah,
+        to,
+      })),
+    };
+  })
   .filter((t) => t.refs.length > 0);
 
 const mergedTopics = [...TOPICS];
