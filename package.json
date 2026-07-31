@@ -5,14 +5,14 @@
   "type": "module",
   "scripts": {
     "dev": "vite dev",
-    "build": "bun run typecheck:vite && vite build",
+    "build": "npm run typecheck:vite && vite build",
     "build:dev": "vite build --mode development",
     "preview": "vite preview",
-    "typecheck": "tsgo -p tsconfig.json",
-    "typecheck:vite": "tsgo -p tsconfig.vite.json",
+    "typecheck": "tsc -p tsconfig.json",
+    "typecheck:vite": "tsc -p tsconfig.vite.json",
     "lint": "eslint .",
     "format": "prettier --write .",
-    "test": "bunx vitest run"
+    "test": "npx vitest run"
   },
   "dependencies": {
     "@ai-sdk/mcp": "^2.0.0",
