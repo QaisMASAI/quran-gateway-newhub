@@ -55,6 +55,7 @@ export function Header() {
 
             <Link
               to="/search"
+              search={{ q: undefined, qState: "missing", src: "unknown" }}
               className="hidden items-center gap-2 rounded-full border border-border/70 bg-secondary/50 px-3 py-1.5 text-xs font-medium text-muted-foreground transition-all hover:border-primary/40 hover:bg-secondary hover:text-foreground md:flex"
               aria-label={t("nav.search")}
             >
@@ -67,6 +68,7 @@ export function Header() {
 
             <Link
               to="/ask"
+              search={{ q: undefined, qState: "missing", src: "unknown" }}
               className="flex items-center gap-1.5 rounded-full bg-gradient-to-r from-primary-soft to-accent px-3 py-1.5 text-xs font-semibold text-primary transition-all hover:scale-105 hover:shadow-sm"
             >
               <Sparkles className="h-3.5 w-3.5 text-gold" />
