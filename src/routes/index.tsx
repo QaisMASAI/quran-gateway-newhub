@@ -94,8 +94,7 @@ function Home() {
       const raw = window.localStorage.getItem(HOME_RECENT_PLAN_KEY);
       if (!raw) return;
       const parsed = JSON.parse(raw) as Record<string, number[]>;
-      const slug =
-        Object.entries(parsed).find(([, days]) => Array.isArray(days) && days.length > 0)?.[0] ?? null;
+      const slug = Object.entries(parsed).find(([, days]) => Array.isArray(days) && days.length > 0)?.[0] ?? null;
       setRecentPlanSlug(slug);
     } catch {
       setRecentPlanSlug(null);
@@ -239,21 +238,35 @@ function Home() {
   }
 
   return (
-    <div className="min-h-screen bg-background" dir={isRtl ? "rtl" : "ltr"}>
+    <div className="min-h-screen bg-background relative overflow-x-hidden" dir={isRtl ? "rtl" : "ltr"}>
       <Header />
 
-      <main id="main" className="mx-auto max-w-5xl px-4 py-10 sm:px-6 sm:py-12">
-        <section className="relative overflow-hidden rounded-3xl border border-border bg-gradient-to-b from-card to-background px-5 py-10 sm:px-8 sm:py-14">
-          <div className="mx-auto max-w-3xl text-center">
-            <div className="mx-auto inline-flex items-center justify-center rounded-2xl border border-border bg-background p-3 shadow-sm">
-              <Logo className="h-10 w-10 text-primary" />
+      {/* Hero Ambient Background Lighting */}
+      <div
+        className="pointer-events-none absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-7xl h-[500px] bg-radial from-primary/15 via-gold/5 to-transparent blur-3xl opacity-70"
+        aria-hidden
+      />
+
+      <main id="main" className="mx-auto max-w-6xl px-4 py-8 sm:px-6 sm:py-12">
+        {/* HERO SECTION */}
+        <section className="relative overflow-hidden rounded-3xl border border-border/80 bg-gradient-to-b from-card/90 via-card/60 to-background p-6 sm:p-10 lg:p-14 shadow-2xl backdrop-blur-xl">
+          <span className="arabesque-corner top-0 left-0" aria-hidden />
+          <span className="arabesque-corner bottom-0 right-0 rotate-180" aria-hidden />
+
+          <div className="mx-auto max-w-3xl text-center relative z-10">
+            {/* Arabic Basmala Calligraphy Badge */}
+            <div className="mx-auto inline-flex items-center gap-2 rounded-full border border-gold/30 bg-gold/10 px-4 py-1.5 backdrop-blur-md shadow-xs">
+              <Sparkles className="h-4 w-4 text-gold animate-pulse" />
+              <span
+                className="font-arabic text-base sm:text-lg font-semibold text-gold tracking-wide"
+                dir="rtl"
+                lang="ar"
+              >
+                بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ
+              </span>
             </div>
 
-            <span className="mt-5 inline-block rounded-full border border-border bg-secondary px-3 py-1 text-xs font-medium text-secondary-foreground">
-              {t("home.badge")}
-            </span>
-
-            <h1 className="mt-4 text-balance font-display text-4xl font-bold leading-tight text-foreground sm:text-5xl md:text-6xl">
+            <h1 className="mt-6 text-balance font-display text-4xl font-extrabold tracking-tight text-foreground sm:text-5xl md:text-6xl lg:leading-tight">
               {t("home.h1")}
             </h1>
 
@@ -261,131 +274,184 @@ function Home() {
               {t("home.subtitle")}
             </p>
 
-            <div className="mx-auto mt-8 max-w-3xl rounded-2xl border border-border bg-card p-4 shadow-sm">
+            {/* AI SEARCH & DISCOVERY BAR */}
+            <div className="mx-auto mt-8 max-w-3xl glass-panel p-4 sm:p-5 shadow-xl transition-all duration-300">
               <form onSubmit={submitAssistantSearch} className="space-y-3">
-                <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2 rounded-xl border border-input bg-background px-3 py-3">
-                  <div className="flex min-w-0 items-center gap-2">
-                    <SearchIcon className="h-5 w-5 shrink-0 text-muted-foreground" />
-                    <input
-                      ref={inputRef}
-                      value={assistantPrompt}
-                      onChange={(e) => setAssistantPrompt(e.target.value)}
-                      placeholder={suggestedQuestions[0]}
-                      className="w-full bg-transparent text-sm text-foreground outline-none placeholder:text-muted-foreground"
-                      aria-label="AI search"
-                    />
+                <div className="relative flex items-center rounded-xl border border-border/80 bg-background/90 px-3.5 py-3 shadow-inner focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/20 transition-all">
+                  <SearchIcon className="h-5 w-5 shrink-0 text-primary" />
+                  <input
+                    ref={inputRef}
+                    value={assistantPrompt}
+                    onChange={(e) => setAssistantPrompt(e.target.value)}
+                    placeholder={suggestedQuestions[0]}
+                    className="w-full bg-transparent px-3 text-sm font-medium text-foreground outline-none placeholder:text-muted-foreground/70"
+                    aria-label="AI search"
+                  />
+                  <div className="flex items-center gap-1.5 shrink-0">
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      aria-label={locale === "ar" ? "بحث صوتي" : locale === "he" ? "חיפוש קולי" : "Voice search"}
+                      className="h-8 w-8 rounded-lg text-muted-foreground hover:text-primary hover:bg-primary-soft/50"
+                      onClick={() => {
+                        if (typeof window === "undefined") return;
+                        const speechWindow = window as Window & {
+                          SpeechRecognition?: new () => {
+                            lang: string;
+                            onresult: ((event: SpeechRecognitionEvent) => void) | null;
+                            start: () => void;
+                          };
+                          webkitSpeechRecognition?: new () => {
+                            lang: string;
+                            onresult: ((event: SpeechRecognitionEvent) => void) | null;
+                            start: () => void;
+                          };
+                        };
+                        const Recognition = speechWindow.SpeechRecognition ?? speechWindow.webkitSpeechRecognition;
+                        if (!Recognition) return;
+                        const recognition = new Recognition();
+                        recognition.lang = locale === "ar" ? "ar" : locale === "he" ? "he" : "en";
+                        recognition.onresult = (resultEvent: SpeechRecognitionEvent) => {
+                          const text = resultEvent.results[0]?.[0]?.transcript?.trim();
+                          if (text) setAssistantPrompt(text);
+                        };
+                        recognition.start();
+                      }}
+                    >
+                      <Mic className="h-4 w-4" />
+                    </Button>
+
+                    <kbd className="hidden sm:inline-flex h-5 items-center rounded border border-border/80 bg-muted/60 px-1.5 text-[10px] font-mono font-medium text-muted-foreground">
+                      /
+                    </kbd>
                   </div>
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="icon"
-                    aria-label={locale === "ar" ? "بحث صوتي" : locale === "he" ? "חיפוש קולי" : "Voice search"}
-                    className="h-9 w-9 rounded-lg"
-                    onClick={() => {
-                      if (typeof window === "undefined") return;
-                      const speechWindow = window as Window & {
-                        SpeechRecognition?: new () => {
-                          lang: string;
-                          onresult: ((event: SpeechRecognitionEvent) => void) | null;
-                          start: () => void;
-                        };
-                        webkitSpeechRecognition?: new () => {
-                          lang: string;
-                          onresult: ((event: SpeechRecognitionEvent) => void) | null;
-                          start: () => void;
-                        };
-                      };
-                      const Recognition = speechWindow.SpeechRecognition ?? speechWindow.webkitSpeechRecognition;
-                      if (!Recognition) return;
-                      const recognition = new Recognition();
-                      recognition.lang = locale === "ar" ? "ar" : locale === "he" ? "he" : "en";
-                      recognition.onresult = (resultEvent: SpeechRecognitionEvent) => {
-                        const text = resultEvent.results[0]?.[0]?.transcript?.trim();
-                        if (text) setAssistantPrompt(text);
-                      };
-                      recognition.start();
-                    }}
-                  >
-                    <Mic className="h-4 w-4" />
-                  </Button>
                 </div>
 
-                <div className="grid grid-cols-1 gap-2 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center">
+                {/* SUGGESTED PROMPT CHIPS */}
+                <div className="flex flex-wrap items-center justify-between gap-2 pt-1">
                   <div className="flex min-w-0 flex-wrap gap-1.5">
                     {suggestedQuestions.map((example) => (
-                      <Button
+                      <button
                         key={example}
                         type="button"
                         onClick={() => setAssistantPrompt(example)}
-                        variant="outline"
-                        className="h-8 rounded-full px-3 text-xs"
+                        className="rounded-full border border-border/60 bg-secondary/50 px-3 py-1 text-xs font-medium text-muted-foreground transition-all hover:border-primary/40 hover:bg-primary-soft hover:text-primary"
                       >
                         {example}
-                      </Button>
+                      </button>
                     ))}
                   </div>
-                  <Button type="submit" className="min-h-11 rounded-xl px-5">
-                    <SearchIcon className="h-4 w-4" />
-                    {locale === "ar" ? "ابدأ البحث" : locale === "he" ? "התחל לחפש" : "Start searching"}
+
+                  <Button
+                    type="submit"
+                    className="min-h-10 w-full sm:w-auto rounded-xl px-5 bg-primary text-primary-foreground font-semibold shadow-md hover:bg-primary/90 transition-all"
+                  >
+                    <Sparkles className="h-4 w-4 text-gold" />
+                    {locale === "ar"
+                      ? "بحث بالذكاء الاصطناعي"
+                      : locale === "he"
+                        ? "חיפוש בינה מלאכותית"
+                        : "Ask Grounded AI"}
                   </Button>
                 </div>
               </form>
 
-              <div className="mt-3 flex items-center justify-between text-xs text-muted-foreground">
-                <span>{locale === "ar" ? "اضغط / للتركيز" : locale === "he" ? "לחצו / למיקוד" : "Press / to focus"}</span>
-                <TrustBadge size="sm" className="border-border bg-background" />
+              <div className="mt-3.5 flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-border/40 text-[11px] text-muted-foreground">
+                <span className="flex items-center gap-1">
+                  <BookOpen className="h-3.5 w-3.5 text-primary" />
+                  {locale === "ar"
+                    ? "تفسير الجلالين • أحاديث صحيحة"
+                    : locale === "he"
+                      ? "תפסיר אל-ג'לאלין • חדית'ים מוסמכים"
+                      : "Jalalayn Tafsir • Verified Sahih Hadith"}
+                </span>
+                <TrustBadge size="sm" className="border-border/60 bg-background/50" />
               </div>
             </div>
 
-            <div className="mt-6 flex flex-wrap justify-center gap-2">
-              <Button asChild variant="outline" className="rounded-full">
-                <Link to="/search" search={{ q: "", qState: "missing", src: "unknown" }}>
-                  {locale === "ar" ? "بحث" : locale === "he" ? "חיפוש" : "Search"}
+            {/* QUICK LINK BUTTONS */}
+            <div className="mt-8 flex flex-wrap justify-center gap-3">
+              <Button
+                asChild
+                variant="outline"
+                className="rounded-full border-border/80 px-5 font-semibold hover:border-primary/40"
+              >
+                <Link to="/surahs">
+                  <BookOpen className="h-4 w-4 text-primary" />
+                  {locale === "ar"
+                    ? "قراءة السور (114)"
+                    : locale === "he"
+                      ? "קריאת סורות (114)"
+                      : "Read Quran (114 Surahs)"}
                 </Link>
               </Button>
-              <Button asChild className="rounded-full">
-                <Link to="/ask" search={{ q: "", qState: "missing", src: "unknown" }}>
-                  <Sparkles className="h-4 w-4" />
-                  {locale === "ar" ? "اسأل" : locale === "he" ? "שאלו" : "Ask"}
+
+              <Button
+                asChild
+                variant="outline"
+                className="rounded-full border-border/80 px-5 font-semibold hover:border-primary/40"
+              >
+                <Link to="/hadith">
+                  <LibraryBig className="h-4 w-4 text-olive" />
+                  {locale === "ar" ? "مكتبة الحديث" : locale === "he" ? "ספריית החדית'" : "Hadith Library"}
                 </Link>
               </Button>
-              <Button asChild variant="ghost" className="rounded-full">
-                <Link to="/learn">
-                  <Compass className="h-4 w-4" />
-                  {locale === "ar" ? "اكتشف" : locale === "he" ? "גלו" : "Discover"}
+
+              <Button
+                asChild
+                className="rounded-full bg-gradient-to-r from-primary to-olive px-5 font-semibold text-primary-foreground shadow-md hover:opacity-95"
+              >
+                <Link to="/ask">
+                  <Sparkles className="h-4 w-4 text-gold" />
+                  {locale === "ar" ? "مساعد AI" : locale === "he" ? "סייען AI" : "Grounded AI Research"}
                 </Link>
               </Button>
             </div>
           </div>
         </section>
 
+        {/* RESUME & CONTINUATION BAR */}
         {hasContinue && (
-          <section className="mt-10 space-y-4">
-            <h2 className="text-2xl font-semibold text-foreground">
-              {locale === "ar" ? "تابع" : locale === "he" ? "המשך" : "Continue"}
-            </h2>
-            <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
+          <section className="mt-10 space-y-3">
+            <div className="flex items-center justify-between">
+              <h2 className="text-xl font-bold tracking-tight text-foreground flex items-center gap-2">
+                <Clock className="h-5 w-5 text-primary" />
+                {locale === "ar" ? "تابع من حيث توقفت" : locale === "he" ? "המשך מהנקודה האחרונה" : "Continue Activity"}
+              </h2>
+            </div>
+
+            <div className="grid grid-cols-1 gap-3.5 md:grid-cols-3">
               {progress && (
                 <Link
                   to="/surah/$id"
                   params={{ id: String(progress.surah) }}
                   search={{ q: undefined }}
                   hash={progress.ayah ? `v-${progress.ayah}` : undefined}
-                  className="surface-card flex items-center justify-between p-4 hover:border-primary/40"
+                  className="surface-card group flex items-center justify-between p-4 hover:border-primary/50 hover:shadow-md transition-all"
                 >
-                  <div>
-                    <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                      {locale === "ar" ? "متابعة القراءة" : locale === "he" ? "המשך קריאה" : "Continue reading"}
-                    </p>
-                    <p className="mt-1 text-sm font-semibold text-foreground">
-                      {locale === "ar"
-                        ? `سورة ${progress.surah} • آية ${progress.ayah}`
-                        : locale === "he"
-                          ? `סורה ${progress.surah} • פסוק ${progress.ayah}`
-                          : `Surah ${progress.surah} • Ayah ${progress.ayah}`}
-                    </p>
+                  <div className="flex items-center gap-3">
+                    <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-primary-soft text-primary font-bold">
+                      {progress.surah}
+                    </div>
+                    <div>
+                      <p className="text-[11px] font-semibold uppercase tracking-wider text-primary">
+                        {locale === "ar" ? "متابعة القراءة" : locale === "he" ? "המשך קريאה" : "Continue Reading"}
+                      </p>
+                      <p className="mt-0.5 text-sm font-bold text-foreground">
+                        {locale === "ar"
+                          ? `سورة ${progress.surah} • آية ${progress.ayah}`
+                          : locale === "he"
+                            ? `סורה ${progress.surah} • פסוק ${progress.ayah}`
+                            : `Surah ${progress.surah} • Ayah ${progress.ayah}`}
+                      </p>
+                    </div>
                   </div>
-                  {isRtl ? <ArrowLeft className="h-4 w-4 text-muted-foreground" /> : <ArrowRight className="h-4 w-4 text-muted-foreground" />}
+                  {isRtl ? (
+                    <ArrowLeft className="h-4 w-4 text-muted-foreground group-hover:text-primary transition-colors" />
+                  ) : (
+                    <ArrowRight className="h-4 w-4 text-muted-foreground group-hover:text-primary transition-colors" />
+                  )}
                 </Link>
               )}
 
@@ -393,15 +459,26 @@ function Home() {
                 <Link
                   to="/plans/$slug"
                   params={{ slug: recentPlanSlug }}
-                  className="surface-card flex items-center justify-between p-4 hover:border-primary/40"
+                  className="surface-card group flex items-center justify-between p-4 hover:border-primary/50 hover:shadow-md transition-all"
                 >
-                  <div>
-                    <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                      {locale === "ar" ? "متابعة الرحلة" : locale === "he" ? "המשך מסלול" : "Continue journey"}
-                    </p>
-                    <p className="mt-1 text-sm font-semibold text-foreground">{recentPlanSlug.replace(/-/g, " ")}</p>
+                  <div className="flex items-center gap-3">
+                    <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-gold-soft text-gold font-bold">
+                      <GraduationCap className="h-5 w-5" />
+                    </div>
+                    <div>
+                      <p className="text-[11px] font-semibold uppercase tracking-wider text-gold">
+                        {locale === "ar" ? "متابعة الخطة" : locale === "he" ? "המשך מסלול" : "Learning Journey"}
+                      </p>
+                      <p className="mt-0.5 text-sm font-bold text-foreground capitalize">
+                        {recentPlanSlug.replace(/-/g, " ")}
+                      </p>
+                    </div>
                   </div>
-                  {isRtl ? <ArrowLeft className="h-4 w-4 text-muted-foreground" /> : <ArrowRight className="h-4 w-4 text-muted-foreground" />}
+                  {isRtl ? (
+                    <ArrowLeft className="h-4 w-4 text-muted-foreground group-hover:text-primary transition-colors" />
+                  ) : (
+                    <ArrowRight className="h-4 w-4 text-muted-foreground group-hover:text-primary transition-colors" />
+                  )}
                 </Link>
               )}
 
@@ -409,32 +486,55 @@ function Home() {
                 <Link
                   to="/ask"
                   search={{ q: recentPrompts[0], qState: "ok", src: "home_continue_ai" }}
-                  className="surface-card flex items-center justify-between p-4 hover:border-primary/40"
+                  className="surface-card group flex items-center justify-between p-4 hover:border-primary/50 hover:shadow-md transition-all"
                 >
-                  <div>
-                    <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                      {locale === "ar" ? "متابعة محادثة AI" : locale === "he" ? "המשך שיחת AI" : "Continue AI conversation"}
-                    </p>
-                    <p className="mt-1 line-clamp-1 text-sm font-semibold text-foreground">{recentPrompts[0]}</p>
+                  <div className="flex items-center gap-3">
+                    <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-accent text-primary font-bold">
+                      <Sparkles className="h-5 w-5" />
+                    </div>
+                    <div>
+                      <p className="text-[11px] font-semibold uppercase tracking-wider text-primary">
+                        {locale === "ar" ? "متابعة البحث" : locale === "he" ? "המשך שיחת AI" : "AI Research Prompt"}
+                      </p>
+                      <p className="mt-0.5 line-clamp-1 text-sm font-bold text-foreground">{recentPrompts[0]}</p>
+                    </div>
                   </div>
-                  {isRtl ? <ArrowLeft className="h-4 w-4 text-muted-foreground" /> : <ArrowRight className="h-4 w-4 text-muted-foreground" />}
+                  {isRtl ? (
+                    <ArrowLeft className="h-4 w-4 text-muted-foreground group-hover:text-primary transition-colors" />
+                  ) : (
+                    <ArrowRight className="h-4 w-4 text-muted-foreground group-hover:text-primary transition-colors" />
+                  )}
                 </Link>
               )}
             </div>
           </section>
         )}
+
+        {/* RECENTLY VIEWED SLIDER */}
         {recentViews.length > 0 && (
-          <section className="mt-10">
-            <h2 className="mb-4 text-2xl font-semibold text-foreground">
-              {locale === "ar" ? "شوهدت مؤخراً" : locale === "he" ? "נצפו לאחרונה" : "Recently Viewed"}
-            </h2>
+          <section className="mt-8">
+            <h3 className="mb-3 text-xs font-bold uppercase tracking-wider text-muted-foreground">
+              {locale === "ar" ? "نصفي حديثاً" : locale === "he" ? "נצפו לאחרונה" : "Recently Opened"}
+            </h3>
             <div className="flex flex-wrap gap-2">
               {recentViews.slice(0, 8).map((view, idx) => (
                 <Link
                   key={`home-recent-${idx}`}
-                  to={view.kind === "surah" ? "/surah/$id" : view.kind === "entity" ? "/learn/$kind/$slug" : "/hadith/$collection/entry/$num"}
-                  params={view.kind === "surah" ? { id: String(view.surah) } : view.kind === "entity" ? { kind: view.entityKind, slug: view.slug } : { collection: view.collection, num: String(view.num) }}
-                  className="rounded-full border border-border bg-card px-4 py-1.5 text-sm font-medium hover:border-primary/40"
+                  to={
+                    view.kind === "surah"
+                      ? "/surah/$id"
+                      : view.kind === "entity"
+                        ? "/learn/$kind/$slug"
+                        : "/hadith/$collection/entry/$num"
+                  }
+                  params={
+                    view.kind === "surah"
+                      ? { id: String(view.surah) }
+                      : view.kind === "entity"
+                        ? { kind: view.entityKind, slug: view.slug }
+                        : { collection: view.collection, num: String(view.num) }
+                  }
+                  className="rounded-full border border-border/80 bg-card/80 px-3.5 py-1.5 text-xs font-semibold text-foreground transition-all hover:border-primary/40 hover:bg-primary-soft/40 hover:text-primary shadow-2xs"
                 >
                   {view.label}
                 </Link>
@@ -443,53 +543,138 @@ function Home() {
           </section>
         )}
 
+        {/* DAILY INSPIRATION SECTION */}
         <section className="mt-12">
-          <h2 className="mb-4 text-2xl font-semibold text-foreground">
-            {locale === "ar" ? "إلهام اليوم" : locale === "he" ? "השראה יומית" : "Daily Inspiration"}
-          </h2>
+          <div className="flex items-center justify-between mb-4">
+            <div>
+              <h2 className="text-2xl font-extrabold tracking-tight text-foreground flex items-center gap-2">
+                <Sparkles className="h-5 w-5 text-gold" />
+                {locale === "ar" ? "إلهام آية اليوم" : locale === "he" ? "השראת היום" : "Verse of the Day"}
+              </h2>
+              <p className="text-xs text-muted-foreground mt-0.5">
+                {locale === "ar"
+                  ? "آية متجددة يومياً مع ترجمة وتفسير الجلالين"
+                  : locale === "he"
+                    ? "פסוק יומי מתחלף עם תרגום ותפסיר"
+                    : "Daily rotating Quranic verse with bilingual translations and tafsir"}
+              </p>
+            </div>
+          </div>
           <DailyVerse />
         </section>
 
-        <section className="mt-12">
-          <h2 className="mb-4 text-2xl font-semibold text-foreground">
-            {locale === "ar" ? "استكشف" : locale === "he" ? "גלו" : "Explore"}
-          </h2>
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        {/* BENTO GRID EXPLORE SECTION */}
+        <section className="mt-14">
+          <div className="mb-6">
+            <h2 className="text-2xl font-extrabold tracking-tight text-foreground flex items-center gap-2">
+              <Compass className="h-6 w-6 text-primary" />
+              {locale === "ar"
+                ? "استكشف بوابة المعرفة"
+                : locale === "he"
+                  ? "חקרו את שער הידע"
+                  : "Explore Knowledge Gateway"}
+            </h2>
+            <p className="text-xs text-muted-foreground mt-0.5">
+              {locale === "ar"
+                ? "تصفح السور والحديث والمواضيع والأنبياء عبر خرائط تفاعلية"
+                : locale === "he"
+                  ? "עיינו בסורות, חדית', נושאים ונביאים במפות אינטראקטיביות"
+                  : "Browse Surahs, Hadith, Topics, Prophets, and interactive maps"}
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {exploreCards.map((card) => {
               const Icon = card.icon;
               return (
                 <Link
                   key={card.label}
                   to={card.to}
-                  className="surface-card flex min-h-28 flex-col items-start justify-between p-4 transition hover:border-primary/40"
+                  className="surface-card group relative overflow-hidden p-5 transition-all duration-300 hover:border-primary/60 hover:-translate-y-1 hover:shadow-lg"
                 >
-                  <Icon className="h-5 w-5 text-primary" />
-                  <span className="text-sm font-semibold text-foreground">{card.label}</span>
+                  <div className="flex items-start justify-between">
+                    <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-primary-soft text-primary transition-transform duration-300 group-hover:scale-110">
+                      <Icon className="h-6 w-6" />
+                    </div>
+                    {isRtl ? (
+                      <ArrowLeft className="h-5 w-5 text-muted-foreground/50 transition-colors group-hover:text-primary" />
+                    ) : (
+                      <ArrowRight className="h-5 w-5 text-muted-foreground/50 transition-colors group-hover:text-primary" />
+                    )}
+                  </div>
+
+                  <div className="mt-4">
+                    <h3 className="text-lg font-bold text-foreground group-hover:text-primary transition-colors">
+                      {card.label}
+                    </h3>
+                    <p className="mt-1 text-xs text-muted-foreground/80 line-clamp-2">
+                      {card.to === "/surahs"
+                        ? locale === "ar"
+                          ? "114 سورة برسم عثماني وتلاوة ممتازة"
+                          : locale === "he"
+                            ? "114 סורות בכתב עות'מאני והקראה"
+                            : "114 Surahs with Uthmanic script & audio"
+                        : card.to === "/topics"
+                          ? locale === "ar"
+                            ? "شجرة مفاهيم تفاعلية وربط بالآيات"
+                            : locale === "he"
+                              ? "עץ קונספטים אינטראקטיבי"
+                              : "Interactive concept graph & cross-references"
+                          : card.to === "/hadith"
+                            ? locale === "ar"
+                              ? "كتب الحديث الصحيحة مع دراسة الإسناد"
+                              : locale === "he"
+                                ? "ספרי חדית' מוסמכים עם חקר סנד"
+                                : "Authentic Hadith collections & narrators"
+                            : card.to === "/kids"
+                              ? locale === "ar"
+                                ? "أسئلة تفاعلية وممتعة للأطفال"
+                                : locale === "he"
+                                  ? "שאלות ותשובות אינטראקטיביות לילדים"
+                                  : "Interactive Q&A hub for kids"
+                              : locale === "ar"
+                                ? "استكشف المحتوى التعليمي والتفاعلي"
+                                : locale === "he"
+                                  ? "חקרו תוכן לימודי אינטראקטיבי"
+                                  : "Explore educational learning content"}
+                    </p>
+                  </div>
                 </Link>
               );
             })}
           </div>
         </section>
 
-        <section className="mt-12">
-          <h2 className="mb-4 text-2xl font-semibold text-foreground">
-            {locale === "ar" ? "اكتشف" : locale === "he" ? "גלו עוד" : "Discover"}
-          </h2>
-          <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
+        {/* DISCOVER & SPECIALIZED MODULES SECTION */}
+        <section className="mt-14">
+          <div className="mb-6">
+            <h2 className="text-2xl font-extrabold tracking-tight text-foreground flex items-center gap-2">
+              <BookMarked className="h-6 w-6 text-gold" />
+              {locale === "ar"
+                ? "أدوات وميزات مميزة"
+                : locale === "he"
+                  ? "כלים ותכונות מיוחדות"
+                  : "Featured Research Tools"}
+            </h2>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {discoverCards.map((card) => {
               const Icon = card.icon;
               return (
                 <Link
                   key={card.label}
                   to={card.to}
-                  className="surface-card flex items-start gap-3 p-4 transition hover:border-primary/40"
+                  className="surface-card group flex items-start gap-3.5 p-5 transition-all duration-300 hover:border-gold/60 hover:-translate-y-0.5 hover:shadow-md"
                 >
-                  <div className="rounded-lg bg-primary-soft p-2 text-primary">
-                    <Icon className="h-4 w-4" />
+                  <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-gold-soft text-gold transition-transform duration-300 group-hover:scale-110">
+                    <Icon className="h-5 w-5" />
                   </div>
                   <div>
-                    <p className="text-sm font-semibold text-foreground">{card.label}</p>
-                    <p className="mt-1 text-xs text-muted-foreground">{card.description}</p>
+                    <h3 className="text-sm font-bold text-foreground group-hover:text-gold transition-colors">
+                      {card.label}
+                    </h3>
+                    <p className="mt-1 text-xs text-muted-foreground leading-relaxed">{card.description}</p>
                   </div>
                 </Link>
               );
@@ -498,20 +683,25 @@ function Home() {
         </section>
       </main>
 
-      <footer className="border-t border-border bg-card/40 py-8 text-xs text-muted-foreground">
-        <div className="mx-auto flex max-w-5xl flex-wrap items-center justify-between gap-3 px-4 sm:px-6">
-          <p>{t("home.footerTagline")}</p>
-          <div className="flex flex-wrap gap-3">
-            <Link to="/topics" className="hover:text-primary">
+      {/* FOOTER */}
+      <footer className="mt-20 border-t border-border/60 bg-card/60 py-10 text-xs text-muted-foreground backdrop-blur-md">
+        <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-4 px-4 sm:px-6">
+          <div className="flex items-center gap-3">
+            <Logo className="h-6 w-6 text-primary" />
+            <p className="font-semibold text-foreground/80">{t("home.footerTagline")}</p>
+          </div>
+
+          <div className="flex flex-wrap items-center gap-4 text-xs font-medium">
+            <Link to="/topics" className="hover:text-primary transition-colors">
               {locale === "ar" ? "المواضيع" : locale === "he" ? "נושאים" : "Topics"}
             </Link>
-            <Link to="/prophets" className="hover:text-primary">
+            <Link to="/prophets" className="hover:text-primary transition-colors">
               {locale === "ar" ? "الأنبياء" : locale === "he" ? "נביאים" : "Prophets"}
             </Link>
-            <Link to="/learn/journeys" className="hover:text-primary">
+            <Link to="/learn/journeys" className="hover:text-primary transition-colors">
               {locale === "ar" ? "الرحلات" : locale === "he" ? "מסלולים" : "Journeys"}
             </Link>
-            <Link to="/recent-ai" className="hover:text-primary">
+            <Link to="/recent-ai" className="hover:text-primary transition-colors">
               {locale === "ar" ? "جلسات AI" : locale === "he" ? "שיחות AI" : "AI Sessions"}
             </Link>
           </div>
