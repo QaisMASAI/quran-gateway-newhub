@@ -187,7 +187,10 @@ export const searchQuranItemsHybrid = createServerFn({ method: "POST" })
         } as never,
       );
 
-      if (error) return { hits: [], expandedTokens: expanded.expandedTokens, error: error.message };
+      if (error) {
+        console.error("searchQuranItemsHybrid_failed", error);
+        return { hits: [], expandedTokens: expanded.expandedTokens, error: "search_failed" };
+      }
       return {
         hits: (rows ?? []) as QuranItemHit[],
         expandedTokens: expanded.expandedTokens,
