@@ -18,14 +18,13 @@ export type EntityKind =
   | "mosque";
 
 const DB_ENTITY_KINDS = new Set<
-  "concept" | "event" | "nation" | "person" | "place" | "prophet" | "story" | "theme" | "topic"
->(["concept", "event", "nation", "person", "place", "prophet", "story", "theme", "topic"]);
+  "concept" | "event" | "nation" | "place" | "prophet" | "story" | "theme" | "topic"
+>(["concept", "event", "nation", "place", "prophet", "story", "theme", "topic"]);
 
 type DbEntityKind =
   | "concept"
   | "event"
   | "nation"
-  | "person"
   | "place"
   | "prophet"
   | "story"
