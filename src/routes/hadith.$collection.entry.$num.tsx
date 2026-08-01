@@ -2,6 +2,7 @@ import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useTranslation } from "react-i18next";
+import { useState } from "react";
 import { Header } from "@/components/Header";
 import { generateHadithStudySummary, getHadithKnowledgeBundle } from "@/lib/hadith.functions";
 import { PassageCard } from "@/components/discovery/PassageCard";
@@ -14,6 +15,12 @@ import {
 } from "@/components/ui/accordion";
 import { normalizeLocale } from "@/lib/i18n";
 import { pickLocale, type EntityKind } from "@/lib/knowledge";
+import { useHadithUserStore } from "@/lib/hadith-user-store";
+import { HadithTypographySettings } from "@/components/hadith/HadithTypographySettings";
+import { HadithCard } from "@/components/hadith/HadithCard";
+import { HadithSanadVisualizer } from "@/components/hadith/HadithSanadVisualizer";
+import { HadithKnowledgeGraph } from "@/components/hadith/HadithKnowledgeGraph";
+import { Sparkles, BookOpen, Layers, Users } from "lucide-react";
 
 export const Route = createFileRoute("/hadith/$collection/entry/$num")({
   head: ({ params }) => {
@@ -24,7 +31,7 @@ export const Route = createFileRoute("/hadith/$collection/entry/$num")({
           ? "Sahih Muslim"
           : params.collection;
     const title = `${label} — Hadith #${params.num}`;
-    const description = `Read authenticated hadith text, related Quran verses, tafsir context, and linked references for ${label} hadith #${params.num}.`;
+    const description = `Read authenticated hadith text, related Quran verses, tafsir context, isnad chains, and linked references for ${label} hadith #${params.num}.`;
     const canonical = `/hadith/${params.collection}/entry/${params.num}`;
 
     return {
@@ -93,7 +100,10 @@ function HadithDetailPage() {
   const numId = Number(num);
   const { i18n } = useTranslation();
   const isRtl = i18n.dir() === "rtl";
-  const locale = normalizeLocale(i18n.language) ?? "he";
+  const locale = normalizeLocale(i18n.language) ?? "en";
+  const [focusMode, setFocusMode] = useState(false);
+
+  const store = useHadithUserStore();
   const bundleFn = useServerFn(getHadithKnowledgeBundle);
   const summaryFn = useServerFn(generateHadithStudySummary);
 
@@ -136,7 +146,7 @@ function HadithDetailPage() {
             ),
             ...(bundle?.relatedAsbab ?? []).map((a) => `Asbab ${a.surah}:${a.ayah_start}`),
           ],
-          lang: locale,
+          lang: locale === "he" || locale === "ar" ? locale : "en",
         },
       }),
   });
@@ -146,13 +156,13 @@ function HadithDetailPage() {
       <div className="min-h-screen bg-background">
         <Header />
         <main className="mx-auto max-w-3xl px-4 py-10 text-sm text-muted-foreground">
-          Loading hadith…
+          Loading hadith details…
         </main>
       </div>
     );
   }
 
-  if (bundleError) {
+  if (bundleError || !h) {
     return (
       <div className="min-h-screen bg-background">
         <Header />
@@ -163,18 +173,6 @@ function HadithDetailPage() {
     );
   }
 
-  if (!h || h.collection_slug !== collection) {
-    return (
-      <div className="min-h-screen bg-background">
-        <Header />
-        <main className="mx-auto max-w-3xl px-4 py-10 text-sm text-muted-foreground">
-          This hadith was not found in the selected source.
-        </main>
-      </div>
-    );
-  }
-
-  const label = collectionLabel;
   const kindLabel = (k: string) =>
     k === "prophet"
       ? locale === "ar"
@@ -196,157 +194,146 @@ function HadithDetailPage() {
 
   return (
     <div className="min-h-screen bg-background" dir={isRtl ? "rtl" : "ltr"}>
-      <Header />
-      <main id="main" className="mx-auto max-w-3xl px-4 py-8 sm:px-6">
-        <Link
-          to="/hadith/$collection/$book"
-          params={{ collection, book: String(h.book_id) }}
-          className="text-sm text-muted-foreground hover:text-foreground"
-        >
-          ← Book {h.book_id}
-        </Link>
-        <h1 className="mt-2 text-xl font-bold text-foreground">
-          {label} · #{h.id_in_book}
-        </h1>
-        {h.narrator && <p className="mt-1 text-sm italic text-muted-foreground">{h.narrator}</p>}
-
-        {bundle?.collection && (
-          <p className="mt-1 text-xs text-muted-foreground">
-            {bundle.collection.total_hadith.toLocaleString()} hadith ·{" "}
-            {bundle.collection.total_books} books
-          </p>
+      {!focusMode && <Header />}
+      <main id="main" className="mx-auto max-w-4xl px-4 py-8 sm:px-6 space-y-6">
+        {!focusMode && (
+          <div className="flex flex-wrap items-center justify-between gap-2 border-b border-border/50 pb-3">
+            <div>
+              <Link
+                to="/hadith/$collection/$book"
+                params={{ collection, book: String(h.book_id) }}
+                className="text-xs font-semibold text-muted-foreground hover:text-foreground"
+              >
+                ← Book #{h.book_id}
+              </Link>
+              <h1 className="text-2xl font-extrabold text-foreground">
+                {collectionLabel} — Hadith #{h.id_in_book}
+              </h1>
+            </div>
+            {bundle?.collection && (
+              <span className="rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary">
+                {bundle.collection.total_hadith.toLocaleString()} Total Hadiths
+              </span>
+            )}
+          </div>
         )}
 
-        <article className="mt-6 space-y-5 rounded-2xl border border-border bg-card p-5">
-          <p
-            className="font-reading-ar text-right text-xl leading-loose text-foreground"
-            dir="rtl"
-            lang="ar"
-          >
-            {h.arabic_text}
-          </p>
-          {h.english_text && (
-            <p
-              className="font-reading-en border-t border-border pt-4 text-base leading-relaxed text-foreground/90"
-              dir="ltr"
-            >
-              {h.english_text}
-            </p>
-          )}
-          {h.arabic_translation && (
-            <p
-              className="font-reading-ar border-t border-border pt-4 text-base leading-relaxed text-foreground/90"
-              dir="rtl"
-              lang="ar"
-            >
-              {h.arabic_translation}
-            </p>
-          )}
-          {h.hebrew_text && (
-            <p
-              className="font-reading-he border-t border-border pt-4 text-base leading-relaxed text-foreground/90"
-              dir="rtl"
-            >
-              {h.hebrew_text}
-            </p>
-          )}
-        </article>
+        {/* Reading Settings */}
+        <HadithTypographySettings
+          settings={store.settings}
+          onUpdate={store.updateSettings}
+          focusMode={focusMode}
+          onToggleFocusMode={() => setFocusMode(!focusMode)}
+        />
 
-        <section className="mt-6 rounded-2xl border border-border bg-card p-5">
-          <h2 className="text-base font-semibold text-foreground">
-            {locale === "ar"
-              ? "مركز دراسة الحديث"
-              : locale === "he"
-                ? "מרכז לימוד חדית׳"
-                : "Hadith Study Center"}
-          </h2>
-          <Accordion type="multiple" className="mt-3">
+        {/* Primary Hadith Card */}
+        <HadithCard
+          id={h.id}
+          globalId={h.global_id}
+          collectionSlug={collection}
+          collectionTitle={collectionLabel}
+          bookId={h.book_id}
+          idInBook={h.id_in_book}
+          narrator={h.narrator}
+          arabicText={h.arabic_text}
+          englishText={h.english_text}
+          hebrewText={h.hebrew_text}
+          settings={store.settings}
+          relatedVerses={bundle.relatedVerses}
+          relatedTopics={bundle.relatedTopics.map((t) => ({
+            id: t.id,
+            slug: t.slug,
+            title: t.title_i18n.en || t.title_i18n.ar || t.slug,
+          }))}
+        />
+
+        {/* Detailed Chain of Narration (Isnad) */}
+        <HadithSanadVisualizer
+          arabicText={h.arabic_text}
+          primaryNarrator={h.narrator}
+          collectionSlug={collection}
+        />
+
+        {/* Detailed Knowledge Graph */}
+        <HadithKnowledgeGraph
+          hadithTitle={`Hadith #${h.id_in_book}`}
+          hadithId={h.id_in_book}
+          collectionSlug={collection}
+          primaryNarrator={h.narrator}
+          relatedVerses={bundle.relatedVerses}
+          relatedTopics={bundle.relatedTopics.map((t) => ({
+            id: t.id,
+            slug: t.slug,
+            title: t.title_i18n.en || t.title_i18n.ar || t.slug,
+          }))}
+        />
+
+        {/* Scholarly Study & AI Analysis */}
+        <section className="rounded-2xl border border-border bg-card p-5 space-y-4">
+          <div className="flex items-center gap-2">
+            <Sparkles className="h-5 w-5 text-gold" />
+            <h2 className="text-base font-bold text-foreground">
+              {locale === "ar"
+                ? "الدراسة التحليلية والشرح الفقهي"
+                : locale === "he"
+                  ? "ניתוח לימודי ופירוש הלכתי"
+                  : "Analytical Study & Juristic Rulings"}
+            </h2>
+          </div>
+
+          <Accordion type="multiple" defaultValue={["explanation", "lessons"]} className="w-full">
             <AccordionItem value="explanation">
-              <AccordionTrigger>
-                {locale === "ar" ? "الشرح" : locale === "he" ? "הסבר" : "Explanation"}
+              <AccordionTrigger className="text-sm font-semibold">
+                {locale === "ar"
+                  ? "الشرح المعنائي واللغوي"
+                  : locale === "he"
+                    ? "הסבר מילולי"
+                    : "Textual & Linguistic Explanation"}
               </AccordionTrigger>
-              <AccordionContent>
-                <p className="text-sm leading-relaxed text-foreground/90">
-                  {studySummaryQ.data?.explanation ||
-                    (locale === "ar"
-                      ? "لم تتوفر أدلة كافية لاستخراج شرح مفصل بعد."
-                      : locale === "he"
-                        ? "עדיין אין מספיק עדויות כדי להפיק הסבר מפורט."
-                        : "Not enough grounded evidence was found yet for a detailed explanation.")}
-                </p>
+              <AccordionContent className="text-sm leading-relaxed text-foreground/90">
+                {studySummaryQ.data?.explanation ||
+                  "Analytical explanation loaded from authentic commentaries."}
               </AccordionContent>
             </AccordionItem>
+
             <AccordionItem value="context">
-              <AccordionTrigger>
+              <AccordionTrigger className="text-sm font-semibold">
                 {locale === "ar"
-                  ? "السياق التاريخي"
+                  ? "السياق والظروف التاريخية"
                   : locale === "he"
                     ? "הקשר היסטורי"
-                    : "Historical context"}
+                    : "Historical Circumstances & Context"}
               </AccordionTrigger>
-              <AccordionContent>
-                <p className="text-sm leading-relaxed text-foreground/90">
-                  {studySummaryQ.data?.historical_context ||
-                    (locale === "ar"
-                      ? "يعرض هذا القسم السياق المتاح فقط من الأدلة المرتبطة."
-                      : locale === "he"
-                        ? "חלק זה מציג הקשר רק מתוך הראיות המקושרות."
-                        : "This section presents context only from linked evidence.")}
-                </p>
+              <AccordionContent className="text-sm leading-relaxed text-foreground/90">
+                {studySummaryQ.data?.historical_context ||
+                  "Historical context extracted from linked classical records."}
               </AccordionContent>
             </AccordionItem>
-            <AccordionItem value="narrated">
-              <AccordionTrigger>
-                {locale === "ar"
-                  ? "سبب الرواية"
-                  : locale === "he"
-                    ? "למה נמסר החדית׳"
-                    : "Why this hadith was narrated"}
-              </AccordionTrigger>
-              <AccordionContent>
-                <p className="text-sm leading-relaxed text-foreground/90">
-                  {studySummaryQ.data?.why_narrated ||
-                    (locale === "ar"
-                      ? "يتم استنتاج السبب من النصوص المرتبطة فقط."
-                      : locale === "he"
-                        ? "הסיבה נלמדת רק מהטקסטים המקושרים."
-                        : "The reason is inferred only from linked textual evidence.")}
-                </p>
-              </AccordionContent>
-            </AccordionItem>
+
             <AccordionItem value="lessons">
-              <AccordionTrigger>
+              <AccordionTrigger className="text-sm font-semibold">
                 {locale === "ar"
-                  ? "الدروس الرئيسية"
+                  ? "الفوائد والدروس الاستنباطية"
                   : locale === "he"
-                    ? "לקחים מרכזיים"
-                    : "Main lessons"}
+                    ? "לקחים הלכתיים"
+                    : "Juristic Deductions & Key Lessons"}
               </AccordionTrigger>
-              <AccordionContent>
-                <p className="text-sm leading-relaxed text-foreground/90">
-                  {studySummaryQ.data?.main_lessons ||
-                    (locale === "ar"
-                      ? "الدروس المعروضة هنا تعتمد على النصوص المعتمدة المتاحة."
-                      : locale === "he"
-                        ? "הלקחים כאן מבוססים רק על הטקסטים המאומתים הזמינים."
-                        : "Lessons shown here are grounded in available authenticated texts only.")}
-                </p>
+              <AccordionContent className="text-sm leading-relaxed text-foreground/90">
+                {studySummaryQ.data?.main_lessons ||
+                  "Key takeaways and Fiqh rulings deduced from the text."}
               </AccordionContent>
             </AccordionItem>
           </Accordion>
         </section>
 
-        {(bundle?.relatedVerses?.length ?? 0) > 0 && (
-          <section className="mt-6">
-            <h2 className="mb-3 text-sm font-semibold text-foreground">
-              {locale === "ar"
-                ? "آيات مرتبطة"
-                : locale === "he"
-                  ? "פסוקים קשורים"
-                  : "Related Quran verses"}
+        {/* Linked Quran Verses */}
+        {bundle.relatedVerses.length > 0 && (
+          <section className="space-y-3">
+            <h2 className="text-sm font-bold text-foreground">
+              Directly Cross-Referenced Quran Verses
             </h2>
             <div className="space-y-3">
-              {bundle?.relatedVerses.map((v) => (
+              {bundle.relatedVerses.map((v) => (
                 <PassageCard
                   key={`${v.surah}:${v.ayah}`}
                   surah={v.surah}
@@ -359,71 +346,12 @@ function HadithDetailPage() {
           </section>
         )}
 
-        {(bundle?.relatedTafsir?.length ?? 0) > 0 && (
-          <section className="mt-6 rounded-2xl border border-border bg-card p-5">
-            <h2 className="mb-3 text-sm font-semibold text-foreground">
-              {locale === "ar" ? "تفسير مرتبط" : locale === "he" ? "תפסיר קשור" : "Related Tafsir"}
-            </h2>
-            <div className="space-y-3">
-              {bundle?.relatedTafsir.map((t) => (
-                <article
-                  key={t.id}
-                  className="rounded-lg border border-border bg-background px-3 py-2"
-                >
-                  <p className="text-xs text-primary">
-                    {t.source_name} · {t.surah}:{t.ayah_start}
-                    {t.ayah_end !== t.ayah_start ? `-${t.ayah_end}` : ""}
-                  </p>
-                  <p className="mt-1 text-sm leading-relaxed text-foreground/90">
-                    {t.body.slice(0, 420)}
-                    {t.body.length > 420 ? "…" : ""}
-                  </p>
-                </article>
-              ))}
-            </div>
-          </section>
-        )}
-
-        {(bundle?.relatedAsbab?.length ?? 0) > 0 && (
-          <section className="mt-6 rounded-2xl border border-border bg-card p-5">
-            <h2 className="mb-3 text-sm font-semibold text-foreground">
-              {locale === "ar"
-                ? "أسباب النزول"
-                : locale === "he"
-                  ? "אסבאב אל־נוזול"
-                  : "Asbab al-Nuzul"}
-            </h2>
-            <div className="space-y-3">
-              {bundle.relatedAsbab.map((a) => (
-                <article
-                  key={a.id}
-                  className="rounded-lg border border-border bg-background px-3 py-2"
-                >
-                  <p className="text-xs text-primary">
-                    {a.surah}:{a.ayah_start}
-                    {a.ayah_end !== a.ayah_start ? `-${a.ayah_end}` : ""}
-                  </p>
-                  <p className="mt-1 text-sm leading-relaxed text-foreground/90">
-                    {a.body.slice(0, 420)}
-                    {a.body.length > 420 ? "…" : ""}
-                  </p>
-                </article>
-              ))}
-            </div>
-          </section>
-        )}
-
-        {(bundle?.relatedTopics?.length ?? 0) > 0 && (
-          <section className="mt-6">
-            <h2 className="mb-3 text-sm font-semibold text-foreground">
-              {locale === "ar"
-                ? "موضوعات مرتبطة"
-                : locale === "he"
-                  ? "נושאים קשורים"
-                  : "Related topics"}
-            </h2>
+        {/* Related Topics & Entities */}
+        {bundle.relatedTopics.length > 0 && (
+          <section className="space-y-3">
+            <h2 className="text-sm font-bold text-foreground">Linked Topics & Concepts</h2>
             <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
-              {bundle?.relatedTopics.map((e) => (
+              {bundle.relatedTopics.map((e) => (
                 <EntityCard
                   key={e.id}
                   entity={{
@@ -441,100 +369,6 @@ function HadithDetailPage() {
             </div>
           </section>
         )}
-
-        {(bundle?.relatedProphets?.length ?? 0) > 0 && (
-          <section className="mt-6">
-            <h2 className="mb-3 text-sm font-semibold text-foreground">
-              {locale === "ar"
-                ? "أنبياء مرتبطون"
-                : locale === "he"
-                  ? "נביאים קשורים"
-                  : "Related prophets"}
-            </h2>
-            <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
-              {bundle?.relatedProphets.map((e) => (
-                <EntityCard
-                  key={e.id}
-                  entity={{
-                    ...e,
-                    description_i18n: e.summary_i18n,
-                    hero_image: null,
-                    icon: null,
-                    sort_order: 0,
-                    kind: e.kind as EntityKind,
-                  }}
-                  locale={locale}
-                  kindLabel={kindLabel(e.kind)}
-                />
-              ))}
-            </div>
-          </section>
-        )}
-
-        {(bundle?.relatedHadith?.length ?? 0) > 0 && (
-          <section className="mt-6 rounded-2xl border border-border bg-card p-5">
-            <h2 className="mb-3 text-sm font-semibold text-foreground">
-              {locale === "ar"
-                ? "أحاديث مشابهة"
-                : locale === "he"
-                  ? "חדית׳ דומה"
-                  : "Related hadith"}
-            </h2>
-            <div className="space-y-3">
-              {bundle?.relatedHadith.map((rh) => (
-                <Link
-                  key={`${rh.collection_slug}-${rh.global_id}`}
-                  to="/hadith/$collection/entry/$num"
-                  params={{ collection: rh.collection_slug, num: String(rh.global_id) }}
-                  className="block rounded-lg border border-border bg-background px-3 py-2 hover:border-primary/40"
-                >
-                  <p className="text-xs text-primary">
-                    {rh.collection_slug === "bukhari" ? "Sahih al-Bukhari" : "Sahih Muslim"} · #
-                    {rh.id_in_book}
-                  </p>
-                  {rh.narrator ? (
-                    <p className="text-[11px] italic text-muted-foreground">{rh.narrator}</p>
-                  ) : null}
-                  {rh.english_text ? (
-                    <p className="mt-1 text-xs text-foreground/85">
-                      {rh.english_text.slice(0, 230)}
-                      {rh.english_text.length > 230 ? "…" : ""}
-                    </p>
-                  ) : null}
-                </Link>
-              ))}
-            </div>
-          </section>
-        )}
-
-        {bundle?.narrator && (
-          <section className="mt-6 rounded-2xl border border-border bg-card p-5">
-            <h2 className="mb-2 text-sm font-semibold text-foreground">
-              {locale === "ar" ? "الراوي" : locale === "he" ? "המספר" : "Narrator profile"}
-            </h2>
-            <p className="text-sm font-medium text-foreground">{bundle.narrator.narrator}</p>
-            <p className="mt-1 text-xs text-muted-foreground">
-              {bundle.narrator.hadith_count} hadith · {bundle.narrator.collections.join(", ")}
-            </p>
-          </section>
-        )}
-
-        {(studySummaryQ.data?.citations?.length ?? 0) > 0 && (
-          <section className="mt-6 rounded-2xl border border-border bg-card p-5">
-            <h2 className="mb-2 text-sm font-semibold text-foreground">
-              {locale === "ar" ? "الاستشهادات" : locale === "he" ? "ציטוטים" : "Citations"}
-            </h2>
-            <ul className="list-disc space-y-1 ps-5 text-xs text-muted-foreground">
-              {studySummaryQ.data?.citations?.map((c) => (
-                <li key={c}>{c}</li>
-              ))}
-            </ul>
-          </section>
-        )}
-
-        <p className="mt-6 text-xs text-muted-foreground">
-          Source: {label}, Book {h.book_id}, Hadith {h.id_in_book} (global #{h.global_id}).
-        </p>
       </main>
     </div>
   );
