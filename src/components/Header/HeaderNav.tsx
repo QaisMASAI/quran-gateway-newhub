@@ -1,5 +1,15 @@
 import { Link } from "@tanstack/react-router";
-import { BookOpen, Search, Compass, BookMarked, Sparkles, Folder, Gamepad2, Library, ScrollText } from "lucide-react";
+import {
+  BookOpen,
+  Search,
+  Compass,
+  BookMarked,
+  Sparkles,
+  Folder,
+  Gamepad2,
+  Library,
+  ScrollText,
+} from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
@@ -57,20 +67,32 @@ export function HeaderNav({ isAuthenticated }: HeaderNavProps) {
         <NavLink to="/surahs" label={t("nav.surahs")} icon={<BookOpen className="h-4 w-4" />} />
       )}
       {!hidden.has("stories") && (
-        <NavLink to="/learn" hash="story-library" label={t("nav.stories")} icon={<ScrollText className="h-4 w-4" />} />
+        <NavLink to="/stories" label={t("nav.stories")} icon={<ScrollText className="h-4 w-4" />} />
       )}
       {!hidden.has("research") && (
         <NavLink to="/research" label={t("nav.research")} icon={<Sparkles className="h-4 w-4" />} />
       )}
-      {!hidden.has("learn") && <NavLink to="/learn" label={t("nav.learn")} icon={<BookMarked className="h-4 w-4" />} />}
-      {!hidden.has("hadith") && <NavLink to="/hadith" label={t("nav.hadith")} icon={<Library className="h-4 w-4" />} />}
-      {!hidden.has("search") && <NavLink to="/search" label={t("nav.search")} icon={<Search className="h-4 w-4" />} />}
-      {!hidden.has("kids") && <NavLink to="/kids" label="Kids" icon={<Gamepad2 className="h-4 w-4" />} />}
+      {!hidden.has("learn") && (
+        <NavLink to="/learn" label={t("nav.learn")} icon={<BookMarked className="h-4 w-4" />} />
+      )}
+      {!hidden.has("hadith") && (
+        <NavLink to="/hadith" label={t("nav.hadith")} icon={<Library className="h-4 w-4" />} />
+      )}
+      {!hidden.has("search") && (
+        <NavLink to="/search" label={t("nav.search")} icon={<Search className="h-4 w-4" />} />
+      )}
+      {!hidden.has("kids") && (
+        <NavLink to="/kids" label="Kids" icon={<Gamepad2 className="h-4 w-4" />} />
+      )}
       {isAuthenticated && !hidden.has("admin_kids") && (
         <NavLink to="/admin/kids" label="Kids Q&A" icon={<Gamepad2 className="h-4 w-4" />} />
       )}
       {isAuthenticated && !hidden.has("collections") && (
-        <NavLink to="/collections" label={t("nav.collections")} icon={<Folder className="h-4 w-4" />} />
+        <NavLink
+          to="/collections"
+          label={t("nav.collections")}
+          icon={<Folder className="h-4 w-4" />}
+        />
       )}
       {isAuthenticated && !hidden.has("admin_setup") && (
         <NavLink to="/admin/setup" label="Admin setup" icon={<Compass className="h-4 w-4" />} />
@@ -79,10 +101,18 @@ export function HeaderNav({ isAuthenticated }: HeaderNavProps) {
         <NavLink to="/admin/backfill" label="Admin" icon={<Sparkles className="h-4 w-4" />} />
       )}
       {isAuthenticated && !hidden.has("admin_hadith_api") && (
-        <NavLink to="/admin/hadith-api" label="Hadith API" icon={<BookMarked className="h-4 w-4" />} />
+        <NavLink
+          to="/admin/hadith-api"
+          label="Hadith API"
+          icon={<BookMarked className="h-4 w-4" />}
+        />
       )}
       {isAuthenticated && !hidden.has("admin_hadith_ingest") && (
-        <NavLink to="/admin/hadith-ingest" label="Hadith Import" icon={<Compass className="h-4 w-4" />} />
+        <NavLink
+          to="/admin/hadith-ingest"
+          label="Hadith Import"
+          icon={<Compass className="h-4 w-4" />}
+        />
       )}
     </nav>
   );
