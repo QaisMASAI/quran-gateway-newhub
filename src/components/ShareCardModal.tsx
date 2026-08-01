@@ -31,7 +31,10 @@ export function ShareCardModal({
   const [isExporting, setIsExporting] = useState(false);
   const cardRef = useRef<HTMLDivElement>(null);
 
-  const themeStyles: Record<CardTheme, { bg: string; text: string; arabic: string; border: string; accent: string; refBadge: string }> = {
+  const themeStyles: Record<
+    CardTheme,
+    { bg: string; text: string; arabic: string; border: string; accent: string; refBadge: string }
+  > = {
     emerald: {
       bg: "bg-gradient-to-br from-[#064e3b] via-[#043427] to-[#022219]",
       text: "text-emerald-100",
@@ -104,7 +107,9 @@ export function ShareCardModal({
         <div className="space-y-4 my-2">
           {/* Theme Selector */}
           <div className="flex items-center justify-between gap-2">
-            <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Select Card Theme</span>
+            <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+              Select Card Theme
+            </span>
             <div className="flex items-center gap-2">
               <button
                 type="button"
@@ -163,12 +168,18 @@ export function ShareCardModal({
             {/* Geometric Accent Corners */}
             <div className={`absolute top-3 left-3 w-4 h-4 border-t-2 border-l-2 ${currentTheme.border} opacity-60`} />
             <div className={`absolute top-3 right-3 w-4 h-4 border-t-2 border-r-2 ${currentTheme.border} opacity-60`} />
-            <div className={`absolute bottom-3 left-3 w-4 h-4 border-b-2 border-l-2 ${currentTheme.border} opacity-60`} />
-            <div className={`absolute bottom-3 right-3 w-4 h-4 border-b-2 border-r-2 ${currentTheme.border} opacity-60`} />
+            <div
+              className={`absolute bottom-3 left-3 w-4 h-4 border-b-2 border-l-2 ${currentTheme.border} opacity-60`}
+            />
+            <div
+              className={`absolute bottom-3 right-3 w-4 h-4 border-b-2 border-r-2 ${currentTheme.border} opacity-60`}
+            />
 
             {/* Type Icon Badge */}
             <div className="flex justify-center">
-              <span className={`inline-block px-3 py-1 rounded-full text-[11px] font-bold tracking-wider uppercase ${currentTheme.refBadge}`}>
+              <span
+                className={`inline-block px-3 py-1 rounded-full text-[11px] font-bold tracking-wider uppercase ${currentTheme.refBadge}`}
+              >
                 {reference || type}
               </span>
             </div>
