@@ -3,15 +3,16 @@
  */
 
 /**
- * Clean and fix Arabic Uthmani text glyphs, specifically replacing problematic
- * ARABIC SMALL HIGH ROUNDED ZERO (U+06DF) on Alef that renders as broken box symbols
+ * Clean and fix Arabic Uthmani glyphs that frequently render as unsupported
+ * floating circles/boxes in some web fonts.
  */
 export function sanitizeArabicText(s: string): string {
   if (!s) return "";
   return (
     s
-      // Replace U+06DF (small high rounded zero over silent alef) with standard sukoon U+0652 or clean
-      .replace(/[\u06DF\u06E0]/g, "\u0652")
+      // Remove Quranic micro-signs that are often displayed as isolated circles
+      // with non-specialized fonts (e.g. after words like "ءَامَنُوا۟").
+      .replace(/[\u06DF\u06E0]/g, "")
       // Remove invisible control characters that break font rendering
       .replace(/[\u200B-\u200D\uFEFF]/g, "")
       .trim()

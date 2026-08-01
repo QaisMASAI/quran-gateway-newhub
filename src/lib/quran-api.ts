@@ -3,6 +3,7 @@
 import { supabase } from "@/integrations/supabase/client";
 import { SURAH_NAMES_AR, SURAH_NAMES_EN, SURAH_NAMES_HE } from "@/lib/surah-names-he";
 import { fetchSurahBilingual } from "@/lib/translations-db";
+import { sanitizeArabicText } from "@/utils/text";
 
 export interface Chapter {
   id: number;
@@ -237,7 +238,7 @@ export async function fetchVerses(chapterId: number, lang: ApiLang = "he"): Prom
     id: Number(`${row.surah}${String(row.ayah).padStart(3, "0")}`),
     verse_key: `${row.surah}:${row.ayah}`,
     verse_number: row.ayah,
-    text_uthmani: row.arabic,
+    text_uthmani: sanitizeArabicText(row.arabic),
     translations: [
       {
         id: translationIdFor(lang),
