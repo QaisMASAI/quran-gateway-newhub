@@ -36,6 +36,11 @@ const VALID: EntityKind[] = [
   "nation",
   "concept",
   "theme",
+  "scholar",
+  "companion",
+  "book",
+  "dua",
+  "mosque",
 ];
 
 export const Route = createFileRoute("/learn/$kind/$slug")({
@@ -48,7 +53,7 @@ export const Route = createFileRoute("/learn/$kind/$slug")({
   head: ({ params, loaderData }) => {
     const locale = (normalizeLocale(i18n.language) ?? "he") as Locale;
     const kind = params.kind as EntityKind;
-    const kindLabel = {
+    const kindMap: Record<Locale, Record<EntityKind, string>> = {
       he: {
         topic: "נושא",
         prophet: "נביא",
@@ -58,6 +63,11 @@ export const Route = createFileRoute("/learn/$kind/$slug")({
         nation: "עם",
         concept: "מושג",
         theme: "תמה",
+        scholar: "חוקר/אימאם",
+        companion: "סחאבי",
+        book: "ספר מוסמך",
+        dua: "תפילה/דועאא",
+        mosque: "מסגד קדוש",
       },
       ar: {
         topic: "موضوع",
@@ -68,6 +78,11 @@ export const Route = createFileRoute("/learn/$kind/$slug")({
         nation: "أمة",
         concept: "مفهوم",
         theme: "محور",
+        scholar: "عالم ومفسر",
+        companion: "صحابي جليل",
+        book: "مصنف ومؤلف",
+        dua: "دعاء ومناجاة",
+        mosque: "مسجد وجامع",
       },
       en: {
         topic: "Topic",
@@ -78,8 +93,14 @@ export const Route = createFileRoute("/learn/$kind/$slug")({
         nation: "Nation",
         concept: "Concept",
         theme: "Theme",
+        scholar: "Scholar",
+        companion: "Companion",
+        book: "Book",
+        dua: "Du'a & Prayer",
+        mosque: "Mosque",
       },
-    }[locale][kind];
+    };
+    const kindLabel = (kindMap[locale] && kindMap[locale][kind]) || kind;
 
     const titleText = pickLocale(loaderData?.entity?.title_i18n, locale);
     const summaryText =
