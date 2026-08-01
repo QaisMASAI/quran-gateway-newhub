@@ -4,13 +4,7 @@ import { useTranslation } from "react-i18next";
 import { useEffect, useState } from "react";
 import { Header } from "@/components/Header";
 import { ChevronLeft, Loader2, Check, Circle, Compass } from "lucide-react";
-import {
-  getJourneyBySlug,
-  getJourneyProgress,
-  toggleJourneyStep,
-  pickLocale,
-  type EntityKind,
-} from "@/lib/knowledge";
+import { getJourneyBySlug, getJourneyProgress, toggleJourneyStep, pickLocale, type EntityKind } from "@/lib/knowledge";
 import { awardXP } from "@/lib/gamification";
 import { supabase } from "@/integrations/supabase/client";
 import { normalizeLocale, type Locale } from "@/lib/i18n";
@@ -28,9 +22,7 @@ function JourneyPage() {
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => setUserId(data.user?.id ?? null));
-    const { data: sub } = supabase.auth.onAuthStateChange((_e, session) =>
-      setUserId(session?.user?.id ?? null),
-    );
+    const { data: sub } = supabase.auth.onAuthStateChange((_e, session) => setUserId(session?.user?.id ?? null));
     return () => sub.subscription.unsubscribe();
   }, []);
 
@@ -50,7 +42,7 @@ function JourneyPage() {
   const data = q.data;
   const [localDone, setLocalDone] = useState<Set<string>>(new Set());
 
-  const done = userId ? progressQ.data ?? new Set<string>() : localDone;
+  const done = userId ? (progressQ.data ?? new Set<string>()) : localDone;
   const total = data?.steps.length ?? 0;
   const completed = done.size;
   const pct = total > 0 ? Math.round((completed / total) * 100) : 0;
@@ -101,9 +93,7 @@ function JourneyPage() {
               <h1 className="text-2xl font-bold text-foreground sm:text-3xl">
                 {pickLocale(data.journey.title_i18n, locale)}
               </h1>
-              <p className="mt-2 text-sm text-muted-foreground">
-                {pickLocale(data.journey.summary_i18n, locale)}
-              </p>
+              <p className="mt-2 text-sm text-muted-foreground">{pickLocale(data.journey.summary_i18n, locale)}</p>
               {userId && (
                 <div className="mt-4">
                   <div className="mb-1 flex items-center justify-between text-xs text-muted-foreground">
@@ -111,10 +101,7 @@ function JourneyPage() {
                     <span className="font-semibold text-primary">{pct}%</span>
                   </div>
                   <div className="h-2 overflow-hidden rounded-full bg-secondary">
-                    <div
-                      className="h-full bg-primary transition-all duration-500"
-                      style={{ width: `${pct}%` }}
-                    />
+                    <div className="h-full bg-primary transition-all duration-500" style={{ width: `${pct}%` }} />
                   </div>
                 </div>
               )}
@@ -151,8 +138,7 @@ function JourneyPage() {
                     <div className="min-w-0 flex-1">
                       <div className="mb-0.5 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
                         {t("journeys.stepN", { n: idx + 1 })}
-                        {e &&
-                          ` • ${t(`search.kind${e.kind.charAt(0).toUpperCase()}${e.kind.slice(1)}` as const)}`}
+                        {e && ` • ${t(`search.kind${e.kind.charAt(0).toUpperCase()}${e.kind.slice(1)}` as const)}`}
                       </div>
                       {e ? (
                         <Link
@@ -168,9 +154,7 @@ function JourneyPage() {
                           </p>
                         </Link>
                       ) : (
-                        <div className="text-sm text-muted-foreground">
-                          {pickLocale(s.notes_i18n, locale)}
-                        </div>
+                        <div className="text-sm text-muted-foreground">{pickLocale(s.notes_i18n, locale)}</div>
                       )}
                     </div>
                   </li>
