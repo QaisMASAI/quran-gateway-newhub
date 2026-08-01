@@ -22,6 +22,7 @@ import {
 import { Header } from "@/components/Header";
 import { Logo } from "@/components/Logo";
 import { DailyVerse } from "@/components/DailyVerse";
+import { DailyAssistantWidget } from "@/components/DailyAssistantWidget";
 import { TrustBadge } from "@/components/TrustBadge";
 import { Button } from "@/components/ui/button";
 import { trackHomePromptEvent } from "@/lib/home-prompts.functions";
@@ -483,6 +484,11 @@ export function Home() {
         </section>
 
         <PrayerTimesModal open={prayerModalOpen} onOpenChange={setPrayerModalOpen} />
+
+        {/* FEATURE 5: DAILY ISLAMIC ASSISTANT ECOSYS WIDGET */}
+        <div className="mt-8">
+          <DailyAssistantWidget locale={locale} />
+        </div>
 
         {/* RESUME & CONTINUATION BAR */}
         {hasContinue && (
