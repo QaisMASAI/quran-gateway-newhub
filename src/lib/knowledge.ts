@@ -21,6 +21,21 @@ const DB_ENTITY_KINDS = new Set<
   "concept" | "event" | "nation" | "person" | "place" | "prophet" | "story" | "theme" | "topic"
 >(["concept", "event", "nation", "person", "place", "prophet", "story", "theme", "topic"]);
 
+type DbEntityKind =
+  | "concept"
+  | "event"
+  | "nation"
+  | "person"
+  | "place"
+  | "prophet"
+  | "story"
+  | "theme"
+  | "topic";
+
+function isDbEntityKind(kind: EntityKind): kind is DbEntityKind {
+  return DB_ENTITY_KINDS.has(kind as DbEntityKind);
+}
+
 export interface I18nText {
   he?: string;
   ar?: string;
@@ -121,7 +136,7 @@ export function pickLocale(t: I18nText | null | undefined, locale: LocaleCode): 
 }
 
 export async function listEntitiesByKind(kind: EntityKind): Promise<KnowledgeEntity[]> {
-  if (!DB_ENTITY_KINDS.has(kind)) {
+  if (!isDbEntityKind(kind)) {
     return mergeEntities([], seedByKind.get(kind) ?? []);
   }
 
