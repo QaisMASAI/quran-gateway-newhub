@@ -77,6 +77,7 @@ import { Route as AuthenticatedAdminHadithIngestRouteImport } from './routes/_au
 import { Route as AuthenticatedAdminHadithApiRouteImport } from './routes/_authenticated/admin.hadith-api'
 import { Route as AuthenticatedAdminBackfillRouteImport } from './routes/_authenticated/admin.backfill'
 import { Route as HadithCollectionEntryNumRouteImport } from './routes/hadith.$collection.entry.$num'
+import { Route as ApiPublicAdminValidateQuranCertificationRouteImport } from './routes/api/public/admin/validate-quran-certification'
 import { Route as ApiPublicAdminTranslateTafsirHebrewRouteImport } from './routes/api/public/admin/translate-tafsir-hebrew'
 import { Route as ApiPublicAdminTranslateTafsirEnglishRouteImport } from './routes/api/public/admin/translate-tafsir-english'
 import { Route as ApiPublicAdminTranslateHadithHebrewRouteImport } from './routes/api/public/admin/translate-hadith-hebrew'
@@ -435,6 +436,12 @@ const HadithCollectionEntryNumRoute =
     path: '/entry/$num',
     getParentRoute: () => HadithCollectionRoute,
   } as any)
+const ApiPublicAdminValidateQuranCertificationRoute =
+  ApiPublicAdminValidateQuranCertificationRouteImport.update({
+    id: '/api/public/admin/validate-quran-certification',
+    path: '/api/public/admin/validate-quran-certification',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPublicAdminTranslateTafsirHebrewRoute =
   ApiPublicAdminTranslateTafsirHebrewRouteImport.update({
     id: '/api/public/admin/translate-tafsir-hebrew',
@@ -586,6 +593,7 @@ export interface FileRoutesByFullPath {
   '/api/public/admin/translate-hadith-hebrew': typeof ApiPublicAdminTranslateHadithHebrewRoute
   '/api/public/admin/translate-tafsir-english': typeof ApiPublicAdminTranslateTafsirEnglishRoute
   '/api/public/admin/translate-tafsir-hebrew': typeof ApiPublicAdminTranslateTafsirHebrewRoute
+  '/api/public/admin/validate-quran-certification': typeof ApiPublicAdminValidateQuranCertificationRoute
   '/hadith/$collection/entry/$num': typeof HadithCollectionEntryNumRoute
   '/api/public/admin/ingest-quran-json/$id': typeof ApiPublicAdminIngestQuranJsonIdRoute
 }
@@ -667,6 +675,7 @@ export interface FileRoutesByTo {
   '/api/public/admin/translate-hadith-hebrew': typeof ApiPublicAdminTranslateHadithHebrewRoute
   '/api/public/admin/translate-tafsir-english': typeof ApiPublicAdminTranslateTafsirEnglishRoute
   '/api/public/admin/translate-tafsir-hebrew': typeof ApiPublicAdminTranslateTafsirHebrewRoute
+  '/api/public/admin/validate-quran-certification': typeof ApiPublicAdminValidateQuranCertificationRoute
   '/hadith/$collection/entry/$num': typeof HadithCollectionEntryNumRoute
   '/api/public/admin/ingest-quran-json/$id': typeof ApiPublicAdminIngestQuranJsonIdRoute
 }
@@ -750,6 +759,7 @@ export interface FileRoutesById {
   '/api/public/admin/translate-hadith-hebrew': typeof ApiPublicAdminTranslateHadithHebrewRoute
   '/api/public/admin/translate-tafsir-english': typeof ApiPublicAdminTranslateTafsirEnglishRoute
   '/api/public/admin/translate-tafsir-hebrew': typeof ApiPublicAdminTranslateTafsirHebrewRoute
+  '/api/public/admin/validate-quran-certification': typeof ApiPublicAdminValidateQuranCertificationRoute
   '/hadith/$collection/entry/$num': typeof HadithCollectionEntryNumRoute
   '/api/public/admin/ingest-quran-json/$id': typeof ApiPublicAdminIngestQuranJsonIdRoute
 }
@@ -833,6 +843,7 @@ export interface FileRouteTypes {
     | '/api/public/admin/translate-hadith-hebrew'
     | '/api/public/admin/translate-tafsir-english'
     | '/api/public/admin/translate-tafsir-hebrew'
+    | '/api/public/admin/validate-quran-certification'
     | '/hadith/$collection/entry/$num'
     | '/api/public/admin/ingest-quran-json/$id'
   fileRoutesByTo: FileRoutesByTo
@@ -914,6 +925,7 @@ export interface FileRouteTypes {
     | '/api/public/admin/translate-hadith-hebrew'
     | '/api/public/admin/translate-tafsir-english'
     | '/api/public/admin/translate-tafsir-hebrew'
+    | '/api/public/admin/validate-quran-certification'
     | '/hadith/$collection/entry/$num'
     | '/api/public/admin/ingest-quran-json/$id'
   id:
@@ -996,6 +1008,7 @@ export interface FileRouteTypes {
     | '/api/public/admin/translate-hadith-hebrew'
     | '/api/public/admin/translate-tafsir-english'
     | '/api/public/admin/translate-tafsir-hebrew'
+    | '/api/public/admin/validate-quran-certification'
     | '/hadith/$collection/entry/$num'
     | '/api/public/admin/ingest-quran-json/$id'
   fileRoutesById: FileRoutesById
@@ -1068,6 +1081,7 @@ export interface RootRouteChildren {
   ApiPublicAdminTranslateHadithHebrewRoute: typeof ApiPublicAdminTranslateHadithHebrewRoute
   ApiPublicAdminTranslateTafsirEnglishRoute: typeof ApiPublicAdminTranslateTafsirEnglishRoute
   ApiPublicAdminTranslateTafsirHebrewRoute: typeof ApiPublicAdminTranslateTafsirHebrewRoute
+  ApiPublicAdminValidateQuranCertificationRoute: typeof ApiPublicAdminValidateQuranCertificationRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -1548,6 +1562,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof HadithCollectionEntryNumRouteImport
       parentRoute: typeof HadithCollectionRoute
     }
+    '/api/public/admin/validate-quran-certification': {
+      id: '/api/public/admin/validate-quran-certification'
+      path: '/api/public/admin/validate-quran-certification'
+      fullPath: '/api/public/admin/validate-quran-certification'
+      preLoaderRoute: typeof ApiPublicAdminValidateQuranCertificationRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/admin/translate-tafsir-hebrew': {
       id: '/api/public/admin/translate-tafsir-hebrew'
       path: '/api/public/admin/translate-tafsir-hebrew'
@@ -1775,7 +1796,19 @@ const rootRouteChildren: RootRouteChildren = {
     ApiPublicAdminTranslateTafsirEnglishRoute,
   ApiPublicAdminTranslateTafsirHebrewRoute:
     ApiPublicAdminTranslateTafsirHebrewRoute,
+  ApiPublicAdminValidateQuranCertificationRoute:
+    ApiPublicAdminValidateQuranCertificationRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}

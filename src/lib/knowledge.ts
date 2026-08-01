@@ -17,6 +17,10 @@ export type EntityKind =
   | "dua"
   | "mosque";
 
+const DB_ENTITY_KINDS = new Set<
+  "concept" | "event" | "nation" | "person" | "place" | "prophet" | "story" | "theme" | "topic"
+>(["concept", "event", "nation", "person", "place", "prophet", "story", "theme", "topic"]);
+
 export interface I18nText {
   he?: string;
   ar?: string;
@@ -117,6 +121,10 @@ export function pickLocale(t: I18nText | null | undefined, locale: LocaleCode): 
 }
 
 export async function listEntitiesByKind(kind: EntityKind): Promise<KnowledgeEntity[]> {
+  if (!DB_ENTITY_KINDS.has(kind)) {
+    return mergeEntities([], seedByKind.get(kind) ?? []);
+  }
+
   const { data } = await supabase
     .from("knowledge_entities")
     .select("*")
