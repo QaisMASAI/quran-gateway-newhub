@@ -20,6 +20,8 @@ import {
   Layers,
   ArrowRight,
   Loader2,
+  Heart,
+  Landmark,
 } from "lucide-react";
 import { listAllEntities, pickLocale, type KnowledgeEntity } from "@/lib/knowledge";
 
@@ -69,9 +71,14 @@ export function LearnIndexPage() {
       {
         id: "topics",
         to: "/topics",
-        title: locale === "ar" ? "مواضيع القرآن" : locale === "he" ? "נושאי הקورאן" : "Quranic Topics",
+        title:
+          locale === "ar" ? "مواضيع القرآن" : locale === "he" ? "נושאי הקورאן" : "Quranic Topics",
         subtitle:
-          locale === "ar" ? "فهرس موضوعي شامل" : locale === "he" ? "אינדקס נושאים מקיף" : "Thematic Quranic Index",
+          locale === "ar"
+            ? "فهرس موضوعي شامل"
+            : locale === "he"
+              ? "אינדקס נושאים מקיף"
+              : "Thematic Quranic Index",
         description:
           locale === "ar"
             ? "التوحيد، الصلاة، الصبر، الرحمة، الأخلاق، العدل والإنفاق."
@@ -79,15 +86,25 @@ export function LearnIndexPage() {
               ? "ייחוד האל, תפילה, סבלנות, רחמים, מוסר וצדקה."
               : "Monotheism, prayer, patience, mercy, morality, and justice.",
         icon: Sparkles,
-        color: "from-amber-500/15 to-amber-500/5 text-amber-600 dark:text-amber-400 border-amber-500/30",
+        color:
+          "from-amber-500/15 to-amber-500/5 text-amber-600 dark:text-amber-400 border-amber-500/30",
         badge: locale === "ar" ? "الفهرس" : locale === "he" ? "אינדקס" : "Index",
       },
       {
         id: "prophets",
         to: "/prophets",
-        title: locale === "ar" ? "الأنبياء والرسل" : locale === "he" ? "נביאי האל ושליחיו" : "Prophets & Messengers",
+        title:
+          locale === "ar"
+            ? "الأنبياء والرسل"
+            : locale === "he"
+              ? "נביאי האל ושליחיו"
+              : "Prophets & Messengers",
         subtitle:
-          locale === "ar" ? "سير وأسماء الأنبياء" : locale === "he" ? "סיפורי נביאי הקוראן" : "Lives of 25+ Prophets",
+          locale === "ar"
+            ? "سير وأسماء الأنبياء"
+            : locale === "he"
+              ? "סיפורי נביאי הקוראן"
+              : "Lives of 25+ Prophets",
         description:
           locale === "ar"
             ? "قصص آدم، نوح، إبراهيم، موسى، عيسى ومحمد صلوات الله عليهم."
@@ -95,13 +112,15 @@ export function LearnIndexPage() {
               ? "סיפורי אדם, נח, אברהם, משה, ישוע ומוחמד עליהם השלום."
               : "Stories of Adam, Noah, Abraham, Moses, Jesus & Muhammad ﷺ.",
         icon: UserCheck,
-        color: "from-emerald-500/15 to-emerald-500/5 text-emerald-600 dark:text-emerald-400 border-emerald-500/30",
+        color:
+          "from-emerald-500/15 to-emerald-500/5 text-emerald-600 dark:text-emerald-400 border-emerald-500/30",
         badge: locale === "ar" ? "25+ نبي" : locale === "he" ? "25+ נביאים" : "25+ Prophets",
       },
       {
         id: "stories",
         to: "/stories",
-        title: locale === "ar" ? "قصص القرآن" : locale === "he" ? "סיפורי הקוראן" : "Quranic Stories",
+        title:
+          locale === "ar" ? "قصص القرآن" : locale === "he" ? "סיפורי הקוראן" : "Quranic Stories",
         subtitle:
           locale === "ar"
             ? "العبر والدروس القرآنية"
@@ -121,9 +140,18 @@ export function LearnIndexPage() {
       {
         id: "events",
         to: "/events",
-        title: locale === "ar" ? "الأحداث التاريخية" : locale === "he" ? "אירועים היסטוריים" : "Historical Events",
+        title:
+          locale === "ar"
+            ? "الأحداث التاريخية"
+            : locale === "he"
+              ? "אירועים היסטוריים"
+              : "Historical Events",
         subtitle:
-          locale === "ar" ? "محطات السيرة النبوية" : locale === "he" ? "אבני דרך בסירה" : "Prophetic Timeline & Wars",
+          locale === "ar"
+            ? "محطات السيرة النبوية"
+            : locale === "he"
+              ? "אבני דרך בסירה"
+              : "Prophetic Timeline & Wars",
         description:
           locale === "ar"
             ? "الهجرة النبوية، غزوة بدر، أحد، الخندق، فتح مكة والإسراء."
@@ -135,25 +163,142 @@ export function LearnIndexPage() {
         badge: locale === "ar" ? "التأريخ" : locale === "he" ? "היסטוריה" : "History",
       },
       {
-        id: "places",
-        to: "/places",
-        title: locale === "ar" ? "الأماكن المقدسة" : locale === "he" ? "מקומות קדושים" : "Sacred Places",
+        id: "scholars",
+        to: "/scholars",
+        title:
+          locale === "ar"
+            ? "علماء الأمة والمفسرون"
+            : locale === "he"
+              ? "חכמי האומה ומפרשיה"
+              : "Scholars & Mufassirun",
         subtitle:
-          locale === "ar" ? "جغرافيا كتاب الله" : locale === "he" ? "גאוגרפיה קוראנית" : "Quranic Holy Geography",
+          locale === "ar"
+            ? "أئمة التفسير والحديث"
+            : locale === "he"
+              ? "אימאמים וחוקרי תפסיר"
+              : "Imams & Exegetes",
         description:
           locale === "ar"
-            ? "مكة المكرمة، المدينة المنورة، المسجد الأقصى وطور سيناء."
+            ? "الإمام الطبري، ابن كثير، القرطبي، البخاري، مسلم والنووي."
             : locale === "he"
-              ? "מכה, מדינה, מסגד אל-אקצא, הר סיני ובכּה."
-              : "Mecca, Madinah, Al-Aqsa Mosque, Mount Sinai, and Bakkah.",
-        icon: MapPin,
+              ? "אבן כתי'ר, אימאם אל-טברי, אל-בוח'ארי, מוסלים וא-נוואווי."
+              : "Imam Al-Tabari, Ibn Kathir, Al-Qurtubi, Al-Bukhari, and An-Nawawi.",
+        icon: GraduationCap,
+        color:
+          "from-amber-500/15 to-amber-500/5 text-amber-600 dark:text-amber-400 border-amber-500/30",
+        badge: locale === "ar" ? "علماء" : locale === "he" ? "חוקרים" : "Scholars",
+      },
+      {
+        id: "companions",
+        to: "/companions",
+        title:
+          locale === "ar"
+            ? "الصحابة الكرام"
+            : locale === "he"
+              ? "הסחאבה (החברים)"
+              : "Companions (Sahabah)",
+        subtitle:
+          locale === "ar"
+            ? "جيل التنزيل الرائد"
+            : locale === "he"
+              ? "דור ההתגלות"
+              : "Generations of Revelation",
+        description:
+          locale === "ar"
+            ? "أبو بكر، عمر، عثمان، علي، عائشة أم المؤمنين، وابن عباس."
+            : locale === "he"
+              ? "אבו בכר, עומר, עות'מאן, עלי, עאישה ועבדאללה בן עבאס."
+              : "Abu Bakr, Umar, Uthman, Ali, Aisha, and Ibn Abbas.",
+        icon: UserCheck,
+        color:
+          "from-emerald-500/15 to-emerald-500/5 text-emerald-600 dark:text-emerald-400 border-emerald-500/30",
+        badge: locale === "ar" ? "صحابة" : locale === "he" ? "סחאبة" : "Sahabah",
+      },
+      {
+        id: "books",
+        to: "/books",
+        title:
+          locale === "ar"
+            ? "أمهات الكتب والمصنفات"
+            : locale === "he"
+              ? "ספרי היסוד"
+              : "Classical Books & Texts",
+        subtitle:
+          locale === "ar"
+            ? "كتب الحديث والتفسير"
+            : locale === "he"
+              ? "ספרי חדית' ותפסיר"
+              : "Primary Sources",
+        description:
+          locale === "ar"
+            ? "صحيح البخاري، صحيح مسلم، تفسير ابن كثير، والموطأ."
+            : locale === "he"
+              ? "צחיח אל-בוח'ארי, צחיח מוסלים, תפסיר אבן כתי'ר ואל-מוואטא."
+              : "Sahih al-Bukhari, Sahih Muslim, Tafsir Ibn Kathir, and Al-Muwatta.",
+        icon: BookMarked,
+        color: "from-blue-500/15 to-blue-500/5 text-blue-600 dark:text-blue-400 border-blue-500/30",
+        badge: locale === "ar" ? "كتب" : locale === "he" ? "ספרים" : "Books",
+      },
+      {
+        id: "duas",
+        to: "/duas",
+        title:
+          locale === "ar"
+            ? "الأدعية والأذكار"
+            : locale === "he"
+              ? "תפילות ודועאא"
+              : "Du'as & Supplications",
+        subtitle:
+          locale === "ar"
+            ? "دعاء القرآن والسنة"
+            : locale === "he"
+              ? "תپילות הקוראן והסונה"
+              : "Quranic & Prophetic Prayers",
+        description:
+          locale === "ar"
+            ? "دعاء يونس، القنوت، سيد الاستغفار، وأدعية القرآن الكبرى."
+            : locale === "he"
+              ? "תפילת יונה, דועאא אל-קנוט, סייד אל-אסתע'פאר ותפילות הקוראן."
+              : "Dua of Jonah, Al-Qunoot, Sayyid al-Istighfar, and Rabbana duas.",
+        icon: Heart,
         color: "from-rose-500/15 to-rose-500/5 text-rose-600 dark:text-rose-400 border-rose-500/30",
-        badge: locale === "ar" ? "جغرافيا" : locale === "he" ? "מקומות" : "Geography",
+        badge: locale === "ar" ? "أدعية" : locale === "he" ? "תפילות" : "Du'as",
+      },
+      {
+        id: "mosques",
+        to: "/mosques",
+        title:
+          locale === "ar"
+            ? "المساجد والجوامع الكبرى"
+            : locale === "he"
+              ? "המסגדים הקדושים"
+              : "Holiest Mosques",
+        subtitle:
+          locale === "ar"
+            ? "المساجد الثلاثة والمشاهد"
+            : locale === "he"
+              ? "שלושת המסגדים הקדושים"
+              : "Sacred Sanctuaries",
+        description:
+          locale === "ar"
+            ? "المسجد الحرام بمكة، المسجد النبوي بالمدينة، والمسجد الأقصى."
+            : locale === "he"
+              ? "המסגד החראם במכה, מסגד הנביא במדינה ומסגד אל-אקצא בירושלים."
+              : "Al-Masjid Al-Haram, Al-Masjid An-Nabawi, and Al-Masjid Al-Aqsa.",
+        icon: Landmark,
+        color:
+          "from-purple-500/15 to-purple-500/5 text-purple-600 dark:text-purple-400 border-purple-500/30",
+        badge: locale === "ar" ? "مساجد" : locale === "he" ? "מסגדים" : "Mosques",
       },
       {
         id: "concepts",
         to: "/concepts",
-        title: locale === "ar" ? "المفاهيم والأمم" : locale === "he" ? "מושגים ועמים" : "Concepts & Nations",
+        title:
+          locale === "ar"
+            ? "المفاهيم والأمم"
+            : locale === "he"
+              ? "מושגים ועמים"
+              : "Concepts & Nations",
         subtitle:
           locale === "ar"
             ? "العقيدة والأمم السابقة"
@@ -167,7 +312,8 @@ export function LearnIndexPage() {
               ? "מושגי יסוד באמונה וסיפורי עאד, ת'מוד ועם פרעה."
               : "Core theological concepts, afterlife, angels, and ancient nations.",
         icon: GraduationCap,
-        color: "from-purple-500/15 to-purple-500/5 text-purple-600 dark:text-purple-400 border-purple-500/30",
+        color:
+          "from-purple-500/15 to-purple-500/5 text-purple-600 dark:text-purple-400 border-purple-500/30",
         badge: locale === "ar" ? "عقيدة" : locale === "he" ? "אמונה" : "Theology",
       },
     ];
@@ -200,7 +346,13 @@ export function LearnIndexPage() {
         <div className="mx-auto max-w-5xl px-4 pt-8 pb-6 sm:px-6">
           <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-primary mb-2">
             <Compass className="h-4 w-4 text-gold" />
-            <span>{locale === "ar" ? "بوابة المعرفة" : locale === "he" ? "מרכז הידע" : "Knowledge Portal"}</span>
+            <span>
+              {locale === "ar"
+                ? "بوابة المعرفة"
+                : locale === "he"
+                  ? "מרכז הידע"
+                  : "Knowledge Portal"}
+            </span>
           </div>
           <h1 className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
             {t("learn.title", "Quranic Knowledge Hub")}
@@ -274,7 +426,9 @@ export function LearnIndexPage() {
                     className="flex flex-col justify-between rounded-xl border border-border bg-background p-4 hover:border-primary/50 hover:shadow-sm transition"
                   >
                     <div>
-                      <span className="text-[10px] font-bold uppercase tracking-wider text-primary">{item.kind}</span>
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-primary">
+                        {item.kind}
+                      </span>
                       <h3 className="font-semibold text-foreground text-sm mt-0.5" dir="auto">
                         {item.title}
                       </h3>
@@ -303,7 +457,11 @@ export function LearnIndexPage() {
                 {t("learn.openJourneys", "Reading Journeys")}
               </div>
               <p className="text-xs text-muted-foreground truncate">
-                {locale === "ar" ? "مسارات موضوعية" : locale === "he" ? "מסלולי למידה" : "Structured Paths"}
+                {locale === "ar"
+                  ? "مسارات موضوعية"
+                  : locale === "he"
+                    ? "מסלולי למידה"
+                    : "Structured Paths"}
               </p>
             </div>
           </Link>
@@ -320,7 +478,11 @@ export function LearnIndexPage() {
                 {t("learn.openGraph", "Knowledge Graph")}
               </div>
               <p className="text-xs text-muted-foreground truncate">
-                {locale === "ar" ? "شبكة المفاهيم" : locale === "he" ? "רשת המושגים" : "Concept Network"}
+                {locale === "ar"
+                  ? "شبكة المفاهيم"
+                  : locale === "he"
+                    ? "רשת המושגים"
+                    : "Concept Network"}
               </p>
             </div>
           </Link>
@@ -337,7 +499,11 @@ export function LearnIndexPage() {
                 {t("learn.openTimeline", "Islamic Timeline")}
               </div>
               <p className="text-xs text-muted-foreground truncate">
-                {locale === "ar" ? "التأريض النبوي" : locale === "he" ? "ציר היסטורי" : "Prophetic Chronology"}
+                {locale === "ar"
+                  ? "التأريض النبوي"
+                  : locale === "he"
+                    ? "ציר היסטורי"
+                    : "Prophetic Chronology"}
               </p>
             </div>
           </Link>
@@ -354,7 +520,11 @@ export function LearnIndexPage() {
                 {t("learn.openMap", "Sacred Map")}
               </div>
               <p className="text-xs text-muted-foreground truncate">
-                {locale === "ar" ? "خريطة المعالم" : locale === "he" ? "מפת המקומות" : "Sacred Geography"}
+                {locale === "ar"
+                  ? "خريطة المعالم"
+                  : locale === "he"
+                    ? "מפת המקומות"
+                    : "Sacred Geography"}
               </p>
             </div>
           </Link>
@@ -410,7 +580,9 @@ export function LearnIndexPage() {
                         {cat.title}
                       </h3>
                       <p className="mt-0.5 text-xs font-semibold text-gold">{cat.subtitle}</p>
-                      <p className="mt-2 text-xs sm:text-sm text-muted-foreground leading-relaxed">{cat.description}</p>
+                      <p className="mt-2 text-xs sm:text-sm text-muted-foreground leading-relaxed">
+                        {cat.description}
+                      </p>
                     </div>
                   </div>
 
@@ -436,7 +608,11 @@ export function LearnIndexPage() {
               <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-gold mb-2">
                 <BookMarked className="h-4 w-4" />
                 <span>
-                  {locale === "ar" ? "المكتبة التفسيرية" : locale === "he" ? "ספריית התפסיר" : "Tafsir Library"}
+                  {locale === "ar"
+                    ? "المكتبة التفسيرية"
+                    : locale === "he"
+                      ? "ספריית התפסיר"
+                      : "Tafsir Library"}
                 </span>
               </div>
               <h3 className="font-display text-2xl sm:text-3xl font-bold text-white">
@@ -459,7 +635,11 @@ export function LearnIndexPage() {
               className="shrink-0 rounded-2xl bg-gold px-5 py-3 text-xs sm:text-sm font-bold text-slate-950 hover:bg-gold-soft hover:shadow-lg transition flex items-center gap-2"
             >
               <span>
-                {locale === "ar" ? "تصفّح التفسير الآن" : locale === "he" ? "עיין בתפסיר עכשיו" : "Browse Tafsir Now"}
+                {locale === "ar"
+                  ? "تصفّح التفسير الآن"
+                  : locale === "he"
+                    ? "עיין בתפסיר עכשיו"
+                    : "Browse Tafsir Now"}
               </span>
               <ArrowRight className="h-4 w-4 ltr:rotate-0 rtl:rotate-180" />
             </Link>
