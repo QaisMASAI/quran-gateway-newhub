@@ -1,138 +1,233 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { useTranslation } from "react-i18next";
-import { Header } from "@/components/Header";
-import { listHadithCollections } from "@/lib/hadith.functions";
-import { BookMarked, Users } from "lucide-react";
+import { Search, Sparkles, Filter, RefreshCw, Layers, ShieldCheck, UserCheck } from "lucide-react";
+import { searchHadith } from "@/lib/hadith.functions";
+import { HadithCard } from "./HadithCard";
+import type { HadithReadingSettings } from "@/lib/hadith-user-store";
 
-export const Route = createFileRoute("/hadith/")({
-  head: () => ({
-    meta: [
-      { title: "Hadith Library — Canonical Collections" },
-      {
-        name: "description",
-        content:
-          "Explore canonical Hadith collections with Arabic text, multilingual translations, topic hubs, and narrator pathways.",
-      },
-      { property: "og:title", content: "Hadith Library" },
-      {
-        property: "og:description",
-        content: "Browse authenticated Hadith collections in one searchable library.",
-      },
-      { property: "og:url", content: "/hadith" },
-      { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:title", content: "Hadith Library" },
-      {
-        name: "twitter:description",
-        content: "Browse authenticated Hadith collections with Arabic text and translations.",
-      },
-    ],
-    links: [{ rel: "canonical", href: "/hadith" }],
-    scripts: [
-      {
-        type: "application/ld+json",
-        children: JSON.stringify({
-          "@context": "https://schema.org",
-          "@type": "BreadcrumbList",
-          itemListElement: [{ "@type": "ListItem", position: 1, name: "Hadith", item: "/hadith" }],
-        }),
-      },
-    ],
-  }),
-  loader: async ({ context }) => {
-    await context.queryClient.ensureQueryData({
-      queryKey: ["hadith", "collections"],
-      queryFn: () => listHadithCollections(),
-    });
-  },
-  component: HadithIndex,
-});
+interface HadithSearchExplorerProps {
+  settings: HadithReadingSettings;
+}
 
-function HadithIndex() {
-  const { i18n } = useTranslation();
-  const isRtl = i18n.dir() === "rtl";
-  const locale = (i18n.language?.slice(0, 2) ?? "he") as "he" | "ar" | "en";
-  const fn = useServerFn(listHadithCollections);
+export function HadithSearchExplorer({ settings }: HadithSearchExplorerProps) {
+  const [query, setQuery] = useState("");
+  const [activeQuery, setActiveQuery] = useState("");
+  const [searchMode, setSearchMode] = useState<"keyword" | "semantic">("keyword");
+  const [selectedCollection, setSelectedCollection] = useState<string>("all");
+  const [selectedAuthenticity, setSelectedAuthenticity] = useState<string>("all");
+  const [selectedNarrator, setSelectedNarrator] = useState<string>("all");
+  const [page, setPage] = useState(0);
+
+  const searchFn = useServerFn(searchHadith);
+
   const { data, isLoading, isError, refetch } = useQuery({
-    queryKey: ["hadith", "collections"],
-    queryFn: () => fn(),
+    queryKey: ["hadith-search", activeQuery, selectedCollection, page],
+    enabled: activeQuery.trim().length > 0,
+    queryFn: () =>
+      searchFn({
+        data: {
+          q: activeQuery,
+          collections: selectedCollection !== "all" ? [selectedCollection] : undefined,
+          page,
+          pageSize: 10,
+        },
+      }),
   });
 
-  return (
-    <div className="min-h-screen bg-background" dir={isRtl ? "rtl" : "ltr"}>
-      <Header />
-      <main id="main" className="mx-auto max-w-4xl px-4 py-8 sm:px-6">
-        <h1 className="text-2xl font-bold text-foreground">
-          {locale === "he" ? "ספריית החדית'" : locale === "ar" ? "مكتبة الحديث" : "Hadith Library"}
-        </h1>
-        <p className="mt-1 text-sm text-muted-foreground">
-          {locale === "he"
-            ? "אוספי חדית׳ מרכזיים — טקסט ערבי מקורי עם תרגומים."
-            : locale === "ar"
-              ? "مجموعات الحديث الأساسية — النص العربي الأصلي مع ترجمات."
-              : "Core hadith collections with original Arabic text and translations."}
-        </p>
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    setActiveQuery(query.trim());
+    setPage(0);
+  };
 
-        <div className="mt-6 grid gap-4 sm:grid-cols-2">
-          {isLoading && (
-            <div className="rounded-xl border border-border bg-card p-4 text-sm text-muted-foreground">
-              Loading hadith collections…
-            </div>
-          )}
-          {isError && (
-            <div className="rounded-xl border border-destructive/30 bg-destructive/5 p-4 text-sm text-destructive">
-              Failed to load hadith collections.
-              <button
-                type="button"
-                onClick={() => void refetch()}
-                className="ms-2 underline underline-offset-2"
-              >
-                Retry
-              </button>
-            </div>
-          )}
-          {(data ?? []).map((c) => (
-            <Link
-              key={c.slug}
-              to="/hadith/$collection"
-              params={{ collection: c.slug }}
-              className="group rounded-2xl border border-primary/10 bg-card p-5 transition-all hover:-translate-y-0.5 hover:border-gold hover:shadow-xl"
-            >
-              <div className="flex items-center gap-3">
-                <BookMarked className="h-5 w-5 text-primary" aria-hidden />
-                <div className="font-arabic-ui text-xl" dir="rtl">
-                  {c.title_ar}
-                </div>
-              </div>
-              <div className="mt-1 text-sm font-semibold text-foreground">{c.title_en}</div>
-              {c.author_en && <div className="text-xs text-muted-foreground">{c.author_en}</div>}
-              <div className="mt-3 text-xs text-muted-foreground">
-                {c.total_hadith.toLocaleString()} hadith · {c.total_books} books
-              </div>
-            </Link>
-          ))}
+  const collectionsList = [
+    { id: "all", name: "All Collections" },
+    { id: "bukhari", name: "Sahih al-Bukhari" },
+    { id: "muslim", name: "Sahih Muslim" },
+    { id: "tirmidhi", name: "Jami at-Tirmidhi" },
+    { id: "abudawud", name: "Sunan Abu Dawud" },
+    { id: "nasai", name: "Sunan an-Nasa'i" },
+    { id: "ibnmajah", name: "Sunan Ibn Majah" },
+    { id: "malik", name: "Muwatta Malik" },
+  ];
+
+  const narratorsList = [
+    { id: "all", name: "All Narrators" },
+    { id: "abu_hurairah", name: "Abu Hurairah (أبو هريرة)" },
+    { id: "aisha", name: "Aisha bint Abi Bakr (عائشة)" },
+    { id: "umar", name: "Umar ibn al-Khattab (عمر بن الخطاب)" },
+    { id: "anas", name: "Anas ibn Malik (أنس بن مالك)" },
+    { id: "ibn_umar", name: "Abdullah ibn Umar (عبد الله بن عمر)" },
+  ];
+
+  return (
+    <div className="space-y-6">
+      {/* Search Bar & Mode Switcher */}
+      <form onSubmit={handleSearch} className="space-y-3">
+        <div className="relative flex items-center">
+          <input
+            type="text"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder={
+              searchMode === "semantic"
+                ? "Describe what you're looking for (e.g., 'Hadith about honoring parents or patience in sickness')..."
+                : "Search by keyword, narrator, hadith number, or Arabic text..."
+            }
+            className="w-full rounded-2xl border border-primary/20 bg-card py-3.5 pl-11 pr-28 text-sm text-foreground placeholder:text-muted-foreground shadow-xs focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+          />
+          <Search className="absolute left-4 h-5 w-5 text-muted-foreground" />
+
+          <button
+            type="submit"
+            className="absolute right-2 rounded-xl bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground shadow-xs transition-colors hover:bg-primary/90"
+          >
+            Search
+          </button>
         </div>
 
-        <div className="mt-8">
-          <div className="flex flex-wrap gap-2">
-            <Link
-              to="/hadith/topics"
-              className="inline-flex items-center gap-2 rounded-lg border border-primary/20 bg-card px-4 py-2 text-sm font-medium text-primary hover:bg-primary/5"
+        {/* Mode & Filters Toolbar */}
+        <div className="flex flex-wrap items-center justify-between gap-3 text-xs">
+          {/* Mode Selector */}
+          <div className="flex items-center gap-1 rounded-xl border border-border bg-card p-1">
+            <button
+              type="button"
+              onClick={() => setSearchMode("keyword")}
+              className={`flex items-center gap-1.5 rounded-lg px-3 py-1 font-semibold transition-colors ${
+                searchMode === "keyword"
+                  ? "bg-primary text-primary-foreground"
+                  : "text-muted-foreground hover:text-foreground"
+              }`}
             >
-              <BookMarked className="h-4 w-4" />
-              {locale === "he" ? "לפי נושאים" : locale === "ar" ? "حسب الموضوع" : "By topics"}
-            </Link>
-            <Link
-              to="/hadith/narrators"
-              className="inline-flex items-center gap-2 rounded-lg border border-primary/20 bg-card px-4 py-2 text-sm font-medium text-primary hover:bg-primary/5"
+              <Search className="h-3.5 w-3.5" /> Keyword Search
+            </button>
+            <button
+              type="button"
+              onClick={() => setSearchMode("semantic")}
+              className={`flex items-center gap-1.5 rounded-lg px-3 py-1 font-semibold transition-colors ${
+                searchMode === "semantic"
+                  ? "bg-gradient-to-r from-purple-600 to-indigo-600 text-white"
+                  : "text-muted-foreground hover:text-foreground"
+              }`}
             >
-              <Users className="h-4 w-4" /> Narrators
-            </Link>
+              <Sparkles className="h-3.5 w-3.5" /> AI Semantic Search
+            </button>
+          </div>
+
+          {/* Quick Filter Selectors */}
+          <div className="flex flex-wrap items-center gap-2">
+            <div className="flex items-center gap-1 text-muted-foreground">
+              <Filter className="h-3.5 w-3.5" />
+            </div>
+
+            {/* Collection Filter */}
+            <select
+              value={selectedCollection}
+              onChange={(e) => {
+                setSelectedCollection(e.target.value);
+                setPage(0);
+              }}
+              className="rounded-lg border border-border bg-card px-2.5 py-1 text-xs text-foreground focus:outline-none"
+            >
+              {collectionsList.map((c) => (
+                <option key={c.id} value={c.id}>
+                  {c.name}
+                </option>
+              ))}
+            </select>
+
+            {/* Authenticity Filter */}
+            <select
+              value={selectedAuthenticity}
+              onChange={(e) => setSelectedAuthenticity(e.target.value)}
+              className="rounded-lg border border-border bg-card px-2.5 py-1 text-xs text-foreground focus:outline-none"
+            >
+              <option value="all">All Grades</option>
+              <option value="sahih">Sahih (صحيح)</option>
+              <option value="muttafaq">Muttafaq 'Alayh (متفق عليه)</option>
+              <option value="hasan">Hasan (حسن)</option>
+            </select>
+
+            {/* Narrator Filter */}
+            <select
+              value={selectedNarrator}
+              onChange={(e) => setSelectedNarrator(e.target.value)}
+              className="rounded-lg border border-border bg-card px-2.5 py-1 text-xs text-foreground focus:outline-none"
+            >
+              {narratorsList.map((n) => (
+                <option key={n.id} value={n.id}>
+                  {n.name}
+                </option>
+              ))}
+            </select>
           </div>
         </div>
-      </main>
+      </form>
+
+      {/* Results Header */}
+      {activeQuery && (
+        <div className="flex items-center justify-between text-xs text-muted-foreground">
+          <span>
+            Results for <strong className="text-foreground">"{activeQuery}"</strong>
+            {data && ` (${data.total} found)`}
+          </span>
+          {isLoading && (
+            <span className="flex items-center gap-1 text-primary">
+              <RefreshCw className="h-3.5 w-3.5 animate-spin" /> Searching...
+            </span>
+          )}
+        </div>
+      )}
+
+      {/* Results List */}
+      {activeQuery && data && data.items.length > 0 && (
+        <div className="space-y-4">
+          {data.items.map((item) => (
+            <HadithCard
+              key={item.id}
+              id={item.id}
+              globalId={item.global_id}
+              collectionSlug={item.collection_slug}
+              collectionTitle={collectionsList.find((c) => c.id === item.collection_slug)?.name || item.collection_slug}
+              bookId={item.book_id}
+              idInBook={item.id_in_book}
+              narrator={item.narrator}
+              arabicText={item.arabic_text}
+              englishText={item.english_text}
+              hebrewText={item.hebrew_text}
+              settings={settings}
+            />
+          ))}
+
+          {/* Pagination */}
+          <div className="flex items-center justify-between border-t border-border pt-4 text-xs">
+            <button
+              type="button"
+              disabled={page === 0}
+              onClick={() => setPage(page - 1)}
+              className="rounded-lg border border-border px-3 py-1.5 font-medium disabled:opacity-50"
+            >
+              ← Previous
+            </button>
+            <span className="text-muted-foreground">Page {page + 1}</span>
+            <button
+              type="button"
+              disabled={!data.hasMore}
+              onClick={() => setPage(page + 1)}
+              className="rounded-lg border border-border px-3 py-1.5 font-medium disabled:opacity-50"
+            >
+              Next →
+            </button>
+          </div>
+        </div>
+      )}
+
+      {activeQuery && data && data.items.length === 0 && !isLoading && (
+        <div className="rounded-2xl border border-border bg-card p-8 text-center text-sm text-muted-foreground">
+          No hadiths found matching your query. Try broadening your terms or switching to AI Semantic Search.
+        </div>
+      )}
     </div>
   );
 }
