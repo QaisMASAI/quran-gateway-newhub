@@ -1,5 +1,19 @@
 import { Link } from "@tanstack/react-router";
-import { BookOpen, User, Scroll, Sparkles, MapPin, Users, Lightbulb, Layers } from "lucide-react";
+import {
+  BookOpen,
+  User,
+  Scroll,
+  Sparkles,
+  MapPin,
+  Users,
+  Lightbulb,
+  Layers,
+  GraduationCap,
+  UserCheck,
+  BookMarked,
+  Heart,
+  Landmark,
+} from "lucide-react";
 import type { EntityKind, KnowledgeEntity } from "@/lib/knowledge";
 import { pickLocale } from "@/lib/knowledge";
 import type { LocaleCode } from "@/lib/translations-db";
@@ -13,6 +27,11 @@ const KIND_ICON: Record<EntityKind, typeof BookOpen> = {
   nation: Users,
   concept: Lightbulb,
   theme: Layers,
+  scholar: GraduationCap,
+  companion: UserCheck,
+  book: BookMarked,
+  dua: Heart,
+  mosque: Landmark,
 };
 
 const KIND_TONE: Record<EntityKind, string> = {
@@ -24,6 +43,11 @@ const KIND_TONE: Record<EntityKind, string> = {
   nation: "from-muted to-muted/0 text-foreground",
   concept: "from-secondary to-secondary/0 text-foreground",
   theme: "from-primary/12 to-primary/0 text-primary",
+  scholar: "from-amber-500/15 to-amber-500/0 text-amber-600 dark:text-amber-400",
+  companion: "from-emerald-500/15 to-emerald-500/0 text-emerald-600 dark:text-emerald-400",
+  book: "from-blue-500/15 to-blue-500/0 text-blue-600 dark:text-blue-400",
+  dua: "from-rose-500/15 to-rose-500/0 text-rose-600 dark:text-rose-400",
+  mosque: "from-purple-500/15 to-purple-500/0 text-purple-600 dark:text-purple-400",
 };
 
 export function EntityCard({
