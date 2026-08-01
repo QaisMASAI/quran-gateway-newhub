@@ -1,12 +1,5 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import {
-  Outlet,
-  Link,
-  createRootRouteWithContext,
-  useRouter,
-  HeadContent,
-  Scripts,
-} from "@tanstack/react-router";
+import { Outlet, Link, createRootRouteWithContext, useRouter, HeadContent, Scripts } from "@tanstack/react-router";
 import { useEffect, useState, type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 
@@ -24,8 +17,7 @@ const ROOT_META = {
   title: "Noor Al-Huda AI | Quran & Sunnah Knowledge Hub",
   description:
     "Explore Quran and Sahih Hadith with grounded citations, Jalalayn-only tafsir, knowledge graph discovery, and multilingual AI research.",
-  socialDescription:
-    "Grounded Quran + Hadith learning with Jalalayn-only tafsir and citation-first AI research.",
+  socialDescription: "Grounded Quran + Hadith learning with Jalalayn-only tafsir and citation-first AI research.",
 };
 
 function NotFoundComponent() {
@@ -33,10 +25,7 @@ function NotFoundComponent() {
   const isRtl = i18n.dir() === "rtl";
 
   return (
-    <div
-      className="flex min-h-screen items-center justify-center bg-background px-4"
-      dir={isRtl ? "rtl" : "ltr"}
-    >
+    <div className="flex min-h-screen items-center justify-center bg-background px-4" dir={isRtl ? "rtl" : "ltr"}>
       <div className="max-w-md text-center">
         <h1 className="font-display text-7xl font-bold text-primary">404</h1>
         <p className="mt-3 font-arabic text-2xl text-gold" dir="rtl" lang="ar">
@@ -68,17 +57,12 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
   }, [error]);
 
   return (
-    <div
-      className="flex min-h-screen items-center justify-center bg-background px-4"
-      dir={isRtl ? "rtl" : "ltr"}
-    >
+    <div className="flex min-h-screen items-center justify-center bg-background px-4" dir={isRtl ? "rtl" : "ltr"}>
       <div className="max-w-md text-center">
         <p className="font-arabic text-2xl text-gold" dir="rtl" lang="ar">
           إِنَّا لِلَّهِ وَإِنَّا إِلَيْهِ رَاجِعُونَ
         </p>
-        <h1 className="mt-4 text-xl font-semibold tracking-tight text-foreground">
-          {t("errors.genericTitle")}
-        </h1>
+        <h1 className="mt-4 text-xl font-semibold tracking-tight text-foreground">{t("errors.genericTitle")}</h1>
         <p className="mt-2 text-sm text-muted-foreground">{t("errors.genericBody")}</p>
         <div className="mt-6 flex flex-wrap justify-center gap-2">
           <button
@@ -198,6 +182,12 @@ function RootShell({ children }: { children: ReactNode }) {
         <HeadContent />
       </head>
       <body className="pb-16 sm:pb-0" dir={dir}>
+        <a
+          href="#main-content"
+          className="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-50 focus:rounded-xl focus:bg-primary focus:px-4 focus:py-2.5 focus:text-xs focus:font-bold focus:text-primary-foreground focus:shadow-xl focus:ring-2 focus:ring-gold"
+        >
+          Skip to main content
+        </a>
         {children}
         <Scripts />
       </body>
@@ -269,9 +259,7 @@ function RootComponent() {
   }, []);
 
   const showDevBanner =
-    import.meta.env.DEV &&
-    !!devErrorStatus &&
-    (devErrorStatus.interceptedCount > 0 || !!devErrorStatus.lastViteError);
+    import.meta.env.DEV && !!devErrorStatus && (devErrorStatus.interceptedCount > 0 || !!devErrorStatus.lastViteError);
 
   return (
     <QueryClientProvider client={queryClient}>
@@ -289,7 +277,9 @@ function RootComponent() {
             </div>
           ) : null}
           {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
-          <Outlet />
+          <main id="main-content" tabIndex={-1} className="outline-none">
+            <Outlet />
+          </main>
           <GlobalAudioPlayer />
           <BottomNav />
         </DirectionProvider>
