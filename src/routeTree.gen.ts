@@ -24,22 +24,30 @@ import { Route as AskRouteImport } from './routes/ask'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as TopicsIndexRouteImport } from './routes/topics.index'
+import { Route as TafsirIndexRouteImport } from './routes/tafsir.index'
 import { Route as SurahsIndexRouteImport } from './routes/surahs.index'
 import { Route as StoriesIndexRouteImport } from './routes/stories.index'
+import { Route as ScholarsIndexRouteImport } from './routes/scholars.index'
 import { Route as ProphetsIndexRouteImport } from './routes/prophets.index'
 import { Route as PlansIndexRouteImport } from './routes/plans.index'
 import { Route as PlacesIndexRouteImport } from './routes/places.index'
+import { Route as MosquesIndexRouteImport } from './routes/mosques.index'
 import { Route as LearnIndexRouteImport } from './routes/learn.index'
-import { Route as HadithIndexRouteImport } from './routes/hadith.index'
 import { Route as EventsIndexRouteImport } from './routes/events.index'
 import { Route as EmotionsIndexRouteImport } from './routes/emotions.index'
+import { Route as DuasIndexRouteImport } from './routes/duas.index'
 import { Route as ConceptsIndexRouteImport } from './routes/concepts.index'
+import { Route as CompanionsIndexRouteImport } from './routes/companions.index'
+import { Route as BooksIndexRouteImport } from './routes/books.index'
 import { Route as TopicsSlugRouteImport } from './routes/topics.$slug'
+import { Route as TafsirCompareRouteImport } from './routes/tafsir.compare'
 import { Route as SurahIdRouteImport } from './routes/surah.$id'
 import { Route as StoriesSlugRouteImport } from './routes/stories.$slug'
+import { Route as ScholarsSlugRouteImport } from './routes/scholars.$slug'
 import { Route as ProphetsSlugRouteImport } from './routes/prophets.$slug'
 import { Route as PlansSlugRouteImport } from './routes/plans.$slug'
 import { Route as PlacesSlugRouteImport } from './routes/places.$slug'
+import { Route as MosquesSlugRouteImport } from './routes/mosques.$slug'
 import { Route as LearnTafsirIbnKathirRouteImport } from './routes/learn.tafsir-ibn-kathir'
 import { Route as LearnGraphRouteImport } from './routes/learn.graph'
 import { Route as KnowledgeHadithRouteImport } from './routes/knowledge.hadith'
@@ -50,9 +58,13 @@ import { Route as ExploreTimelineRouteImport } from './routes/explore.timeline'
 import { Route as ExploreMapRouteImport } from './routes/explore.map'
 import { Route as EventsSlugRouteImport } from './routes/events.$slug'
 import { Route as EmotionsSlugRouteImport } from './routes/emotions.$slug'
+import { Route as DuasSlugRouteImport } from './routes/duas.$slug'
 import { Route as ConceptsSlugRouteImport } from './routes/concepts.$slug'
+import { Route as CompanionsSlugRouteImport } from './routes/companions.$slug'
+import { Route as BooksSlugRouteImport } from './routes/books.$slug'
 import { Route as LearnJourneysIndexRouteImport } from './routes/learn.journeys.index'
 import { Route as AuthenticatedCollectionsIndexRouteImport } from './routes/_authenticated/collections.index'
+import { Route as TafsirSurahAyahRouteImport } from './routes/tafsir.$surah.$ayah'
 import { Route as LearnJourneysSlugRouteImport } from './routes/learn.journeys.$slug'
 import { Route as LearnKindSlugRouteImport } from './routes/learn.$kind.$slug'
 import { Route as HadithCollectionBookRouteImport } from './routes/hadith.$collection.$book'
@@ -152,6 +164,11 @@ const TopicsIndexRoute = TopicsIndexRouteImport.update({
   path: '/topics/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const TafsirIndexRoute = TafsirIndexRouteImport.update({
+  id: '/tafsir/',
+  path: '/tafsir/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SurahsIndexRoute = SurahsIndexRouteImport.update({
   id: '/surahs/',
   path: '/surahs/',
@@ -160,6 +177,11 @@ const SurahsIndexRoute = SurahsIndexRouteImport.update({
 const StoriesIndexRoute = StoriesIndexRouteImport.update({
   id: '/stories/',
   path: '/stories/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ScholarsIndexRoute = ScholarsIndexRouteImport.update({
+  id: '/scholars/',
+  path: '/scholars/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ProphetsIndexRoute = ProphetsIndexRouteImport.update({
@@ -177,15 +199,15 @@ const PlacesIndexRoute = PlacesIndexRouteImport.update({
   path: '/places/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const MosquesIndexRoute = MosquesIndexRouteImport.update({
+  id: '/mosques/',
+  path: '/mosques/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const LearnIndexRoute = LearnIndexRouteImport.update({
   id: '/learn/',
   path: '/learn/',
   getParentRoute: () => rootRouteImport,
-} as any)
-const HadithIndexRoute = HadithIndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => HadithRoute,
 } as any)
 const EventsIndexRoute = EventsIndexRouteImport.update({
   id: '/events/',
@@ -197,14 +219,34 @@ const EmotionsIndexRoute = EmotionsIndexRouteImport.update({
   path: '/emotions/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DuasIndexRoute = DuasIndexRouteImport.update({
+  id: '/duas/',
+  path: '/duas/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ConceptsIndexRoute = ConceptsIndexRouteImport.update({
   id: '/concepts/',
   path: '/concepts/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CompanionsIndexRoute = CompanionsIndexRouteImport.update({
+  id: '/companions/',
+  path: '/companions/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BooksIndexRoute = BooksIndexRouteImport.update({
+  id: '/books/',
+  path: '/books/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const TopicsSlugRoute = TopicsSlugRouteImport.update({
   id: '/topics/$slug',
   path: '/topics/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TafsirCompareRoute = TafsirCompareRouteImport.update({
+  id: '/tafsir/compare',
+  path: '/tafsir/compare',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SurahIdRoute = SurahIdRouteImport.update({
@@ -215,6 +257,11 @@ const SurahIdRoute = SurahIdRouteImport.update({
 const StoriesSlugRoute = StoriesSlugRouteImport.update({
   id: '/stories/$slug',
   path: '/stories/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ScholarsSlugRoute = ScholarsSlugRouteImport.update({
+  id: '/scholars/$slug',
+  path: '/scholars/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ProphetsSlugRoute = ProphetsSlugRouteImport.update({
@@ -230,6 +277,11 @@ const PlansSlugRoute = PlansSlugRouteImport.update({
 const PlacesSlugRoute = PlacesSlugRouteImport.update({
   id: '/places/$slug',
   path: '/places/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MosquesSlugRoute = MosquesSlugRouteImport.update({
+  id: '/mosques/$slug',
+  path: '/mosques/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LearnTafsirIbnKathirRoute = LearnTafsirIbnKathirRouteImport.update({
@@ -282,9 +334,24 @@ const EmotionsSlugRoute = EmotionsSlugRouteImport.update({
   path: '/emotions/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DuasSlugRoute = DuasSlugRouteImport.update({
+  id: '/duas/$slug',
+  path: '/duas/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ConceptsSlugRoute = ConceptsSlugRouteImport.update({
   id: '/concepts/$slug',
   path: '/concepts/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CompanionsSlugRoute = CompanionsSlugRouteImport.update({
+  id: '/companions/$slug',
+  path: '/companions/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BooksSlugRoute = BooksSlugRouteImport.update({
+  id: '/books/$slug',
+  path: '/books/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LearnJourneysIndexRoute = LearnJourneysIndexRouteImport.update({
@@ -298,6 +365,11 @@ const AuthenticatedCollectionsIndexRoute =
     path: '/collections/',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const TafsirSurahAyahRoute = TafsirSurahAyahRouteImport.update({
+  id: '/tafsir/$surah/$ayah',
+  path: '/tafsir/$surah/$ayah',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const LearnJourneysSlugRoute = LearnJourneysSlugRouteImport.update({
   id: '/learn/journeys/$slug',
   path: '/learn/journeys/$slug',
@@ -450,7 +522,10 @@ export interface FileRoutesByFullPath {
   '/research': typeof ResearchRoute
   '/search': typeof SearchRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/books/$slug': typeof BooksSlugRoute
+  '/companions/$slug': typeof CompanionsSlugRoute
   '/concepts/$slug': typeof ConceptsSlugRoute
+  '/duas/$slug': typeof DuasSlugRoute
   '/emotions/$slug': typeof EmotionsSlugRoute
   '/events/$slug': typeof EventsSlugRoute
   '/explore/map': typeof ExploreMapRoute
@@ -461,22 +536,30 @@ export interface FileRoutesByFullPath {
   '/knowledge/hadith': typeof KnowledgeHadithRoute
   '/learn/graph': typeof LearnGraphRoute
   '/learn/tafsir-ibn-kathir': typeof LearnTafsirIbnKathirRoute
+  '/mosques/$slug': typeof MosquesSlugRoute
   '/places/$slug': typeof PlacesSlugRoute
   '/plans/$slug': typeof PlansSlugRoute
   '/prophets/$slug': typeof ProphetsSlugRoute
+  '/scholars/$slug': typeof ScholarsSlugRoute
   '/stories/$slug': typeof StoriesSlugRoute
   '/surah/$id': typeof SurahIdRoute
+  '/tafsir/compare': typeof TafsirCompareRoute
   '/topics/$slug': typeof TopicsSlugRoute
+  '/books/': typeof BooksIndexRoute
+  '/companions/': typeof CompanionsIndexRoute
   '/concepts/': typeof ConceptsIndexRoute
+  '/duas/': typeof DuasIndexRoute
   '/emotions/': typeof EmotionsIndexRoute
   '/events/': typeof EventsIndexRoute
-  '/hadith/': typeof HadithIndexRoute
   '/learn/': typeof LearnIndexRoute
+  '/mosques/': typeof MosquesIndexRoute
   '/places/': typeof PlacesIndexRoute
   '/plans/': typeof PlansIndexRoute
   '/prophets/': typeof ProphetsIndexRoute
+  '/scholars/': typeof ScholarsIndexRoute
   '/stories/': typeof StoriesIndexRoute
   '/surahs/': typeof SurahsIndexRoute
+  '/tafsir/': typeof TafsirIndexRoute
   '/topics/': typeof TopicsIndexRoute
   '/admin/backfill': typeof AuthenticatedAdminBackfillRoute
   '/admin/hadith-api': typeof AuthenticatedAdminHadithApiRoute
@@ -489,6 +572,7 @@ export interface FileRoutesByFullPath {
   '/hadith/$collection/$book': typeof HadithCollectionBookRoute
   '/learn/$kind/$slug': typeof LearnKindSlugRoute
   '/learn/journeys/$slug': typeof LearnJourneysSlugRoute
+  '/tafsir/$surah/$ayah': typeof TafsirSurahAyahRoute
   '/collections/': typeof AuthenticatedCollectionsIndexRoute
   '/learn/journeys/': typeof LearnJourneysIndexRoute
   '/api/public/admin/backfill-arabic-ayat': typeof ApiPublicAdminBackfillArabicAyatRoute
@@ -510,6 +594,7 @@ export interface FileRoutesByTo {
   '/ask': typeof AskRoute
   '/auth': typeof AuthRoute
   '/favorites': typeof FavoritesRoute
+  '/hadith': typeof HadithRouteWithChildren
   '/kids': typeof KidsRoute
   '/library': typeof LibraryRoute
   '/onboarding': typeof OnboardingRoute
@@ -518,7 +603,10 @@ export interface FileRoutesByTo {
   '/research': typeof ResearchRoute
   '/search': typeof SearchRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/books/$slug': typeof BooksSlugRoute
+  '/companions/$slug': typeof CompanionsSlugRoute
   '/concepts/$slug': typeof ConceptsSlugRoute
+  '/duas/$slug': typeof DuasSlugRoute
   '/emotions/$slug': typeof EmotionsSlugRoute
   '/events/$slug': typeof EventsSlugRoute
   '/explore/map': typeof ExploreMapRoute
@@ -529,22 +617,30 @@ export interface FileRoutesByTo {
   '/knowledge/hadith': typeof KnowledgeHadithRoute
   '/learn/graph': typeof LearnGraphRoute
   '/learn/tafsir-ibn-kathir': typeof LearnTafsirIbnKathirRoute
+  '/mosques/$slug': typeof MosquesSlugRoute
   '/places/$slug': typeof PlacesSlugRoute
   '/plans/$slug': typeof PlansSlugRoute
   '/prophets/$slug': typeof ProphetsSlugRoute
+  '/scholars/$slug': typeof ScholarsSlugRoute
   '/stories/$slug': typeof StoriesSlugRoute
   '/surah/$id': typeof SurahIdRoute
+  '/tafsir/compare': typeof TafsirCompareRoute
   '/topics/$slug': typeof TopicsSlugRoute
+  '/books': typeof BooksIndexRoute
+  '/companions': typeof CompanionsIndexRoute
   '/concepts': typeof ConceptsIndexRoute
+  '/duas': typeof DuasIndexRoute
   '/emotions': typeof EmotionsIndexRoute
   '/events': typeof EventsIndexRoute
-  '/hadith': typeof HadithIndexRoute
   '/learn': typeof LearnIndexRoute
+  '/mosques': typeof MosquesIndexRoute
   '/places': typeof PlacesIndexRoute
   '/plans': typeof PlansIndexRoute
   '/prophets': typeof ProphetsIndexRoute
+  '/scholars': typeof ScholarsIndexRoute
   '/stories': typeof StoriesIndexRoute
   '/surahs': typeof SurahsIndexRoute
+  '/tafsir': typeof TafsirIndexRoute
   '/topics': typeof TopicsIndexRoute
   '/admin/backfill': typeof AuthenticatedAdminBackfillRoute
   '/admin/hadith-api': typeof AuthenticatedAdminHadithApiRoute
@@ -557,6 +653,7 @@ export interface FileRoutesByTo {
   '/hadith/$collection/$book': typeof HadithCollectionBookRoute
   '/learn/$kind/$slug': typeof LearnKindSlugRoute
   '/learn/journeys/$slug': typeof LearnJourneysSlugRoute
+  '/tafsir/$surah/$ayah': typeof TafsirSurahAyahRoute
   '/collections': typeof AuthenticatedCollectionsIndexRoute
   '/learn/journeys': typeof LearnJourneysIndexRoute
   '/api/public/admin/backfill-arabic-ayat': typeof ApiPublicAdminBackfillArabicAyatRoute
@@ -589,7 +686,10 @@ export interface FileRoutesById {
   '/research': typeof ResearchRoute
   '/search': typeof SearchRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/books/$slug': typeof BooksSlugRoute
+  '/companions/$slug': typeof CompanionsSlugRoute
   '/concepts/$slug': typeof ConceptsSlugRoute
+  '/duas/$slug': typeof DuasSlugRoute
   '/emotions/$slug': typeof EmotionsSlugRoute
   '/events/$slug': typeof EventsSlugRoute
   '/explore/map': typeof ExploreMapRoute
@@ -600,22 +700,30 @@ export interface FileRoutesById {
   '/knowledge/hadith': typeof KnowledgeHadithRoute
   '/learn/graph': typeof LearnGraphRoute
   '/learn/tafsir-ibn-kathir': typeof LearnTafsirIbnKathirRoute
+  '/mosques/$slug': typeof MosquesSlugRoute
   '/places/$slug': typeof PlacesSlugRoute
   '/plans/$slug': typeof PlansSlugRoute
   '/prophets/$slug': typeof ProphetsSlugRoute
+  '/scholars/$slug': typeof ScholarsSlugRoute
   '/stories/$slug': typeof StoriesSlugRoute
   '/surah/$id': typeof SurahIdRoute
+  '/tafsir/compare': typeof TafsirCompareRoute
   '/topics/$slug': typeof TopicsSlugRoute
+  '/books/': typeof BooksIndexRoute
+  '/companions/': typeof CompanionsIndexRoute
   '/concepts/': typeof ConceptsIndexRoute
+  '/duas/': typeof DuasIndexRoute
   '/emotions/': typeof EmotionsIndexRoute
   '/events/': typeof EventsIndexRoute
-  '/hadith/': typeof HadithIndexRoute
   '/learn/': typeof LearnIndexRoute
+  '/mosques/': typeof MosquesIndexRoute
   '/places/': typeof PlacesIndexRoute
   '/plans/': typeof PlansIndexRoute
   '/prophets/': typeof ProphetsIndexRoute
+  '/scholars/': typeof ScholarsIndexRoute
   '/stories/': typeof StoriesIndexRoute
   '/surahs/': typeof SurahsIndexRoute
+  '/tafsir/': typeof TafsirIndexRoute
   '/topics/': typeof TopicsIndexRoute
   '/_authenticated/admin/backfill': typeof AuthenticatedAdminBackfillRoute
   '/_authenticated/admin/hadith-api': typeof AuthenticatedAdminHadithApiRoute
@@ -628,6 +736,7 @@ export interface FileRoutesById {
   '/hadith/$collection/$book': typeof HadithCollectionBookRoute
   '/learn/$kind/$slug': typeof LearnKindSlugRoute
   '/learn/journeys/$slug': typeof LearnJourneysSlugRoute
+  '/tafsir/$surah/$ayah': typeof TafsirSurahAyahRoute
   '/_authenticated/collections/': typeof AuthenticatedCollectionsIndexRoute
   '/learn/journeys/': typeof LearnJourneysIndexRoute
   '/api/public/admin/backfill-arabic-ayat': typeof ApiPublicAdminBackfillArabicAyatRoute
@@ -660,7 +769,10 @@ export interface FileRouteTypes {
     | '/research'
     | '/search'
     | '/sitemap.xml'
+    | '/books/$slug'
+    | '/companions/$slug'
     | '/concepts/$slug'
+    | '/duas/$slug'
     | '/emotions/$slug'
     | '/events/$slug'
     | '/explore/map'
@@ -671,22 +783,30 @@ export interface FileRouteTypes {
     | '/knowledge/hadith'
     | '/learn/graph'
     | '/learn/tafsir-ibn-kathir'
+    | '/mosques/$slug'
     | '/places/$slug'
     | '/plans/$slug'
     | '/prophets/$slug'
+    | '/scholars/$slug'
     | '/stories/$slug'
     | '/surah/$id'
+    | '/tafsir/compare'
     | '/topics/$slug'
+    | '/books/'
+    | '/companions/'
     | '/concepts/'
+    | '/duas/'
     | '/emotions/'
     | '/events/'
-    | '/hadith/'
     | '/learn/'
+    | '/mosques/'
     | '/places/'
     | '/plans/'
     | '/prophets/'
+    | '/scholars/'
     | '/stories/'
     | '/surahs/'
+    | '/tafsir/'
     | '/topics/'
     | '/admin/backfill'
     | '/admin/hadith-api'
@@ -699,6 +819,7 @@ export interface FileRouteTypes {
     | '/hadith/$collection/$book'
     | '/learn/$kind/$slug'
     | '/learn/journeys/$slug'
+    | '/tafsir/$surah/$ayah'
     | '/collections/'
     | '/learn/journeys/'
     | '/api/public/admin/backfill-arabic-ayat'
@@ -720,6 +841,7 @@ export interface FileRouteTypes {
     | '/ask'
     | '/auth'
     | '/favorites'
+    | '/hadith'
     | '/kids'
     | '/library'
     | '/onboarding'
@@ -728,7 +850,10 @@ export interface FileRouteTypes {
     | '/research'
     | '/search'
     | '/sitemap.xml'
+    | '/books/$slug'
+    | '/companions/$slug'
     | '/concepts/$slug'
+    | '/duas/$slug'
     | '/emotions/$slug'
     | '/events/$slug'
     | '/explore/map'
@@ -739,22 +864,30 @@ export interface FileRouteTypes {
     | '/knowledge/hadith'
     | '/learn/graph'
     | '/learn/tafsir-ibn-kathir'
+    | '/mosques/$slug'
     | '/places/$slug'
     | '/plans/$slug'
     | '/prophets/$slug'
+    | '/scholars/$slug'
     | '/stories/$slug'
     | '/surah/$id'
+    | '/tafsir/compare'
     | '/topics/$slug'
+    | '/books'
+    | '/companions'
     | '/concepts'
+    | '/duas'
     | '/emotions'
     | '/events'
-    | '/hadith'
     | '/learn'
+    | '/mosques'
     | '/places'
     | '/plans'
     | '/prophets'
+    | '/scholars'
     | '/stories'
     | '/surahs'
+    | '/tafsir'
     | '/topics'
     | '/admin/backfill'
     | '/admin/hadith-api'
@@ -767,6 +900,7 @@ export interface FileRouteTypes {
     | '/hadith/$collection/$book'
     | '/learn/$kind/$slug'
     | '/learn/journeys/$slug'
+    | '/tafsir/$surah/$ayah'
     | '/collections'
     | '/learn/journeys'
     | '/api/public/admin/backfill-arabic-ayat'
@@ -798,7 +932,10 @@ export interface FileRouteTypes {
     | '/research'
     | '/search'
     | '/sitemap.xml'
+    | '/books/$slug'
+    | '/companions/$slug'
     | '/concepts/$slug'
+    | '/duas/$slug'
     | '/emotions/$slug'
     | '/events/$slug'
     | '/explore/map'
@@ -809,22 +946,30 @@ export interface FileRouteTypes {
     | '/knowledge/hadith'
     | '/learn/graph'
     | '/learn/tafsir-ibn-kathir'
+    | '/mosques/$slug'
     | '/places/$slug'
     | '/plans/$slug'
     | '/prophets/$slug'
+    | '/scholars/$slug'
     | '/stories/$slug'
     | '/surah/$id'
+    | '/tafsir/compare'
     | '/topics/$slug'
+    | '/books/'
+    | '/companions/'
     | '/concepts/'
+    | '/duas/'
     | '/emotions/'
     | '/events/'
-    | '/hadith/'
     | '/learn/'
+    | '/mosques/'
     | '/places/'
     | '/plans/'
     | '/prophets/'
+    | '/scholars/'
     | '/stories/'
     | '/surahs/'
+    | '/tafsir/'
     | '/topics/'
     | '/_authenticated/admin/backfill'
     | '/_authenticated/admin/hadith-api'
@@ -837,6 +982,7 @@ export interface FileRouteTypes {
     | '/hadith/$collection/$book'
     | '/learn/$kind/$slug'
     | '/learn/journeys/$slug'
+    | '/tafsir/$surah/$ayah'
     | '/_authenticated/collections/'
     | '/learn/journeys/'
     | '/api/public/admin/backfill-arabic-ayat'
@@ -869,7 +1015,10 @@ export interface RootRouteChildren {
   ResearchRoute: typeof ResearchRoute
   SearchRoute: typeof SearchRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
+  BooksSlugRoute: typeof BooksSlugRoute
+  CompanionsSlugRoute: typeof CompanionsSlugRoute
   ConceptsSlugRoute: typeof ConceptsSlugRoute
+  DuasSlugRoute: typeof DuasSlugRoute
   EmotionsSlugRoute: typeof EmotionsSlugRoute
   EventsSlugRoute: typeof EventsSlugRoute
   ExploreMapRoute: typeof ExploreMapRoute
@@ -877,26 +1026,36 @@ export interface RootRouteChildren {
   KnowledgeHadithRoute: typeof KnowledgeHadithRoute
   LearnGraphRoute: typeof LearnGraphRoute
   LearnTafsirIbnKathirRoute: typeof LearnTafsirIbnKathirRoute
+  MosquesSlugRoute: typeof MosquesSlugRoute
   PlacesSlugRoute: typeof PlacesSlugRoute
   PlansSlugRoute: typeof PlansSlugRoute
   ProphetsSlugRoute: typeof ProphetsSlugRoute
+  ScholarsSlugRoute: typeof ScholarsSlugRoute
   StoriesSlugRoute: typeof StoriesSlugRoute
   SurahIdRoute: typeof SurahIdRoute
+  TafsirCompareRoute: typeof TafsirCompareRoute
   TopicsSlugRoute: typeof TopicsSlugRoute
+  BooksIndexRoute: typeof BooksIndexRoute
+  CompanionsIndexRoute: typeof CompanionsIndexRoute
   ConceptsIndexRoute: typeof ConceptsIndexRoute
+  DuasIndexRoute: typeof DuasIndexRoute
   EmotionsIndexRoute: typeof EmotionsIndexRoute
   EventsIndexRoute: typeof EventsIndexRoute
   LearnIndexRoute: typeof LearnIndexRoute
+  MosquesIndexRoute: typeof MosquesIndexRoute
   PlacesIndexRoute: typeof PlacesIndexRoute
   PlansIndexRoute: typeof PlansIndexRoute
   ProphetsIndexRoute: typeof ProphetsIndexRoute
+  ScholarsIndexRoute: typeof ScholarsIndexRoute
   StoriesIndexRoute: typeof StoriesIndexRoute
   SurahsIndexRoute: typeof SurahsIndexRoute
+  TafsirIndexRoute: typeof TafsirIndexRoute
   TopicsIndexRoute: typeof TopicsIndexRoute
   ApiPublicSeedKnowledgeRoute: typeof ApiPublicSeedKnowledgeRoute
   ApiPublicSurahNamesRoute: typeof ApiPublicSurahNamesRoute
   LearnKindSlugRoute: typeof LearnKindSlugRoute
   LearnJourneysSlugRoute: typeof LearnJourneysSlugRoute
+  TafsirSurahAyahRoute: typeof TafsirSurahAyahRoute
   LearnJourneysIndexRoute: typeof LearnJourneysIndexRoute
   ApiPublicAdminBackfillArabicAyatRoute: typeof ApiPublicAdminBackfillArabicAyatRoute
   ApiPublicAdminBackfillAsbabNuzulRoute: typeof ApiPublicAdminBackfillAsbabNuzulRoute
@@ -1018,6 +1177,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TopicsIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/tafsir/': {
+      id: '/tafsir/'
+      path: '/tafsir'
+      fullPath: '/tafsir/'
+      preLoaderRoute: typeof TafsirIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/surahs/': {
       id: '/surahs/'
       path: '/surahs'
@@ -1030,6 +1196,13 @@ declare module '@tanstack/react-router' {
       path: '/stories'
       fullPath: '/stories/'
       preLoaderRoute: typeof StoriesIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/scholars/': {
+      id: '/scholars/'
+      path: '/scholars'
+      fullPath: '/scholars/'
+      preLoaderRoute: typeof ScholarsIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/prophets/': {
@@ -1053,19 +1226,19 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PlacesIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/mosques/': {
+      id: '/mosques/'
+      path: '/mosques'
+      fullPath: '/mosques/'
+      preLoaderRoute: typeof MosquesIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/learn/': {
       id: '/learn/'
       path: '/learn'
       fullPath: '/learn/'
       preLoaderRoute: typeof LearnIndexRouteImport
       parentRoute: typeof rootRouteImport
-    }
-    '/hadith/': {
-      id: '/hadith/'
-      path: '/'
-      fullPath: '/hadith/'
-      preLoaderRoute: typeof HadithIndexRouteImport
-      parentRoute: typeof HadithRoute
     }
     '/events/': {
       id: '/events/'
@@ -1081,6 +1254,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof EmotionsIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/duas/': {
+      id: '/duas/'
+      path: '/duas'
+      fullPath: '/duas/'
+      preLoaderRoute: typeof DuasIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/concepts/': {
       id: '/concepts/'
       path: '/concepts'
@@ -1088,11 +1268,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ConceptsIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/companions/': {
+      id: '/companions/'
+      path: '/companions'
+      fullPath: '/companions/'
+      preLoaderRoute: typeof CompanionsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/books/': {
+      id: '/books/'
+      path: '/books'
+      fullPath: '/books/'
+      preLoaderRoute: typeof BooksIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/topics/$slug': {
       id: '/topics/$slug'
       path: '/topics/$slug'
       fullPath: '/topics/$slug'
       preLoaderRoute: typeof TopicsSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tafsir/compare': {
+      id: '/tafsir/compare'
+      path: '/tafsir/compare'
+      fullPath: '/tafsir/compare'
+      preLoaderRoute: typeof TafsirCompareRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/surah/$id': {
@@ -1107,6 +1308,13 @@ declare module '@tanstack/react-router' {
       path: '/stories/$slug'
       fullPath: '/stories/$slug'
       preLoaderRoute: typeof StoriesSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/scholars/$slug': {
+      id: '/scholars/$slug'
+      path: '/scholars/$slug'
+      fullPath: '/scholars/$slug'
+      preLoaderRoute: typeof ScholarsSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/prophets/$slug': {
@@ -1128,6 +1336,13 @@ declare module '@tanstack/react-router' {
       path: '/places/$slug'
       fullPath: '/places/$slug'
       preLoaderRoute: typeof PlacesSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/mosques/$slug': {
+      id: '/mosques/$slug'
+      path: '/mosques/$slug'
+      fullPath: '/mosques/$slug'
+      preLoaderRoute: typeof MosquesSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/learn/tafsir-ibn-kathir': {
@@ -1200,11 +1415,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof EmotionsSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/duas/$slug': {
+      id: '/duas/$slug'
+      path: '/duas/$slug'
+      fullPath: '/duas/$slug'
+      preLoaderRoute: typeof DuasSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/concepts/$slug': {
       id: '/concepts/$slug'
       path: '/concepts/$slug'
       fullPath: '/concepts/$slug'
       preLoaderRoute: typeof ConceptsSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/companions/$slug': {
+      id: '/companions/$slug'
+      path: '/companions/$slug'
+      fullPath: '/companions/$slug'
+      preLoaderRoute: typeof CompanionsSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/books/$slug': {
+      id: '/books/$slug'
+      path: '/books/$slug'
+      fullPath: '/books/$slug'
+      preLoaderRoute: typeof BooksSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/learn/journeys/': {
@@ -1220,6 +1456,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/collections/'
       preLoaderRoute: typeof AuthenticatedCollectionsIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/tafsir/$surah/$ayah': {
+      id: '/tafsir/$surah/$ayah'
+      path: '/tafsir/$surah/$ayah'
+      fullPath: '/tafsir/$surah/$ayah'
+      preLoaderRoute: typeof TafsirSurahAyahRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/learn/journeys/$slug': {
       id: '/learn/journeys/$slug'
@@ -1432,14 +1675,12 @@ interface HadithRouteChildren {
   HadithCollectionRoute: typeof HadithCollectionRouteWithChildren
   HadithNarratorsRoute: typeof HadithNarratorsRoute
   HadithTopicsRoute: typeof HadithTopicsRoute
-  HadithIndexRoute: typeof HadithIndexRoute
 }
 
 const HadithRouteChildren: HadithRouteChildren = {
   HadithCollectionRoute: HadithCollectionRouteWithChildren,
   HadithNarratorsRoute: HadithNarratorsRoute,
   HadithTopicsRoute: HadithTopicsRoute,
-  HadithIndexRoute: HadithIndexRoute,
 }
 
 const HadithRouteWithChildren =
@@ -1474,7 +1715,10 @@ const rootRouteChildren: RootRouteChildren = {
   ResearchRoute: ResearchRoute,
   SearchRoute: SearchRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
+  BooksSlugRoute: BooksSlugRoute,
+  CompanionsSlugRoute: CompanionsSlugRoute,
   ConceptsSlugRoute: ConceptsSlugRoute,
+  DuasSlugRoute: DuasSlugRoute,
   EmotionsSlugRoute: EmotionsSlugRoute,
   EventsSlugRoute: EventsSlugRoute,
   ExploreMapRoute: ExploreMapRoute,
@@ -1482,26 +1726,36 @@ const rootRouteChildren: RootRouteChildren = {
   KnowledgeHadithRoute: KnowledgeHadithRoute,
   LearnGraphRoute: LearnGraphRoute,
   LearnTafsirIbnKathirRoute: LearnTafsirIbnKathirRoute,
+  MosquesSlugRoute: MosquesSlugRoute,
   PlacesSlugRoute: PlacesSlugRoute,
   PlansSlugRoute: PlansSlugRoute,
   ProphetsSlugRoute: ProphetsSlugRoute,
+  ScholarsSlugRoute: ScholarsSlugRoute,
   StoriesSlugRoute: StoriesSlugRoute,
   SurahIdRoute: SurahIdRoute,
+  TafsirCompareRoute: TafsirCompareRoute,
   TopicsSlugRoute: TopicsSlugRoute,
+  BooksIndexRoute: BooksIndexRoute,
+  CompanionsIndexRoute: CompanionsIndexRoute,
   ConceptsIndexRoute: ConceptsIndexRoute,
+  DuasIndexRoute: DuasIndexRoute,
   EmotionsIndexRoute: EmotionsIndexRoute,
   EventsIndexRoute: EventsIndexRoute,
   LearnIndexRoute: LearnIndexRoute,
+  MosquesIndexRoute: MosquesIndexRoute,
   PlacesIndexRoute: PlacesIndexRoute,
   PlansIndexRoute: PlansIndexRoute,
   ProphetsIndexRoute: ProphetsIndexRoute,
+  ScholarsIndexRoute: ScholarsIndexRoute,
   StoriesIndexRoute: StoriesIndexRoute,
   SurahsIndexRoute: SurahsIndexRoute,
+  TafsirIndexRoute: TafsirIndexRoute,
   TopicsIndexRoute: TopicsIndexRoute,
   ApiPublicSeedKnowledgeRoute: ApiPublicSeedKnowledgeRoute,
   ApiPublicSurahNamesRoute: ApiPublicSurahNamesRoute,
   LearnKindSlugRoute: LearnKindSlugRoute,
   LearnJourneysSlugRoute: LearnJourneysSlugRoute,
+  TafsirSurahAyahRoute: TafsirSurahAyahRoute,
   LearnJourneysIndexRoute: LearnJourneysIndexRoute,
   ApiPublicAdminBackfillArabicAyatRoute: ApiPublicAdminBackfillArabicAyatRoute,
   ApiPublicAdminBackfillAsbabNuzulRoute: ApiPublicAdminBackfillAsbabNuzulRoute,
@@ -1525,3 +1779,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
