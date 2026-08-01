@@ -181,7 +181,7 @@ function HadithTopicsPage() {
               className="surface-card block p-4 transition-colors hover:border-primary/40"
             >
               <div className="text-xs font-semibold uppercase text-primary">
-                {b.collection_slug === "bukhari" ? "Sahih al-Bukhari" : "Sahih Muslim"}
+                {b.collection_slug.replace(/-/g, " ")}
               </div>
               <div className="mt-1 font-arabic-ui text-lg" dir="rtl">
                 {b.name_ar}

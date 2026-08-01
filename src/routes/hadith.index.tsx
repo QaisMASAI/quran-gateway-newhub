@@ -9,17 +9,16 @@ import { BookMarked, Users } from "lucide-react";
 export const Route = createFileRoute("/hadith/")({
   head: () => ({
     meta: [
-      { title: "Hadith Library — Sahih al-Bukhari & Sahih Muslim" },
+      { title: "Hadith Library — Canonical Collections" },
       {
         name: "description",
         content:
-          "Explore the authentic Hadith collections of Sahih al-Bukhari and Sahih Muslim. Search by book, topic, or narrator with full Arabic text and English translations.",
+          "Explore canonical Hadith collections with Arabic text, multilingual translations, topic hubs, and narrator pathways.",
       },
       { property: "og:title", content: "Hadith Library" },
       {
         property: "og:description",
-        content:
-          "Sahih al-Bukhari and Sahih Muslim in one searchable library with Quranic connections.",
+        content: "Browse authenticated Hadith collections in one searchable library.",
       },
       { property: "og:url", content: "/hadith" },
       { property: "og:type", content: "website" },
@@ -27,8 +26,7 @@ export const Route = createFileRoute("/hadith/")({
       { name: "twitter:title", content: "Hadith Library" },
       {
         name: "twitter:description",
-        content:
-          "Browse Sahih al-Bukhari and Sahih Muslim with full Arabic text and English translation.",
+        content: "Browse authenticated Hadith collections with Arabic text and translations.",
       },
     ],
     links: [{ rel: "canonical", href: "/hadith" }],
@@ -71,10 +69,10 @@ function HadithIndex() {
         </h1>
         <p className="mt-1 text-sm text-muted-foreground">
           {locale === "he"
-            ? "סהיח אל-בוח'ארי וסהיח מוסלים — טקסט ערבי מקורי עם תרגום לאנגלית."
+            ? "אוספי חדית׳ מרכזיים — טקסט ערבי מקורי עם תרגומים."
             : locale === "ar"
-              ? "صحيح البخاري وصحيح مسلم — النص العربي الأصلي مع الترجمة الإنجليزية."
-              : "Sahih al-Bukhari and Sahih Muslim — original Arabic with English translation."}
+              ? "مجموعات الحديث الأساسية — النص العربي الأصلي مع ترجمات."
+              : "Core hadith collections with original Arabic text and translations."}
         </p>
 
         <div className="mt-6 grid gap-4 sm:grid-cols-2">

@@ -7,13 +7,27 @@ import { listHadithBooks, listHadithCollections } from "@/lib/hadith.functions";
 import { ChevronRight, ChevronLeft } from "lucide-react";
 
 export const Route = createFileRoute("/hadith/$collection")({
-  head: ({ params }) => ({
-    meta: [
-      { title: `${params.collection === "bukhari" ? "Sahih al-Bukhari" : "Sahih Muslim"} — Books` },
-      { property: "og:url", content: `/hadith/${params.collection}` },
-    ],
-    links: [{ rel: "canonical", href: `/hadith/${params.collection}` }],
-  }),
+  head: ({ params }) => {
+    const collectionLabel = params.collection.replace(/-/g, " ");
+    return {
+      meta: [
+        { title: `${collectionLabel} — Hadith Books` },
+        {
+          name: "description",
+          content: `Browse hadith books in ${collectionLabel} with Arabic text and translations.`,
+        },
+        { property: "og:title", content: `${collectionLabel} — Hadith Books` },
+        {
+          property: "og:description",
+          content: `Browse hadith books in ${collectionLabel}.`,
+        },
+        { property: "og:url", content: `/hadith/${params.collection}` },
+        { property: "og:type", content: "website" },
+        { name: "twitter:card", content: "summary" },
+      ],
+      links: [{ rel: "canonical", href: `/hadith/${params.collection}` }],
+    };
+  },
   loader: async ({ context, params }) => {
     if (!params.collection || params.collection.trim().length === 0) throw notFound();
     await Promise.all([

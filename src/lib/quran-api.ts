@@ -354,11 +354,25 @@ export function ayahAudioUrl(
   reciter: ReciterKey = "yasser-ad-dussary",
   quality: AudioQualityKey = "128k",
 ): string {
+  return ayahAudioUrls(surahId, ayahNumber, reciter, quality)[0];
+}
+
+export function ayahAudioUrls(
+  surahId: number,
+  ayahNumber: number,
+  reciter: ReciterKey = "yasser-ad-dussary",
+  quality: AudioQualityKey = "128k",
+): string[] {
   const s = String(surahId).padStart(3, "0");
   const a = String(ayahNumber).padStart(3, "0");
   const selected = RECITERS.find((r) => r.key === reciter) ?? RECITERS[0];
-  const folder = selected.foldersByQuality[quality] ?? selected.foldersByQuality["128k"];
-  return `https://everyayah.com/data/${folder}/${s}${a}.mp3`;
+  const qualityOrder: AudioQualityKey[] = [quality, "128k", "64k", "192k"].filter(
+    (q, index, arr): q is AudioQualityKey => arr.indexOf(q) === index,
+  );
+  return qualityOrder.map((q) => {
+    const folder = selected.foldersByQuality[q] ?? selected.foldersByQuality["128k"];
+    return `https://everyayah.com/data/${folder}/${s}${a}.mp3`;
+  });
 }
 
 // Strip HTML tags that sometimes appear in translation text

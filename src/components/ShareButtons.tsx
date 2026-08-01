@@ -1,6 +1,7 @@
 import { Share2, Copy, Check, ImageDown, Loader2, ChevronDown, Palette } from "lucide-react";
 import { useState, useCallback, useMemo } from "react";
 import { useTranslation } from "react-i18next";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import {
   renderVerseImage,
   type VerseImageFormat,
@@ -65,8 +66,6 @@ export function ShareButtons(props: Props) {
   const [busy, setBusy] = useState<string | null>(null);
   const [format, setFormat] = useState<VerseImageFormat>("square");
   const [theme, setTheme] = useState<VerseImageTheme>("emerald");
-  const [openFormat, setOpenFormat] = useState(false);
-  const [openTheme, setOpenTheme] = useState(false);
   const { t, i18n } = useTranslation("common");
   const locale = i18n.language || "en";
 
@@ -159,89 +158,79 @@ export function ShareButtons(props: Props) {
       </span>
 
       {/* Theme selector dropdown */}
-      <div className="relative">
-        <button
-          type="button"
-          onClick={() => {
-            setOpenTheme((v) => !v);
-            setOpenFormat(false);
-          }}
-          className="inline-flex items-center gap-1.5 rounded-full border border-border bg-background px-2.5 py-1 text-[11px] font-medium text-foreground/80 hover:border-primary/40 hover:text-primary"
-        >
-          <Palette className="h-3 w-3 text-gold" />
-          <span>{themeLabel(theme)}</span>
-          <ChevronDown className="h-3 w-3 opacity-60" />
-        </button>
-        {openTheme && (
-          <div
-            className="absolute bottom-full z-[60] mb-1 min-w-[170px] rounded-xl border border-border bg-popover p-1 text-start shadow-lg"
-            onMouseLeave={() => setOpenTheme(false)}
+      <Popover>
+        <PopoverTrigger asChild>
+          <button
+            type="button"
+            className="inline-flex items-center gap-1.5 rounded-full border border-border bg-background px-2.5 py-1 text-[11px] font-medium text-foreground/80 hover:border-primary/40 hover:text-primary"
           >
-            {THEMES.map((thKey) => {
-              const meta = THEMES_META[thKey];
-              return (
-                <button
-                  key={thKey}
-                  type="button"
-                  onClick={() => {
-                    setTheme(thKey);
-                    setOpenTheme(false);
-                  }}
-                  className={`flex w-full items-center justify-between gap-2 rounded-lg px-2.5 py-1.5 text-[12px] hover:bg-accent transition ${
-                    thKey === theme ? "font-bold text-primary bg-primary/10" : "text-foreground/80"
-                  }`}
-                >
-                  <span className="flex items-center gap-2">
-                    <span
-                      className="h-3 w-3 rounded-full border border-black/20"
-                      style={{ background: meta.cardBorder }}
-                    />
-                    {themeLabel(thKey)}
-                  </span>
-                  {thKey === theme && <Check className="h-3.5 w-3.5 text-primary" />}
-                </button>
-              );
-            })}
-          </div>
-        )}
-      </div>
-
-      {/* Format selector */}
-      <div className="relative">
-        <button
-          type="button"
-          onClick={() => {
-            setOpenFormat((v) => !v);
-            setOpenTheme(false);
-          }}
-          className="inline-flex items-center gap-1 rounded-full border border-border bg-background px-2.5 py-1 text-[11px] font-medium text-foreground/80 hover:border-primary/40 hover:text-primary"
+            <Palette className="h-3 w-3 text-gold" />
+            <span>{themeLabel(theme)}</span>
+            <ChevronDown className="h-3 w-3 opacity-60" />
+          </button>
+        </PopoverTrigger>
+        <PopoverContent
+          side="top"
+          align="start"
+          sideOffset={8}
+          className="z-[80] w-52 rounded-xl border border-border bg-popover p-1 text-start shadow-lg"
         >
-          {formatLabel(format)}
-          <ChevronDown className="h-3 w-3 opacity-60" />
-        </button>
-        {openFormat && (
-          <div
-            className="absolute bottom-full z-[60] mb-1 min-w-[200px] rounded-xl border border-border bg-popover p-1 text-start shadow-lg"
-            onMouseLeave={() => setOpenFormat(false)}
-          >
-            {FORMATS.map((f) => (
+          {THEMES.map((thKey) => {
+            const meta = THEMES_META[thKey];
+            return (
               <button
-                key={f}
+                key={thKey}
                 type="button"
-                onClick={() => {
-                  setFormat(f);
-                  setOpenFormat(false);
-                }}
-                className={`block w-full rounded-lg px-2.5 py-1.5 text-[12px] hover:bg-accent ${
-                  f === format ? "text-primary font-semibold bg-primary/10" : "text-foreground/80"
+                onClick={() => setTheme(thKey)}
+                className={`flex w-full items-center justify-between gap-2 rounded-lg px-2.5 py-1.5 text-[12px] hover:bg-accent transition ${
+                  thKey === theme ? "font-bold text-primary bg-primary/10" : "text-foreground/80"
                 }`}
               >
-                {formatLabel(f)}
+                <span className="flex items-center gap-2">
+                  <span
+                    className="h-3 w-3 rounded-full border border-black/20"
+                    style={{ background: meta.cardBorder }}
+                  />
+                  {themeLabel(thKey)}
+                </span>
+                {thKey === theme && <Check className="h-3.5 w-3.5 text-primary" />}
               </button>
-            ))}
-          </div>
-        )}
-      </div>
+            );
+          })}
+        </PopoverContent>
+      </Popover>
+
+      {/* Format selector */}
+      <Popover>
+        <PopoverTrigger asChild>
+          <button
+            type="button"
+            className="inline-flex items-center gap-1 rounded-full border border-border bg-background px-2.5 py-1 text-[11px] font-medium text-foreground/80 hover:border-primary/40 hover:text-primary"
+          >
+            {formatLabel(format)}
+            <ChevronDown className="h-3 w-3 opacity-60" />
+          </button>
+        </PopoverTrigger>
+        <PopoverContent
+          side="top"
+          align="start"
+          sideOffset={8}
+          className="z-[80] w-56 rounded-xl border border-border bg-popover p-1 text-start shadow-lg"
+        >
+          {FORMATS.map((f) => (
+            <button
+              key={f}
+              type="button"
+              onClick={() => setFormat(f)}
+              className={`block w-full rounded-lg px-2.5 py-1.5 text-[12px] hover:bg-accent ${
+                f === format ? "text-primary font-semibold bg-primary/10" : "text-foreground/80"
+              }`}
+            >
+              {formatLabel(f)}
+            </button>
+          ))}
+        </PopoverContent>
+      </Popover>
 
       <button
         type="button"

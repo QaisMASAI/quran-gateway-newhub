@@ -7,15 +7,28 @@ import { Header } from "@/components/Header";
 import { listHadithEntries } from "@/lib/hadith.functions";
 
 export const Route = createFileRoute("/hadith/$collection/$book")({
-  head: ({ params }) => ({
-    meta: [
-      {
-        title: `${params.collection === "bukhari" ? "Sahih al-Bukhari" : "Sahih Muslim"} — Book ${params.book}`,
-      },
-      { property: "og:url", content: `/hadith/${params.collection}/${params.book}` },
-    ],
-    links: [{ rel: "canonical", href: `/hadith/${params.collection}/${params.book}` }],
-  }),
+  head: ({ params }) => {
+    const collectionLabel = params.collection.replace(/-/g, " ");
+    const title = `${collectionLabel} — Book ${params.book}`;
+    return {
+      meta: [
+        { title },
+        {
+          name: "description",
+          content: `Read ${collectionLabel} book ${params.book} with Arabic hadith text and translations.`,
+        },
+        { property: "og:title", content: title },
+        {
+          property: "og:description",
+          content: `Browse hadith entries from ${collectionLabel}, book ${params.book}.`,
+        },
+        { property: "og:url", content: `/hadith/${params.collection}/${params.book}` },
+        { property: "og:type", content: "article" },
+        { name: "twitter:card", content: "summary" },
+      ],
+      links: [{ rel: "canonical", href: `/hadith/${params.collection}/${params.book}` }],
+    };
+  },
   loader: async ({ context, params }) => {
     if (!params.collection || params.collection.trim().length === 0) throw notFound();
     const book = Number(params.book);
