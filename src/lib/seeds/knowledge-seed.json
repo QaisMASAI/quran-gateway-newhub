@@ -906,6 +906,191 @@
         "en": "The year an invading army came to destroy the Kaaba and was turned back."
       },
       "keywords": ["fil", "elephant"]
+    },
+
+    {
+      "kind": "scholar",
+      "slug": "ibn-kathir",
+      "title": { "he": "אבן כתי'ר", "ar": "ابن كثير", "en": "Ibn Kathir" },
+      "summary": {
+        "he": "החוקר והפרשן הדגול, מחבר תפסיר אבן כתי'ר והביוגרפיה 'אל-בידאיה וה-ניהאיה'.",
+        "ar": "الإمام الحافظ المفسر والمؤرخ صاحب التفسير الشهير والبداية والنهاية.",
+        "en": "Renowned Quranic exegete and historian, author of Tafsir Ibn Kathir and Al-Bidayah wa al-Nihayah."
+      },
+      "keywords": ["ibn kathir", "tafsir", "mufassir", "scholar"]
+    },
+    {
+      "kind": "scholar",
+      "slug": "al-bukhari",
+      "title": { "he": "אימאם אל-בוח'ארי", "ar": "الإمام البخاري", "en": "Imam Al-Bukhari" },
+      "summary": {
+        "he": "אמיר המאמינים בחדית', מלקט ה-צחיח הטהור ביותר.",
+        "ar": "أمير المؤمنين في الحديث وشيخ المحدثين، صاحب الجامع الصحيح.",
+        "en": "Master scholar of Hadith sciences and compiler of Sahih al-Bukhari."
+      },
+      "keywords": ["bukhari", "hadith", "sahih", "scholar"]
+    },
+    {
+      "kind": "scholar",
+      "slug": "al-tabari",
+      "title": { "he": "אימאם אל-טברי", "ar": "الإمام الطبري", "en": "Imam Al-Tabari" },
+      "summary": {
+        "he": "אבי הפרשנות וההיסטוריה האסלאמית, מחבר 'ג'אמיע אל-בייאן'.",
+        "ar": "شيخ المفسرين وإمام المؤرخين، صاحب أجمع تفاسير القرآن.",
+        "en": "Father of Quranic exegesis and pioneer Islamic historian."
+      },
+      "keywords": ["tabari", "tafsir", "history", "scholar"]
+    },
+    {
+      "kind": "scholar",
+      "slug": "an-nawawi",
+      "title": { "he": "אימאם א-נוואווי", "ar": "الإمام النووي", "en": "Imam An-Nawawi" },
+      "summary": {
+        "he": "החכם הזאהד מחבר 'ארבעים החדית'' ו'ריאד אל-צאליחין'.",
+        "ar": "العالم الزاهد صاحب الأربعين النووية ورياض الصالحين.",
+        "en": "Prolific jurist and scholar, author of 40 Hadith and Riyadh as-Salihin."
+      },
+      "keywords": ["nawawi", "40 hadith", "riyadh as-salihin", "scholar"]
+    },
+    {
+      "kind": "companion",
+      "slug": "abu-bakr",
+      "title": { "he": "אבו בכר א-צידיק", "ar": "أبو بكر الصديق", "en": "Abu Bakr As-Siddiq" },
+      "summary": {
+        "he": "הח'ליף הראשון, חברו הקרוב ביותר של הנביא במערה ובהג'רה.",
+        "ar": "أول الخلفاء الراشدين وصاحب النبي في الهجرة والغار.",
+        "en": "The first Caliph of Islam and the Prophet's closest companion in the Hijrah."
+      },
+      "keywords": ["abu bakr", "siddiq", "caliph", "companion"]
+    },
+    {
+      "kind": "companion",
+      "slug": "umar-ibn-al-khattab",
+      "title": { "he": "עומר בן אל-ח'טאב", "ar": "عمر بن الخطاب", "en": "Umar Ibn Al-Khattab" },
+      "summary": {
+        "he": "הח'ליף השני (אל-פארוק), שכונן את מוסדות הצדק והלוח העברי-אסלאמי.",
+        "ar": "الفاروق ثاني الخلفاء الراشدين ومؤسس التقويم الهجري.",
+        "en": "Al-Faruq, second Caliph, renowned for justice and establishing the Hijri calendar."
+      },
+      "keywords": ["umar", "farooq", "caliph", "companion"]
+    },
+    {
+      "kind": "companion",
+      "slug": "uthman-ibn-affan",
+      "title": { "he": "עות'מאן בן עפאן", "ar": "عثمان بن عفان", "en": "Uthman Ibn Affan" },
+      "summary": {
+        "he": "הח'ליף השלישי (דו אל-נוריין), מלקט נוסח הקוראן המאוחד.",
+        "ar": "ذو النورين ثالث الخلفاء الراشدين وجامع المصحف الشريف.",
+        "en": "Dhul-Nurayn, third Caliph who compiled the standardized Quranic codex."
+      },
+      "keywords": ["uthman", "mushaf", "caliph", "companion"]
+    },
+    {
+      "kind": "companion",
+      "slug": "ali-ibn-abi-talib",
+      "title": { "he": "עלי בן אבי טאלב", "ar": "علي بن أبي طالب", "en": "Ali Ibn Abi Talib" },
+      "summary": {
+        "he": "הח'ליף הרביעי, בן דודו וחתנו של הנביא, שער החכמה.",
+        "ar": "باب مدينة العلم ورابع الخلفاء الراشدين وابن عم النبي.",
+        "en": "Fourth Caliph, cousin and son-in-law of the Prophet, gate to the city of knowledge."
+      },
+      "keywords": ["ali", "caliph", "companion", "knowledge"]
+    },
+    {
+      "kind": "companion",
+      "slug": "aisha-bint-abi-bakr",
+      "title": {
+        "he": "עאישה בינת אבו בכר",
+        "ar": "عائشة بنت أبي بكر",
+        "en": "Aisha Bint Abi Bakr"
+      },
+      "summary": {
+        "he": "אם המאמינים, מלומדת דגולה וממסרצי החדית' הגדולים ביותר.",
+        "ar": "أم المؤمنين والفقيهة العالمة ومن أكثر الصحابة رواية للحديث.",
+        "en": "Mother of the Believers, scholar, jurist, and major narrator of Hadith."
+      },
+      "keywords": ["aisha", "mother of believers", "hadith", "companion"]
+    },
+    {
+      "kind": "companion",
+      "slug": "ibn-abbas",
+      "title": { "he": "עבדאללה בן עבאס", "ar": "عبد الله بن عباس", "en": "Abdullah Ibn Abbas" },
+      "summary": {
+        "he": "תורג'מאן אל-קוראן, חכם האומה ופרשן הקוראן הצעיר הדגול.",
+        "ar": "ترجمان القرآن وحبر الأمة وعالم المفسرين الأول.",
+        "en": "The Interpreter of the Quran and premier scholar among the companions."
+      },
+      "keywords": ["ibn abbas", "tafsir", "companion", "scholar"]
+    },
+    {
+      "kind": "book",
+      "slug": "sahih-al-bukhari",
+      "title": { "he": "צחיח אל-בוח'ארי", "ar": "صحيح البخاري", "en": "Sahih Al-Bukhari" },
+      "summary": {
+        "he": "ספר החדית' האמין והמוסמך ביותר בעולם האסלאמי.",
+        "ar": "أصح كتاب بعد كتاب الله تعالى يجمع أصح الأحاديث النبوية.",
+        "en": "The most authentic book of prophetic traditions in Islamic scholarship."
+      },
+      "keywords": ["sahih bukhari", "hadith", "authentic", "book"]
+    },
+    {
+      "kind": "book",
+      "slug": "tafsir-ibn-kathir",
+      "title": { "he": "תפסיר אבן כתי'ر", "ar": "تفسير ابن كثير", "en": "Tafsir Ibn Kathir" },
+      "summary": {
+        "he": "פירוש הקוראן הנודע המבוסס על איה, חדית' ודברי הסלף.",
+        "ar": "التفسير المعتمد القائم على تفسير القرآن بالقرآن والحديث.",
+        "en": "Masterpiece Quranic exegesis using Quran, Hadith, and scholarly reports."
+      },
+      "keywords": ["tafsir ibn kathir", "quran", "exegesis", "book"]
+    },
+    {
+      "kind": "dua",
+      "slug": "dua-yunus",
+      "title": {
+        "he": "תפילת יונה (דועאא יונס)",
+        "ar": "دعاء يونس عليه السلام",
+        "en": "Du'a of Prophet Jonah"
+      },
+      "summary": {
+        "he": "אין אלוה מלבדך, שבח לך, אכן הייתי מן החוטאים (לֹא إِلَٰهَ إِلَّا أَنْتَ سُبْحَانَكَ...).",
+        "ar": "لا إِلَهَ إِلا أَنْتَ سُبْحَانَكَ إِنِّي كُنْتُ مِنَ الظَّالِمِينَ.",
+        "en": "There is no deity except You; exalted are You. Indeed, I have been of the wrongdoers."
+      },
+      "keywords": ["dua yunus", "supplication", "distress", "dua"]
+    },
+    {
+      "kind": "mosque",
+      "slug": "al-masjid-al-haram",
+      "title": { "he": "המסגד החראם במכה", "ar": "المسجد الحرام", "en": "Al-Masjid Al-Haram" },
+      "summary": {
+        "he": "המסגד הקדוש ביותר באסלאם, המקיף את הכעבה השריפה.",
+        "ar": "أعظم مسجد في الإسلام يتوسطه الكعبة المشرفة بمكة المكرمة.",
+        "en": "The Holiest Mosque in Islam, surrounding the Sacred Kaaba in Mecca."
+      },
+      "keywords": ["masjid haram", "kaaba", "mecca", "mosque"]
+    },
+    {
+      "kind": "mosque",
+      "slug": "al-masjid-an-nabawi",
+      "title": { "he": "מסגד הנביא במדינה", "ar": "المسجد النبوي", "en": "Al-Masjid An-Nabawi" },
+      "summary": {
+        "he": "מסגדו של הנביא מוחמד במדינה, ובו הרודהה השריפה.",
+        "ar": "ثاني الحرمين الشريفين في المدينة المنورة وبداخل الروضة الشريفة.",
+        "en": "The Prophet's Mosque in Medina, housing the Prophet's final resting place."
+      },
+      "keywords": ["masjid nabawi", "medina", "prophet mosque", "mosque"]
+    },
+    {
+      "kind": "mosque",
+      "slug": "al-masjid-al-aqsa",
+      "title": { "he": "מסגד אל-אקצא בירושלים", "ar": "المسجد الأقصى", "en": "Al-Masjid Al-Aqsa" },
+      "summary": {
+        "he": "הקילבה הראשונה והמקום השלישי בחשיבותו באסלאם, יעד מסע הלילה.",
+        "ar": "أولى القبلتين وثالث الحرمين الشريفين ومسرى الرسول صلى الله عليه وسلم.",
+        "en": "The First Qibla and Third Holiest Site in Islam, destination of Isra & Mi'raj."
+      },
+      "keywords": ["aqsa", "jerusalem", "first qibla", "mosque"]
     }
   ],
 
@@ -1461,6 +1646,23 @@
     ["jannah", "afterlife", "part_of"],
     ["jahannam", "afterlife", "part_of"],
     ["day-of-judgment", "afterlife", "part_of"],
-    ["shirk", "tawhid", "related"]
+    ["shirk", "tawhid", "related"],
+
+    ["ibn-kathir", "tafsir-ibn-kathir", "authored"],
+    ["al-bukhari", "sahih-al-bukhari", "authored"],
+    ["an-nawawi", "sahih-al-bukhari", "commented_on"],
+    ["al-tabari", "quran", "interpreted"],
+    ["abu-bakr", "muhammad", "companion_of"],
+    ["umar-ibn-al-khattab", "muhammad", "companion_of"],
+    ["uthman-ibn-affan", "quran", "compiled"],
+    ["ali-ibn-abi-talib", "muhammad", "companion_of"],
+    ["aisha-bint-abi-bakr", "sahih-al-bukhari", "narrated_in"],
+    ["ibn-abbas", "quran", "interpreted"],
+    ["dua-yunus", "yunus", "prayed_by"],
+    ["al-masjid-al-haram", "mecca", "located_in"],
+    ["al-masjid-an-nabawi", "medina", "located_in"],
+    ["al-masjid-al-aqsa", "jerusalem", "located_in"],
+    ["night-journey", "al-masjid-al-aqsa", "happened_in"],
+    ["al-masjid-al-haram", "kaaba", "contains"]
   ]
 }
