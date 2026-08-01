@@ -10,12 +10,30 @@ export type EntityKind =
   | "place"
   | "nation"
   | "concept"
-  | "theme";
+  | "theme"
+  | "scholar"
+  | "companion"
+  | "book"
+  | "dua"
+  | "mosque";
 
 export interface I18nText {
   he?: string;
   ar?: string;
   en?: string;
+}
+
+export interface TimelineNode {
+  year?: string;
+  title_i18n: I18nText;
+  desc_i18n: I18nText;
+}
+
+export interface SourceReference {
+  name: string;
+  type: string;
+  url?: string;
+  citation?: string;
 }
 
 export interface KnowledgeEntity {
@@ -28,6 +46,10 @@ export interface KnowledgeEntity {
   hero_image: string | null;
   icon: string | null;
   sort_order: number;
+  era?: string;
+  timeline?: TimelineNode[];
+  sources?: SourceReference[];
+  keywords?: string[];
 }
 
 type SeedEntity = {
@@ -162,28 +184,75 @@ export async function getEntityVerses(entityId: string): Promise<EntityVerseLink
   }));
 }
 
-export async function getRelatedEntities(entityId: string): Promise<KnowledgeEntity[]> {
+export async function getRelatedEntities(entityId: string, limit = 16): Promise<KnowledgeEntity[]> {
   const sourceSlug = entityId.startsWith("seed:")
     ? entityId.slice(5)
     : seedEntities.find((e) => e.id === entityId)?.slug;
+
+  const currentEntity = seedEntities.find((e) => e.id === entityId || e.slug === sourceSlug);
+  const matchedSlugs = new Set<string>();
+  const results: KnowledgeEntity[] = [];
+
   if (sourceSlug) {
-    const relatedSlugs = seedRelations.filter(([from]) => from === sourceSlug).map(([, to]) => to);
-    if (relatedSlugs.length > 0) {
-      return relatedSlugs.map((s) => seedBySlug.get(s)).filter((e): e is KnowledgeEntity => !!e);
+    const directSlugs = seedRelations
+      .filter(([from, to]) => from === sourceSlug || to === sourceSlug)
+      .map(([from, to]) => (from === sourceSlug ? to : from));
+
+    for (const s of directSlugs) {
+      const ent = seedBySlug.get(s);
+      if (ent && !matchedSlugs.has(ent.slug) && ent.slug !== sourceSlug) {
+        matchedSlugs.add(ent.slug);
+        results.push(ent);
+      }
     }
   }
 
-  const { data, error } = await supabase
-    .from("knowledge_relations")
-    .select("weight, to:knowledge_entities!knowledge_relations_to_id_fkey(*)")
-    .eq("from_id", entityId)
-    .order("weight", { ascending: false });
-  if (error || !data) return [];
-  const out = (data as Array<{ to: KnowledgeEntity | null }>)
-    .map((r) => r.to)
-    .filter((e): e is KnowledgeEntity => !!e);
-  if (out.length > 0) return out;
-  return [];
+  // Try DB relations if needed
+  if (results.length < limit) {
+    const { data } = await supabase
+      .from("knowledge_relations")
+      .select("weight, to:knowledge_entities!knowledge_relations_to_id_fkey(*)")
+      .eq("from_id", entityId)
+      .order("weight", { ascending: false });
+
+    if (data) {
+      const dbEntities = (data as Array<{ to: KnowledgeEntity | null }>)
+        .map((r) => r.to)
+        .filter((e): e is KnowledgeEntity => !!e);
+      for (const ent of dbEntities) {
+        if (!matchedSlugs.has(ent.slug) && ent.slug !== sourceSlug) {
+          matchedSlugs.add(ent.slug);
+          results.push(ent);
+        }
+      }
+    }
+  }
+
+  // Fill up with same kind entities
+  if (currentEntity && results.length < limit) {
+    const sameKind = seedEntities.filter(
+      (e) =>
+        e.kind === currentEntity.kind && e.slug !== currentEntity.slug && !matchedSlugs.has(e.slug),
+    );
+    for (const ent of sameKind) {
+      matchedSlugs.add(ent.slug);
+      results.push(ent);
+      if (results.length >= limit) break;
+    }
+  }
+
+  // Fill up with other entities to prevent dead ends
+  if (results.length < limit) {
+    for (const ent of seedEntities) {
+      if (!matchedSlugs.has(ent.slug) && ent.slug !== sourceSlug) {
+        matchedSlugs.add(ent.slug);
+        results.push(ent);
+        if (results.length >= limit) break;
+      }
+    }
+  }
+
+  return results.slice(0, limit);
 }
 
 export async function searchEntities(query: string, limit = 12): Promise<KnowledgeEntity[]> {
