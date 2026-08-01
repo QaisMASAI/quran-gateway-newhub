@@ -105,7 +105,11 @@ export function MegaMenu() {
       items: [
         {
           label: isAr ? "قصص الأنبياء" : isHe ? "סיפורי נביאים" : "Prophets & Messengers",
-          desc: isAr ? "قصص الأنبياء والدروس المستفادة" : isHe ? "סיפורי הנביאים בקוראן" : "Quranic Stories of Prophets",
+          desc: isAr
+            ? "قصص الأنبياء والدروس المستفادة"
+            : isHe
+              ? "סיפורי הנביאים בקוראן"
+              : "Quranic Stories of Prophets",
           to: "/prophets",
           icon: <UserCheck className="h-4 w-4" />,
         },
@@ -199,9 +203,7 @@ export function MegaMenu() {
                           <div className="text-xs font-semibold text-foreground group-hover:text-primary transition-colors">
                             {item.label}
                           </div>
-                          <div className="text-[10.5px] text-muted-foreground line-clamp-1">
-                            {item.desc}
-                          </div>
+                          <div className="text-[10.5px] text-muted-foreground line-clamp-1">{item.desc}</div>
                         </div>
                       </Link>
                     </li>
