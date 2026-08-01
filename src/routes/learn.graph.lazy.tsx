@@ -33,6 +33,11 @@ const KIND_COLOR: Record<EntityKind, string> = {
   nation: "#dc2626",
   concept: "#0891b2",
   theme: "#64748b",
+  scholar: "#d97706",
+  companion: "#059669",
+  book: "#2563eb",
+  dua: "#e11d48",
+  mosque: "#9333ea",
 };
 
 function GraphPage() {
@@ -109,7 +114,22 @@ function GraphPage() {
   }, [entitiesQ.data, relationsQ.data, filter]);
 
   const loading = entitiesQ.isLoading || relationsQ.isLoading;
-  const kindOptions: Array<EntityKind | "all"> = ["all", "prophet", "story", "topic"];
+  const kindOptions: Array<EntityKind | "all"> = [
+    "all",
+    "prophet",
+    "story",
+    "topic",
+    "event",
+    "place",
+    "nation",
+    "concept",
+    "theme",
+    "scholar",
+    "companion",
+    "book",
+    "dua",
+    "mosque",
+  ];
   const hoverNode = hover ? byId[hover] : null;
 
   return (
