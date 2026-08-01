@@ -1,83 +1,62 @@
-import { useEffect } from "react";
+import { useState, useMemo } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
-import i18n from "@/lib/i18n";
+import i18n, { normalizeLocale, type Locale } from "@/lib/i18n";
 import { Header } from "@/components/Header";
 import {
-  Loader2,
+  Search,
   Compass,
   Network,
   Clock,
   MapPin,
   ChevronLeft,
-  Heart,
-  Scale,
-  BookOpen,
-  Sun,
-  Moon,
-  Shield,
-  Users,
   Sparkles,
-  HandHelping,
-  Star,
+  UserCheck,
+  ScrollText,
+  Map,
+  BookMarked,
+  GraduationCap,
+  Layers,
+  ArrowRight,
+  Loader2,
 } from "lucide-react";
-import { listAllEntities, groupByKind, type EntityKind } from "@/lib/knowledge";
-import { EntityCard } from "@/components/discovery/EntityCard";
-import { normalizeLocale, type Locale } from "@/lib/i18n";
-import { ALL_TOPICS } from "@/lib/topics";
-import { useTopicT } from "@/lib/content-i18n";
+import { listAllEntities, pickLocale, type KnowledgeEntity } from "@/lib/knowledge";
 
 export const Route = createFileRoute("/learn/")({
   head: () => {
     const locale = normalizeLocale(i18n.resolvedLanguage) ?? "he";
+    const title =
+      locale === "ar"
+        ? "بوابة المعرفة القرآنية والإسلامية | نور"
+        : locale === "en"
+          ? "Quranic Knowledge & Learning Hub | Noor"
+          : "מרכז הידע והלמידה הקוראני | נור";
+    const description =
+      locale === "ar"
+        ? "بوابة معرفية شاملة تعرّض مواضيع القرآن، قصص الأنبياء، الأحداث التاريخية، الأماكن المقدسة والمفاهيم العقائدية."
+        : locale === "en"
+          ? "Comprehensive Islamic knowledge directory: Quranic topics, prophets, historical stories, events, places, and theological concepts."
+          : "פורטל ידע מקיף: נושאי קוראן, סיפורי נביאים, אירועים היסטוריים, מקומות קדושים ומושגי אמונה.";
+
     return {
       meta: [
-        { title: i18n.t("pages:learn.metaTitle", { lng: locale }) },
-        {
-          name: "description",
-          content: i18n.t("pages:learn.metaDescription", { lng: locale }),
-        },
-        { property: "og:title", content: i18n.t("pages:learn.metaTitle", { lng: locale }) },
-        {
-          property: "og:description",
-          content: i18n.t("pages:learn.metaDescription", { lng: locale }),
-        },
+        { title },
+        { name: "description", content: description },
+        { property: "og:title", content: title },
+        { property: "og:description", content: description },
         { property: "og:url", content: "/learn" },
       ],
       links: [{ rel: "canonical", href: "/learn" }],
     };
   },
-  component: LearnIndex,
+  component: LearnIndexPage,
 });
 
-const ORDER: EntityKind[] = [
-  "topic",
-  "prophet",
-  "story",
-  "event",
-  "place",
-  "nation",
-  "concept",
-  "theme",
-];
-
-const TOPIC_ICONS = {
-  heart: Heart,
-  scale: Scale,
-  book: BookOpen,
-  sun: Sun,
-  moon: Moon,
-  shield: Shield,
-  users: Users,
-  sparkles: Sparkles,
-  hand: HandHelping,
-  star: Star,
-} as const;
-
-function LearnIndex() {
+export function LearnIndexPage() {
   const { t, i18n } = useTranslation("pages");
   const locale = (normalizeLocale(i18n.language) ?? "he") as Locale;
+  const [searchQuery, setSearchQuery] = useState("");
 
   const q = useQuery({
     queryKey: ["all-entities"],
@@ -85,213 +64,408 @@ function LearnIndex() {
     staleTime: 5 * 60_000,
   });
 
-  // Handle hash deep-linking (e.g., #topics-library, #story-library, #prophet-library)
-  useEffect(() => {
-    if (typeof window !== "undefined" && window.location.hash) {
-      const id = window.location.hash.replace("#", "");
-      const elem = document.getElementById(id);
-      if (elem) {
-        setTimeout(() => {
-          elem.scrollIntoView({ behavior: "smooth", block: "start" });
-        }, 100);
-      }
-    }
-  }, []);
+  const categories = useMemo(() => {
+    return [
+      {
+        id: "topics",
+        to: "/topics",
+        title: locale === "ar" ? "مواضيع القرآن" : locale === "he" ? "נושאי הקورאן" : "Quranic Topics",
+        subtitle:
+          locale === "ar" ? "فهرس موضوعي شامل" : locale === "he" ? "אינדקס נושאים מקיף" : "Thematic Quranic Index",
+        description:
+          locale === "ar"
+            ? "التوحيد، الصلاة، الصبر، الرحمة، الأخلاق، العدل والإنفاق."
+            : locale === "he"
+              ? "ייחוד האל, תפילה, סבלנות, רחמים, מוסר וצדקה."
+              : "Monotheism, prayer, patience, mercy, morality, and justice.",
+        icon: Sparkles,
+        color: "from-amber-500/15 to-amber-500/5 text-amber-600 dark:text-amber-400 border-amber-500/30",
+        badge: locale === "ar" ? "الفهرس" : locale === "he" ? "אינדקס" : "Index",
+      },
+      {
+        id: "prophets",
+        to: "/prophets",
+        title: locale === "ar" ? "الأنبياء والرسل" : locale === "he" ? "נביאי האל ושליחיו" : "Prophets & Messengers",
+        subtitle:
+          locale === "ar" ? "سير وأسماء الأنبياء" : locale === "he" ? "סיפורי נביאי הקוראן" : "Lives of 25+ Prophets",
+        description:
+          locale === "ar"
+            ? "قصص آدم، نوح، إبراهيم، موسى، عيسى ومحمد صلوات الله عليهم."
+            : locale === "he"
+              ? "סיפורי אדם, נח, אברהם, משה, ישוע ומוחמד עליהם השלום."
+              : "Stories of Adam, Noah, Abraham, Moses, Jesus & Muhammad ﷺ.",
+        icon: UserCheck,
+        color: "from-emerald-500/15 to-emerald-500/5 text-emerald-600 dark:text-emerald-400 border-emerald-500/30",
+        badge: locale === "ar" ? "25+ نبي" : locale === "he" ? "25+ נביאים" : "25+ Prophets",
+      },
+      {
+        id: "stories",
+        to: "/stories",
+        title: locale === "ar" ? "قصص القرآن" : locale === "he" ? "סיפורי הקוראן" : "Quranic Stories",
+        subtitle:
+          locale === "ar"
+            ? "العبر والدروس القرآنية"
+            : locale === "he"
+              ? "לקחים ומוסר השכל"
+              : "Narratives & Moral Lessons",
+        description:
+          locale === "ar"
+            ? "أصحاب الكهف، ذو القرنين، لقمان الحكيم، أصحاب الفيل وقارون."
+            : locale === "he"
+              ? "אנשי המערה, דול-קרניין, לוקמאן החכם, אנשי הפיל וקרון."
+              : "People of the Cave, Dhul-Qarnayn, Luqman, and Qarun.",
+        icon: ScrollText,
+        color: "from-teal-500/15 to-teal-500/5 text-teal-600 dark:text-teal-400 border-teal-500/30",
+        badge: locale === "ar" ? "قصص وعبر" : locale === "he" ? "סיפורים" : "Stories",
+      },
+      {
+        id: "events",
+        to: "/events",
+        title: locale === "ar" ? "الأحداث التاريخية" : locale === "he" ? "אירועים היסטוריים" : "Historical Events",
+        subtitle:
+          locale === "ar" ? "محطات السيرة النبوية" : locale === "he" ? "אבני דרך בסירה" : "Prophetic Timeline & Wars",
+        description:
+          locale === "ar"
+            ? "الهجرة النبوية، غزوة بدر، أحد، الخندق، فتح مكة والإسراء."
+            : locale === "he"
+              ? "ההג'רה, קרב בדר, אוחוד, כיבוש מכה ומסע הלילה."
+              : "The Hijrah, Battle of Badr, Uhud, Conquest of Mecca, and Isra.",
+        icon: Clock,
+        color: "from-blue-500/15 to-blue-500/5 text-blue-600 dark:text-blue-400 border-blue-500/30",
+        badge: locale === "ar" ? "التأريخ" : locale === "he" ? "היסטוריה" : "History",
+      },
+      {
+        id: "places",
+        to: "/places",
+        title: locale === "ar" ? "الأماكن المقدسة" : locale === "he" ? "מקומות קדושים" : "Sacred Places",
+        subtitle:
+          locale === "ar" ? "جغرافيا كتاب الله" : locale === "he" ? "גאוגרפיה קוראנית" : "Quranic Holy Geography",
+        description:
+          locale === "ar"
+            ? "مكة المكرمة، المدينة المنورة، المسجد الأقصى وطور سيناء."
+            : locale === "he"
+              ? "מכה, מדינה, מסגד אל-אקצא, הר סיני ובכּה."
+              : "Mecca, Madinah, Al-Aqsa Mosque, Mount Sinai, and Bakkah.",
+        icon: MapPin,
+        color: "from-rose-500/15 to-rose-500/5 text-rose-600 dark:text-rose-400 border-rose-500/30",
+        badge: locale === "ar" ? "جغرافيا" : locale === "he" ? "מקומות" : "Geography",
+      },
+      {
+        id: "concepts",
+        to: "/concepts",
+        title: locale === "ar" ? "المفاهيم والأمم" : locale === "he" ? "מושגים ועמים" : "Concepts & Nations",
+        subtitle:
+          locale === "ar"
+            ? "العقيدة والأمم السابقة"
+            : locale === "he"
+              ? "מושגי אמונה ועמים עתיקים"
+              : "Theology & Ancient Nations",
+        description:
+          locale === "ar"
+            ? "المفاهيم العقائدية الكبرى وقصص قوم عاد وثمود وقوم فرعون."
+            : locale === "he"
+              ? "מושגי יסוד באמונה וסיפורי עאד, ת'מוד ועם פרעה."
+              : "Core theological concepts, afterlife, angels, and ancient nations.",
+        icon: GraduationCap,
+        color: "from-purple-500/15 to-purple-500/5 text-purple-600 dark:text-purple-400 border-purple-500/30",
+        badge: locale === "ar" ? "عقيدة" : locale === "he" ? "אמונה" : "Theology",
+      },
+    ];
+  }, [locale]);
 
-  const kindLabel = (k: EntityKind) =>
-    t(`search.kind${k.charAt(0).toUpperCase()}${k.slice(1)}` as const);
-  const sectionLabel = (k: EntityKind) => {
-    if (k === "topic") return t("learn.browseTopics");
-    if (k === "prophet") return t("learn.browseProphets");
-    if (k === "story") return t("learn.browseStories");
-    return kindLabel(k);
-  };
-
-  const grouped = q.data ? groupByKind(q.data) : ({} as Record<EntityKind, never[]>);
+  const searchResults = useMemo(() => {
+    if (!searchQuery.trim() || !q.data) return [];
+    const sq = searchQuery.toLowerCase().trim();
+    return q.data
+      .map((e) => ({
+        ...e,
+        title: pickLocale(e.title_i18n, locale),
+        summary: pickLocale(e.summary_i18n, locale),
+      }))
+      .filter(
+        (e) =>
+          e.title.toLowerCase().includes(sq) ||
+          e.summary.toLowerCase().includes(sq) ||
+          e.slug.toLowerCase().includes(sq),
+      )
+      .slice(0, 8);
+  }, [q.data, searchQuery, locale]);
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background text-foreground">
       <Header />
 
-      <div className="border-b border-border bg-gradient-to-b from-primary-soft/40 to-transparent">
-        <div className="mx-auto max-w-5xl px-4 pt-8 pb-3 sm:px-6">
-          <h1 className="text-3xl font-bold text-foreground">{t("learn.title")}</h1>
-          <p className="mt-2 text-sm text-muted-foreground">{t("learn.subtitle")}</p>
+      {/* Header Portal Hero */}
+      <div className="border-b border-border bg-gradient-to-b from-primary-soft/40 via-background to-background">
+        <div className="mx-auto max-w-5xl px-4 pt-8 pb-6 sm:px-6">
+          <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-primary mb-2">
+            <Compass className="h-4 w-4 text-gold" />
+            <span>{locale === "ar" ? "بوابة المعرفة" : locale === "he" ? "מרכז הידע" : "Knowledge Portal"}</span>
+          </div>
+          <h1 className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
+            {t("learn.title", "Quranic Knowledge Hub")}
+          </h1>
+          <p className="mt-2 text-sm text-muted-foreground max-w-2xl">
+            {t(
+              "learn.subtitle",
+              "Discover curated Quranic topics, stories of prophets, historic events, sacred places, and theological concepts.",
+            )}
+          </p>
+
+          {/* Quick Search Bar */}
+          <div className="mt-6 relative max-w-xl">
+            <Search className="absolute inset-y-0 start-3 my-auto h-4 w-4 text-muted-foreground" />
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder={
+                locale === "ar"
+                  ? "بحث شامل في المعرفة القرآنية (التوحيد، موسى، بدر...)"
+                  : locale === "he"
+                    ? "חיפוש מקיף בידע הקוראני (ייחוד האל, משה, בדר...)"
+                    : "Search all Quran knowledge (Tawhid, Moses, Badr...)"
+              }
+              className="w-full rounded-2xl border border-border bg-card/80 py-3 start-10 pe-4 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 transition shadow-sm"
+            />
+            {searchQuery && (
+              <button
+                type="button"
+                onClick={() => setSearchQuery("")}
+                className="absolute inset-y-0 end-3 my-auto text-xs text-muted-foreground hover:text-foreground"
+              >
+                Clear
+              </button>
+            )}
+          </div>
         </div>
-        <div className="mosque-arch" aria-hidden />
       </div>
 
-      <main id="main" className="mx-auto max-w-5xl px-4 py-6 sm:px-6">
-        {q.isLoading && (
-          <p className="flex items-center justify-center gap-2 py-12 text-sm text-muted-foreground">
-            <Loader2 className="h-4 w-4 animate-spin" />
-          </p>
+      <main className="mx-auto max-w-5xl px-4 py-8 sm:px-6 space-y-10">
+        {/* Search Results Drawer if user is typing */}
+        {searchQuery.trim().length > 0 && (
+          <section className="rounded-2xl border border-primary/30 bg-card p-6 shadow-md">
+            <h2 className="text-base font-bold text-foreground mb-4 flex items-center gap-2">
+              <Search className="h-4 w-4 text-primary" />
+              <span>
+                {locale === "ar"
+                  ? `نتائج البحث عن "${searchQuery}"`
+                  : locale === "he"
+                    ? `תוצאות חיפוש עבור "${searchQuery}"`
+                    : `Search Results for "${searchQuery}"`}
+              </span>
+            </h2>
+
+            {searchResults.length === 0 ? (
+              <p className="text-sm text-muted-foreground py-4">
+                {locale === "ar"
+                  ? "لم يتم العثور على نتائج تطابق بحثك."
+                  : locale === "he"
+                    ? "לא נמצאו תוצאות התואמות את החיפוש שלך."
+                    : "No matching results found."}
+              </p>
+            ) : (
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                {searchResults.map((item) => (
+                  <Link
+                    key={item.id}
+                    to="/learn/$kind/$slug"
+                    params={{ kind: item.kind, slug: item.slug }}
+                    className="flex flex-col justify-between rounded-xl border border-border bg-background p-4 hover:border-primary/50 hover:shadow-sm transition"
+                  >
+                    <div>
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-primary">{item.kind}</span>
+                      <h3 className="font-semibold text-foreground text-sm mt-0.5" dir="auto">
+                        {item.title}
+                      </h3>
+                      <p className="text-xs text-muted-foreground line-clamp-2 mt-1" dir="auto">
+                        {item.summary}
+                      </p>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            )}
+          </section>
         )}
 
-        <div className="mb-8 grid grid-cols-1 gap-3 sm:grid-cols-2">
+        {/* Specialized Tools Quick Bar */}
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
           <Link
             to="/learn/journeys"
-            className="group flex items-start gap-3 rounded-2xl border border-border bg-gradient-to-br from-primary-soft/40 to-card p-4 transition hover:border-primary/60 hover:shadow-sm"
+            className="group flex items-center gap-3 rounded-2xl border border-border bg-gradient-to-br from-primary-soft/30 to-card p-4 transition hover:border-primary/50 hover:shadow-sm"
           >
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary group-hover:bg-primary group-hover:text-primary-foreground transition">
               <Compass className="h-5 w-5" />
             </div>
             <div className="min-w-0">
-              <div className="text-base font-semibold text-foreground group-hover:text-primary">
-                {t("learn.openJourneys")}
+              <div className="text-sm font-semibold text-foreground group-hover:text-primary">
+                {t("learn.openJourneys", "Reading Journeys")}
               </div>
-              <p className="mt-0.5 text-xs text-muted-foreground">{t("learn.openJourneysHint")}</p>
+              <p className="text-xs text-muted-foreground truncate">
+                {locale === "ar" ? "مسارات موضوعية" : locale === "he" ? "מסלולי למידה" : "Structured Paths"}
+              </p>
             </div>
           </Link>
+
           <Link
             to="/learn/graph"
-            className="group flex items-start gap-3 rounded-2xl border border-border bg-gradient-to-br from-primary-soft/40 to-card p-4 transition hover:border-primary/60 hover:shadow-sm"
+            className="group flex items-center gap-3 rounded-2xl border border-border bg-gradient-to-br from-primary-soft/30 to-card p-4 transition hover:border-primary/50 hover:shadow-sm"
           >
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary group-hover:bg-primary group-hover:text-primary-foreground transition">
               <Network className="h-5 w-5" />
             </div>
             <div className="min-w-0">
-              <div className="text-base font-semibold text-foreground group-hover:text-primary">
-                {t("learn.openGraph")}
+              <div className="text-sm font-semibold text-foreground group-hover:text-primary">
+                {t("learn.openGraph", "Knowledge Graph")}
               </div>
-              <p className="mt-0.5 text-xs text-muted-foreground">{t("learn.openGraphHint")}</p>
+              <p className="text-xs text-muted-foreground truncate">
+                {locale === "ar" ? "شبكة المفاهيم" : locale === "he" ? "רשת המושגים" : "Concept Network"}
+              </p>
             </div>
           </Link>
+
           <Link
             to="/explore/timeline"
-            className="group flex items-start gap-3 rounded-2xl border border-border bg-gradient-to-br from-primary-soft/40 to-card p-4 transition hover:border-primary/60 hover:shadow-sm"
+            className="group flex items-center gap-3 rounded-2xl border border-border bg-gradient-to-br from-primary-soft/30 to-card p-4 transition hover:border-primary/50 hover:shadow-sm"
           >
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary group-hover:bg-primary group-hover:text-primary-foreground transition">
               <Clock className="h-5 w-5" />
             </div>
             <div className="min-w-0">
-              <div className="text-base font-semibold text-foreground group-hover:text-primary">
-                {t("learn.openTimeline")}
+              <div className="text-sm font-semibold text-foreground group-hover:text-primary">
+                {t("learn.openTimeline", "Islamic Timeline")}
               </div>
-              <p className="mt-0.5 text-xs text-muted-foreground">{t("learn.openTimelineHint")}</p>
+              <p className="text-xs text-muted-foreground truncate">
+                {locale === "ar" ? "التأريض النبوي" : locale === "he" ? "ציר היסטורי" : "Prophetic Chronology"}
+              </p>
             </div>
           </Link>
+
           <Link
             to="/explore/map"
-            className="group flex items-start gap-3 rounded-2xl border border-border bg-gradient-to-br from-primary-soft/40 to-card p-4 transition hover:border-primary/60 hover:shadow-sm"
+            className="group flex items-center gap-3 rounded-2xl border border-border bg-gradient-to-br from-primary-soft/30 to-card p-4 transition hover:border-primary/50 hover:shadow-sm"
           >
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary group-hover:bg-primary group-hover:text-primary-foreground transition">
               <MapPin className="h-5 w-5" />
             </div>
             <div className="min-w-0">
-              <div className="text-base font-semibold text-foreground group-hover:text-primary">
-                {t("learn.openMap")}
+              <div className="text-sm font-semibold text-foreground group-hover:text-primary">
+                {t("learn.openMap", "Sacred Map")}
               </div>
-              <p className="mt-0.5 text-xs text-muted-foreground">{t("learn.openMapHint")}</p>
+              <p className="text-xs text-muted-foreground truncate">
+                {locale === "ar" ? "خريطة المعالم" : locale === "he" ? "מפת המקומות" : "Sacred Geography"}
+              </p>
             </div>
           </Link>
         </div>
 
-        <section id="topics-library" className="mb-10">
-          <h2 className="mb-3 flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-primary">
-            <span className="h-px flex-1 bg-gradient-to-l from-primary/30 to-transparent" />
-            <span>{t("topics.title")}</span>
-            <span className="h-px flex-1 bg-gradient-to-r from-primary/30 to-transparent" />
-          </h2>
-          <p className="mb-4 text-sm text-muted-foreground">{t("topics.intro")}</p>
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
-            {ALL_TOPICS.map((topic) => (
-              <LearnTopicCard
-                key={topic.slug}
-                slug={topic.slug}
-                icon={topic.icon}
-                refsCount={topic.refs.length}
-              />
-            ))}
+        {/* Main Separated Category Cards Grid */}
+        <section>
+          <div className="flex items-center justify-between mb-6">
+            <div>
+              <h2 className="text-xl font-bold text-foreground">
+                {locale === "ar"
+                  ? "اقسام المعرفة القرآنية"
+                  : locale === "he"
+                    ? "קטגוריות ידע קוראניות"
+                    : "Quran Knowledge Categories"}
+              </h2>
+              <p className="text-xs text-muted-foreground mt-0.5">
+                {locale === "ar"
+                  ? "اختر القسم المطلوب للاستكشاف والتعمق"
+                  : locale === "he"
+                    ? "בחר קטגוריה לחקירה מעמיקה"
+                    : "Select a category to explore in detail"}
+              </p>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            {categories.map((cat) => {
+              const IconComp = cat.icon;
+              return (
+                <Link
+                  key={cat.id}
+                  to={cat.to}
+                  className="group relative flex flex-col justify-between overflow-hidden rounded-2xl border border-border/80 bg-gradient-to-br from-card/90 via-card to-secondary/30 p-6 shadow-xs transition-all duration-300 hover:border-primary/60 hover:shadow-md hover:-translate-y-1"
+                >
+                  <div>
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="flex items-center gap-3">
+                        <div
+                          className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border bg-gradient-to-br ${cat.color} shadow-2xs`}
+                        >
+                          <IconComp className="h-6 w-6" />
+                        </div>
+                        <span className="rounded-full border border-primary/20 bg-primary-soft/50 px-2.5 py-0.5 text-[11px] font-semibold text-primary">
+                          {cat.badge}
+                        </span>
+                      </div>
+                      <ChevronLeft className="h-5 w-5 shrink-0 text-muted-foreground transition-all group-hover:-translate-x-1 group-hover:text-primary ltr:rotate-180" />
+                    </div>
+
+                    <div className="mt-5">
+                      <h3 className="font-display text-xl font-bold text-foreground group-hover:text-primary transition-colors">
+                        {cat.title}
+                      </h3>
+                      <p className="mt-0.5 text-xs font-semibold text-gold">{cat.subtitle}</p>
+                      <p className="mt-2 text-xs sm:text-sm text-muted-foreground leading-relaxed">{cat.description}</p>
+                    </div>
+                  </div>
+
+                  <div className="mt-6 flex items-center justify-between border-t border-border/60 pt-3.5 text-xs font-semibold text-primary group-hover:underline">
+                    <span>
+                      {locale === "ar"
+                        ? `استكشف ${cat.title} ←`
+                        : locale === "he"
+                          ? `חפש ${cat.title} ←`
+                          : `Explore ${cat.title} →`}
+                    </span>
+                  </div>
+                </Link>
+              );
+            })}
           </div>
         </section>
 
-        {ORDER.map((kind) => {
-          const list = grouped[kind];
-          if (!list || list.length === 0) return null;
-          return (
-            <section key={kind} id={`${kind}-library`} className="mb-8">
-              <h2 className="mb-3 flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-primary">
-                <span className="h-px flex-1 bg-gradient-to-l from-primary/30 to-transparent" />
-                <span>{sectionLabel(kind)}</span>
-                <span className="h-px flex-1 bg-gradient-to-r from-primary/30 to-transparent" />
-              </h2>
-              <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3">
-                {list.map((e) => (
-                  <EntityCard key={e.id} entity={e} locale={locale} kindLabel={kindLabel(e.kind)} />
-                ))}
+        {/* Featured Tafsir Ibn Kathir Banner */}
+        <section className="relative overflow-hidden rounded-3xl border border-primary/20 bg-gradient-to-r from-emerald-950 via-slate-900 to-primary-dark p-6 sm:p-8 text-white shadow-xl">
+          <div className="relative z-10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
+            <div className="max-w-xl">
+              <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-gold mb-2">
+                <BookMarked className="h-4 w-4" />
+                <span>
+                  {locale === "ar" ? "المكتبة التفسيرية" : locale === "he" ? "ספריית התפסיר" : "Tafsir Library"}
+                </span>
               </div>
-            </section>
-          );
-        })}
+              <h3 className="font-display text-2xl sm:text-3xl font-bold text-white">
+                {locale === "ar"
+                  ? "تفسير القرآن العظيم لإبن كثير"
+                  : locale === "he"
+                    ? "תפסיר אבן כת'יר המלא"
+                    : "Tafsir Ibn Kathir Complete"}
+              </h3>
+              <p className="mt-2 text-xs sm:text-sm text-emerald-100/80 leading-relaxed">
+                {locale === "ar"
+                  ? "تصفح التفسير الكامل لجميع سور القرآن الكريم مع ربط الأحاديث الشريفة وسياق النزول الموثق."
+                  : locale === "he"
+                    ? "עיין בתפסיר המלא לכל סורות הקוראן עם קישורים לחדית'ים ולסיבות הירידה."
+                    : "Read the authentic classical commentary of all 114 Surahs with cross-referenced Hadiths."}
+              </p>
+            </div>
+            <Link
+              to="/learn/tafsir-ibn-kathir"
+              className="shrink-0 rounded-2xl bg-gold px-5 py-3 text-xs sm:text-sm font-bold text-slate-950 hover:bg-gold-soft hover:shadow-lg transition flex items-center gap-2"
+            >
+              <span>
+                {locale === "ar" ? "تصفّح التفسير الآن" : locale === "he" ? "עיין בתפסיר עכשיו" : "Browse Tafsir Now"}
+              </span>
+              <ArrowRight className="h-4 w-4 ltr:rotate-0 rtl:rotate-180" />
+            </Link>
+          </div>
+        </section>
       </main>
     </div>
-  );
-}
-
-function LearnTopicCard({
-  slug,
-  icon,
-  refsCount,
-}: {
-  slug: string;
-  icon: keyof typeof TOPIC_ICONS;
-  refsCount: number;
-}) {
-  const Icon = TOPIC_ICONS[icon] ?? BookOpen;
-  const { t, i18n } = useTranslation("pages");
-  const topic = useTopicT(slug);
-  const locale = i18n.language || "en";
-
-  return (
-    <Link
-      to="/learn/$kind/$slug"
-      params={{ kind: "topic", slug }}
-      className="group relative flex flex-col justify-between overflow-hidden rounded-2xl border border-border/80 bg-gradient-to-br from-card/90 via-card to-secondary/30 p-4 sm:p-5 shadow-xs transition-all duration-300 hover:border-primary/50 hover:shadow-md hover:-translate-y-0.5"
-    >
-      <div className="flex items-start justify-between gap-3">
-        <div className="flex items-center gap-2">
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary transition-colors group-hover:bg-gold/15 group-hover:text-gold shadow-2xs">
-            <Icon className="h-5 w-5" aria-hidden="true" />
-          </div>
-          <span className="rounded-full border border-primary/20 bg-primary-soft/50 px-2.5 py-0.5 text-[10.5px] font-semibold text-primary">
-            {t("search.kindTopic", "Topic")}
-          </span>
-        </div>
-        <ChevronLeft
-          className="h-4 w-4 shrink-0 text-muted-foreground transition-all group-hover:-translate-x-0.5 group-hover:text-gold ltr:rotate-180"
-          aria-hidden="true"
-        />
-      </div>
-
-      <div className="mt-3 min-w-0">
-        <h3
-          className="line-clamp-1 font-display text-base sm:text-lg font-bold text-foreground group-hover:text-primary transition-colors"
-          dir="auto"
-        >
-          {topic.title}
-        </h3>
-        {topic.subtitle && (
-          <p className="mt-0.5 text-xs font-arabic font-medium text-gold truncate" dir="auto">
-            {topic.subtitle}
-          </p>
-        )}
-        <p
-          className="mt-2 line-clamp-2 text-xs sm:text-sm text-muted-foreground leading-relaxed"
-          dir="auto"
-        >
-          {topic.description}
-        </p>
-      </div>
-
-      <div className="mt-4 flex items-center justify-between border-t border-border/60 pt-2.5 text-[11px] font-medium text-muted-foreground">
-        <span className="text-gold font-semibold">
-          {refsCount} {t("topics.refsLabel")}
-        </span>
-        <span className="text-primary group-hover:underline">
-          {locale === "ar" ? "عرض الموضوع ←" : locale === "he" ? "הצג נושא ←" : "Explore →"}
-        </span>
-      </div>
-    </Link>
   );
 }
