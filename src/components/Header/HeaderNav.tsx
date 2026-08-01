@@ -78,6 +78,9 @@ export function HeaderNav({ isAuthenticated }: HeaderNavProps) {
       {!hidden.has("hadith") && (
         <NavLink to="/hadith" label={t("nav.hadith")} icon={<Library className="h-4 w-4" />} />
       )}
+      {!hidden.has("tafsir") && (
+        <NavLink to="/tafsir" label={t("nav.tafsir")} icon={<BookOpen className="h-4 w-4" />} />
+      )}
       {!hidden.has("search") && (
         <NavLink to="/search" label={t("nav.search")} icon={<Search className="h-4 w-4" />} />
       )}
