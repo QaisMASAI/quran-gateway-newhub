@@ -10,17 +10,7 @@ export type Emotion = {
   title: string; // Hebrew
   subtitle?: string; // short emotional context
   description: string; // factual framing, no interpretation
-  icon:
-    | "heart"
-    | "shield"
-    | "sun"
-    | "moon"
-    | "sparkles"
-    | "hand"
-    | "scale"
-    | "star"
-    | "book"
-    | "users";
+  icon: "heart" | "shield" | "sun" | "moon" | "sparkles" | "hand" | "scale" | "star" | "book" | "users";
   // gentle accent shown on cards — semantic-token classes only
   accent: "calm" | "warm" | "deep" | "soft";
   refs: AyahRef[];
@@ -195,6 +185,90 @@ export const EMOTIONS: Emotion[] = [
       { surah: 29, ayah: 69 },
       { surah: 47, ayah: 17 },
       { surah: 2, ayah: 186 },
+    ],
+  },
+  {
+    slug: "marriage",
+    title: "נישואין וזוגיות",
+    subtitle: "אהבה וחמלה",
+    description: "פסוקים על הקמת בית מבורך, מַוַדַּה ורַחְמַה בין בני הזוג.",
+    icon: "heart",
+    accent: "warm",
+    refs: [
+      { surah: 30, ayah: 21 },
+      { surah: 25, ayah: 74 },
+      { surah: 4, ayah: 1 },
+      { surah: 2, ayah: 187 },
+    ],
+  },
+  {
+    slug: "family",
+    title: "משפחה וכיבוד הורים",
+    subtitle: "קשרי משפחה",
+    description: "פסוקים על חסד ורחמים להורים, קשרי משפחה וחינוך ילדים.",
+    icon: "users",
+    accent: "soft",
+    refs: [
+      { surah: 17, ayah: 23, to: 24 },
+      { surah: 31, ayah: 14 },
+      { surah: 46, ayah: 15 },
+      { surah: 66, ayah: 6 },
+    ],
+  },
+  {
+    slug: "death",
+    title: "מוות והעולם הבא",
+    subtitle: "זיכרון הנצח",
+    description: "פסוקים על טבעם הארעי של החיים, הנצחיות של העולם הבא והשיבה אל האל.",
+    icon: "star",
+    accent: "deep",
+    refs: [
+      { surah: 3, ayah: 185 },
+      { surah: 21, ayah: 35 },
+      { surah: 2, ayah: 156 },
+      { surah: 50, ayah: 19 },
+    ],
+  },
+  {
+    slug: "success",
+    title: "הצלחה וברכה",
+    subtitle: "הפלאח האמיתי",
+    description: "פסוקים על הגדרת ההצלחה האמיתית בחיים אלו ובעולם הבא.",
+    icon: "sparkles",
+    accent: "warm",
+    refs: [
+      { surah: 23, ayah: 1, to: 11 },
+      { surah: 91, ayah: 9 },
+      { surah: 87, ayah: 14, to: 15 },
+      { surah: 28, ayah: 77 },
+    ],
+  },
+  {
+    slug: "knowledge",
+    title: "בקשת דעת וחכמה",
+    subtitle: "עִלְם וחיפוש אמת",
+    description: "פסוקים על מעלת לומדי התורה והמדע והתפילה לתוספת ידע.",
+    icon: "book",
+    accent: "calm",
+    refs: [
+      { surah: 20, ayah: 114 },
+      { surah: 58, ayah: 11 },
+      { surah: 39, ayah: 9 },
+      { surah: 96, ayah: 1, to: 5 },
+    ],
+  },
+  {
+    slug: "patience",
+    title: "סבלנות ועמידה איתנה",
+    subtitle: "צַבְּר",
+    description: "פסוקים על כוח הסבלנות בשעות מבחן והבטחת האל לסבלנים.",
+    icon: "shield",
+    accent: "deep",
+    refs: [
+      { surah: 2, ayah: 153 },
+      { surah: 3, ayah: 200 },
+      { surah: 11, ayah: 115 },
+      { surah: 39, ayah: 10 },
     ],
   },
 ];
