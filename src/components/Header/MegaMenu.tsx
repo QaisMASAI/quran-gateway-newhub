@@ -60,13 +60,17 @@ export function MegaMenu() {
           icon: <BookOpen className="h-4 w-4" />,
         },
         {
-          label: isAr ? "تفسير ابن كثير" : isHe ? "תפסיר אבן כת'יר" : "Tafsir Ibn Kathir",
-          desc: isAr
-            ? "تفسير القرآن بالقرآن والحديث"
+          label: isAr
+            ? "منصة التفاسير المتقدمة"
             : isHe
-              ? "תפסיר מאומת"
-              : "Authentic Quranic Tafsir",
-          to: "/learn/tafsir-ibn-kathir",
+              ? "פלטפורמת התפסיר המתקדמת"
+              : "Tafsir Platform",
+          desc: isAr
+            ? "8 تفاسير علمية ومقارنة بالذكاء الاصطناعي"
+            : isHe
+              ? "8 תפסיקים מוסמכים וניתוח חכם"
+              : "8 Collections & AI Side-by-Side Studio",
+          to: "/tafsir",
           icon: <BookMarked className="h-4 w-4" />,
         },
         {
