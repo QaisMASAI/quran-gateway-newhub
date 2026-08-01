@@ -111,12 +111,16 @@ export function DailyAssistantWidget({ locale = "en" }: { locale?: "he" | "ar" |
         <div className="flex items-center gap-3">
           <div className="flex items-center gap-1.5 rounded-2xl border border-amber-500/30 bg-amber-500/10 px-3.5 py-1.5 text-xs font-bold text-amber-600 dark:text-amber-400">
             <Flame className="h-4 w-4 text-amber-500 fill-amber-500 animate-bounce" />
-            <span>{stats.streak} {locale === "ar" ? "أيام متتالية" : locale === "he" ? "ימים ברצף" : "Day Streak"}</span>
+            <span>
+              {stats.streak} {locale === "ar" ? "أيام متتالية" : locale === "he" ? "ימים ברצף" : "Day Streak"}
+            </span>
           </div>
 
           <div className="flex items-center gap-1.5 rounded-2xl border border-emerald-500/30 bg-emerald-500/10 px-3.5 py-1.5 text-xs font-bold text-emerald-600 dark:text-emerald-400">
             <Award className="h-4 w-4 text-emerald-500" />
-            <span>{stats.xp} XP • {levelInfo.titleEn}</span>
+            <span>
+              {stats.xp} XP • {levelInfo.titleEn}
+            </span>
           </div>
         </div>
       </div>
@@ -148,13 +152,14 @@ export function DailyAssistantWidget({ locale = "en" }: { locale?: "he" | "ar" |
               </button>
             </div>
 
-            <p className="text-lg leading-loose font-arabic text-right text-emerald-950 dark:text-emerald-200" dir="rtl">
+            <p
+              className="text-lg leading-loose font-arabic text-right text-emerald-950 dark:text-emerald-200"
+              dir="rtl"
+            >
               {todayVerse.arabic}
             </p>
 
-            <p className="text-xs text-muted-foreground leading-relaxed italic">
-              "{todayVerse.translation}"
-            </p>
+            <p className="text-xs text-muted-foreground leading-relaxed italic">"{todayVerse.translation}"</p>
           </div>
 
           <div className="mt-4 pt-3 border-t border-border/50 flex items-center justify-between text-[11px]">
@@ -195,21 +200,19 @@ export function DailyAssistantWidget({ locale = "en" }: { locale?: "he" | "ar" |
               </button>
             </div>
 
-            <p className="text-base leading-relaxed font-arabic text-right text-amber-950 dark:text-amber-200" dir="rtl">
+            <p
+              className="text-base leading-relaxed font-arabic text-right text-amber-950 dark:text-amber-200"
+              dir="rtl"
+            >
               {todayHadith.arabic}
             </p>
 
-            <p className="text-xs text-muted-foreground leading-relaxed italic">
-              "{todayHadith.translation}"
-            </p>
+            <p className="text-xs text-muted-foreground leading-relaxed italic">"{todayHadith.translation}"</p>
           </div>
 
           <div className="mt-4 pt-3 border-t border-border/50 flex items-center justify-between text-[11px]">
             <span className="font-semibold text-foreground">{todayHadith.collection}</span>
-            <Link
-              to="/hadith"
-              className="inline-flex items-center gap-1 text-gold hover:underline font-semibold"
-            >
+            <Link to="/hadith" className="inline-flex items-center gap-1 text-gold hover:underline font-semibold">
               Hadith Library <ArrowRight className="h-3 w-3" />
             </Link>
           </div>
@@ -243,10 +246,7 @@ export function DailyAssistantWidget({ locale = "en" }: { locale?: "he" | "ar" |
 
           <div className="mt-4 pt-3 border-t border-border/50 flex items-center justify-between text-[11px]">
             <span className="font-semibold text-foreground">{todayDua.ref}</span>
-            <Link
-              to="/ask"
-              className="inline-flex items-center gap-1 text-primary hover:underline font-semibold"
-            >
+            <Link to="/ask" className="inline-flex items-center gap-1 text-primary hover:underline font-semibold">
               Ask AI Research <ArrowRight className="h-3 w-3" />
             </Link>
           </div>
