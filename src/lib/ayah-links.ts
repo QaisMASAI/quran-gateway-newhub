@@ -97,6 +97,17 @@ function hasHebrewLetters(value: string): boolean {
   return /[\u0590-\u05FF]/.test(value);
 }
 
+function hasArabicLetters(value: string): boolean {
+  return /[\u0600-\u06FF]/.test(value);
+}
+
+function isLocaleCompatibleText(value: string, locale: UiLocale): boolean {
+  if (!value) return false;
+  if (locale === "he") return hasHebrewLetters(value);
+  if (locale === "ar") return hasArabicLetters(value) || !hasHebrewLetters(value);
+  return !hasHebrewLetters(value);
+}
+
 function slugToReadable(slug: string): string {
   return slug
     .split("-")
@@ -141,28 +152,34 @@ export function getAyahLinks(surah: number, ayah: number, locale: UiLocale = "he
 
   for (const [slug] of b.prophets) {
     const prophet = PROPHETS.find((p) => p.slug === slug);
+    const title = prophet ? prophetTitleForLocale(prophet, locale) : slugToReadable(slug);
+    if (!isLocaleCompatibleText(title, locale)) continue;
     out.push({
       kind: "prophet",
       slug,
-      title: prophet ? prophetTitleForLocale(prophet, locale) : slugToReadable(slug),
+      title,
     });
   }
 
   for (const [slug] of b.topics) {
     const topic = TOPICS.find((t) => t.slug === slug);
+    const title = topic ? topicTitleForLocale(topic, locale) : slugToReadable(slug);
+    if (!isLocaleCompatibleText(title, locale)) continue;
     out.push({
       kind: "topic",
       slug,
-      title: topic ? topicTitleForLocale(topic, locale) : slugToReadable(slug),
+      title,
     });
   }
 
   for (const [slug] of b.emotions) {
     const emotion = EMOTIONS.find((e) => e.slug === slug);
+    const title = emotion ? emotionTitleForLocale(emotion, locale) : slugToReadable(slug);
+    if (!isLocaleCompatibleText(title, locale)) continue;
     out.push({
       kind: "emotion",
       slug,
-      title: emotion ? emotionTitleForLocale(emotion, locale) : slugToReadable(slug),
+      title,
     });
   }
 
@@ -203,10 +220,12 @@ export function getConnectedVerses(
       const id = `${m.surah}:${m.ayah}`;
       if (seen.has(id)) continue;
       seen.add(id);
+      const localizedSurahName = surahNameForLocale(m.surah, locale);
+      if (!isLocaleCompatibleText(localizedSurahName, locale)) continue;
       out.push({
         surah: m.surah,
         ayah: m.ayah,
-        surahName: surahNameForLocale(m.surah, locale),
+        surahName: localizedSurahName,
         via: meta,
       });
     }

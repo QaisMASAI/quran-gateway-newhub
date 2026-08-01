@@ -1,12 +1,11 @@
 import React, { createContext, useContext, useEffect, useRef, useState } from "react";
 import {
-  ayahAudioUrl,
+  ayahAudioUrls,
   RECITERS,
   reciterName,
   getStoredReciter,
   setStoredReciter,
   type ReciterKey,
-  type AudioQualityKey,
   getStoredAudioQuality,
 } from "@/lib/quran-api";
 
@@ -52,6 +51,43 @@ export function AudioPlayerProvider({ children }: { children: React.ReactNode })
   const [currentTime, setCurrentTime] = useState(0);
 
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const trackVersionRef = useRef(0);
+  const mirrorIndexRef = useRef(0);
+
+  const buildAyahMirrors = (track: ActiveTrack) => {
+    return ayahAudioUrls(track.surah, track.ayah, "yasser-ad-dussary", getStoredAudioQuality());
+  };
+
+  const playMirrors = (audio: HTMLAudioElement, mirrors: string[], startIndex = 0): Promise<void> => {
+    if (mirrors.length === 0) return Promise.reject(new Error("no_audio_mirrors"));
+    let i = startIndex;
+    const tryNext = (): Promise<void> => {
+      if (i >= mirrors.length) return Promise.reject(new Error("all_audio_mirrors_failed"));
+      audio.src = mirrors[i];
+      mirrorIndexRef.current = i;
+      i += 1;
+      return audio.play().then(
+        () => Promise.resolve(),
+        () => tryNext(),
+      );
+    };
+    return tryNext();
+  };
+
+  const playTrackInternal = async (track: ActiveTrack, version: number) => {
+    const audio = audioRef.current;
+    if (!audio) return;
+    const mirrors = buildAyahMirrors(track);
+    try {
+      await playMirrors(audio, mirrors, 0);
+      if (trackVersionRef.current !== version) return;
+      setIsPlaying(true);
+    } catch (err) {
+      if (trackVersionRef.current !== version) return;
+      console.warn("Play track failed:", err);
+      setIsPlaying(false);
+    }
+  };
 
   useEffect(() => {
     const audio = new Audio();
@@ -61,7 +97,20 @@ export function AudioPlayerProvider({ children }: { children: React.ReactNode })
     const onLoadedMetadata = () => setDuration(audio.duration || 0);
     const onError = (e: Event) => {
       console.warn("Audio playback error:", e);
-      setIsPlaying(false);
+      const current = activeTrackRef.current;
+      if (!current) {
+        setIsPlaying(false);
+        return;
+      }
+      const mirrors = buildAyahMirrors(current);
+      const nextMirrorIndex = mirrorIndexRef.current + 1;
+      if (nextMirrorIndex >= mirrors.length) {
+        setIsPlaying(false);
+        return;
+      }
+      playMirrors(audio, mirrors, nextMirrorIndex)
+        .then(() => setIsPlaying(true))
+        .catch(() => setIsPlaying(false));
     };
     const onEnded = () => {
       setIsPlaying(false);
@@ -79,12 +128,9 @@ export function AudioPlayerProvider({ children }: { children: React.ReactNode })
         if (current.maxAyahInSurah && current.ayah < current.maxAyahInSurah) {
           const nextAyah = current.ayah + 1;
           const nextTrack = { ...current, ayah: nextAyah };
-          const quality: AudioQualityKey = getStoredAudioQuality();
-          audio.src = ayahAudioUrl(current.surah, nextAyah, "yasser-ad-dussary", quality);
-          audio
-            .play()
-            .then(() => setIsPlaying(true))
-            .catch(() => setIsPlaying(false));
+          const version = trackVersionRef.current + 1;
+          trackVersionRef.current = version;
+          void playTrackInternal(nextTrack, version);
           return nextTrack;
         }
         return current;
@@ -105,20 +151,18 @@ export function AudioPlayerProvider({ children }: { children: React.ReactNode })
     };
   }, [isLooping]);
 
+  const activeTrackRef = useRef<ActiveTrack | null>(null);
+  useEffect(() => {
+    activeTrackRef.current = activeTrack;
+  }, [activeTrack]);
+
   const playTrack = (track: ActiveTrack) => {
     setActiveTrack(track);
     if (!audioRef.current) return;
-    const quality: AudioQualityKey = getStoredAudioQuality();
-    const url = ayahAudioUrl(track.surah, track.ayah, "yasser-ad-dussary", quality);
-    audioRef.current.src = url;
     audioRef.current.playbackRate = playbackSpeed;
-    audioRef.current
-      .play()
-      .then(() => setIsPlaying(true))
-      .catch((err) => {
-        console.warn("Play track failed:", err);
-        setIsPlaying(false);
-      });
+    const version = trackVersionRef.current + 1;
+    trackVersionRef.current = version;
+    void playTrackInternal(track, version);
   };
 
   const pauseTrack = () => {
@@ -131,13 +175,10 @@ export function AudioPlayerProvider({ children }: { children: React.ReactNode })
   const resumeTrack = () => {
     if (audioRef.current && activeTrack) {
       if (!audioRef.current.src) {
-        const quality: AudioQualityKey = getStoredAudioQuality();
-        audioRef.current.src = ayahAudioUrl(
-          activeTrack.surah,
-          activeTrack.ayah,
-          "yasser-ad-dussary",
-          quality,
-        );
+        const version = trackVersionRef.current + 1;
+        trackVersionRef.current = version;
+        void playTrackInternal(activeTrack, version);
+        return;
       }
       audioRef.current
         .play()
