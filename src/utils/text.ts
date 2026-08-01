@@ -3,20 +3,18 @@
  */
 
 /**
- * Clean and fix Arabic Uthmani glyphs that frequently render as unsupported
- * floating circles/boxes in some web fonts.
+ * Preserves authentic Official Madinah Mushaf Uthmani text glyphs and Unicode code points.
+ * Ensures strict Unicode NFC normalization and strips invisible zero-width anomalies
+ * that break browser OpenType text shaping.
  */
 export function sanitizeArabicText(s: string): string {
   if (!s) return "";
-  return (
-    s
-      // Remove Quranic micro-signs that are often displayed as isolated circles
-      // with non-specialized fonts (e.g. after words like "ءَامَنُوا۟").
-      .replace(/[\u06DF\u06E0]/g, "")
-      // Remove invisible control characters that break font rendering
-      .replace(/[\u200B-\u200D\uFEFF]/g, "")
-      .trim()
-  );
+  return s
+    // Remove invisible control characters that break font OpenType shaping
+    .replace(/[\u200B-\u200D\uFEFF]/g, "")
+    // Apply canonical Unicode Normalization Form C (NFC) for proper grapheme clustering
+    .normalize("NFC")
+    .trim();
 }
 
 /**
