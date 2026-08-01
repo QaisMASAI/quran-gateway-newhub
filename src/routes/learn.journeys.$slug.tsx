@@ -11,6 +11,7 @@ import {
   pickLocale,
   type EntityKind,
 } from "@/lib/knowledge";
+import { awardXP } from "@/lib/gamification";
 import { supabase } from "@/integrations/supabase/client";
 import { normalizeLocale, type Locale } from "@/lib/i18n";
 
@@ -47,15 +48,29 @@ function JourneyPage() {
 
   if (q.isFetched && !q.data) throw notFound();
   const data = q.data;
-  const done = progressQ.data ?? new Set<string>();
+  const [localDone, setLocalDone] = useState<Set<string>>(new Set());
+
+  const done = userId ? progressQ.data ?? new Set<string>() : localDone;
   const total = data?.steps.length ?? 0;
   const completed = done.size;
   const pct = total > 0 ? Math.round((completed / total) * 100) : 0;
 
   async function toggle(stepId: string, isDone: boolean) {
-    if (!userId || !data) return;
-    await toggleJourneyStep(userId, data.journey.id, stepId, !isDone);
-    qc.invalidateQueries({ queryKey: ["journey-progress", data.journey.id, userId] });
+    if (userId && data) {
+      await toggleJourneyStep(userId, data.journey.id, stepId, !isDone);
+      qc.invalidateQueries({ queryKey: ["journey-progress", data.journey.id, userId] });
+    } else {
+      setLocalDone((prev) => {
+        const next = new Set(prev);
+        if (isDone) next.delete(stepId);
+        else next.add(stepId);
+        return next;
+      });
+    }
+
+    if (!isDone) {
+      awardXP(20);
+    }
   }
 
   return (
@@ -124,13 +139,12 @@ function JourneyPage() {
                     <button
                       type="button"
                       onClick={() => toggle(s.id, isDone)}
-                      disabled={!userId}
                       aria-label={isDone ? t("journeys.markUndone") : t("journeys.markDone")}
                       className={`mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full border-2 transition ${
                         isDone
-                          ? "border-primary bg-primary text-primary-foreground"
+                          ? "border-primary bg-primary text-primary-foreground shadow-sm scale-105"
                           : "border-border bg-background text-muted-foreground hover:border-primary"
-                      } ${!userId ? "cursor-not-allowed opacity-50" : ""}`}
+                      }`}
                     >
                       {isDone ? <Check className="h-3.5 w-3.5" /> : <Circle className="h-3 w-3" />}
                     </button>
