@@ -122,9 +122,7 @@ export function getGamificationStats(): UserStats {
     if (parsed.lastActiveDate && parsed.lastActiveDate !== today) {
       const lastDate = new Date(parsed.lastActiveDate);
       const currentDate = new Date(today);
-      const diffDays = Math.floor(
-        (currentDate.getTime() - lastDate.getTime()) / (1000 * 3600 * 24),
-      );
+      const diffDays = Math.floor((currentDate.getTime() - lastDate.getTime()) / (1000 * 3600 * 24));
       if (diffDays === 1) {
         parsed.streak += 1;
         parsed.lastActiveDate = today;
@@ -186,7 +184,14 @@ export function awardXP(amount: number, reason?: "verse" | "hadith" | "ai" | "ta
   return current;
 }
 
-export function calculateLevel(xp: number): { level: number; titleAr: string; titleEn: string; titleHe: string; nextLevelXP: number; progressPercent: number } {
+export function calculateLevel(xp: number): {
+  level: number;
+  titleAr: string;
+  titleEn: string;
+  titleHe: string;
+  nextLevelXP: number;
+  progressPercent: number;
+} {
   if (xp < 100) {
     return {
       level: 1,
