@@ -132,9 +132,7 @@ export function AITafsirViewer({
             <span className="text-[10px] uppercase tracking-wider font-mono">Verified Source</span>
           </div>
 
-          <p className="text-sm leading-relaxed text-foreground/90 font-serif">
-            {getActiveText()}
-          </p>
+          <p className="text-sm leading-relaxed text-foreground/90 font-serif">{getActiveText()}</p>
         </div>
 
         {/* Asbab Nuzul (Reasons for Revelation) if available or in Advanced mode */}
@@ -142,7 +140,13 @@ export function AITafsirViewer({
           <div className="rounded-2xl border border-gold/30 bg-gold/5 p-4 space-y-1.5">
             <div className="flex items-center gap-1.5 text-xs font-bold text-gold">
               <ScrollText className="h-4 w-4" />
-              <span>{locale === "ar" ? "أسباب النزول والسياق التاريخي" : locale === "he" ? "אסבאב א-נזול (נסיבות ההתגלות)" : "Reasons for Revelation (Asbab al-Nuzul)"}</span>
+              <span>
+                {locale === "ar"
+                  ? "أسباب النزول والسياق التاريخي"
+                  : locale === "he"
+                    ? "אסבאב א-נזול (נסיבות ההתגלות)"
+                    : "Reasons for Revelation (Asbab al-Nuzul)"}
+              </span>
             </div>
             <p className="text-xs text-foreground/80 leading-relaxed">
               {asbabNuzul ||
