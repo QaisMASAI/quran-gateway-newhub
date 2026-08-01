@@ -11,6 +11,26 @@ import { uiFontClass } from "@/lib/locale-ui";
 import { Input } from "@/components/ui/input";
 
 export const Route = createFileRoute("/surahs/")({
+  head: () => ({
+    meta: [
+      { title: "Surahs of the Quran | Noor Al-Quran & Hadith" },
+      {
+        name: "description",
+        content:
+          "Browse all 114 Surahs with Arabic text, multilingual translations, and seamless access to tafsir and listening.",
+      },
+      { property: "og:title", content: "Surahs of the Quran | Noor Al-Quran & Hadith" },
+      {
+        property: "og:description",
+        content:
+          "Open any Surah to read, listen, and explore trusted tafsir with a multilingual Quran study experience.",
+      },
+      { property: "og:url", content: "/surahs" },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
+    ],
+    links: [{ rel: "canonical", href: "/surahs" }],
+  }),
   component: SurahsIndex,
 });
 
