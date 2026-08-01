@@ -49,8 +49,8 @@
   --font-reading-ar:
     "Noto Naskh Arabic", "Amiri", "Scheherazade New", "IBM Plex Sans Arabic", "Geeza Pro", serif;
   --font-quran:
-    "KFGQPC Uthmanic Script HAFS", "UthmanicHafs", "Noto Naskh Arabic", "Amiri Quran",
-    "Scheherazade New", serif;
+    "KFGQPC Uthmanic Script HAFS", "UthmanicHafs", "KFGQPC Hafs", "Amiri Quran",
+    "Scheherazade New", "Noto Naskh Arabic", serif;
   --font-tafsir-hadith-ar: var(--font-reading-ar);
   --font-tafsir-hadith-he: var(--font-reading-he);
   --font-tafsir-hadith-en: var(--font-reading-en);
@@ -298,10 +298,18 @@
     font-family: var(--font-quran);
     direction: rtl;
     line-height: 2.45;
-    letter-spacing: 0;
+    letter-spacing: 0 !important;
+    word-spacing: normal;
+    text-rendering: optimizeLegibility;
     font-feature-settings:
       "liga" 1,
-      "calt" 1;
+      "calt" 1,
+      "mizm" 1,
+      "mark" 1,
+      "mkmk" 1;
+    font-variant-ligatures: common-ligatures contextual;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 
   .font-display {
@@ -316,7 +324,18 @@
     color: var(--color-foreground);
     direction: rtl;
     text-align: right;
-    letter-spacing: 0;
+    letter-spacing: 0 !important;
+    word-spacing: normal;
+    text-rendering: optimizeLegibility;
+    font-feature-settings:
+      "liga" 1,
+      "calt" 1,
+      "mizm" 1,
+      "mark" 1,
+      "mkmk" 1;
+    font-variant-ligatures: common-ligatures contextual;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 
   .hebrew-text {
@@ -376,8 +395,29 @@
   font-family: "KFGQPC Uthmanic Script HAFS";
   src:
     local("KFGQPC Uthmanic Script HAFS"),
+    local("KFGQPC Hafs"),
     url("https://cdn.jsdelivr.net/gh/mustafa0x/qpc-fonts@f93bf5f3/various-woff2/UthmanicHafs1%20Ver09.woff2")
       format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Amiri Quran";
+  src:
+    local("Amiri Quran"),
+    url("https://fonts.gstatic.com/s/amiriquran/v2/amiri-quran-v2-regular.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Scheherazade New";
+  src:
+    local("Scheherazade New"),
+    url("https://fonts.gstatic.com/s/scheherazadenew/v13/6xK4sS1n23c4aInXv9g6pQW7_K2j0X8.woff2") format("woff2");
   font-weight: 400;
   font-style: normal;
   font-display: swap;
