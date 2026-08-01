@@ -3,7 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { Search, Sparkles, Filter, RefreshCw, Layers, ShieldCheck, UserCheck } from "lucide-react";
 import { searchHadith } from "@/lib/hadith.functions";
-import { HadithCard } from "./HadithCard";
+import { HadithCard } from "@/components/hadith/HadithCard";
 import type { HadithReadingSettings } from "@/lib/hadith-user-store";
 
 interface HadithSearchExplorerProps {

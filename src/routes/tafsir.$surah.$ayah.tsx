@@ -562,7 +562,7 @@ function VerseTafsirPage() {
             </div>
 
             <div className="rounded-2xl bg-card p-5 border border-border/70 text-sm text-foreground/90 leading-relaxed font-serif whitespace-pre-line">
-              {asbabData && asbabData.length > 0
+              {asbabData?.[0]?.body
                 ? asbabData[0].body
                 : locale === "ar"
                   ? "نزلت هذه الآية الكريمة إجابة على تساؤل الصحابة رضوان الله عليهم وتوضيحًا للحكم الشرعي والتوجيه الأخلاقي في الواقعة."

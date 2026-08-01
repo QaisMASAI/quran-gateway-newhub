@@ -8,6 +8,7 @@ const NavKeySchema = z.enum([
   "research",
   "learn",
   "hadith",
+  "tafsir",
   "search",
   "kids",
   "collections",
