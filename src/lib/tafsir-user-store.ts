@@ -140,8 +140,7 @@ export function getReadingHistory(): TafsirReadingHistoryItem[] {
 export function useTafsirUserStore() {
   const [bookmarks, setBookmarks] = useState<TafsirBookmark[]>(getStoredBookmarks);
   const [notes, setNotes] = useState<Record<string, TafsirNote>>(getStoredNotes);
-  const [compareSources, setCompareSourcesState] =
-    useState<TafsirSourceKey[]>(getStoredCompareSources);
+  const [compareSources, setCompareSourcesState] = useState<TafsirSourceKey[]>(getStoredCompareSources);
   const [history, setHistory] = useState<TafsirReadingHistoryItem[]>(getReadingHistory);
 
   useEffect(() => {
@@ -162,8 +161,7 @@ export function useTafsirUserStore() {
     compareSources,
     history,
     saveBookmark: (b: Omit<TafsirBookmark, "id" | "createdAt">) => saveBookmark(b),
-    isBookmarked: (surah: number, ayah: number, key: TafsirSourceKey) =>
-      isBookmarked(surah, ayah, key),
+    isBookmarked: (surah: number, ayah: number, key: TafsirSourceKey) => isBookmarked(surah, ayah, key),
     saveNote: (surah: number, ayah: number, text: string) => saveNote(surah, ayah, text),
     setCompareSources: (sources: TafsirSourceKey[]) => setCompareSources(sources),
     addReadingHistory: (surah: number, ayah: number) => addReadingHistory(surah, ayah),
