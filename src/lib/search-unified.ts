@@ -1,7 +1,8 @@
-import { buildQuranIndex, type SearchOutput } from "./quran-api";
-import { searchWithFallback } from "./quran-search";
-import { searchHadith } from "./hadith.functions";
-import { listEntitiesByKind, pickLocale, type KnowledgeEntity } from "./knowledge";
+import { searchVersesWithConcepts, type SearchOutput } from "./quran-search";
+import { searchHadithAction } from "./hadith.functions";
+import { searchTopics } from "./topics";
+import { PROPHETS } from "./prophets";
+import { pickLocale } from "./content-i18n";
 
 export interface UnifiedSearchResultItem {
   id: string;
@@ -27,16 +28,6 @@ export interface UnifiedSearchResponse {
   };
 }
 
-function entityMatchesQuery(entity: KnowledgeEntity, query: string, locale: "ar" | "en" | "he"): boolean {
-  const q = query.toLowerCase();
-  const title = pickLocale(entity.title_i18n, locale).toLowerCase();
-  const summary = pickLocale(entity.summary_i18n, locale).toLowerCase();
-  const titleFallback = `${entity.title_i18n.en ?? ""} ${entity.title_i18n.ar ?? ""} ${entity.title_i18n.he ?? ""}`.toLowerCase();
-  const summaryFallback = `${entity.summary_i18n.en ?? ""} ${entity.summary_i18n.ar ?? ""} ${entity.summary_i18n.he ?? ""}`.toLowerCase();
-
-  return title.includes(q) || summary.includes(q) || titleFallback.includes(q) || summaryFallback.includes(q);
-}
-
 export async function performUnifiedSearch(
   query: string,
   locale: "ar" | "en" | "he" = "en",
@@ -53,28 +44,24 @@ export async function performUnifiedSearch(
   // 1. Quran & Tafsir search (if applicable)
   if (domainFilter === "all" || domainFilter === "quran" || domainFilter === "tafsir") {
     try {
-      const index = await buildQuranIndex();
-      const quranResults: SearchOutput = searchWithFallback(index, q, locale);
-      const verseHits = quranResults.groups.flatMap((group) => group.hits);
-
-      if (verseHits.length > 0) {
-        counts.quran = verseHits.length;
+      const quranResults: SearchOutput = await searchVersesWithConcepts(q, locale);
+      if (quranResults?.hits) {
+        counts.quran = quranResults.hits.length;
         if (domainFilter === "all" || domainFilter === "quran") {
-          verseHits.slice(0, 15).forEach((hit) => {
+          quranResults.hits.slice(0, 15).forEach((hit) => {
             const verseText =
               locale === "ar"
-                ? hit.verse.arabic
+                ? hit.verse.text_ar
                 : locale === "he"
-                  ? hit.verse.hebrew || hit.verse.english
-                  : hit.verse.english;
-
+                  ? hit.verse.text_he || hit.verse.text_en
+                  : hit.verse.text_en;
             items.push({
-              id: `quran-${hit.verse.surah}-${hit.verse.ayah}`,
+              id: `quran-${hit.verse.surah_id}-${hit.verse.ayah_number}`,
               domain: "quran",
-              title: `Surah ${hit.verse.surah}:${hit.verse.ayah}`,
-              subtitle: hit.verse.arabic,
+              title: `Surah ${hit.verse.surah_id}:${hit.verse.ayah_number}`,
+              subtitle: hit.verse.text_ar,
               snippet: verseText,
-              url: `/surah/${hit.verse.surah}?ayah=${hit.verse.ayah}`,
+              url: `/surah/${hit.verse.surah_id}?ayah=${hit.verse.ayah_number}`,
               badge: "Quran",
             });
           });
@@ -88,27 +75,32 @@ export async function performUnifiedSearch(
   // 2. Hadith search (if applicable)
   if (domainFilter === "all" || domainFilter === "hadith") {
     try {
-      const hadithRes = await searchHadith({ data: { q, page: 0, pageSize: 15 } });
+      const hadithRes = await searchHadithAction({ data: { query: q, locale, limit: 15 } });
       if (hadithRes?.items) {
         counts.hadith = hadithRes.items.length;
-        hadithRes.items.forEach((h) => {
-          const snippet =
-            locale === "he"
-              ? h.hebrew_text || h.english_text || h.arabic_text
-              : locale === "ar"
-                ? h.arabic_text || h.english_text || h.hebrew_text || ""
-                : h.english_text || h.arabic_text || h.hebrew_text || "";
-
-          items.push({
-            id: `hadith-${h.collection_slug || "sys"}-${h.id_in_book || h.id}`,
-            domain: "hadith",
-            title: `${h.collection_slug || "Hadith"} #${h.id_in_book || ""}`,
-            subtitle: h.narrator || undefined,
-            snippet,
-            url: `/hadith/${h.collection_slug}/entry/${h.id_in_book}`,
-            badge: h.collection_slug || "Hadith",
-          });
-        });
+        hadithRes.items.forEach(
+          (h: {
+            collection?: string;
+            hadith_number?: number | string;
+            id?: string;
+            collection_name?: string;
+            grade?: string;
+            narrator?: string;
+            text?: string;
+            english_text?: string;
+            hebrew_text?: string;
+          }) => {
+            items.push({
+              id: `hadith-${h.collection || "sys"}-${h.hadith_number || h.id}`,
+              domain: "hadith",
+              title: `${h.collection_name || "Hadith"} #${h.hadith_number || ""}`,
+              subtitle: h.grade || h.narrator,
+              snippet: h.text || h.english_text || h.hebrew_text || "",
+              url: `/hadith/${h.collection}/${h.hadith_number}`,
+              badge: h.collection_name || "Hadith",
+            });
+          },
+        );
       }
     } catch {
       // Fallback
@@ -118,8 +110,7 @@ export async function performUnifiedSearch(
   // 3. Topics search
   if (domainFilter === "all" || domainFilter === "topics") {
     try {
-      const topics = await listEntitiesByKind("topic");
-      const matchedTopics = topics.filter((topic) => entityMatchesQuery(topic, q, locale));
+      const matchedTopics = searchTopics(q, locale);
       counts.topics = matchedTopics.length;
       matchedTopics.slice(0, 10).forEach((t) => {
         items.push({
@@ -139,16 +130,21 @@ export async function performUnifiedSearch(
   // 4. Prophets search
   if (domainFilter === "all" || domainFilter === "prophets") {
     try {
-      const prophets = await listEntitiesByKind("prophet");
-      const matchedProphets = prophets.filter((prophet) => entityMatchesQuery(prophet, q, locale));
+      const matchedProphets = PROPHETS.filter(
+        (p) =>
+          p.nameEn.toLowerCase().includes(q) ||
+          p.nameAr.includes(q) ||
+          p.nameHe.includes(q) ||
+          p.summary.toLowerCase().includes(q),
+      );
       counts.prophets = matchedProphets.length;
       matchedProphets.slice(0, 10).forEach((p) => {
-        const title = pickLocale(p.title_i18n, locale) || p.slug;
+        const title = locale === "ar" ? p.nameAr : locale === "he" ? p.nameHe : p.nameEn;
         items.push({
           id: `prophet-${p.slug}`,
           domain: "prophets",
           title,
-          snippet: pickLocale(p.summary_i18n, locale),
+          snippet: p.summary,
           url: `/prophets/${p.slug}`,
           badge: "Prophet",
         });
