@@ -27,7 +27,7 @@ import type { ReactNode } from "react";
 import { useQueryPrefillInput } from "@/hooks/useQueryPrefillInput";
 import { trackHomePromptEvent } from "@/lib/home-prompts.functions";
 
-export const Route = createLazyFileRoute("/search")({
+export const Route = createLazyFileRoute("/research")({
   component: SearchPage,
 });
 

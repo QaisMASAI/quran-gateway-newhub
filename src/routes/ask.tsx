@@ -25,7 +25,5 @@ export const Route = createFileRoute("/ask")({
       links: [{ rel: "canonical", href: "/ask" }],
     };
   },
-  pendingComponent: () => (
-    <div className="mx-auto max-w-3xl px-4 py-10 text-sm text-muted-foreground">Loading…</div>
-  ),
+  pendingComponent: () => <div className="mx-auto max-w-3xl px-4 py-10 text-sm text-muted-foreground">Loading…</div>,
 });
