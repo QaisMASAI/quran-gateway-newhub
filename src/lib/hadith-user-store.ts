@@ -69,12 +69,8 @@ function saveToStorage<T>(key: string, value: T) {
 }
 
 export function useHadithUserStore() {
-  const [bookmarks, setBookmarks] = useState<Record<string, number>>(() =>
-    loadFromStorage(STORAGE_KEY_BOOKMARKS, {}),
-  );
-  const [notes, setNotes] = useState<Record<string, string>>(() =>
-    loadFromStorage(STORAGE_KEY_NOTES, {}),
-  );
+  const [bookmarks, setBookmarks] = useState<Record<string, number>>(() => loadFromStorage(STORAGE_KEY_BOOKMARKS, {}));
+  const [notes, setNotes] = useState<Record<string, string>>(() => loadFromStorage(STORAGE_KEY_NOTES, {}));
   const [highlights, setHighlights] = useState<Record<string, HadithHighlight>>(() =>
     loadFromStorage(STORAGE_KEY_HIGHLIGHTS, {}),
   );
@@ -96,9 +92,7 @@ export function useHadithUserStore() {
       },
     ]),
   );
-  const [history, setHistory] = useState<HadithHistoryItem[]>(() =>
-    loadFromStorage(STORAGE_KEY_HISTORY, []),
-  );
+  const [history, setHistory] = useState<HadithHistoryItem[]>(() => loadFromStorage(STORAGE_KEY_HISTORY, []));
   const [settings, setSettings] = useState<HadithReadingSettings>(() =>
     loadFromStorage(STORAGE_KEY_SETTINGS, DEFAULT_SETTINGS),
   );
@@ -196,12 +190,7 @@ export function useHadithUserStore() {
     setCollections((prev) => [newColl, ...prev]);
   };
 
-  const toggleInCollection = (
-    collectionId: string,
-    collection_slug: string,
-    num: number,
-    title: string,
-  ) => {
+  const toggleInCollection = (collectionId: string, collection_slug: string, num: number, title: string) => {
     setCollections((prev) =>
       prev.map((c) => {
         if (c.id !== collectionId) return c;
@@ -216,9 +205,7 @@ export function useHadithUserStore() {
 
   const recordHistory = (collection_slug: string, num: number, title: string) => {
     setHistory((prev) => {
-      const filtered = prev.filter(
-        (i) => !(i.collection_slug === collection_slug && i.num === num),
-      );
+      const filtered = prev.filter((i) => !(i.collection_slug === collection_slug && i.num === num));
       return [{ collection_slug, num, title, timestamp: Date.now() }, ...filtered].slice(0, 50);
     });
   };
