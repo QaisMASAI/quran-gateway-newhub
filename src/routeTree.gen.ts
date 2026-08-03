@@ -73,12 +73,8 @@ import { Route as AuthenticatedAdminHadithIngestRouteImport } from './routes/_au
 import { Route as AuthenticatedAdminBackfillRouteImport } from './routes/_authenticated/admin.backfill'
 import { Route as HadithCollectionEntryNumRouteImport } from './routes/hadith.$collection.entry.$num'
 import { Route as ApiPublicAdminValidateQuranCertificationRouteImport } from './routes/api/public/admin/validate-quran-certification'
-import { Route as ApiPublicAdminTranslateTafsirHebrewRouteImport } from './routes/api/public/admin/translate-tafsir-hebrew'
-import { Route as ApiPublicAdminTranslateHadithHebrewRouteImport } from './routes/api/public/admin/translate-hadith-hebrew'
 import { Route as ApiPublicAdminRebuildGroundedIndexRouteImport } from './routes/api/public/admin/rebuild-grounded-index'
-import { Route as ApiPublicAdminLinkHadithGraphRouteImport } from './routes/api/public/admin/link-hadith-graph'
 import { Route as ApiPublicAdminIngestQuranJsonRouteImport } from './routes/api/public/admin/ingest-quran-json'
-import { Route as ApiPublicAdminEmbedHadithRouteImport } from './routes/api/public/admin/embed-hadith'
 import { Route as ApiPublicAdminBackfillVerseTranslationsRouteImport } from './routes/api/public/admin/backfill-verse-translations'
 import { Route as ApiPublicAdminBackfillQuranChaptersRouteImport } from './routes/api/public/admin/backfill-quran-chapters'
 import { Route as ApiPublicAdminBackfillAsbabNuzulRouteImport } from './routes/api/public/admin/backfill-asbab-nuzul'
@@ -408,40 +404,16 @@ const ApiPublicAdminValidateQuranCertificationRoute =
     path: '/api/public/admin/validate-quran-certification',
     getParentRoute: () => rootRouteImport,
   } as any)
-const ApiPublicAdminTranslateTafsirHebrewRoute =
-  ApiPublicAdminTranslateTafsirHebrewRouteImport.update({
-    id: '/api/public/admin/translate-tafsir-hebrew',
-    path: '/api/public/admin/translate-tafsir-hebrew',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiPublicAdminTranslateHadithHebrewRoute =
-  ApiPublicAdminTranslateHadithHebrewRouteImport.update({
-    id: '/api/public/admin/translate-hadith-hebrew',
-    path: '/api/public/admin/translate-hadith-hebrew',
-    getParentRoute: () => rootRouteImport,
-  } as any)
 const ApiPublicAdminRebuildGroundedIndexRoute =
   ApiPublicAdminRebuildGroundedIndexRouteImport.update({
     id: '/api/public/admin/rebuild-grounded-index',
     path: '/api/public/admin/rebuild-grounded-index',
     getParentRoute: () => rootRouteImport,
   } as any)
-const ApiPublicAdminLinkHadithGraphRoute =
-  ApiPublicAdminLinkHadithGraphRouteImport.update({
-    id: '/api/public/admin/link-hadith-graph',
-    path: '/api/public/admin/link-hadith-graph',
-    getParentRoute: () => rootRouteImport,
-  } as any)
 const ApiPublicAdminIngestQuranJsonRoute =
   ApiPublicAdminIngestQuranJsonRouteImport.update({
     id: '/api/public/admin/ingest-quran-json',
     path: '/api/public/admin/ingest-quran-json',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiPublicAdminEmbedHadithRoute =
-  ApiPublicAdminEmbedHadithRouteImport.update({
-    id: '/api/public/admin/embed-hadith',
-    path: '/api/public/admin/embed-hadith',
     getParentRoute: () => rootRouteImport,
   } as any)
 const ApiPublicAdminBackfillVerseTranslationsRoute =
@@ -535,12 +507,8 @@ export interface FileRoutesByFullPath {
   '/api/public/admin/backfill-asbab-nuzul': typeof ApiPublicAdminBackfillAsbabNuzulRoute
   '/api/public/admin/backfill-quran-chapters': typeof ApiPublicAdminBackfillQuranChaptersRoute
   '/api/public/admin/backfill-verse-translations': typeof ApiPublicAdminBackfillVerseTranslationsRoute
-  '/api/public/admin/embed-hadith': typeof ApiPublicAdminEmbedHadithRoute
   '/api/public/admin/ingest-quran-json': typeof ApiPublicAdminIngestQuranJsonRoute
-  '/api/public/admin/link-hadith-graph': typeof ApiPublicAdminLinkHadithGraphRoute
   '/api/public/admin/rebuild-grounded-index': typeof ApiPublicAdminRebuildGroundedIndexRoute
-  '/api/public/admin/translate-hadith-hebrew': typeof ApiPublicAdminTranslateHadithHebrewRoute
-  '/api/public/admin/translate-tafsir-hebrew': typeof ApiPublicAdminTranslateTafsirHebrewRoute
   '/api/public/admin/validate-quran-certification': typeof ApiPublicAdminValidateQuranCertificationRoute
   '/hadith/$collection/entry/$num': typeof HadithCollectionEntryNumRoute
 }
@@ -610,12 +578,8 @@ export interface FileRoutesByTo {
   '/api/public/admin/backfill-asbab-nuzul': typeof ApiPublicAdminBackfillAsbabNuzulRoute
   '/api/public/admin/backfill-quran-chapters': typeof ApiPublicAdminBackfillQuranChaptersRoute
   '/api/public/admin/backfill-verse-translations': typeof ApiPublicAdminBackfillVerseTranslationsRoute
-  '/api/public/admin/embed-hadith': typeof ApiPublicAdminEmbedHadithRoute
   '/api/public/admin/ingest-quran-json': typeof ApiPublicAdminIngestQuranJsonRoute
-  '/api/public/admin/link-hadith-graph': typeof ApiPublicAdminLinkHadithGraphRoute
   '/api/public/admin/rebuild-grounded-index': typeof ApiPublicAdminRebuildGroundedIndexRoute
-  '/api/public/admin/translate-hadith-hebrew': typeof ApiPublicAdminTranslateHadithHebrewRoute
-  '/api/public/admin/translate-tafsir-hebrew': typeof ApiPublicAdminTranslateTafsirHebrewRoute
   '/api/public/admin/validate-quran-certification': typeof ApiPublicAdminValidateQuranCertificationRoute
   '/hadith/$collection/entry/$num': typeof HadithCollectionEntryNumRoute
 }
@@ -687,12 +651,8 @@ export interface FileRoutesById {
   '/api/public/admin/backfill-asbab-nuzul': typeof ApiPublicAdminBackfillAsbabNuzulRoute
   '/api/public/admin/backfill-quran-chapters': typeof ApiPublicAdminBackfillQuranChaptersRoute
   '/api/public/admin/backfill-verse-translations': typeof ApiPublicAdminBackfillVerseTranslationsRoute
-  '/api/public/admin/embed-hadith': typeof ApiPublicAdminEmbedHadithRoute
   '/api/public/admin/ingest-quran-json': typeof ApiPublicAdminIngestQuranJsonRoute
-  '/api/public/admin/link-hadith-graph': typeof ApiPublicAdminLinkHadithGraphRoute
   '/api/public/admin/rebuild-grounded-index': typeof ApiPublicAdminRebuildGroundedIndexRoute
-  '/api/public/admin/translate-hadith-hebrew': typeof ApiPublicAdminTranslateHadithHebrewRoute
-  '/api/public/admin/translate-tafsir-hebrew': typeof ApiPublicAdminTranslateTafsirHebrewRoute
   '/api/public/admin/validate-quran-certification': typeof ApiPublicAdminValidateQuranCertificationRoute
   '/hadith/$collection/entry/$num': typeof HadithCollectionEntryNumRoute
 }
@@ -764,12 +724,8 @@ export interface FileRouteTypes {
     | '/api/public/admin/backfill-asbab-nuzul'
     | '/api/public/admin/backfill-quran-chapters'
     | '/api/public/admin/backfill-verse-translations'
-    | '/api/public/admin/embed-hadith'
     | '/api/public/admin/ingest-quran-json'
-    | '/api/public/admin/link-hadith-graph'
     | '/api/public/admin/rebuild-grounded-index'
-    | '/api/public/admin/translate-hadith-hebrew'
-    | '/api/public/admin/translate-tafsir-hebrew'
     | '/api/public/admin/validate-quran-certification'
     | '/hadith/$collection/entry/$num'
   fileRoutesByTo: FileRoutesByTo
@@ -839,12 +795,8 @@ export interface FileRouteTypes {
     | '/api/public/admin/backfill-asbab-nuzul'
     | '/api/public/admin/backfill-quran-chapters'
     | '/api/public/admin/backfill-verse-translations'
-    | '/api/public/admin/embed-hadith'
     | '/api/public/admin/ingest-quran-json'
-    | '/api/public/admin/link-hadith-graph'
     | '/api/public/admin/rebuild-grounded-index'
-    | '/api/public/admin/translate-hadith-hebrew'
-    | '/api/public/admin/translate-tafsir-hebrew'
     | '/api/public/admin/validate-quran-certification'
     | '/hadith/$collection/entry/$num'
   id:
@@ -915,12 +867,8 @@ export interface FileRouteTypes {
     | '/api/public/admin/backfill-asbab-nuzul'
     | '/api/public/admin/backfill-quran-chapters'
     | '/api/public/admin/backfill-verse-translations'
-    | '/api/public/admin/embed-hadith'
     | '/api/public/admin/ingest-quran-json'
-    | '/api/public/admin/link-hadith-graph'
     | '/api/public/admin/rebuild-grounded-index'
-    | '/api/public/admin/translate-hadith-hebrew'
-    | '/api/public/admin/translate-tafsir-hebrew'
     | '/api/public/admin/validate-quran-certification'
     | '/hadith/$collection/entry/$num'
   fileRoutesById: FileRoutesById
@@ -983,12 +931,8 @@ export interface RootRouteChildren {
   ApiPublicAdminBackfillAsbabNuzulRoute: typeof ApiPublicAdminBackfillAsbabNuzulRoute
   ApiPublicAdminBackfillQuranChaptersRoute: typeof ApiPublicAdminBackfillQuranChaptersRoute
   ApiPublicAdminBackfillVerseTranslationsRoute: typeof ApiPublicAdminBackfillVerseTranslationsRoute
-  ApiPublicAdminEmbedHadithRoute: typeof ApiPublicAdminEmbedHadithRoute
   ApiPublicAdminIngestQuranJsonRoute: typeof ApiPublicAdminIngestQuranJsonRoute
-  ApiPublicAdminLinkHadithGraphRoute: typeof ApiPublicAdminLinkHadithGraphRoute
   ApiPublicAdminRebuildGroundedIndexRoute: typeof ApiPublicAdminRebuildGroundedIndexRoute
-  ApiPublicAdminTranslateHadithHebrewRoute: typeof ApiPublicAdminTranslateHadithHebrewRoute
-  ApiPublicAdminTranslateTafsirHebrewRoute: typeof ApiPublicAdminTranslateTafsirHebrewRoute
   ApiPublicAdminValidateQuranCertificationRoute: typeof ApiPublicAdminValidateQuranCertificationRoute
 }
 
@@ -1442,20 +1386,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicAdminValidateQuranCertificationRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/public/admin/translate-tafsir-hebrew': {
-      id: '/api/public/admin/translate-tafsir-hebrew'
-      path: '/api/public/admin/translate-tafsir-hebrew'
-      fullPath: '/api/public/admin/translate-tafsir-hebrew'
-      preLoaderRoute: typeof ApiPublicAdminTranslateTafsirHebrewRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/public/admin/translate-hadith-hebrew': {
-      id: '/api/public/admin/translate-hadith-hebrew'
-      path: '/api/public/admin/translate-hadith-hebrew'
-      fullPath: '/api/public/admin/translate-hadith-hebrew'
-      preLoaderRoute: typeof ApiPublicAdminTranslateHadithHebrewRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/api/public/admin/rebuild-grounded-index': {
       id: '/api/public/admin/rebuild-grounded-index'
       path: '/api/public/admin/rebuild-grounded-index'
@@ -1463,25 +1393,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicAdminRebuildGroundedIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/public/admin/link-hadith-graph': {
-      id: '/api/public/admin/link-hadith-graph'
-      path: '/api/public/admin/link-hadith-graph'
-      fullPath: '/api/public/admin/link-hadith-graph'
-      preLoaderRoute: typeof ApiPublicAdminLinkHadithGraphRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/api/public/admin/ingest-quran-json': {
       id: '/api/public/admin/ingest-quran-json'
       path: '/api/public/admin/ingest-quran-json'
       fullPath: '/api/public/admin/ingest-quran-json'
       preLoaderRoute: typeof ApiPublicAdminIngestQuranJsonRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/public/admin/embed-hadith': {
-      id: '/api/public/admin/embed-hadith'
-      path: '/api/public/admin/embed-hadith'
-      fullPath: '/api/public/admin/embed-hadith'
-      preLoaderRoute: typeof ApiPublicAdminEmbedHadithRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/public/admin/backfill-verse-translations': {
@@ -1622,18 +1538,22 @@ const rootRouteChildren: RootRouteChildren = {
     ApiPublicAdminBackfillQuranChaptersRoute,
   ApiPublicAdminBackfillVerseTranslationsRoute:
     ApiPublicAdminBackfillVerseTranslationsRoute,
-  ApiPublicAdminEmbedHadithRoute: ApiPublicAdminEmbedHadithRoute,
   ApiPublicAdminIngestQuranJsonRoute: ApiPublicAdminIngestQuranJsonRoute,
-  ApiPublicAdminLinkHadithGraphRoute: ApiPublicAdminLinkHadithGraphRoute,
   ApiPublicAdminRebuildGroundedIndexRoute:
     ApiPublicAdminRebuildGroundedIndexRoute,
-  ApiPublicAdminTranslateHadithHebrewRoute:
-    ApiPublicAdminTranslateHadithHebrewRoute,
-  ApiPublicAdminTranslateTafsirHebrewRoute:
-    ApiPublicAdminTranslateTafsirHebrewRoute,
   ApiPublicAdminValidateQuranCertificationRoute:
     ApiPublicAdminValidateQuranCertificationRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
