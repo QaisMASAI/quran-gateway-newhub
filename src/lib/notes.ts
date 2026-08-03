@@ -60,16 +60,14 @@ export function useAyahNote(surah: number, ayah: number) {
           .eq("id", note.id)
           .select("id, body, updated_at")
           .single();
-        if (data)
-          setNote({ id: data.id as string, body: data.body as string, updatedAt: Date.now() });
+        if (data) setNote({ id: data.id as string, body: data.body as string, updatedAt: Date.now() });
       } else {
         const { data } = await supabase
           .from("notes")
           .insert({ user_id: user.id, surah, ayah, body: trimmed })
           .select("id, body, updated_at")
           .single();
-        if (data)
-          setNote({ id: data.id as string, body: data.body as string, updatedAt: Date.now() });
+        if (data) setNote({ id: data.id as string, body: data.body as string, updatedAt: Date.now() });
       }
     },
     [user, surah, ayah, note],
