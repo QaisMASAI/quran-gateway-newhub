@@ -51,20 +51,12 @@ export function MegaMenu() {
       items: [
         {
           label: isAr ? "جميع السور (114)" : isHe ? "כל הסורות (114)" : "All Surahs (114)",
-          desc: isAr
-            ? "قراءة واستماع بالتجويد"
-            : isHe
-              ? "קריאה והאזנה"
-              : "Read & Listen with Tajweed",
+          desc: isAr ? "قراءة واستماع بالتجويد" : isHe ? "קריאה והאזנה" : "Read & Listen with Tajweed",
           to: "/surahs",
           icon: <BookOpen className="h-4 w-4" />,
         },
         {
-          label: isAr
-            ? "منصة التفاسير المتقدمة"
-            : isHe
-              ? "פלטפורמת התפסיר המתקדמת"
-              : "Tafsir Platform",
+          label: isAr ? "منصة التفاسير المتقدمة" : isHe ? "פלטפורמת התפסיר המתקדמת" : "Tafsir Platform",
           desc: isAr
             ? "8 تفاسير علمية ومقارنة بالذكاء الاصطناعي"
             : isHe
@@ -74,16 +66,8 @@ export function MegaMenu() {
           icon: <BookMarked className="h-4 w-4" />,
         },
         {
-          label: isAr
-            ? "خريطة المعرفة القرآنية"
-            : isHe
-              ? "מפת ידע קוראנית"
-              : "Quran Knowledge Graph",
-          desc: isAr
-            ? "استكشف المفاهيم المترابطة"
-            : isHe
-              ? "רשת המושגים"
-              : "Explore Connected Concepts",
+          label: isAr ? "خريطة المعرفة القرآنية" : isHe ? "מפת ידע קוראנית" : "Quran Knowledge Graph",
+          desc: isAr ? "استكشف المفاهيم المترابطة" : isHe ? "רשת המושגים" : "Explore Connected Concepts",
           to: "/learn/graph",
           icon: <Compass className="h-4 w-4" />,
         },
@@ -101,31 +85,19 @@ export function MegaMenu() {
       items: [
         {
           label: isAr ? "مكتبة الأحاديث" : isHe ? "ספריית החדית'" : "Hadith Collections",
-          desc: isAr
-            ? "البخاري، مسلم وباقي الكتب"
-            : isHe
-              ? "בוחארי ומוסלים"
-              : "Sahih Bukhari, Muslim & more",
+          desc: isAr ? "البخاري، مسلم وباقي الكتب" : isHe ? "בוחארי ומוסלים" : "Sahih Bukhari, Muslim & more",
           to: "/hadith",
           icon: <Library className="h-4 w-4" />,
         },
         {
           label: isAr ? "أحاديث المواضيع" : isHe ? "חדית' לפי נושאים" : "Hadith by Topic",
-          desc: isAr
-            ? "مصنفة حسب الأحكام والأخلاق"
-            : isHe
-              ? "נושאי הלכה ומודעות"
-              : "Categorized by Islamic Topics",
+          desc: isAr ? "مصنفة حسب الأحكام والأخلاق" : isHe ? "נושאי הלכה ומודעות" : "Categorized by Islamic Topics",
           to: "/hadith/topics",
           icon: <ScrollText className="h-4 w-4" />,
         },
         {
           label: isAr ? "رواة الحديث والتراجم" : isHe ? "ראשי המוסרים" : "Narrators Index",
-          desc: isAr
-            ? "سلاسل الأسانيد والصحابة"
-            : isHe
-              ? "שרשרות המוסרים"
-              : "Sahabah & Chain of Narrators",
+          desc: isAr ? "سلاسل الأسانيد والصحابة" : isHe ? "שרשרות המוסרים" : "Sahabah & Chain of Narrators",
           to: "/hadith/narrators",
           icon: <UserCheck className="h-4 w-4" />,
         },
@@ -137,11 +109,7 @@ export function MegaMenu() {
       items: [
         {
           label: isAr ? "مواضيع القرآن" : isHe ? "נושאי הקוראן" : "Quran Topics",
-          desc: isAr
-            ? "فهرس موضوعي شامل لآيات القرآن"
-            : isHe
-              ? "אינדקס נושאים מקיף"
-              : "Comprehensive Thematic Index",
+          desc: isAr ? "فهرس موضوعي شامل لآيات القرآن" : isHe ? "אינדקס נושאים מקיף" : "Comprehensive Thematic Index",
           to: "/topics",
           icon: <Sparkles className="h-4 w-4" />,
         },
@@ -167,11 +135,7 @@ export function MegaMenu() {
         },
         {
           label: isAr ? "الأحداث التاريخية" : isHe ? "אירועים היסטוריים" : "Historic Events",
-          desc: isAr
-            ? "الهجرة، بدر، أحد وحنين"
-            : isHe
-              ? "ההג'רה, בדר ואירועים"
-              : "Prophetic Timeline & Milestones",
+          desc: isAr ? "الهجرة، بدر، أحد وحنين" : isHe ? "ההג'רה, בדר ואירועים" : "Prophetic Timeline & Milestones",
           to: "/events",
           icon: <Clock className="h-4 w-4" />,
         },
@@ -198,24 +162,12 @@ export function MegaMenu() {
       ],
     },
     {
-      title: isAr
-        ? "الأدوات والذكاء الاصطناعي"
-        : isHe
-          ? "כלים ובינה מלאכותית"
-          : "AI Tools & Learning",
+      title: isAr ? "الأدوات والذكاء الاصطناعي" : isHe ? "כלים ובינה מלאכותית" : "AI Tools & Learning",
       icon: <Sparkles className="h-4 w-4 text-primary" />,
       items: [
         {
-          label: isAr
-            ? "الباحث الإسلامي الذكي"
-            : isHe
-              ? "חוקר בינה מלאכותית"
-              : "AI Research Engine",
-          desc: isAr
-            ? "بحث بالدليل والتوثيق"
-            : isHe
-              ? "מחקר מעמיק ומאומת"
-              : "Deep Cited Research Assistant",
+          label: isAr ? "الباحث الإسلامي الذكي" : isHe ? "חוקר בינה מלאכותית" : "AI Research Engine",
+          desc: isAr ? "بحث بالدليل والتوثيق" : isHe ? "מחקר מעמיק ומאומת" : "Deep Cited Research Assistant",
           to: "/research",
           icon: <Sparkles className="h-4 w-4" />,
         },
@@ -252,9 +204,7 @@ export function MegaMenu() {
       >
         <Compass className="h-3.5 w-3.5 text-primary" />
         <span>{isAr ? "استكشف المنصة" : isHe ? "גלה את הפלטפורמה" : "Explore Platform"}</span>
-        <ChevronDown
-          className={`h-3 w-3 transition-transform duration-200 ${open ? "rotate-180" : ""}`}
-        />
+        <ChevronDown className={`h-3 w-3 transition-transform duration-200 ${open ? "rotate-180" : ""}`} />
       </button>
 
       {open && (
@@ -281,9 +231,7 @@ export function MegaMenu() {
                           <div className="text-xs font-semibold text-foreground group-hover:text-primary transition-colors">
                             {item.label}
                           </div>
-                          <div className="text-[10.5px] text-muted-foreground line-clamp-1">
-                            {item.desc}
-                          </div>
+                          <div className="text-[10.5px] text-muted-foreground line-clamp-1">{item.desc}</div>
                         </div>
                       </Link>
                     </li>
