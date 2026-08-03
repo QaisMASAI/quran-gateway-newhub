@@ -32,6 +32,7 @@ import { Route as PlansIndexRouteImport } from './routes/plans.index'
 import { Route as PlacesIndexRouteImport } from './routes/places.index'
 import { Route as MosquesIndexRouteImport } from './routes/mosques.index'
 import { Route as LearnIndexRouteImport } from './routes/learn.index'
+import { Route as HadithIndexRouteImport } from './routes/hadith.index'
 import { Route as EventsIndexRouteImport } from './routes/events.index'
 import { Route as EmotionsIndexRouteImport } from './routes/emotions.index'
 import { Route as DuasIndexRouteImport } from './routes/duas.index'
@@ -193,6 +194,11 @@ const LearnIndexRoute = LearnIndexRouteImport.update({
   id: '/learn/',
   path: '/learn/',
   getParentRoute: () => rootRouteImport,
+} as any)
+const HadithIndexRoute = HadithIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => HadithRoute,
 } as any)
 const EventsIndexRoute = EventsIndexRouteImport.update({
   id: '/events/',
@@ -481,6 +487,7 @@ export interface FileRoutesByFullPath {
   '/duas/': typeof DuasIndexRoute
   '/emotions/': typeof EmotionsIndexRoute
   '/events/': typeof EventsIndexRoute
+  '/hadith/': typeof HadithIndexRoute
   '/learn/': typeof LearnIndexRoute
   '/mosques/': typeof MosquesIndexRoute
   '/places/': typeof PlacesIndexRoute
@@ -517,7 +524,6 @@ export interface FileRoutesByTo {
   '/ask': typeof AskRoute
   '/auth': typeof AuthRoute
   '/favorites': typeof FavoritesRoute
-  '/hadith': typeof HadithRouteWithChildren
   '/kids': typeof KidsRoute
   '/library': typeof LibraryRoute
   '/onboarding': typeof OnboardingRoute
@@ -552,6 +558,7 @@ export interface FileRoutesByTo {
   '/duas': typeof DuasIndexRoute
   '/emotions': typeof EmotionsIndexRoute
   '/events': typeof EventsIndexRoute
+  '/hadith': typeof HadithIndexRoute
   '/learn': typeof LearnIndexRoute
   '/mosques': typeof MosquesIndexRoute
   '/places': typeof PlacesIndexRoute
@@ -625,6 +632,7 @@ export interface FileRoutesById {
   '/duas/': typeof DuasIndexRoute
   '/emotions/': typeof EmotionsIndexRoute
   '/events/': typeof EventsIndexRoute
+  '/hadith/': typeof HadithIndexRoute
   '/learn/': typeof LearnIndexRoute
   '/mosques/': typeof MosquesIndexRoute
   '/places/': typeof PlacesIndexRoute
@@ -698,6 +706,7 @@ export interface FileRouteTypes {
     | '/duas/'
     | '/emotions/'
     | '/events/'
+    | '/hadith/'
     | '/learn/'
     | '/mosques/'
     | '/places/'
@@ -734,7 +743,6 @@ export interface FileRouteTypes {
     | '/ask'
     | '/auth'
     | '/favorites'
-    | '/hadith'
     | '/kids'
     | '/library'
     | '/onboarding'
@@ -769,6 +777,7 @@ export interface FileRouteTypes {
     | '/duas'
     | '/emotions'
     | '/events'
+    | '/hadith'
     | '/learn'
     | '/mosques'
     | '/places'
@@ -841,6 +850,7 @@ export interface FileRouteTypes {
     | '/duas/'
     | '/emotions/'
     | '/events/'
+    | '/hadith/'
     | '/learn/'
     | '/mosques/'
     | '/places/'
@@ -1098,6 +1108,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/learn/'
       preLoaderRoute: typeof LearnIndexRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/hadith/': {
+      id: '/hadith/'
+      path: '/'
+      fullPath: '/hadith/'
+      preLoaderRoute: typeof HadithIndexRouteImport
+      parentRoute: typeof HadithRoute
     }
     '/events/': {
       id: '/events/'
@@ -1467,12 +1484,14 @@ interface HadithRouteChildren {
   HadithCollectionRoute: typeof HadithCollectionRouteWithChildren
   HadithNarratorsRoute: typeof HadithNarratorsRoute
   HadithTopicsRoute: typeof HadithTopicsRoute
+  HadithIndexRoute: typeof HadithIndexRoute
 }
 
 const HadithRouteChildren: HadithRouteChildren = {
   HadithCollectionRoute: HadithCollectionRouteWithChildren,
   HadithNarratorsRoute: HadithNarratorsRoute,
   HadithTopicsRoute: HadithTopicsRoute,
+  HadithIndexRoute: HadithIndexRoute,
 }
 
 const HadithRouteWithChildren =

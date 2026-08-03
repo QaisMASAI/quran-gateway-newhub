@@ -4,13 +4,9 @@ import { useServerFn } from "@tanstack/react-start";
 import { useTranslation } from "react-i18next";
 import { Header } from "@/components/Header";
 import { ChevronLeft, Loader2, BookOpen, Quote, ScrollText, Compass } from "lucide-react";
-import {
-  getEntityBySlug,
-  getEntityVerses,
-  getRelatedEntities,
-  pickLocale,
-  type EntityKind,
-} from "@/lib/knowledge";
+import { getEntityBySlug, getEntityVerses, getRelatedEntities, pickLocale, type EntityKind } from "@/lib/knowledge";
+import { getInterconnectedKnowledge } from "@/lib/knowledge-engine";
+import { UnifiedKnowledgePanel } from "@/components/discovery/UnifiedKnowledgePanel";
 import { EntityCard } from "@/components/discovery/EntityCard";
 import { PassageCard } from "@/components/discovery/PassageCard";
 import { TopicHadithSection } from "@/components/hadith/TopicHadithSection";
@@ -104,8 +100,7 @@ export const Route = createFileRoute("/learn/$kind/$slug")({
 
     const titleText = pickLocale(loaderData?.entity?.title_i18n, locale);
     const summaryText =
-      pickLocale(loaderData?.entity?.summary_i18n, locale) ||
-      pickLocale(loaderData?.entity?.description_i18n, locale);
+      pickLocale(loaderData?.entity?.summary_i18n, locale) || pickLocale(loaderData?.entity?.description_i18n, locale);
     const rawTitle = titleText
       ? `${titleText} | ${kindLabel} | Noor Quran & Hadith`
       : `Noor Quran & Hadith | ${kindLabel}`;
@@ -117,8 +112,7 @@ export const Route = createFileRoute("/learn/$kind/$slug")({
           ? "Guided Quran discovery with connected verses, authentic tafsir, and asbab al-nuzul context."
           : "גילוי קוראני מודרך עם פסוקים קשורים, תפסיר מאומת וסיבות ירידה.");
     const title = rawTitle.length > 60 ? `${rawTitle.slice(0, 57)}…` : rawTitle;
-    const description =
-      rawDescription.length > 160 ? `${rawDescription.slice(0, 157)}…` : rawDescription;
+    const description = rawDescription.length > 160 ? `${rawDescription.slice(0, 157)}…` : rawDescription;
     const url = `/learn/${params.kind}/${params.slug}`;
 
     return {
@@ -163,6 +157,7 @@ function EntityPage() {
   const textDir = localeTextDir(locale);
   const tafsirApiFn = useServerFn(fetchTafsirFromApi);
   const asbabApiFn = useServerFn(fetchAsbabFromApi);
+  const interconnectedFn = useServerFn(getInterconnectedKnowledge);
 
   if (!VALID.includes(kind as EntityKind)) throw notFound();
 
@@ -173,6 +168,16 @@ function EntityPage() {
     staleTime: 5 * 60_000,
   });
   const entity = entityQ.data;
+
+  const interconnectedQ = useQuery({
+    queryKey: ["interconnected-knowledge", kind, slug, locale],
+    queryFn: () =>
+      interconnectedFn({
+        data: { kind: kind as any, id: slug, locale: locale === "ar" ? "ar" : locale === "en" ? "en" : "he" },
+      }),
+    enabled: !!entity,
+    staleTime: 5 * 60_000,
+  });
 
   const versesQ = useQuery({
     queryKey: ["entity-verses", entity?.id],
@@ -192,12 +197,7 @@ function EntityPage() {
   // "Authentic Tafsir" section meaningful even without explicit pinning.
   const anchorVerses = useMemo(() => (versesQ.data ?? []).slice(0, 3), [versesQ.data]);
   const tafsirQ = useQuery({
-    queryKey: [
-      "entity-tafsir",
-      entity?.id,
-      locale,
-      anchorVerses.map((v) => `${v.surah}:${v.ayah_start}`).join(","),
-    ],
+    queryKey: ["entity-tafsir", entity?.id, locale, anchorVerses.map((v) => `${v.surah}:${v.ayah_start}`).join(",")],
     queryFn: async () => {
       const out: TafsirPassageRow[] = [];
       for (const v of anchorVerses) {
@@ -218,12 +218,7 @@ function EntityPage() {
   });
 
   const asbabQ = useQuery({
-    queryKey: [
-      "entity-asbab",
-      entity?.id,
-      locale,
-      anchorVerses.map((v) => `${v.surah}:${v.ayah_start}`).join(","),
-    ],
+    queryKey: ["entity-asbab", entity?.id, locale, anchorVerses.map((v) => `${v.surah}:${v.ayah_start}`).join(",")],
     queryFn: async () => {
       const out: AsbabRow[] = [];
       for (const v of anchorVerses) {
@@ -243,8 +238,7 @@ function EntityPage() {
     staleTime: 5 * 60_000,
   });
 
-  const kindLabel = (k: EntityKind) =>
-    t(`search.kind${k.charAt(0).toUpperCase()}${k.slice(1)}` as const);
+  const kindLabel = (k: EntityKind) => t(`search.kind${k.charAt(0).toUpperCase()}${k.slice(1)}` as const);
 
   const isProphet = entity?.kind === "prophet";
 
@@ -271,16 +265,9 @@ function EntityPage() {
           style={{ background: "var(--gradient-hero)" }}
         >
           <span className="arabesque-corner" style={{ top: 0, right: 0 }} aria-hidden />
-          <span
-            className="arabesque-corner"
-            style={{ bottom: 0, left: 0, transform: "rotate(180deg)" }}
-            aria-hidden
-          />
+          <span className="arabesque-corner" style={{ bottom: 0, left: 0, transform: "rotate(180deg)" }} aria-hidden />
           <div className="relative z-10 mx-auto max-w-4xl px-4 py-12 sm:px-6 sm:py-16">
-            <Link
-              to="/learn"
-              className="inline-flex items-center gap-1 text-xs text-white/70 hover:text-white"
-            >
+            <Link to="/learn" className="inline-flex items-center gap-1 text-xs text-white/70 hover:text-white">
               <ChevronLeft className="h-3 w-3 ltr:rotate-180" />
               {t("learn.backToDiscovery")}
             </Link>
@@ -302,10 +289,7 @@ function EntityPage() {
         </section>
       )}
 
-      <main
-        id="main"
-        className="mx-auto grid max-w-5xl gap-10 px-4 py-10 sm:px-6 md:grid-cols-[220px_1fr]"
-      >
+      <main id="main" className="mx-auto grid max-w-5xl gap-10 px-4 py-10 sm:px-6 md:grid-cols-[220px_1fr]">
         {/* Sticky TOC (desktop) */}
         {entity && (
           <aside className="hidden md:block">
@@ -341,12 +325,16 @@ function EntityPage() {
 
           {entity && (
             <>
+              {/* Interconnected Knowledge Engine Panel */}
+              {interconnectedQ.data && (
+                <UnifiedKnowledgePanel
+                  bundle={interconnectedQ.data}
+                  locale={locale === "ar" ? "ar" : locale === "en" ? "en" : "he"}
+                />
+              )}
+
               {/* Overview */}
-              <Section
-                id="overview"
-                icon={<BookOpen className="h-4 w-4" />}
-                title={t("learn.overview")}
-              >
+              <Section id="overview" icon={<BookOpen className="h-4 w-4" />} title={t("learn.overview")}>
                 {pickLocale(entity.description_i18n, locale) ? (
                   <p
                     className={`whitespace-pre-line text-base leading-relaxed text-foreground/90 ${tafsirClass}`}
@@ -355,19 +343,13 @@ function EntityPage() {
                     {pickLocale(entity.description_i18n, locale)}
                   </p>
                 ) : (
-                  <p className="text-sm text-muted-foreground">
-                    {pickLocale(entity.summary_i18n, locale)}
-                  </p>
+                  <p className="text-sm text-muted-foreground">{pickLocale(entity.summary_i18n, locale)}</p>
                 )}
               </Section>
 
               {/* Quranic Perspective + Verses */}
               {versesQ.data && versesQ.data.length > 0 && (
-                <Section
-                  id="verses"
-                  icon={<Quote className="h-4 w-4" />}
-                  title={t("learn.relatedVerses")}
-                >
+                <Section id="verses" icon={<Quote className="h-4 w-4" />} title={t("learn.relatedVerses")}>
                   <div className="space-y-3">
                     {versesQ.data.map((v) => (
                       <PassageCard
@@ -437,42 +419,23 @@ function EntityPage() {
               <Section
                 id="hadith"
                 icon={<ScrollText className="h-4 w-4" />}
-                title={
-                  locale === "he"
-                    ? "חדית' קשורים"
-                    : locale === "ar"
-                      ? "أحاديث ذات صلة"
-                      : "Related Hadith"
-                }
+                title={locale === "he" ? "חדית' קשורים" : locale === "ar" ? "أحاديث ذات صلة" : "Related Hadith"}
               >
                 <TopicHadithSection slug={slug} locale={locale} />
               </Section>
 
               {isProphet && (
-                <Section
-                  id="prophet-extras"
-                  icon={<Compass className="h-4 w-4" />}
-                  title={t("learn.prophetExtras")}
-                >
+                <Section id="prophet-extras" icon={<Compass className="h-4 w-4" />} title={t("learn.prophetExtras")}>
                   <p className="text-sm text-muted-foreground">{t("learn.prophetExtrasBody")}</p>
                 </Section>
               )}
 
               {/* Related */}
               {relatedQ.data && relatedQ.data.length > 0 && (
-                <Section
-                  id="related"
-                  icon={<Compass className="h-4 w-4" />}
-                  title={t("learn.continueExploring")}
-                >
+                <Section id="related" icon={<Compass className="h-4 w-4" />} title={t("learn.continueExploring")}>
                   <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
                     {relatedQ.data.map((e) => (
-                      <EntityCard
-                        key={e.id}
-                        entity={e}
-                        locale={locale}
-                        kindLabel={kindLabel(e.kind)}
-                      />
+                      <EntityCard key={e.id} entity={e} locale={locale} kindLabel={kindLabel(e.kind)} />
                     ))}
                   </div>
                 </Section>
