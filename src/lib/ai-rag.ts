@@ -1,7 +1,7 @@
-import { searchVersesWithConcepts } from "./quran-search";
-import { searchHadithAction } from "./hadith.functions";
-import { searchTopics } from "./topics";
-import { pickLocale } from "./content-i18n";
+import { buildQuranIndex } from "./quran-api";
+import { searchWithFallback } from "./quran-search";
+import { searchHadith } from "./hadith.functions";
+import { listEntitiesByKind, pickLocale, type KnowledgeEntity } from "./knowledge";
 
 export interface RagContextChunk {
   source: "quran" | "hadith" | "tafsir" | "topic";
@@ -14,6 +14,21 @@ export interface RagContextResult {
   query: string;
   chunks: RagContextChunk[];
   systemContextPrompt: string;
+}
+
+function topicMatchesQuery(topic: KnowledgeEntity, query: string, locale: "ar" | "en" | "he"): boolean {
+  const q = query.toLowerCase();
+  const localizedTitle = pickLocale(topic.title_i18n, locale).toLowerCase();
+  const localizedSummary = pickLocale(topic.summary_i18n, locale).toLowerCase();
+  const allTitles = `${topic.title_i18n.en ?? ""} ${topic.title_i18n.ar ?? ""} ${topic.title_i18n.he ?? ""}`.toLowerCase();
+  const allSummaries = `${topic.summary_i18n.en ?? ""} ${topic.summary_i18n.ar ?? ""} ${topic.summary_i18n.he ?? ""}`.toLowerCase();
+
+  return (
+    localizedTitle.includes(q) ||
+    localizedSummary.includes(q) ||
+    allTitles.includes(q) ||
+    allSummaries.includes(q)
+  );
 }
 
 export async function buildRagContext(query: string, locale: "ar" | "en" | "he" = "en"): Promise<RagContextResult> {
@@ -30,18 +45,21 @@ export async function buildRagContext(query: string, locale: "ar" | "en" | "he" 
 
   // 1. Fetch relevant Quranic verses
   try {
-    const quranHits = await searchVersesWithConcepts(q, locale);
-    if (quranHits?.hits) {
-      quranHits.hits.slice(0, 4).forEach((hit) => {
+    const index = await buildQuranIndex();
+    const quranResults = searchWithFallback(index, q, locale);
+    const verseHits = quranResults.groups.flatMap((group) => group.hits);
+
+    if (verseHits.length > 0) {
+      verseHits.slice(0, 4).forEach((hit) => {
         const text =
           locale === "ar"
-            ? hit.verse.text_ar
+            ? hit.verse.arabic
             : locale === "he"
-              ? `${hit.verse.text_he || hit.verse.text_en} (Arabic: ${hit.verse.text_ar})`
-              : `${hit.verse.text_en} (Arabic: ${hit.verse.text_ar})`;
+              ? `${hit.verse.hebrew || hit.verse.english} (Arabic: ${hit.verse.arabic})`
+              : `${hit.verse.english} (Arabic: ${hit.verse.arabic})`;
         chunks.push({
           source: "quran",
-          reference: `Surah ${hit.verse.surah_id}:${hit.verse.ayah_number}`,
+          reference: `Surah ${hit.verse.surah}:${hit.verse.ayah}`,
           text,
         });
       });
@@ -52,27 +70,22 @@ export async function buildRagContext(query: string, locale: "ar" | "en" | "he" 
 
   // 2. Fetch relevant Hadith entries
   try {
-    const hadithHits = await searchHadithAction({ data: { query: q, locale, limit: 3 } });
+    const hadithHits = await searchHadith({ data: { q, page: 0, pageSize: 3 } });
     if (hadithHits?.items) {
-      hadithHits.items
-        .slice(0, 3)
-        .forEach(
-          (h: {
-            collection_name?: string;
-            hadith_number?: string | number;
-            id?: string;
-            text?: string;
-            english_text?: string;
-            hebrew_text?: string;
-          }) => {
-            const text = h.text || h.english_text || h.hebrew_text || "";
-            chunks.push({
-              source: "hadith",
-              reference: `${h.collection_name || "Hadith"} #${h.hadith_number || h.id}`,
-              text,
-            });
-          },
-        );
+      hadithHits.items.slice(0, 3).forEach((h) => {
+        const text =
+          locale === "ar"
+            ? h.arabic_text || h.english_text || h.hebrew_text || ""
+            : locale === "he"
+              ? h.hebrew_text || h.english_text || h.arabic_text || ""
+              : h.english_text || h.arabic_text || h.hebrew_text || "";
+
+        chunks.push({
+          source: "hadith",
+          reference: `${h.collection_slug || "Hadith"} #${h.id_in_book || h.id}`,
+          text,
+        });
+      });
     }
   } catch {
     // Silent catch
@@ -80,7 +93,8 @@ export async function buildRagContext(query: string, locale: "ar" | "en" | "he" 
 
   // 3. Fetch matching topics
   try {
-    const matchedTopics = searchTopics(q, locale);
+    const topics = await listEntitiesByKind("topic");
+    const matchedTopics = topics.filter((topic) => topicMatchesQuery(topic, q, locale));
     if (matchedTopics.length > 0) {
       const topTopic = matchedTopics[0];
       chunks.push({
@@ -97,7 +111,7 @@ export async function buildRagContext(query: string, locale: "ar" | "en" | "he" 
     .map((c, i) => `[Context Item ${i + 1} - ${c.source.toUpperCase()} - ${c.reference}]\n${c.text}`)
     .join("\n\n");
 
-  const systemContextPrompt = `The following authenticated authentic Islamic knowledge chunks were retrieved for query "${q}":\n\n${contextFormatted}`;
+  const systemContextPrompt = `The following authenticated Islamic knowledge chunks were retrieved for query "${q}":\n\n${contextFormatted}`;
 
   return {
     query,
