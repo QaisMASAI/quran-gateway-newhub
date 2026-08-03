@@ -57,10 +57,7 @@ export function useFavorites() {
     refresh();
   }, [refresh]);
 
-  const isFav = useCallback(
-    (s: number, a: number) => items.some((i) => i.surah === s && i.ayah === a),
-    [items],
-  );
+  const isFav = useCallback((s: number, a: number) => items.some((i) => i.surah === s && i.ayah === a), [items]);
 
   const toggle = useCallback(
     async (entry: Omit<FavoriteAyah, "addedAt">) => {
