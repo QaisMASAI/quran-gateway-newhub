@@ -84,17 +84,11 @@ function HadithCollectionPage() {
         )}
 
         <div className="mt-6 divide-y divide-border rounded-2xl border border-border bg-card">
-          {booksLoading && (
-            <div className="px-4 py-3 text-sm text-muted-foreground">Loading books…</div>
-          )}
+          {booksLoading && <div className="px-4 py-3 text-sm text-muted-foreground">Loading books…</div>}
           {(booksError || collectionsError) && (
             <div className="px-4 py-3 text-sm text-destructive">
               Failed to load this collection.
-              <button
-                type="button"
-                onClick={() => void refetchBooks()}
-                className="ms-2 underline underline-offset-2"
-              >
+              <button type="button" onClick={() => void refetchBooks()} className="ms-2 underline underline-offset-2">
                 Retry
               </button>
             </div>
