@@ -109,7 +109,7 @@ export async function performUnifiedSearch(
             id: `hadith-${collection}-${entryNum}`,
             domain: "hadith",
             title: `${collection} #${entryNum}`,
-            subtitle: h.narrator,
+            subtitle: h.narrator ?? undefined,
             snippet,
             url: `/hadith/${collection}/entry/${entryNum}`,
             badge: "Hadith",
