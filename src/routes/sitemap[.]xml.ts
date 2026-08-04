@@ -50,7 +50,6 @@ export const Route = createFileRoute("/sitemap.xml")({
           "/kids",
           "/onboarding",
           "/profile",
-          "/research",
           "/topics",
           "/emotions",
           "/prophets",
