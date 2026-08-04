@@ -13,27 +13,26 @@ const GenerateMetadataSchema = z.object({
 
 export const generateEntityMetadataServerFn = createServerFn({ method: "POST" })
   .inputValidator((input: unknown) => GenerateMetadataSchema.parse(input))
-  .handler(
-    async ({ data }): Promise<{ metadata: EntityRichMetadata; source: "ai" | "curated" }> => {
-      const { entityId, query, locale } = data;
+  .handler(async ({ data }): Promise<{ metadata: EntityRichMetadata; source: "ai" | "curated" }> => {
+    const { entityId, query, locale } = data;
 
-      // Check curated database first
-      if (entityId) {
-        const curated = getRichMetadataForEntity(entityId, query);
-        if (curated && curated.primaryKeywords.length > 2) {
-          return { metadata: curated, source: "curated" };
-        }
+    // Check curated database first
+    if (entityId) {
+      const curated = getRichMetadataForEntity(entityId, query);
+      if (curated && curated.primaryKeywords.length > 2) {
+        return { metadata: curated, source: "curated" };
       }
+    }
 
-      const provider = createLovableAiGatewayProvider();
-      if (!provider) {
-        // Fallback to local heuristic metadata
-        return { metadata: getRichMetadataForEntity(entityId ?? query, query), source: "curated" };
-      }
+    const provider = createLovableAiGatewayProvider();
+    if (!provider) {
+      // Fallback to local heuristic metadata
+      return { metadata: getRichMetadataForEntity(entityId ?? query, query), source: "curated" };
+    }
 
-      const model = provider("google/gemini-2.5-flash");
+    const model = provider("google/gemini-2.5-flash");
 
-      const systemPrompt = `You are an expert Islamic Metadata Indexing AI for a comprehensive Quran & Hadith knowledge platform.
+    const systemPrompt = `You are an expert Islamic Metadata Indexing AI for a comprehensive Quran & Hadith knowledge platform.
 Your task is to analyze the entity or search query "${query}" (Locale: ${locale}) and generate a rich, accurate, multi-dimensional metadata JSON object.
 
 YOU MUST strictly generate valid JSON with ALL of the following keys:
@@ -65,25 +64,24 @@ YOU MUST strictly generate valid JSON with ALL of the following keys:
 
 Output ONLY clean, raw JSON inside a JSON code block. Never invent fabricated verses or false facts.`;
 
-      try {
-        const response = await generateText({
-          model,
-          messages: [{ role: "user", content: systemPrompt }],
-          temperature: 0.2,
-        });
+    try {
+      const response = await generateText({
+        model,
+        messages: [{ role: "user", content: systemPrompt }],
+        temperature: 0.2,
+      });
 
-        const cleanJson = response.text
-          .replace(/```json/gi, "")
-          .replace(/```/g, "")
-          .trim();
+      const cleanJson = response.text
+        .replace(/```json/gi, "")
+        .replace(/```/g, "")
+        .trim();
 
-        const parsed = JSON.parse(cleanJson);
-        const validated = validateMetadataAgainstDb(parsed);
+      const parsed = JSON.parse(cleanJson);
+      const validated = validateMetadataAgainstDb(parsed);
 
-        return { metadata: validated, source: "ai" };
-      } catch (err) {
-        console.error("AI metadata generation failed, returning curated store:", err);
-        return { metadata: getRichMetadataForEntity(entityId ?? query, query), source: "curated" };
-      }
-    },
-  );
+      return { metadata: validated, source: "ai" };
+    } catch (err) {
+      console.error("AI metadata generation failed, returning curated store:", err);
+      return { metadata: getRichMetadataForEntity(entityId ?? query, query), source: "curated" };
+    }
+  });
