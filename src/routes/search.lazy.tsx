@@ -26,8 +26,7 @@ import { normalizeLocale, type Locale } from "@/lib/i18n";
 import { localeTextDir, uiFontClass } from "@/lib/locale-ui";
 import { useQueryPrefillInput } from "@/hooks/useQueryPrefillInput";
 import { getSearchResearchBrief } from "@/lib/search-brief.functions";
-import { AiResearchBriefCard } from "@/components/search/AiResearchBriefCard";
-import { CategorizedSearchResults } from "@/components/search/CategorizedSearchResults";
+import { PerplexityResearchHub } from "@/components/search/PerplexityResearchHub";
 
 export const Route = createLazyFileRoute("/search")({
   component: SearchPage,
@@ -42,7 +41,11 @@ function SearchPage() {
   const textDir = localeTextDir(locale);
 
   const fetchBriefAndResults = useServerFn(getSearchResearchBrief);
-  const { input: searchQuery, setInput: setSearchQuery, trimmed } = useQueryPrefillInput({ initialQ: q });
+  const {
+    input: searchQuery,
+    setInput: setSearchQuery,
+    trimmed,
+  } = useQueryPrefillInput({ initialQ: q });
 
   const activeQuery = q?.trim() || "";
 
@@ -247,20 +250,22 @@ function SearchPage() {
                       : "Failed to generate AI Research Brief. Please try again."}
                 </p>
                 <Button variant="outline" size="sm" onClick={() => refetch()}>
-                  {locale === "ar" ? "إعادة المحاولة" : locale === "he" ? "נסה שוב" : "Retry Research"}
+                  {locale === "ar"
+                    ? "إعادة المحاولة"
+                    : locale === "he"
+                      ? "נסה שוב"
+                      : "Retry Research"}
                 </Button>
               </Card>
             )}
 
-            {/* LOADED DATA AREA */}
+            {/* LOADED DATA AREA - 10-SECTION PERPLEXITY RESEARCH HUB */}
             {data && (
-              <div className="space-y-12">
-                {/* 1. EXECUTIVE AI RESEARCH BRIEF FIRST */}
-                <AiResearchBriefCard brief={data.brief} onSelectNextTopic={handleSelectTopic} />
-
-                {/* 2. CATEGORIZED SEARCH RESULTS SECOND */}
-                <CategorizedSearchResults searchResults={data.searchResults} locale={locale} />
-              </div>
+              <PerplexityResearchHub
+                brief={data.brief}
+                searchResults={data.searchResults}
+                onSelectTopic={handleSelectTopic}
+              />
             )}
           </div>
         ) : (
@@ -294,9 +299,15 @@ function SearchPage() {
                         <ArrowRight className="h-3.5 w-3.5 text-muted-foreground group-hover:text-emerald-600 transition-colors" />
                       </div>
                       <span className="font-bold text-sm text-foreground group-hover:text-emerald-800 dark:group-hover:text-emerald-300">
-                        {locale === "ar" ? prompt.labelAr : locale === "he" ? prompt.labelHe : prompt.labelEn}
+                        {locale === "ar"
+                          ? prompt.labelAr
+                          : locale === "he"
+                            ? prompt.labelHe
+                            : prompt.labelEn}
                       </span>
-                      <span className="text-xs text-muted-foreground mt-1 line-clamp-1">"{prompt.q}"</span>
+                      <span className="text-xs text-muted-foreground mt-1 line-clamp-1">
+                        "{prompt.q}"
+                      </span>
                     </Button>
                   ))}
                 </div>
