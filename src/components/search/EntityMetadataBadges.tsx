@@ -1,13 +1,5 @@
 import React from "react";
-import {
-  Tag,
-  Sparkles,
-  FolderTree,
-  BookOpen,
-  Layers,
-  ShieldCheck,
-  AlertCircle,
-} from "lucide-react";
+import { Tag, Sparkles, FolderTree, BookOpen, Layers, ShieldCheck, AlertCircle } from "lucide-react";
 import { EntityRichMetadata } from "@/types/entity-metadata";
 
 interface EntityMetadataBadgesProps {
@@ -15,10 +7,7 @@ interface EntityMetadataBadgesProps {
   compact?: boolean;
 }
 
-export const EntityMetadataBadges: React.FC<EntityMetadataBadgesProps> = ({
-  metadata,
-  compact = false,
-}) => {
+export const EntityMetadataBadges: React.FC<EntityMetadataBadgesProps> = ({ metadata, compact = false }) => {
   if (!metadata) return null;
 
   const meta = metadata as Partial<EntityRichMetadata>;
