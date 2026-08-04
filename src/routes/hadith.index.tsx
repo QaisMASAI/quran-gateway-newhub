@@ -6,15 +6,36 @@ import { useHadithUserStore } from "@/lib/hadith-user-store";
 export const Route = createFileRoute("/hadith/")({
   head: () => ({
     meta: [
-      { title: "Hadith Collections & Search — Sahih al-Bukhari, Sahih Muslim & Sunan" },
+      { title: "Hadith Explorer | Sahih Collections & Search" },
       {
         name: "description",
         content: "Search and explore authenticated Hadith collections, narrators, sanad chains, and knowledge graphs.",
       },
-      { property: "og:title", content: "Hadith Explorer" },
+      { property: "og:title", content: "Hadith Explorer | Sahih Collections & Search" },
+      {
+        property: "og:description",
+        content:
+          "Browse trusted Hadith collections, navigate books, and explore narrators with structured Islamic knowledge tools.",
+      },
       { property: "og:url", content: "/hadith" },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
     links: [{ rel: "canonical", href: "/hadith" }],
+    scripts: [
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "CollectionPage",
+          name: "Hadith Explorer",
+          description:
+            "Explore authenticated Hadith collections, narrators, and structured prophetic tradition references.",
+          url: "https://quran-gateway-newhub.lovable.app/hadith",
+          inLanguage: ["ar", "he", "en"],
+        }),
+      },
+    ],
   }),
   component: HadithIndexPage,
 });

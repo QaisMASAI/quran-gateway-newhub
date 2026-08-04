@@ -30,6 +30,24 @@ export const Route = createFileRoute("/surahs/")({
       { name: "twitter:card", content: "summary" },
     ],
     links: [{ rel: "canonical", href: "/surahs" }],
+    scripts: [
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "CollectionPage",
+          name: "Surahs of the Quran",
+          description:
+            "Browse all 114 Quran surahs with Arabic text, multilingual translations, and tafsir access.",
+          url: "https://quran-gateway-newhub.lovable.app/surahs",
+          isPartOf: {
+            "@type": "WebSite",
+            name: "Bayan AI",
+            url: "https://quran-gateway-newhub.lovable.app",
+          },
+        }),
+      },
+    ],
   }),
   component: SurahsIndex,
 });
@@ -153,6 +171,13 @@ function SurahsIndex() {
             value={filter}
             onChange={(e) => setFilter(e.target.value)}
             placeholder={t("home.filterPlaceholder")}
+            aria-label={
+              locale === "ar"
+                ? "تصفية السور"
+                : locale === "he"
+                  ? "סינון סורות"
+                  : "Filter surahs"
+            }
             className="ps-10 h-11 rounded-xl border-border/80 bg-card/80 text-sm shadow-2xs focus-visible:ring-primary/20"
           />
         </div>

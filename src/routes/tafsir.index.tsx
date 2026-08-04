@@ -177,10 +177,11 @@ function TafsirHubPage() {
 
               <div className="space-y-3 text-xs">
                 <div>
-                  <label className="block text-muted-foreground font-medium mb-1">
+                  <label htmlFor="tafsir-surah-select" className="block text-muted-foreground font-medium mb-1">
                     {locale === "ar" ? "اختر السورة" : "Select Surah"}
                   </label>
                   <select
+                    id="tafsir-surah-select"
                     value={selectedSurah}
                     onChange={(e) => setSelectedSurah(Number(e.target.value))}
                     className="w-full rounded-xl border border-border bg-background px-3 py-2 text-sm font-medium text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
@@ -194,10 +195,11 @@ function TafsirHubPage() {
                 </div>
 
                 <div>
-                  <label className="block text-muted-foreground font-medium mb-1">
+                  <label htmlFor="tafsir-ayah-input" className="block text-muted-foreground font-medium mb-1">
                     {locale === "ar" ? "رقم الآية" : "Ayah Number"}
                   </label>
                   <input
+                    id="tafsir-ayah-input"
                     type="number"
                     min={1}
                     max={286}

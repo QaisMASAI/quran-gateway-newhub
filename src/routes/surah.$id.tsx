@@ -71,6 +71,33 @@ export const Route = createFileRoute("/surah/$id")({
             url,
           }),
         },
+        {
+          type: "application/ld+json",
+          children: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "BreadcrumbList",
+            itemListElement: [
+              {
+                "@type": "ListItem",
+                position: 1,
+                name: "Home",
+                item: "https://quran-gateway-newhub.lovable.app/",
+              },
+              {
+                "@type": "ListItem",
+                position: 2,
+                name: "Surahs",
+                item: "https://quran-gateway-newhub.lovable.app/surahs",
+              },
+              {
+                "@type": "ListItem",
+                position: 3,
+                name: he,
+                item: `https://quran-gateway-newhub.lovable.app${url}`,
+              },
+            ],
+          }),
+        },
       ],
     };
   },

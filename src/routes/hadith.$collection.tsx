@@ -21,7 +21,13 @@ export const Route = createFileRoute("/hadith/$collection")({
           content: `Browse verified Hadith books in ${collectionLabel} with authentic Arabic text, Hebrew, and English translations.`,
         },
         { property: "og:title", content: `${collectionLabel} — Canonical Books` },
+        {
+          property: "og:description",
+          content: `Explore canonical books in ${collectionLabel} with authenticated narrations, multilingual text, and structured navigation.`,
+        },
         { property: "og:url", content: `/hadith/${params.collection}` },
+        { property: "og:type", content: "website" },
+        { name: "twitter:card", content: "summary" },
       ],
       links: [{ rel: "canonical", href: `/hadith/${params.collection}` }],
     };

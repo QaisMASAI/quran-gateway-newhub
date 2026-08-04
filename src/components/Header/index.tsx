@@ -43,6 +43,9 @@ export function Header() {
               type="button"
               onClick={() => setPrayerModalOpen(true)}
               className="flex items-center gap-1.5 rounded-full border border-border/70 bg-secondary/50 px-3 py-1.5 text-xs font-semibold text-foreground transition-all hover:border-gold/40 hover:bg-gold/10 hover:text-gold"
+              aria-label={
+                isAr ? "أوقات الصلاة والقبلة" : isHe ? "זמני תפילה וקיבלה" : "Prayer Times & Qibla"
+              }
               title={
                 isAr ? "أوقات الصلاة والقبلة" : isHe ? "זמני תפילה וקיבלה" : "Prayer Times & Qibla"
               }
