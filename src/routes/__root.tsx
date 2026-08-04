@@ -14,10 +14,10 @@ import { registerAppServiceWorker } from "@/lib/register-app-sw";
 import "@/lib/i18n";
 
 const ROOT_META = {
-  title: "Noor Al-Huda AI | Quran & Sunnah Knowledge Hub",
-  description:
-    "Explore Quran and Sahih Hadith with grounded citations, Jalalayn-only tafsir, knowledge graph discovery, and multilingual AI research.",
-  socialDescription: "Grounded Quran + Hadith learning with Jalalayn-only tafsir and citation-first AI research.",
+  title: "Bayan AI | Islamic Knowledge & Research Platform",
+  description: "Explore Quran, Sahih Hadith, authentic Tafsir, and interconnected knowledge graphs with Bayan AI.",
+  socialDescription:
+    "Bayan AI is the definitive global Islamic knowledge platform unifying Quran, Hadith, Tafsir, and interconnected research.",
 };
 
 function NotFoundComponent() {
@@ -98,7 +98,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         content: ROOT_META.description,
       },
       { property: "og:type", content: "website" },
-      { property: "og:site_name", content: "Noor Quran & Hadith" },
+      { property: "og:site_name", content: "Bayan AI" },
       { name: "twitter:card", content: "summary_large_image" },
       { property: "og:title", content: ROOT_META.title },
       { name: "twitter:title", content: ROOT_META.title },
@@ -112,7 +112,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       },
       { name: "theme-color", content: "#0f1115" },
       { name: "apple-mobile-web-app-capable", content: "yes" },
-      { name: "apple-mobile-web-app-title", content: "Noor Quran & Hadith" },
+      { name: "apple-mobile-web-app-title", content: "Bayan AI" },
       { name: "apple-mobile-web-app-status-bar-style", content: "black-translucent" },
     ],
     links: [
@@ -137,8 +137,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         children: JSON.stringify({
           "@context": "https://schema.org",
           "@type": "Organization",
-          name: "Noor Quran & Hadith",
-          description: "Multilingual Quran and Hadith learning platform with Jalalayn-only tafsir.",
+          name: "Bayan AI",
+          description: "Multilingual Islamic knowledge and research platform unifying Quran, Hadith, and Tafsir.",
           url: "/",
         }),
       },
@@ -147,10 +147,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         children: JSON.stringify({
           "@context": "https://schema.org",
           "@type": "WebSite",
-          name: "Noor Quran & Hadith",
+          name: "Bayan AI",
           url: "/",
           description:
-            "Explore Quran and Sahih Hadith with Jalalayn-only tafsir, grounded citations, and AI-powered multilingual research.",
+            "Explore Quran and Sahih Hadith with authentic tafsir, grounded citations, and AI-powered research.",
           potentialAction: {
             "@type": "SearchAction",
             target: "/search?q={query}",
