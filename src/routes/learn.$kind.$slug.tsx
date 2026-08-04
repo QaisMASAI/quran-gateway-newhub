@@ -10,6 +10,7 @@ import { UnifiedKnowledgePanel } from "@/components/discovery/UnifiedKnowledgePa
 import { EntityCard } from "@/components/discovery/EntityCard";
 import { PassageCard } from "@/components/discovery/PassageCard";
 import { TopicHadithSection } from "@/components/hadith/TopicHadithSection";
+import { PageKnowledgeHub } from "@/components/knowledge/PageKnowledgeHub";
 import {
   getAsbabForVerse,
   getTafsirForVerse,
@@ -177,7 +178,22 @@ function EntityPage() {
     queryKey: ["interconnected-knowledge", kind, slug, locale],
     queryFn: () =>
       interconnectedFn({
-        data: { kind: kind as any, id: slug, locale: locale === "ar" ? "ar" : locale === "en" ? "en" : "he" },
+        data: {
+          kind: kind as
+            | "surah"
+            | "ayah"
+            | "hadith"
+            | "tafsir"
+            | "prophet"
+            | "topic"
+            | "story"
+            | "event"
+            | "place"
+            | "scholar"
+            | "companion",
+          id: slug,
+          locale: locale === "ar" ? "ar" : locale === "en" ? "en" : "he",
+        },
       }),
     enabled: !!entity,
     staleTime: 5 * 60_000,
@@ -433,6 +449,9 @@ function EntityPage() {
                   <p className="text-sm text-muted-foreground">{t("learn.prophetExtrasBody")}</p>
                 </Section>
               )}
+
+              {/* Dynamic 10D Knowledge Hub */}
+              <PageKnowledgeHub slug={slug} locale={locale} />
 
               {/* Related */}
               {relatedQ.data && relatedQ.data.length > 0 && (
