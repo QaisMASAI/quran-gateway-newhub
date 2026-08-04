@@ -1,6 +1,6 @@
 {
-  "name": "Noor Al-Huda AI",
-  "description": "Noor Al-Huda AI international Islamic knowledge platform for Holy Quran, Sahih Hadith, authentic Tafsir, and interactive learning.",
+  "name": "Bayan AI — Islamic Knowledge Platform",
+  "description": "Bayan AI is a premium, AI-powered Islamic knowledge platform unifying the Holy Quran, Sahih Hadith, authentic Tafsir, and interconnected knowledge graphs.",
   "requestFramePermissions": ["geolocation"],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }
