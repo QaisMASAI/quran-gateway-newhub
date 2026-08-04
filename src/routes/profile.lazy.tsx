@@ -2,7 +2,15 @@ import { createLazyFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
-import { BookOpen, Bookmark, NotebookPen, Compass, Sparkles, Map as MapIcon, LogIn } from "lucide-react";
+import {
+  BookOpen,
+  Bookmark,
+  NotebookPen,
+  Compass,
+  Sparkles,
+  Map as MapIcon,
+  LogIn,
+} from "lucide-react";
 import { Header } from "@/components/Header";
 import { useAuth } from "@/lib/use-auth";
 import { supabase } from "@/integrations/supabase/client";
@@ -11,6 +19,7 @@ import { normalizeLocale, type Locale } from "@/lib/i18n";
 import { surahDisplayName } from "@/lib/surah-names-he";
 import { getGamificationStats, calculateLevel, ALL_BADGES } from "@/lib/gamification";
 import { Flame, Award, Trophy, ShieldCheck, Sparkles as SparklesIcon } from "lucide-react";
+import { HabitPersonalDashboard } from "@/components/dashboard/HabitPersonalDashboard";
 
 export const Route = createLazyFileRoute("/profile")({
   component: ProfilePage,
@@ -40,39 +49,47 @@ interface ProfileSummary {
 }
 
 async function fetchProfileSummary(userId: string): Promise<ProfileSummary> {
-  const [bm, nt, rp, prog, journeys, steps, recs, lastRead, recentBm, recentNt] = await Promise.all([
-    supabase.from("bookmarks").select("id", { count: "exact", head: true }).eq("user_id", userId),
-    supabase.from("notes").select("id", { count: "exact", head: true }).eq("user_id", userId),
-    supabase.from("reading_progress").select("id", { count: "exact", head: true }).eq("user_id", userId),
-    supabase.from("knowledge_journey_progress").select("journey_id,step_id").eq("user_id", userId),
-    supabase.from("knowledge_journeys").select("id,slug,title_i18n").eq("published", true),
-    supabase.from("knowledge_journey_steps").select("id,journey_id"),
-    supabase
-      .from("knowledge_entities")
-      .select("*")
-      .eq("published", true)
-      .in("kind", ["topic", "story", "concept", "prophet"])
-      .limit(60),
-    supabase
-      .from("reading_progress")
-      .select("surah,ayah,last_read_at")
-      .eq("user_id", userId)
-      .order("last_read_at", { ascending: false })
-      .limit(1)
-      .maybeSingle(),
-    supabase
-      .from("bookmarks")
-      .select("surah,ayah,surah_name,hebrew_snapshot,created_at")
-      .eq("user_id", userId)
-      .order("created_at", { ascending: false })
-      .limit(3),
-    supabase
-      .from("notes")
-      .select("surah,ayah,body,updated_at")
-      .eq("user_id", userId)
-      .order("updated_at", { ascending: false })
-      .limit(3),
-  ]);
+  const [bm, nt, rp, prog, journeys, steps, recs, lastRead, recentBm, recentNt] = await Promise.all(
+    [
+      supabase.from("bookmarks").select("id", { count: "exact", head: true }).eq("user_id", userId),
+      supabase.from("notes").select("id", { count: "exact", head: true }).eq("user_id", userId),
+      supabase
+        .from("reading_progress")
+        .select("id", { count: "exact", head: true })
+        .eq("user_id", userId),
+      supabase
+        .from("knowledge_journey_progress")
+        .select("journey_id,step_id")
+        .eq("user_id", userId),
+      supabase.from("knowledge_journeys").select("id,slug,title_i18n").eq("published", true),
+      supabase.from("knowledge_journey_steps").select("id,journey_id"),
+      supabase
+        .from("knowledge_entities")
+        .select("*")
+        .eq("published", true)
+        .in("kind", ["topic", "story", "concept", "prophet"])
+        .limit(60),
+      supabase
+        .from("reading_progress")
+        .select("surah,ayah,last_read_at")
+        .eq("user_id", userId)
+        .order("last_read_at", { ascending: false })
+        .limit(1)
+        .maybeSingle(),
+      supabase
+        .from("bookmarks")
+        .select("surah,ayah,surah_name,hebrew_snapshot,created_at")
+        .eq("user_id", userId)
+        .order("created_at", { ascending: false })
+        .limit(3),
+      supabase
+        .from("notes")
+        .select("surah,ayah,body,updated_at")
+        .eq("user_id", userId)
+        .order("updated_at", { ascending: false })
+        .limit(3),
+    ],
+  );
 
   const stepsByJourney = new Map<string, number>();
   for (const s of (steps.data ?? []) as { id: string; journey_id: string }[]) {
@@ -101,7 +118,8 @@ async function fetchProfileSummary(userId: string): Promise<ProfileSummary> {
     readingProgressCount: rp.count ?? 0,
     journeyProgress,
     recommended,
-    continueReading: (lastRead.data as { surah: number; ayah: number; last_read_at: string } | null) ?? null,
+    continueReading:
+      (lastRead.data as { surah: number; ayah: number; last_read_at: string } | null) ?? null,
     recentBookmarks: (recentBm.data as ProfileSummary["recentBookmarks"] | null) ?? [],
     recentNotes: (recentNt.data as ProfileSummary["recentNotes"] | null) ?? [],
   };
@@ -148,7 +166,10 @@ function ProfilePage() {
   return (
     <div className="min-h-screen bg-background">
       <Header />
-      <section className="arabesque-bg px-4 pb-10 pt-10 sm:px-6" style={{ background: "var(--gradient-hero)" }}>
+      <section
+        className="arabesque-bg px-4 pb-10 pt-10 sm:px-6"
+        style={{ background: "var(--gradient-hero)" }}
+      >
         <div className="mx-auto max-w-4xl text-white">
           <div className="mb-2 inline-flex items-center gap-2 rounded-full border border-white/25 bg-white/10 px-3 py-1 text-xs">
             <Sparkles className="h-3 w-3" /> {t("profile.badge")}
@@ -158,7 +179,9 @@ function ProfilePage() {
         </div>
       </section>
 
-      <main id="main" className="mx-auto max-w-4xl px-4 py-8 sm:px-6 space-y-6">
+      <main id="main" className="mx-auto max-w-7xl px-4 py-8 sm:px-6 space-y-10">
+        {/* HABIT PERSONAL DASHBOARD */}
+        <HabitPersonalDashboard locale={locale} />
         {/* Gamification & Achievements Banner */}
         {(() => {
           const gameStats = getGamificationStats();
@@ -172,13 +195,20 @@ function ProfilePage() {
                   </div>
                   <div>
                     <div className="flex items-center gap-2">
-                      <span className="text-xs font-bold uppercase tracking-wider text-gold">Level {lvl.level}</span>
+                      <span className="text-xs font-bold uppercase tracking-wider text-gold">
+                        Level {lvl.level}
+                      </span>
                       <h2 className="text-xl font-bold text-foreground">
-                        {locale === "ar" ? lvl.titleAr : locale === "he" ? lvl.titleHe : lvl.titleEn}
+                        {locale === "ar"
+                          ? lvl.titleAr
+                          : locale === "he"
+                            ? lvl.titleHe
+                            : lvl.titleEn}
                       </h2>
                     </div>
                     <p className="text-xs text-muted-foreground">
-                      {gameStats.xp} Total XP • {lvl.nextLevelXP - gameStats.xp} XP to next milestone
+                      {gameStats.xp} Total XP • {lvl.nextLevelXP - gameStats.xp} XP to next
+                      milestone
                     </p>
                   </div>
                 </div>
@@ -293,7 +323,9 @@ function ProfilePage() {
             </div>
             <div className="flex items-center justify-between gap-3">
               <div>
-                <div className="text-lg font-semibold">{pickLocale(topJourney.title_i18n, locale)}</div>
+                <div className="text-lg font-semibold">
+                  {pickLocale(topJourney.title_i18n, locale)}
+                </div>
                 <div className="text-xs text-muted-foreground">
                   {topJourney.done} / {topJourney.total} {t("profile.stepsDone")}
                 </div>
@@ -393,7 +425,9 @@ function ProfilePage() {
                   <div className="text-[10px] uppercase tracking-wide text-muted-foreground">
                     {t(`search.kind${e.kind.charAt(0).toUpperCase()}${e.kind.slice(1)}` as const)}
                   </div>
-                  <div className="mt-1 font-semibold text-foreground">{pickLocale(e.title_i18n, locale)}</div>
+                  <div className="mt-1 font-semibold text-foreground">
+                    {pickLocale(e.title_i18n, locale)}
+                  </div>
                   <div className="mt-1 line-clamp-2 text-xs text-muted-foreground">
                     {pickLocale(e.summary_i18n, locale)}
                   </div>
