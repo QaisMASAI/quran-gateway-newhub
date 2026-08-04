@@ -53,13 +53,7 @@ const METADATA_DATABASE: Record<string, EntityRichMetadata> = {
     pluralForms: ["بنو آدم", "בני אדם", "Children of Adam"],
     rootWords: ["ء-د-م", "א-ד-מ"],
     derivedWords: ["أديم الأرض", "الأدمة", "أوادم"],
-    relatedConcepts: [
-      "creation",
-      "tree of knowledge",
-      "repentance",
-      "angels prostration",
-      "iblis arrogance",
-    ],
+    relatedConcepts: ["creation", "tree of knowledge", "repentance", "angels prostration", "iblis arrogance"],
     semanticTags: ["prophethood", "creation", "human nature", "repentance"],
     topicHierarchies: {
       parentTopics: ["Prophets in Islam", "Creation of Creation"],
@@ -73,18 +67,10 @@ const METADATA_DATABASE: Record<string, EntityRichMetadata> = {
     historicalCategories: ["Beginning of Humanity", "Antediluvian Era"],
     characterTraits: ["repentant", "teachable", "humble"],
     virtues: ["immediate repentance", "seeking forgiveness", "patience"],
-    sins: [
-      "disobedience to direct command (subsequently forgiven)",
-      "falling for satanic deception",
-    ],
+    sins: ["disobedience to direct command (subsequently forgiven)", "falling for satanic deception"],
     places: ["Jannah (Paradise)", "Earth"],
     people: ["Hawwa (Eve)", "Iblis (Satan)", "Angels"],
-    events: [
-      "Creation of Adam",
-      "Prostration of Angels to Adam",
-      "Expulsion from Paradise",
-      "First Repentance",
-    ],
+    events: ["Creation of Adam", "Prostration of Angels to Adam", "Expulsion from Paradise", "First Repentance"],
   },
 
   nuh: {
@@ -120,13 +106,7 @@ const METADATA_DATABASE: Record<string, EntityRichMetadata> = {
 
   ibrahim: {
     primaryKeywords: ["ibrahim", "abraham", "אברהם", "إبراهيم"],
-    secondaryKeywords: [
-      "khalilullah",
-      "friend of God",
-      "father of prophets",
-      "kaaba builder",
-      "pure monotheism",
-    ],
+    secondaryKeywords: ["khalilullah", "friend of God", "father of prophets", "kaaba builder", "pure monotheism"],
     alternativeSpellings: ["Ibrahim", "Avraham", "Abrahim"],
     arabicSynonyms: ["خليل الرحمن", "أبو الأنبياء", "إمام الناس"],
     hebrewSynonyms: ["אברהם אבינו", "אברהם העברי", "ידיד האל"],
@@ -135,49 +115,24 @@ const METADATA_DATABASE: Record<string, EntityRichMetadata> = {
     pluralForms: ["آل إبراهيم", "ملة إبراهيم", "Nation of Abraham"],
     rootWords: ["ب-ر-ه-م", "أ-ب-ر"],
     derivedWords: ["إبراهيمي", "الخِلة", "الخليل"],
-    relatedConcepts: [
-      "hanifiyyah",
-      "pure monotheism",
-      "sacrifice of ismail",
-      "building kaaba",
-      "hajj rites",
-    ],
+    relatedConcepts: ["hanifiyyah", "pure monotheism", "sacrifice of ismail", "building kaaba", "hajj rites"],
     semanticTags: ["monotheism", "prophethood", "kaaba", "sacrifice", "hospitality"],
     topicHierarchies: {
       parentTopics: ["Ulul 'Azm (Resolute Prophets)", "Foundations of Faith"],
-      childTopics: [
-        "Building the Kaaba",
-        "Trial of the Fire",
-        "Sacrifice of Ismail",
-        "Milla Ibrahim",
-      ],
+      childTopics: ["Building the Kaaba", "Trial of the Fire", "Sacrifice of Ismail", "Milla Ibrahim"],
     },
     emotionalCategories: ["unshakeable conviction", "tenderness", "awe", "devotion"],
     jurisprudenceCategories: ["Hajj Pilgrimage", "Sacrifice (Qurbani/Udhiyah)"],
     theologicalCategories: ["Tawhid (Absolute Monotheism)", "Prophethood", "Sacred Covenants"],
-    ethicsCategories: [
-      "Hospitality to Strangers",
-      "Gentle Dawah to Parents",
-      "Complete Submission",
-    ],
+    ethicsCategories: ["Hospitality to Strangers", "Gentle Dawah to Parents", "Complete Submission"],
     familyCategories: ["Parental Relationship", "Fatherhood", "Sacred Lineage"],
     historicalCategories: ["Babylonian Era", "Building of Ancient Mecca"],
     characterTraits: ["hanif", "tender-hearted", "forbearing", "brave"],
-    virtues: [
-      "unwavering monotheism",
-      "hospitality",
-      "willingness to sacrifice",
-      "sound heart (Qalb Salim)",
-    ],
+    virtues: ["unwavering monotheism", "hospitality", "willingness to sacrifice", "sound heart (Qalb Salim)"],
     sins: ["idolatry (opposed by Ibrahim)", "tyranny of Nimrod"],
     places: ["Mecca", "Al-Quds (Hebron/Jerusalem)", "Ur of Chaldees", "Syria"],
     people: ["Ismail", "Ishaq", "Sarah", "Hajar", "Nimrod", "Azar"],
-    events: [
-      "Thrown into the Fire",
-      "Building of the Kaaba",
-      "Sacrifice of Ismail",
-      "Debate with Nimrod",
-    ],
+    events: ["Thrown into the Fire", "Building of the Kaaba", "Sacrifice of Ismail", "Debate with Nimrod"],
   },
 
   musa: {
@@ -201,33 +156,16 @@ const METADATA_DATABASE: Record<string, EntityRichMetadata> = {
     semanticTags: ["liberation", "law", "revelation", "miracles", "prophethood"],
     topicHierarchies: {
       parentTopics: ["Ulul 'Azm (Resolute Prophets)", "Stories of the Prophets"],
-      childTopics: [
-        "Confronting Pharaoh",
-        "Parting of the Red Sea",
-        "Mount Sinai Revelation",
-        "Story with Khidr",
-      ],
+      childTopics: ["Confronting Pharaoh", "Parting of the Red Sea", "Mount Sinai Revelation", "Story with Khidr"],
     },
-    emotionalCategories: [
-      "righteous anger against injustice",
-      "fear transformed into courage",
-      "relevance",
-    ],
+    emotionalCategories: ["righteous anger against injustice", "fear transformed into courage", "relevance"],
     jurisprudenceCategories: ["Divine Commandments", "Law and Order", "Justice"],
-    theologicalCategories: [
-      "Direct Divine Speech (Kalam Allah)",
-      "Miracles (Mu'jizat)",
-      "Scriptures",
-    ],
+    theologicalCategories: ["Direct Divine Speech (Kalam Allah)", "Miracles (Mu'jizat)", "Scriptures"],
     ethicsCategories: ["Confronting Injustice", "Modesty", "Trust in Allah's Plan"],
     familyCategories: ["Brotherhood with Harun", "Mother's Faith"],
     historicalCategories: ["Pharaonic Egypt Era", "Exodus", "Wandering in Sinai"],
     characterTraits: ["strong", "trustworthy", "courageous", "passionate for justice"],
-    virtues: [
-      "speaking truth to power",
-      "trust in Allah at the sea",
-      "humility to learn from Khidr",
-    ],
+    virtues: ["speaking truth to power", "trust in Allah at the sea", "humility to learn from Khidr"],
     sins: ["oppression by Pharaoh", "arrogance of Karun (Korah)", "calf worship by Samiri"],
     places: ["Egypt", "Mount Sinai (Tuwa)", "Red Sea", "Madyan"],
     people: ["Harun", "Pharaoh (Fir'awn)", "Asiya", "Khidr", "Yusha ibn Nun", "Karun"],
@@ -251,22 +189,11 @@ const METADATA_DATABASE: Record<string, EntityRichMetadata> = {
     pluralForms: ["الحواريون", "תלמידי ישוע", "Disciples"],
     rootWords: ["ع-ي-س", "م-س-ح"],
     derivedWords: ["عيسوي", "المسيحية", "مسحي"],
-    relatedConcepts: [
-      "virgin birth",
-      "miracles",
-      "injil revelation",
-      "monotheistic message",
-      "second coming",
-    ],
+    relatedConcepts: ["virgin birth", "miracles", "injil revelation", "monotheistic message", "second coming"],
     semanticTags: ["messiah", "miracles", "gospel", "prophethood", "reverence"],
     topicHierarchies: {
       parentTopics: ["Ulul 'Azm (Resolute Prophets)", "Stories of the Prophets"],
-      childTopics: [
-        "Virgin Birth of Maryam",
-        "Miracles in Childhood",
-        "The Disciples (Hawariyyun)",
-        "Ascension",
-      ],
+      childTopics: ["Virgin Birth of Maryam", "Miracles in Childhood", "The Disciples (Hawariyyun)", "Ascension"],
     },
     emotionalCategories: ["compassion", "gentleness", "peace", "spiritual devotion"],
     jurisprudenceCategories: ["Monasticism vs Balance", "Pure Worship"],
@@ -279,23 +206,12 @@ const METADATA_DATABASE: Record<string, EntityRichMetadata> = {
     sins: ["exaggeration in religion (Ghuluw)", "associating partners with God"],
     places: ["Bethlehem", "Jerusalem", "Nazareth"],
     people: ["Maryam (Mary)", "Al-Hawariyyun (Disciples)", "Yahya (John the Baptist)", "Zakariya"],
-    events: [
-      "Miraculous Birth",
-      "Speaking in the Cradle",
-      "The Heavenly Table (Al-Ma'idah)",
-      "Ascension to Heaven",
-    ],
+    events: ["Miraculous Birth", "Speaking in the Cradle", "The Heavenly Table (Al-Ma'idah)", "Ascension to Heaven"],
   },
 
   muhammad: {
     primaryKeywords: ["muhammad", "mohammed", "מוחמד", "محمد"],
-    secondaryKeywords: [
-      "rasulullah",
-      "seal of the prophets",
-      "quran revelation",
-      "mecca and medina",
-      "sunnah",
-    ],
+    secondaryKeywords: ["rasulullah", "seal of the prophets", "quran revelation", "mecca and medina", "sunnah"],
     alternativeSpellings: ["Mohamed", "Muhammed", "Mahomet"],
     arabicSynonyms: ["خاتم النبيين", "رسول الله", "الصادق الأمين", "حبيب الرحمن", "رحمة للعالمين"],
     hebrewSynonyms: ["חותם הנביאים", "שליח האל"],
@@ -315,22 +231,12 @@ const METADATA_DATABASE: Record<string, EntityRichMetadata> = {
     semanticTags: ["final prophet", "quran", "mercy", "guidance", "seerah"],
     topicHierarchies: {
       parentTopics: ["Ulul 'Azm (Resolute Prophets)", "The Final Message"],
-      childTopics: [
-        "Revelation of Quran",
-        "Hijrah to Medina",
-        "Isra and Mi'raj",
-        "Conquest of Mecca",
-      ],
+      childTopics: ["Revelation of Quran", "Hijrah to Medina", "Isra and Mi'raj", "Conquest of Mecca"],
     },
     emotionalCategories: ["deep mercy", "love for humanity", "gratitude", "unyielding faith"],
     jurisprudenceCategories: ["Islamic Law (Shariah)", "Sunnah Norms", "Governance"],
     theologicalCategories: ["Finality of Prophethood (Khatam an-Nabiyyin)", "Universal Message"],
-    ethicsCategories: [
-      "Exemplary Character (Khuluq 'Azim)",
-      "Honesty",
-      "Trustworthiness",
-      "Forgiveness",
-    ],
+    ethicsCategories: ["Exemplary Character (Khuluq 'Azim)", "Honesty", "Trustworthiness", "Forgiveness"],
     familyCategories: ["Ahl al-Bayt", "Husband and Father Role Model"],
     historicalCategories: ["7th Century Arabia", "Makkan Period", "Madinan State"],
     characterTraits: ["merciful", "honest", "trustworthy", "patient", "courageous", "humble"],
@@ -351,13 +257,7 @@ const METADATA_DATABASE: Record<string, EntityRichMetadata> = {
   // --- TOPICS & CONCEPTS ---
   tawhid: {
     primaryKeywords: ["tawhid", "monotheism", "ייחוד האל", "التوحيد"],
-    secondaryKeywords: [
-      "oneness of god",
-      "oneness of allah",
-      "aqeeda",
-      "la ilaha illallah",
-      "shirk rejection",
-    ],
+    secondaryKeywords: ["oneness of god", "oneness of allah", "aqeeda", "la ilaha illallah", "shirk rejection"],
     alternativeSpellings: ["Tauhid", "Tawheed", "Tawhid"],
     arabicSynonyms: ["وحدانية الله", "إفراد الله بالعبادة", "كلمة الإخلاص"],
     hebrewSynonyms: ["אחדות הבורא", "ייחוד השם", "אמונת היחוד"],
@@ -366,13 +266,7 @@ const METADATA_DATABASE: Record<string, EntityRichMetadata> = {
     pluralForms: ["أهل التوحيد", "מאמינים ביחוד", "Monotheists"],
     rootWords: ["و-ح-د", "ו-ח-ד"],
     derivedWords: ["واحد", "أحد", "وحيد", "توحيدي"],
-    relatedConcepts: [
-      "shahada",
-      "shirk warning",
-      "names and attributes of Allah",
-      "sura al-ikhlas",
-      "ayat al-kursi",
-    ],
+    relatedConcepts: ["shahada", "shirk warning", "names and attributes of Allah", "sura al-ikhlas", "ayat al-kursi"],
     semanticTags: ["theology", "core belief", "monotheism", "pillars of faith"],
     topicHierarchies: {
       parentTopics: ["Foundations of Faith (Aqeeda)"],
@@ -403,12 +297,7 @@ const METADATA_DATABASE: Record<string, EntityRichMetadata> = {
     pluralForms: ["الصابرون", "סבלניים", "The Patient Ones"],
     rootWords: ["ص-ب-ر", "ס-ב-ר"],
     derivedWords: ["صابر", "صبور", "اصطبار", "مصابرة"],
-    relatedConcepts: [
-      "trials and tribulations",
-      "sabr jameel",
-      "gratitude (shukr)",
-      "reward without account",
-    ],
+    relatedConcepts: ["trials and tribulations", "sabr jameel", "gratitude (shukr)", "reward without account"],
     semanticTags: ["ethics", "virtue", "character", "coping with hardship"],
     topicHierarchies: {
       parentTopics: ["Quranic Ethics", "Spiritual Purification (Tazkiyah)"],
@@ -439,12 +328,7 @@ const METADATA_DATABASE: Record<string, EntityRichMetadata> = {
     pluralForms: ["العادلون", "المقسطون", "The Just Ones"],
     rootWords: ["ع-د-ل", "ق-س-ط"],
     derivedWords: ["عادل", "عدالة", "تعديل", "مقسط"],
-    relatedConcepts: [
-      "rule of law",
-      "witnessing for god",
-      "anti-oppression",
-      "scales on judgment day",
-    ],
+    relatedConcepts: ["rule of law", "witnessing for god", "anti-oppression", "scales on judgment day"],
     semanticTags: ["governance", "ethics", "social law", "judgment"],
     topicHierarchies: {
       parentTopics: ["Social Order and Governance", "Quranic Ethics"],
@@ -475,13 +359,7 @@ const METADATA_DATABASE: Record<string, EntityRichMetadata> = {
     pluralForms: ["الرحماء", "הרחมนים", "The Merciful Ones"],
     rootWords: ["ر-ح-م", "ר-ח-מ"],
     derivedWords: ["رحيم", "رحمن", "رحم", "ترحّم"],
-    relatedConcepts: [
-      "basmalah",
-      "rahat alli",
-      "forgiveness",
-      "mercy to parents",
-      "compassion to creation",
-    ],
+    relatedConcepts: ["basmalah", "rahat alli", "forgiveness", "mercy to parents", "compassion to creation"],
     semanticTags: ["divine attributes", "ethics", "character", "forgiveness"],
     topicHierarchies: {
       parentTopics: ["Names and Attributes of Allah", "Quranic Ethics"],
@@ -502,11 +380,7 @@ const METADATA_DATABASE: Record<string, EntityRichMetadata> = {
   },
 };
 
-export function getRichMetadataForEntity(
-  slugOrId: string,
-  title?: string,
-  kind?: string,
-): EntityRichMetadata {
+export function getRichMetadataForEntity(slugOrId: string, title?: string, kind?: string): EntityRichMetadata {
   const cleanKey = slugOrId.replace(/^seed:/, "").toLowerCase();
   if (METADATA_DATABASE[cleanKey]) {
     return METADATA_DATABASE[cleanKey];
@@ -537,9 +411,7 @@ export function getRichMetadataForEntity(
 }
 
 // Function to validate any metadata structure against the internal database entities
-export function validateMetadataAgainstDb(
-  metadata: Partial<EntityRichMetadata>,
-): EntityRichMetadata {
+export function validateMetadataAgainstDb(metadata: Partial<EntityRichMetadata>): EntityRichMetadata {
   const allKnownSlugs = new Set([
     ...ALL_PROPHETS.map((p) => p.slug),
     ...ALL_TOPICS.map((t) => t.slug),
@@ -549,9 +421,7 @@ export function validateMetadataAgainstDb(
   const validated: EntityRichMetadata = {
     primaryKeywords: (metadata.primaryKeywords ?? []).map((s) => s.trim()).filter(Boolean),
     secondaryKeywords: (metadata.secondaryKeywords ?? []).map((s) => s.trim()).filter(Boolean),
-    alternativeSpellings: (metadata.alternativeSpellings ?? [])
-      .map((s) => s.trim())
-      .filter(Boolean),
+    alternativeSpellings: (metadata.alternativeSpellings ?? []).map((s) => s.trim()).filter(Boolean),
     arabicSynonyms: (metadata.arabicSynonyms ?? []).map((s) => s.trim()).filter(Boolean),
     hebrewSynonyms: (metadata.hebrewSynonyms ?? []).map((s) => s.trim()).filter(Boolean),
     englishSynonyms: (metadata.englishSynonyms ?? []).map((s) => s.trim()).filter(Boolean),
@@ -565,22 +435,14 @@ export function validateMetadataAgainstDb(
       parentTopics: (metadata.topicHierarchies?.parentTopics ?? ["Islamic Knowledge"])
         .map((s) => s.trim())
         .filter(Boolean),
-      childTopics: (metadata.topicHierarchies?.childTopics ?? [])
-        .map((s) => s.trim())
-        .filter(Boolean),
+      childTopics: (metadata.topicHierarchies?.childTopics ?? []).map((s) => s.trim()).filter(Boolean),
     },
     emotionalCategories: (metadata.emotionalCategories ?? []).map((s) => s.trim()).filter(Boolean),
-    jurisprudenceCategories: (metadata.jurisprudenceCategories ?? [])
-      .map((s) => s.trim())
-      .filter(Boolean),
-    theologicalCategories: (metadata.theologicalCategories ?? [])
-      .map((s) => s.trim())
-      .filter(Boolean),
+    jurisprudenceCategories: (metadata.jurisprudenceCategories ?? []).map((s) => s.trim()).filter(Boolean),
+    theologicalCategories: (metadata.theologicalCategories ?? []).map((s) => s.trim()).filter(Boolean),
     ethicsCategories: (metadata.ethicsCategories ?? []).map((s) => s.trim()).filter(Boolean),
     familyCategories: (metadata.familyCategories ?? []).map((s) => s.trim()).filter(Boolean),
-    historicalCategories: (metadata.historicalCategories ?? [])
-      .map((s) => s.trim())
-      .filter(Boolean),
+    historicalCategories: (metadata.historicalCategories ?? []).map((s) => s.trim()).filter(Boolean),
     characterTraits: (metadata.characterTraits ?? []).map((s) => s.trim()).filter(Boolean),
     virtues: (metadata.virtues ?? []).map((s) => s.trim()).filter(Boolean),
     sins: (metadata.sins ?? []).map((s) => s.trim()).filter(Boolean),
