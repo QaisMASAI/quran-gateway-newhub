@@ -190,16 +190,14 @@ export async function performUnifiedSearch(
               subtitle: h.narrator ?? undefined,
               snippet,
               arabicSnippet: h.arabic_text,
-              hebrewSnippet: h.hebrew_text,
-              englishSnippet: h.english_text,
+              hebrewSnippet: h.hebrew_text || undefined,
+              englishSnippet: h.english_text || undefined,
               url: `/hadith/${collection}/entry/${entryNum}`,
               badge: "Hadith",
               relevanceScore: 60,
               metadata: {
                 collection,
                 id_in_book: h.id_in_book,
-                grade: h.grade,
-                chapter: h.chapter,
               },
             };
           });
