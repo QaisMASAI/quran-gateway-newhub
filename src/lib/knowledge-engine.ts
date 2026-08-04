@@ -1,8 +1,8 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
+import type { Database } from "@/integrations/supabase/types";
 import { ALL_PROPHETS } from "@/lib/prophets";
 import { ALL_TOPICS } from "@/lib/topics";
-import seed from "@/lib/seeds/knowledge-seed.json";
 
 export type KnowledgeKind =
   | "verse"
@@ -86,6 +86,31 @@ export const getInterconnectedKnowledge = createServerFn({ method: "POST" })
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { kind, id, locale } = data;
 
+    const fallbackLocale = locale === "ar" ? "ar" : locale === "en" ? "en" : "he";
+
+    const prophetDisplayName = (prophet: (typeof ALL_PROPHETS)[number]) => {
+      if (fallbackLocale === "ar") return prophet.nameAr;
+      if (fallbackLocale === "he") return prophet.nameHe;
+      return prophet.nameHeAlt ?? prophet.nameAr;
+    };
+
+    const topicDisplayTitle = (topic: (typeof ALL_TOPICS)[number]) => {
+      if (fallbackLocale === "ar") return topic.subtitle ?? topic.title;
+      if (fallbackLocale === "en") return topic.subtitle ?? topic.title;
+      return topic.title;
+    };
+
+    const pickSourceName = (source: { name_he?: string; name_ar?: string; name_en?: string } | null | undefined) => {
+      if (!source) return "Tafsir";
+      if (fallbackLocale === "ar") return source.name_ar ?? source.name_en ?? source.name_he ?? "Tafsir";
+      if (fallbackLocale === "en") return source.name_en ?? source.name_ar ?? source.name_he ?? "Tafsir";
+      return source.name_he ?? source.name_ar ?? source.name_en ?? "Tafsir";
+    };
+
+    type HadithEntityLinkRow = Database["public"]["Tables"]["hadith_entity_links"]["Row"];
+    type HadithEntryRow = Database["public"]["Tables"]["hadith_entries"]["Row"];
+    type TafsirPassageRow = Database["public"]["Tables"]["tafsir_passages"]["Row"];
+
     const bundle: InterconnectedKnowledgeBundle = {
       entityType: kind,
       entityId: id,
@@ -99,12 +124,6 @@ export const getInterconnectedKnowledge = createServerFn({ method: "POST" })
       placesEvents: [],
     };
 
-    // Helper to pick localized string
-    const pickText = (obj: { he?: string; ar?: string; en?: string } | null | undefined) => {
-      if (!obj) return "";
-      return obj[locale] || obj.he || obj.ar || obj.en || "";
-    };
-
     if (kind === "verse") {
       // id format: "surah:ayah" e.g. "2:255" or "1:1"
       const [surahStr, ayahStr] = id.split(":");
@@ -115,30 +134,41 @@ export const getInterconnectedKnowledge = createServerFn({ method: "POST" })
 
       // Fetch Hadiths linked to this verse
       const { data: hadithLinks } = await supabaseAdmin
-        .from("hadith_verse_links")
-        .select("hadith_entry_id, weight")
+        .from("hadith_entity_links")
+        .select("hadith_id, weight")
         .eq("surah", surah)
         .eq("ayah", ayah)
+        .not("hadith_id", "is", null)
         .order("weight", { ascending: false })
         .limit(6);
 
-      const hadithIds = (hadithLinks ?? []).map((l) => l.hadith_entry_id);
+      const hadithIds = ((hadithLinks ?? []) as HadithEntityLinkRow[])
+        .map((l) => l.hadith_id)
+        .filter((value): value is number => typeof value === "number");
+
       if (hadithIds.length > 0) {
         const { data: hadiths } = await supabaseAdmin
           .from("hadith_entries")
           .select("id, collection_slug, book_id, id_in_book, narrator, arabic_text, english_text, hebrew_text")
           .in("id", hadithIds);
 
-        bundle.hadiths = (hadiths ?? []).map((h) => ({
+        bundle.hadiths = ((hadiths ?? []) as HadithEntryRow[]).map((h) => ({
           id: h.id,
           collectionSlug: h.collection_slug,
-          collectionTitle: h.collection_slug === "bukhari" ? "Sahih al-Bukhari" : h.collection_slug === "muslim" ? "Sahih Muslim" : h.collection_slug,
+          collectionTitle:
+            h.collection_slug === "bukhari"
+              ? "Sahih al-Bukhari"
+              : h.collection_slug === "muslim"
+                ? "Sahih Muslim"
+                : h.collection_slug,
           bookId: h.book_id,
           idInBook: h.id_in_book,
           narrator: h.narrator,
           arabicText: h.arabic_text,
-          translationText: (locale === "he" ? h.hebrew_text : locale === "en" ? h.english_text : h.arabic_text) || h.arabic_text,
-          grade: "Sahih",
+          translationText:
+            (fallbackLocale === "he" ? h.hebrew_text : fallbackLocale === "en" ? h.english_text : h.arabic_text) ||
+            h.arabic_text,
+          grade: h.grade ?? undefined,
         }));
       }
 
@@ -151,10 +181,12 @@ export const getInterconnectedKnowledge = createServerFn({ method: "POST" })
         .lte("ayah_end", ayah)
         .limit(3);
 
-      bundle.tafsirPassages = (tafsirs ?? []).map((t) => {
-        const src = t.source as unknown as { name_he?: string; name_ar?: string; name_en?: string } | null;
+      bundle.tafsirPassages = ((tafsirs ?? []) as Array<TafsirPassageRow & { source?: unknown }>).map((t) => {
+        const sourceRow = Array.isArray(t.source)
+          ? (t.source[0] as { name_he?: string; name_ar?: string; name_en?: string } | undefined)
+          : (t.source as { name_he?: string; name_ar?: string; name_en?: string } | null | undefined);
         return {
-          source: pickText(src) || "Tafsir",
+          source: pickSourceName(sourceRow),
           body: t.body,
           surah,
           ayah,
@@ -169,8 +201,8 @@ export const getInterconnectedKnowledge = createServerFn({ method: "POST" })
         id: p.slug,
         slug: p.slug,
         kind: "prophet",
-        title: p.name[locale] || p.name.he || p.name.ar || p.name.en,
-        summary: p.title[locale] || p.title.he || "",
+        title: prophetDisplayName(p),
+        summary: fallbackLocale === "ar" ? "نبي مذكور في القرآن" : fallbackLocale === "en" ? "Prophet mentioned in the Quran" : "נביא מוזכר בקוראן",
       }));
 
       const topicMatches = ALL_TOPICS.filter((t) =>
@@ -180,8 +212,8 @@ export const getInterconnectedKnowledge = createServerFn({ method: "POST" })
         id: t.slug,
         slug: t.slug,
         kind: "topic",
-        title: t.title[locale] || t.title.he || t.title.ar || t.title.en,
-        summary: t.summary?.[locale] || t.summary?.he || "",
+        title: topicDisplayTitle(t),
+        summary: t.description,
       }));
 
     } else if (kind === "hadith") {
@@ -200,13 +232,20 @@ export const getInterconnectedKnowledge = createServerFn({ method: "POST" })
 
           // Fetch related verses
           const { data: vLinks } = await supabaseAdmin
-            .from("hadith_verse_links")
+            .from("hadith_entity_links")
             .select("surah, ayah, weight")
-            .eq("hadith_entry_id", entry.id)
+            .eq("hadith_id", entry.id)
+            .not("surah", "is", null)
+            .not("ayah", "is", null)
             .limit(5);
 
-          if (vLinks && vLinks.length > 0) {
-            for (const vl of vLinks) {
+          const verseLinks = ((vLinks ?? []) as HadithEntityLinkRow[]).filter(
+            (vl): vl is HadithEntityLinkRow & { surah: number; ayah: number } =>
+              typeof vl.surah === "number" && typeof vl.ayah === "number",
+          );
+
+          if (verseLinks.length > 0) {
+            for (const vl of verseLinks) {
               const { data: verseTrans } = await supabaseAdmin
                 .from("ayah_translations")
                 .select("text, source_id")
@@ -231,8 +270,8 @@ export const getInterconnectedKnowledge = createServerFn({ method: "POST" })
       const topic = ALL_TOPICS.find((t) => t.slug === id);
 
       if (prophet) {
-        bundle.title = prophet.name[locale] || prophet.name.ar;
-        bundle.summary = prophet.title[locale] || prophet.title.he;
+        bundle.title = prophetDisplayName(prophet);
+        bundle.summary = fallbackLocale === "ar" ? "رحلة نبي في القرآن" : fallbackLocale === "en" ? "A prophet's journey in the Quran" : "מסע נביא בקוראן";
 
         for (const ref of prophet.refs.slice(0, 8)) {
           bundle.verses.push({
@@ -240,12 +279,12 @@ export const getInterconnectedKnowledge = createServerFn({ method: "POST" })
             ayah: ref.ayah,
             reference: `${ref.surah}:${ref.ayah}${ref.to ? `-${ref.to}` : ""}`,
             arabic: "",
-            translation: ref.note || "",
+            translation: "",
           });
         }
       } else if (topic) {
-        bundle.title = topic.title[locale] || topic.title.ar;
-        bundle.summary = topic.summary?.[locale] || topic.summary?.he;
+        bundle.title = topicDisplayTitle(topic);
+        bundle.summary = topic.description;
 
         for (const ref of topic.refs.slice(0, 8)) {
           bundle.verses.push({
