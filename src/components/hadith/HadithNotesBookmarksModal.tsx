@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Bookmark, FileText, Trash2, ExternalLink, Calendar } from "lucide-react";
+import { Bookmark, FileText, Trash2, ExternalLink } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import { useHadithUserStore } from "@/lib/hadith-user-store";
 import { Button } from "@/components/ui/button";
@@ -17,7 +17,20 @@ export function HadithNotesBookmarksModal({ isOpen, onClose, locale }: HadithNot
   const [activeTab, setActiveTab] = useState<"bookmarks" | "notes">("bookmarks");
 
   const isRtl = locale !== "en";
-  const bookmarksList = store.bookmarks;
+  const bookmarksList = Object.entries(store.bookmarks)
+    .map(([key, savedAt]) => {
+      const [collectionSlug, idInBookRaw] = key.split(":");
+      const idInBook = Number(idInBookRaw);
+      if (!collectionSlug || !Number.isFinite(idInBook)) return null;
+      return {
+        key,
+        collectionSlug,
+        idInBook,
+        savedAt,
+      };
+    })
+    .filter((item): item is { key: string; collectionSlug: string; idInBook: number; savedAt: number } => !!item)
+    .sort((a, b) => b.savedAt - a.savedAt);
   const notesEntries = Object.entries(store.notes);
 
   return (
@@ -86,7 +99,7 @@ export function HadithNotesBookmarksModal({ isOpen, onClose, locale }: HadithNot
             ) : (
               bookmarksList.map((bm, i) => (
                 <div
-                  key={bm.id || `${bm.collectionSlug}-${bm.idInBook}-${i}`}
+                  key={bm.key || `${bm.collectionSlug}-${bm.idInBook}-${i}`}
                   className="flex items-center justify-between rounded-2xl border border-border/70 bg-card p-4 hover:border-primary/40 transition-all shadow-xs"
                 >
                   <div className="space-y-1">
