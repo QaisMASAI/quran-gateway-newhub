@@ -1,6 +1,7 @@
 @import "tailwindcss" source(none);
 @source "../src";
 @import "tw-animate-css";
+@import url("https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700&family=Heebo:wght@400;500;600;700&family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Amiri:ital,wght@0,400;0,700;1,400&family=Scheherazade+New:wght@400;700&display=swap");
 
 @custom-variant dark (&:is(.dark *));
 
@@ -41,16 +42,12 @@
 
   --font-hebrew: "Heebo", "Arial Hebrew", system-ui, sans-serif;
   --font-ui-he: "Heebo", "Arial Hebrew", system-ui, sans-serif;
-  --font-ui-en: "Inter", "Segoe UI", "Helvetica Neue", Arial, system-ui, sans-serif;
-  --font-ui-ar:
-    "IBM Plex Sans Arabic", "Noto Sans Arabic", "Noto Naskh Arabic", "Geeza Pro", Tahoma, sans-serif;
-  --font-reading-en: "Merriweather", "Times New Roman", Georgia, "Noto Serif", serif;
-  --font-reading-he: "Heebo", "Arial Hebrew", "Noto Sans Hebrew", "Segoe UI", sans-serif;
-  --font-reading-ar:
-    "Noto Naskh Arabic", "Amiri", "Scheherazade New", "IBM Plex Sans Arabic", "Geeza Pro", serif;
-  --font-quran:
-    "KFGQPC Uthmanic Script HAFS", "UthmanicHafs", "KFGQPC Hafs", "Amiri Quran",
-    "Scheherazade New", "Noto Naskh Arabic", serif;
+  --font-ui-en: "Plus Jakarta Sans", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-ui-ar: "Cairo", "IBM Plex Sans Arabic", "Noto Sans Arabic", system-ui, sans-serif;
+  --font-reading-en: "Plus Jakarta Sans", Georgia, "Times New Roman", serif;
+  --font-reading-he: "Heebo", "Arial Hebrew", sans-serif;
+  --font-reading-ar: "Amiri", "Scheherazade New", "Noto Naskh Arabic", serif;
+  --font-quran: "KFGQPC Uthmanic Script HAFS", "UthmanicHafs", "KFGQPC Hafs", "Amiri Quran", "Scheherazade New", serif;
   --font-tafsir-hadith-ar: var(--font-reading-ar);
   --font-tafsir-hadith-he: var(--font-reading-he);
   --font-tafsir-hadith-en: var(--font-reading-en);
@@ -62,11 +59,7 @@
     oklch(0.42 0.09 162) 60%,
     oklch(0.48 0.09 165) 100%
   );
-  --gradient-hero-soft: linear-gradient(
-    160deg,
-    oklch(0.97 0.025 110) 0%,
-    oklch(0.95 0.04 150) 100%
-  );
+  --gradient-hero-soft: linear-gradient(160deg, oklch(0.97 0.025 110) 0%, oklch(0.95 0.04 150) 100%);
   --gradient-primary: linear-gradient(135deg, oklch(0.32 0.07 160), oklch(0.48 0.09 165));
   --gradient-olive: linear-gradient(135deg, oklch(0.48 0.09 165), oklch(0.55 0.08 160));
   --gradient-gold: linear-gradient(135deg, oklch(0.78 0.13 80), oklch(0.7 0.14 60));
