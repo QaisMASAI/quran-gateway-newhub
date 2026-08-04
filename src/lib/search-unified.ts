@@ -615,7 +615,7 @@ export async function performUnifiedSearch(
             url: `/topics/${p.slug}`,
             badge: "Place",
             relevanceScore: Math.max(score, 65),
-            metadata: richMetadata as unknown as Record<string, unknown>,
+            metadata: richMetadata as unknown as Record<string, SerializableValue>,
           };
         });
       } catch (err) {
@@ -632,9 +632,6 @@ export async function performUnifiedSearch(
     if (item.rankingFactors && item.rankingExplanation) return item;
 
     const dummyMeta: EntityRichMetadata = ((item.metadata as unknown as EntityRichMetadata | undefined) ?? {
-      entitySlug: item.id,
-      entityTitle: item.title,
-      entityKind: item.badge || "concept",
       primaryKeywords: [item.title, item.badge || ""],
       arabicSynonyms: item.arabicSnippet ? [item.arabicSnippet] : [],
       hebrewSynonyms: item.hebrewSnippet ? [item.hebrewSnippet] : [],
