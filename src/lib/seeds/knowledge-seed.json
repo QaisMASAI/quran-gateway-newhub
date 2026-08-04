@@ -1002,6 +1002,94 @@
         "en": "The year an invading army came to destroy the Kaaba and was turned back."
       },
       "keywords": ["fil", "elephant"]
+    },
+    {
+      "kind": "narrator",
+      "slug": "abu-hurairah",
+      "title": { "he": "אבו הוריירה", "ar": "أبو هريرة", "en": "Abu Hurairah" },
+      "summary": {
+        "he": "מגדולי מוסרי החדית' — ליווה את הנביא ומסר אלפי מסורות מהימנות.",
+        "ar": "من أكثر الصحابة رواية للحديث النبوي الشريف.",
+        "en": "One of the most prolific narrators of Hadith who accompanied the Prophet closely."
+      },
+      "keywords": ["abu hurairah", "hurairah", "narrator"]
+    },
+    {
+      "kind": "narrator",
+      "slug": "aisha-bint-abi-bakr",
+      "title": { "he": "עאישה בינת אבו בכר", "ar": "عائشة بنت أبي بكر", "en": "Aisha bint Abi Bakr" },
+      "summary": {
+        "he": "אשת הנביא, מורת הקהילה ומגדולי מעבירי התורה והמנהגים.",
+        "ar": "أم المؤمنين، من كبار رواة الحديث والفقهاء في الإسلام.",
+        "en": "Mother of the Believers, leading narrator and scholar of early Islam."
+      },
+      "keywords": ["aisha", "mother of believers", "narrator"]
+    },
+    {
+      "kind": "narrator",
+      "slug": "abdullah-ibn-umar",
+      "title": { "he": "עבדאללה בן עומר", "ar": "عبد الله بن عمر", "en": "Abdullah ibn Umar" },
+      "summary": {
+        "he": "בנו של עומר, מוסר חדית' קפדן הידוע בדבקותו בסונה.",
+        "ar": "من كبار الصحابة ورواة الحديث المعروف بتبعه الدقيق للسنة.",
+        "en": "Son of Umar, renowned for his meticulous adherence to the Sunnah and Hadith narration."
+      },
+      "keywords": ["ibn umar", "abdullah ibn umar"]
+    },
+    {
+      "kind": "narrator",
+      "slug": "anas-ibn-malik",
+      "title": { "he": "אנס בן מאלכ", "ar": "أنس بن مالك", "en": "Anas ibn Malik" },
+      "summary": {
+        "he": "משרת הנביא במשך 10 שנים, מוסר חדית' מרכזי.",
+        "ar": "خادم رسول الله لten سنين ومن كبار الرواة.",
+        "en": "Served the Prophet for ten years and narrated numerous Hadiths."
+      },
+      "keywords": ["anas", "anas ibn malik"]
+    },
+    {
+      "kind": "narrator",
+      "slug": "abdullah-ibn-abbas",
+      "title": { "he": "עבדאללה בן עבאס", "ar": "عبد الله بن عباس", "en": "Abdullah ibn Abbas" },
+      "summary": {
+        "he": "בן דודו של הנביא, 'פרשן הקוראן' ומגדולי החכמים.",
+        "ar": "ترجمان القرآن وحبر الأمة ومن كبار الرواة.",
+        "en": "Cousin of the Prophet, known as the Scholar of the Ummah and Quran commentator."
+      },
+      "keywords": ["ibn abbas", "abdullah ibn abbas"]
+    },
+    {
+      "kind": "narrator",
+      "slug": "umar-ibn-al-khattab",
+      "title": { "he": "עומר בן אל-ח'טאב", "ar": "عمر بن الخطاب", "en": "Umar ibn al-Khattab" },
+      "summary": {
+        "he": "הח'ליף השני, מגדולי המנהיגים ומוסר חדית' מרכזי בנושאי כוונות ומשפט.",
+        "ar": "أمير المؤمنين الفاروق، صاحب حديث الأعمال بالنيات.",
+        "en": "The second Caliph, Al-Farooq, narrator of fundamental Hadiths on intentions."
+      },
+      "keywords": ["umar", "umar ibn al-khattab", "farooq"]
+    },
+    {
+      "kind": "narrator",
+      "slug": "imam-al-bukhari",
+      "title": { "he": "אל-אימאם אל-בוח'ארי", "ar": "الإمام البخاري", "en": "Imam al-Bukhari" },
+      "summary": {
+        "he": "מחבר הקובץ המוסמך ביותר 'אל-ג'אמע אל-ציחיח'.",
+        "ar": "أمير المؤمنين في الحديث ومؤلف الصحيح.",
+        "en": "Master of Hadith compilation and author of Sahih al-Bukhari."
+      },
+      "keywords": ["bukhari", "imam bukhari"]
+    },
+    {
+      "kind": "narrator",
+      "slug": "imam-muslim",
+      "title": { "he": "אל-אימאם מוסלים", "ar": "الإمام مسلم", "en": "Imam Muslim" },
+      "summary": {
+        "he": "מחבר הקובץ הטהור והמדויק 'ציחיח מוסלים'.",
+        "ar": "صاحب الجامع الصحيح ومن أئمة الحديث.",
+        "en": "Author of Sahih Muslim and premier authority in Hadith science."
+      },
+      "keywords": ["muslim", "imam muslim"]
     }
   ],
 
