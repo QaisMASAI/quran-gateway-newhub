@@ -379,9 +379,9 @@ function SurahPage() {
         {/* Dynamic 10D Knowledge Hub */}
         <PageKnowledgeHub
           slug={`surah-${surahId}`}
-          locale={locale === "ar" ? "ar" : locale === "he" ? "he" : "en"}
+          locale={lang === "ar" ? "ar" : lang === "he" ? "he" : "en"}
           title={
-            locale === "ar"
+            lang === "ar"
               ? `شبكة المعرفة والإحالات المتقاطعة لسورة ${chapter?.name_arabic ?? surahId}`
               : `Knowledge Hub & Cross-References for Surah ${chapter?.name_simple ?? surahId}`
           }
