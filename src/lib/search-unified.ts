@@ -647,7 +647,6 @@ export async function performUnifiedSearch(
       virtues: [],
       sins: [],
       relatedConcepts: [item.title],
-      crossReferences: [],
       places: item.category === "places" ? [item.title] : [],
       people: item.category === "prophets" || item.category === "narrators" ? [item.title] : [],
       events: item.category === "stories" ? [item.title] : [],
