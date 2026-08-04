@@ -119,9 +119,7 @@ export const SearchResultRankingDetails: React.FC<SearchResultRankingDetailsProp
           </Badge>
 
           {rankingExplanation && !compact && (
-            <span className="text-[11px] text-muted-foreground line-clamp-1 italic">
-              {rankingExplanation}
-            </span>
+            <span className="text-[11px] text-muted-foreground line-clamp-1 italic">{rankingExplanation}</span>
           )}
         </div>
 
@@ -139,11 +137,7 @@ export const SearchResultRankingDetails: React.FC<SearchResultRankingDetailsProp
           >
             <Info className="w-3 h-3 text-primary" />
             <span>
-              {isAr
-                ? "سبب الترتيب (7 عوامل)"
-                : isHe
-                  ? "סיבת הדירוג (7 מדדים)"
-                  : "Ranking Rationale (7 Factors)"}
+              {isAr ? "سبب الترتيب (7 عوامل)" : isHe ? "סיבת הדירוג (7 מדדים)" : "Ranking Rationale (7 Factors)"}
             </span>
             {expanded ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
           </Button>
@@ -155,10 +149,7 @@ export const SearchResultRankingDetails: React.FC<SearchResultRankingDetailsProp
         <div className="p-3 rounded-lg bg-muted/40 border border-border/60 space-y-2 text-xs animate-in fade-in-50 duration-150">
           {rankingExplanation && (
             <p className="text-xs font-medium text-foreground/90 bg-background/80 p-2 rounded border border-border/40 leading-relaxed">
-              💡{" "}
-              <strong>
-                {isAr ? "سبب التصنيف:" : isHe ? "סיבת הדירוג:" : "Ranking Rationale:"}
-              </strong>{" "}
+              💡 <strong>{isAr ? "سبب التصنيف:" : isHe ? "סיבת הדירוג:" : "Ranking Rationale:"}</strong>{" "}
               {rankingExplanation}
             </p>
           )}
@@ -169,10 +160,7 @@ export const SearchResultRankingDetails: React.FC<SearchResultRankingDetailsProp
               const label = isAr ? factor.labelAr : isHe ? factor.labelHe : factor.labelEn;
 
               return (
-                <div
-                  key={factor.key}
-                  className="p-1.5 rounded bg-card border border-border/40 flex flex-col gap-1"
-                >
+                <div key={factor.key} className="p-1.5 rounded bg-card border border-border/40 flex flex-col gap-1">
                   <div className="flex items-center justify-between text-[10px] font-medium text-muted-foreground">
                     <span className="flex items-center gap-1 truncate">
                       {factor.icon}
