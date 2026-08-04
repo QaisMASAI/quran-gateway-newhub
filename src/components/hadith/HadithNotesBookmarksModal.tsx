@@ -12,11 +12,7 @@ interface HadithNotesBookmarksModalProps {
   locale: "he" | "ar" | "en";
 }
 
-export function HadithNotesBookmarksModal({
-  isOpen,
-  onClose,
-  locale,
-}: HadithNotesBookmarksModalProps) {
+export function HadithNotesBookmarksModal({ isOpen, onClose, locale }: HadithNotesBookmarksModalProps) {
   const store = useHadithUserStore();
   const [activeTab, setActiveTab] = useState<"bookmarks" | "notes">("bookmarks");
 
@@ -49,8 +45,7 @@ export function HadithNotesBookmarksModal({
             >
               <Bookmark className="h-3.5 w-3.5" />
               <span>
-                {locale === "ar" ? "المحفوظات" : locale === "he" ? "סימניות" : "Bookmarks"} (
-                {bookmarksList.length})
+                {locale === "ar" ? "المحفوظات" : locale === "he" ? "סימניות" : "Bookmarks"} ({bookmarksList.length})
               </span>
             </button>
             <button
@@ -64,8 +59,7 @@ export function HadithNotesBookmarksModal({
             >
               <FileText className="h-3.5 w-3.5" />
               <span>
-                {locale === "ar" ? "الملاحظات" : locale === "he" ? "הערות" : "Notes"} (
-                {notesEntries.length})
+                {locale === "ar" ? "الملاحظات" : locale === "he" ? "הערות" : "Notes"} ({notesEntries.length})
               </span>
             </button>
           </div>
@@ -120,11 +114,7 @@ export function HadithNotesBookmarksModal({
                       size="icon"
                       onClick={() => {
                         store.toggleBookmark(bm.collectionSlug, bm.idInBook);
-                        toast.success(
-                          locale === "ar"
-                            ? "تم حذف الحديث من المحفوظات"
-                            : "Removed from bookmarks"
-                        );
+                        toast.success(locale === "ar" ? "تم حذف الحديث من المحفوظات" : "Removed from bookmarks");
                       }}
                       className="h-8 w-8 text-muted-foreground hover:text-destructive"
                     >
@@ -167,9 +157,7 @@ export function HadithNotesBookmarksModal({
                       <ExternalLink className="h-3 w-3" />
                     </Link>
                   </div>
-                  <p className="text-xs text-foreground/90 bg-muted/50 p-2.5 rounded-xl font-reading-ar">
-                    {text}
-                  </p>
+                  <p className="text-xs text-foreground/90 bg-muted/50 p-2.5 rounded-xl font-reading-ar">{text}</p>
                 </div>
               );
             })
