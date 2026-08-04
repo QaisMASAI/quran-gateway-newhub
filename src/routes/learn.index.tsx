@@ -603,51 +603,6 @@ export function LearnIndexPage() {
             })}
           </div>
         </section>
-
-        {/* Featured Tafsir Ibn Kathir Banner */}
-        <section className="relative overflow-hidden rounded-3xl border border-primary/20 bg-gradient-to-r from-emerald-950 via-slate-900 to-primary-dark p-6 sm:p-8 text-white shadow-xl">
-          <div className="relative z-10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
-            <div className="max-w-xl">
-              <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-gold mb-2">
-                <BookMarked className="h-4 w-4" />
-                <span>
-                  {locale === "ar"
-                    ? "المكتبة التفسيرية"
-                    : locale === "he"
-                      ? "ספריית התפסיר"
-                      : "Tafsir Library"}
-                </span>
-              </div>
-              <h3 className="font-display text-2xl sm:text-3xl font-bold text-white">
-                {locale === "ar"
-                  ? "تفسير القرآن العظيم لإبن كثير"
-                  : locale === "he"
-                    ? "תפסיר אבן כת'יר המלא"
-                    : "Tafsir Ibn Kathir Complete"}
-              </h3>
-              <p className="mt-2 text-xs sm:text-sm text-emerald-100/80 leading-relaxed">
-                {locale === "ar"
-                  ? "تصفح التفسير الكامل لجميع سور القرآن الكريم مع ربط الأحاديث الشريفة وسياق النزول الموثق."
-                  : locale === "he"
-                    ? "עיין בתפסיר המלא לכל סורות הקוראן עם קישורים לחדית'ים ולסיבות הירידה."
-                    : "Read the authentic classical commentary of all 114 Surahs with cross-referenced Hadiths."}
-              </p>
-            </div>
-            <Link
-              to="/learn/tafsir-ibn-kathir"
-              className="shrink-0 rounded-2xl bg-gold px-5 py-3 text-xs sm:text-sm font-bold text-slate-950 hover:bg-gold-soft hover:shadow-lg transition flex items-center gap-2"
-            >
-              <span>
-                {locale === "ar"
-                  ? "تصفّح التفسير الآن"
-                  : locale === "he"
-                    ? "עיין בתפסיר עכשיו"
-                    : "Browse Tafsir Now"}
-              </span>
-              <ArrowRight className="h-4 w-4 ltr:rotate-0 rtl:rotate-180" />
-            </Link>
-          </div>
-        </section>
       </main>
     </div>
   );
