@@ -76,10 +76,7 @@ export function HadithCard({
     if (collectionSlug === "bukhari" || collectionSlug === "muslim") {
       return {
         label: "Sahih (صحيح)",
-        sub:
-          collectionSlug === "bukhari" && textLower.includes("muslim")
-            ? "Muttafaq 'Alayh (متفق عليه)"
-            : "Authentic",
+        sub: collectionSlug === "bukhari" && textLower.includes("muslim") ? "Muttafaq 'Alayh (متفق عليه)" : "Authentic",
         color: "bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border-emerald-500/30",
       };
     }
@@ -147,9 +144,7 @@ export function HadithCard({
             params={{ collection: collectionSlug, num: String(idInBook) }}
             className="group flex items-center gap-1.5 text-xs font-bold text-foreground hover:text-primary"
           >
-            <span className="rounded-md bg-primary/10 px-2 py-0.5 text-primary">
-              {collectionTitle}
-            </span>
+            <span className="rounded-md bg-primary/10 px-2 py-0.5 text-primary">{collectionTitle}</span>
             <span>Hadith #{idInBook}</span>
           </Link>
 
@@ -253,12 +248,7 @@ export function HadithCard({
           className={`${getFontFamilyClass()} text-right leading-relaxed text-foreground`}
           style={{
             fontSize: `${settings.arabicFontSize}px`,
-            lineHeight:
-              settings.lineSpacing === "loose"
-                ? 2.4
-                : settings.lineSpacing === "relaxed"
-                  ? 2.0
-                  : 1.7,
+            lineHeight: settings.lineSpacing === "loose" ? 2.4 : settings.lineSpacing === "relaxed" ? 2.0 : 1.7,
           }}
           dir="rtl"
         >
@@ -266,16 +256,24 @@ export function HadithCard({
         </div>
 
         {/* Multilingual Translation */}
-        <div
-          className="space-y-2 text-muted-foreground"
-          style={{ fontSize: `${settings.translationFontSize}px` }}
-          dir={locale === "he" ? "rtl" : "ltr"}
-        >
-          {locale === "he" && hebrewText ? (
-            <p className="leading-relaxed text-foreground">{hebrewText}</p>
-          ) : englishText ? (
-            <p className="leading-relaxed text-foreground">{englishText}</p>
-          ) : null}
+        <div className="space-y-3 text-muted-foreground" style={{ fontSize: `${settings.translationFontSize}px` }}>
+          {hebrewText && (
+            <div className="rounded-xl border border-primary/20 bg-primary/5 p-3 space-y-1" dir="rtl">
+              <span className="text-[10px] font-bold text-primary uppercase tracking-wider block">
+                תרגום לעברית (Hebrew)
+              </span>
+              <p className="leading-relaxed text-foreground font-sans">{hebrewText}</p>
+            </div>
+          )}
+
+          {englishText && (
+            <div className="rounded-xl border border-border/60 bg-secondary/30 p-3 space-y-1" dir="ltr">
+              <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider block">
+                English Translation
+              </span>
+              <p className="leading-relaxed text-foreground/90 italic">{englishText}</p>
+            </div>
+          )}
         </div>
       </div>
 
@@ -289,11 +287,7 @@ export function HadithCard({
       {/* Collapsible Sanad Visualizer */}
       {showSanad && (
         <div className="mt-4 animate-in fade-in duration-200">
-          <HadithSanadVisualizer
-            arabicText={arabicText}
-            primaryNarrator={narrator}
-            collectionSlug={collectionSlug}
-          />
+          <HadithSanadVisualizer arabicText={arabicText} primaryNarrator={narrator} collectionSlug={collectionSlug} />
         </div>
       )}
 
@@ -344,9 +338,7 @@ export function HadithCard({
           className="flex items-center gap-1 text-xs font-medium text-primary hover:underline"
         >
           <Sparkles className="h-3.5 w-3.5" />
-          <span>
-            {showCommentary ? "Hide Scholarly Commentary" : "Scholar Explanation (الشارح)"}
-          </span>
+          <span>{showCommentary ? "Hide Scholarly Commentary" : "Scholar Explanation (الشارح)"}</span>
           {showCommentary ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />}
         </button>
       </div>
@@ -361,9 +353,9 @@ export function HadithCard({
             </span>
           </div>
           <p className="leading-relaxed text-muted-foreground">
-            Classical Hadith commentators emphasize the central linguistic, legal (Fiqh), and
-            spiritual deductions derived from this text. The narration establishes foundational
-            guidance on intention, sincerity, and ethical practice in daily life.
+            Classical Hadith commentators emphasize the central linguistic, legal (Fiqh), and spiritual deductions
+            derived from this text. The narration establishes foundational guidance on intention, sincerity, and ethical
+            practice in daily life.
           </p>
           <Link
             to="/hadith/$collection/entry/$num"
