@@ -24,6 +24,7 @@ import {
   Landmark,
 } from "lucide-react";
 import { listAllEntities, pickLocale, type KnowledgeEntity } from "@/lib/knowledge";
+import { PremiumDiscoveryHub } from "@/components/discovery/PremiumDiscoveryHub";
 
 export const Route = createFileRoute("/learn/")({
   head: () => {
@@ -393,7 +394,9 @@ export function LearnIndexPage() {
         </div>
       </div>
 
-      <main className="mx-auto max-w-5xl px-4 py-8 sm:px-6 space-y-10">
+      <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 space-y-12">
+        {/* PREMIUM DISCOVERY HUB */}
+        <PremiumDiscoveryHub locale={locale} />
         {/* Search Results Drawer if user is typing */}
         {searchQuery.trim().length > 0 && (
           <section className="rounded-2xl border border-primary/30 bg-card p-6 shadow-md">
