@@ -84,7 +84,7 @@ export function HadithAiAssistant({
             ? "تعذر تحميل التحليل الذكي للحديث"
             : locale === "he"
               ? "לא ניתן לטעון ניתוח חכם לחדית'"
-              : "Could not load AI scholarly analysis for this Hadith"
+              : "Could not load AI scholarly analysis for this Hadith",
         );
       }
     } catch {
@@ -93,7 +93,7 @@ export function HadithAiAssistant({
           ? "حدث خطأ أثناء إجراء التحليل الفقهي المعتمد"
           : locale === "he"
             ? "אירעה שגיאה בעיבוד הניתוח המוסמך"
-            : "Failed to generate AI scholarly Hadith analysis"
+            : "Failed to generate AI scholarly Hadith analysis",
       );
     } finally {
       setLoading(false);
@@ -164,13 +164,7 @@ export function HadithAiAssistant({
         </div>
 
         {summaryData && (
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            onClick={handleCopy}
-            className="rounded-xl gap-1.5 text-xs"
-          >
+          <Button type="button" variant="outline" size="sm" onClick={handleCopy} className="rounded-xl gap-1.5 text-xs">
             <Copy className="h-3.5 w-3.5" />
             <span>{locale === "ar" ? "نسخ" : "Copy"}</span>
           </Button>
@@ -261,7 +255,9 @@ export function HadithAiAssistant({
         ) : summaryData ? (
           <div className="space-y-4">
             <div className="prose dark:prose-invert max-w-none text-sm text-foreground/90 leading-relaxed font-reading-ar">
-              <ReactMarkdown>{currentDisplayContent() || "No detailed commentary available for this view."}</ReactMarkdown>
+              <ReactMarkdown>
+                {currentDisplayContent() || "No detailed commentary available for this view."}
+              </ReactMarkdown>
             </div>
 
             {/* Citations Footer */}
@@ -300,7 +296,13 @@ export function HadithAiAssistant({
               className="rounded-xl gap-2 text-xs font-bold"
             >
               <Sparkles className="h-3.5 w-3.5 text-primary" />
-              <span>{locale === "ar" ? "تشغيل الشرح الفقهي" : locale === "he" ? "הפעל ניתוח לימודי" : "Generate Explanation"}</span>
+              <span>
+                {locale === "ar"
+                  ? "تشغيل الشرح الفقهي"
+                  : locale === "he"
+                    ? "הפעל ניתוח לימודי"
+                    : "Generate Explanation"}
+              </span>
             </Button>
           </div>
         )}
