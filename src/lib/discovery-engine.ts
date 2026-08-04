@@ -655,7 +655,6 @@ export function getDailyLearningJourney(locale: LocaleCode): LearningStep[] {
     },
     {
       step: 2,
-      title2En: "Step 2: Prophetic Wisdom & Action",
       titleEn: "Step 2: Prophetic Wisdom & Hadith Insight",
       titleAr: "المحطة الثانية: الفهم النبوي والشاهد الحديثي",
       titleHe: "שלב 2: חוכמת החדית' והנביא",

@@ -742,7 +742,7 @@ export function Home() {
             <Link to="/learn/journeys" className="hover:text-primary transition-colors">
               {locale === "ar" ? "الرحلات" : locale === "he" ? "מסלולים" : "Journeys"}
             </Link>
-            <Link to="/recent-ai" className="hover:text-primary transition-colors">
+            <Link to="/research" className="hover:text-primary transition-colors">
               {locale === "ar" ? "جلسات AI" : locale === "he" ? "שיחות AI" : "AI Sessions"}
             </Link>
           </div>
