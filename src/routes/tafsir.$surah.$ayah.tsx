@@ -23,11 +23,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import {
-  fetchTafsirBySourceFn,
-  fetchTafsirMultiSourceFn,
-  fetchAsbabFromApi,
-} from "@/lib/tafsir-api.functions";
+import { fetchTafsirBySourceFn, fetchTafsirMultiSourceFn, fetchAsbabFromApi } from "@/lib/tafsir-api.functions";
 import {
   TAFSIR_SOURCES_META,
   getTafsirMetaByKey,
@@ -41,6 +37,7 @@ import { TafsirAiAssistant } from "@/components/tafsir/TafsirAiAssistant";
 import { TafsirScholarBioModal } from "@/components/tafsir/TafsirScholarBioModal";
 import { TafsirNotesBookmarksModal } from "@/components/tafsir/TafsirNotesBookmarksModal";
 import { ShareCardModal } from "@/components/ShareCardModal";
+import { PageKnowledgeHub } from "@/components/knowledge/PageKnowledgeHub";
 import { fetchSurahBilingual } from "@/lib/translations-db";
 import { SURAH_NAMES_AR, SURAH_NAMES_EN } from "@/lib/surah-names-he";
 import { toast } from "sonner";
@@ -84,15 +81,8 @@ function VerseTafsirPage() {
   const [shareOpen, setShareOpen] = useState(false);
 
   // User store & note state
-  const {
-    isBookmarked,
-    saveBookmark,
-    notes,
-    saveNote,
-    compareSources,
-    setCompareSources,
-    addReadingHistory,
-  } = useTafsirUserStore();
+  const { isBookmarked, saveBookmark, notes, saveNote, compareSources, setCompareSources, addReadingHistory } =
+    useTafsirUserStore();
   const [noteText, setNoteText] = useState("");
   const [noteEditing, setNoteEditing] = useState(false);
 
@@ -262,8 +252,7 @@ function VerseTafsirPage() {
 
           {/* Translation */}
           <p className="text-sm md:text-base text-muted-foreground leading-relaxed italic border-t border-border/40 pt-3">
-            {translationText ||
-              "In the name of Allah, the Entirely Merciful, the Especially Merciful."}
+            {translationText || "In the name of Allah, the Entirely Merciful, the Especially Merciful."}
           </p>
         </div>
 
@@ -351,9 +340,7 @@ function VerseTafsirPage() {
             <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-border/80 bg-card p-4 shadow-xs">
               <div className="space-y-1">
                 <div className="flex items-center gap-2">
-                  <span
-                    className={`px-2 py-0.5 rounded-md text-[10px] font-bold border ${activeMeta.badgeColor}`}
-                  >
+                  <span className={`px-2 py-0.5 rounded-md text-[10px] font-bold border ${activeMeta.badgeColor}`}>
                     {locale === "ar"
                       ? activeMeta.methodologyLabel_ar
                       : locale === "he"
@@ -362,9 +349,7 @@ function VerseTafsirPage() {
                   </span>
                   <span className="text-xs text-muted-foreground font-mono">{activeMeta.era}</span>
                 </div>
-                <h3 className="font-bold text-lg text-foreground">
-                  {tafsirSourceName(activeMeta, locale)}
-                </h3>
+                <h3 className="font-bold text-lg text-foreground">{tafsirSourceName(activeMeta, locale)}</h3>
                 <p className="text-xs text-muted-foreground">
                   {locale === "ar"
                     ? activeMeta.author_ar
@@ -411,13 +396,7 @@ function VerseTafsirPage() {
                 >
                   <Bookmark className={`h-3.5 w-3.5 ${bookmarked ? "fill-current" : ""}`} />
                   <span>
-                    {bookmarked
-                      ? locale === "ar"
-                        ? "محفوظ"
-                        : "Bookmarked"
-                      : locale === "ar"
-                        ? "حفظ"
-                        : "Bookmark"}
+                    {bookmarked ? (locale === "ar" ? "محفوظ" : "Bookmarked") : locale === "ar" ? "حفظ" : "Bookmark"}
                   </span>
                 </Button>
 
@@ -468,9 +447,7 @@ function VerseTafsirPage() {
               <div className="flex items-center justify-between">
                 <h4 className="font-bold text-sm text-foreground flex items-center gap-2">
                   <FileText className="h-4 w-4 text-primary" />
-                  <span>
-                    {locale === "ar" ? "ملاحظاتك الشخصية على هذه الآية" : "Personal Notes on Verse"}
-                  </span>
+                  <span>{locale === "ar" ? "ملاحظاتك الشخصية على هذه الآية" : "Personal Notes on Verse"}</span>
                 </h4>
 
                 {!noteEditing && noteText && (
@@ -512,9 +489,7 @@ function VerseTafsirPage() {
                 </div>
               ) : (
                 <div className="rounded-2xl bg-secondary/30 p-4 border border-border/50">
-                  <p className="text-sm text-foreground/90 font-serif whitespace-pre-wrap">
-                    {noteText}
-                  </p>
+                  <p className="text-sm text-foreground/90 font-serif whitespace-pre-wrap">{noteText}</p>
                 </div>
               )}
             </div>
@@ -570,6 +545,17 @@ function VerseTafsirPage() {
             </div>
           </div>
         )}
+
+        {/* Dynamic 10D Knowledge Hub */}
+        <PageKnowledgeHub
+          slug={`surah-${surah}`}
+          locale={locale === "ar" ? "ar" : locale === "he" ? "he" : "en"}
+          title={
+            locale === "ar"
+              ? `شبكة المعرفة والإحالات المتقاطعة للآية ${surah}:${ayah}`
+              : `Knowledge Hub & Cross-References for Verse ${surah}:${ayah}`
+          }
+        />
 
         {/* Modals */}
         <TafsirScholarBioModal
