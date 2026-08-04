@@ -90,7 +90,7 @@ const SearchRoute = SearchRouteImport.update({
   id: '/search',
   path: '/search',
   getParentRoute: () => rootRouteImport,
-} as any)
+} as any).lazy(() => import('./routes/search.lazy').then((d) => d.Route))
 const ResearchRoute = ResearchRouteImport.update({
   id: '/research',
   path: '/research',
