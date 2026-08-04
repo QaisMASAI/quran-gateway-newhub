@@ -633,7 +633,7 @@ function HadithDetailPage() {
         englishText={h.english_text || undefined}
         hebrewText={h.hebrew_text || undefined}
         collectionTitle={collectionLabel}
-        hadithNumber={h.id_in_book}
+        hadithNum={h.id_in_book}
         narrator={h.narrator}
       />
     </div>
