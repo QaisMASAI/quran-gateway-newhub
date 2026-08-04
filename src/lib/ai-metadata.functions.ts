@@ -24,11 +24,12 @@ export const generateEntityMetadataServerFn = createServerFn({ method: "POST" })
       }
     }
 
-    const provider = createLovableAiGatewayProvider();
-    if (!provider) {
-      // Fallback to local heuristic metadata
+    const apiKey = process.env.LOVABLE_API_KEY;
+    if (!apiKey) {
       return { metadata: getRichMetadataForEntity(entityId ?? query, query), source: "curated" };
     }
+
+    const provider = createLovableAiGatewayProvider(apiKey);
 
     const model = provider("google/gemini-2.5-flash");
 
