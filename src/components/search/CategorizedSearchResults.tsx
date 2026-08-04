@@ -19,16 +19,14 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import type { UnifiedSearchResponse, KnowledgeCategory } from "@/lib/search-unified";
+import { EntityMetadataBadges } from "./EntityMetadataBadges";
 
 interface CategorizedSearchResultsProps {
   searchResults: UnifiedSearchResponse;
   locale: "ar" | "en" | "he";
 }
 
-export const CategorizedSearchResults: React.FC<CategorizedSearchResultsProps> = ({
-  searchResults,
-  locale,
-}) => {
+export const CategorizedSearchResults: React.FC<CategorizedSearchResultsProps> = ({ searchResults, locale }) => {
   const [activeCategory, setActiveCategory] = useState<string>("all");
 
   const isAr = locale === "ar";
@@ -114,10 +112,7 @@ export const CategorizedSearchResults: React.FC<CategorizedSearchResultsProps> =
       <Tabs value={activeCategory} onValueChange={setActiveCategory} className="w-full">
         <div className="overflow-x-auto pb-2">
           <TabsList className="bg-muted/60 p-1 min-w-max">
-            <TabsTrigger
-              value="all"
-              className="text-xs font-semibold px-3 py-1.5 flex items-center gap-1.5"
-            >
+            <TabsTrigger value="all" className="text-xs font-semibold px-3 py-1.5 flex items-center gap-1.5">
               <Filter className="h-3.5 w-3.5" />
               <span>{isAr ? "جميع المصادر" : isHe ? "כל המקורות" : "All Categories"}</span>
               <Badge variant="secondary" className="ml-1 text-[10px] px-1.5 py-0">
@@ -185,14 +180,13 @@ export const CategorizedSearchResults: React.FC<CategorizedSearchResultsProps> =
                       </div>
 
                       {item.subtitle && (
-                        <p className="text-xs font-semibold text-amber-700 dark:text-amber-400 mb-1">
-                          {item.subtitle}
-                        </p>
+                        <p className="text-xs font-semibold text-amber-700 dark:text-amber-400 mb-1">{item.subtitle}</p>
                       )}
 
                       <p className="text-xs text-foreground/80 line-clamp-3 leading-relaxed font-serif">
                         {item.snippet}
                       </p>
+                      {item.metadata && <EntityMetadataBadges metadata={item.metadata} compact={true} />}
                     </a>
                   ))}
                 </div>
@@ -238,9 +232,8 @@ export const CategorizedSearchResults: React.FC<CategorizedSearchResultsProps> =
                         </p>
                       )}
 
-                      <p className="text-xs text-foreground/80 leading-relaxed font-serif">
-                        {item.snippet}
-                      </p>
+                      <p className="text-xs text-foreground/80 leading-relaxed font-serif">{item.snippet}</p>
+                      {item.metadata && <EntityMetadataBadges metadata={item.metadata} />}
                     </a>
                   ))}
                 </div>
