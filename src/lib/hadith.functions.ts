@@ -369,8 +369,7 @@ export const getHadithEntry = createServerFn({ method: "GET" })
     // Provider Fallback if not in DB
     try {
       const { value } = await runWithProviderFallback(async (p) => {
-        const res = await p.listBookEntries({ collection, book: 1, page: 0, pageSize: 50 });
-        return res.items.find((i) => i.global_id === data.num || i.id_in_book === data.num) ?? null;
+        return findHadithInProvider(p, collection, data.num);
       });
       if (value) {
         return {
@@ -382,7 +381,7 @@ export const getHadithEntry = createServerFn({ method: "GET" })
           narrator: value.narrator,
           arabic_text: value.arabic_text,
           english_text: value.english_text,
-          hebrew_text: null,
+          hebrew_text: value.hebrew_text || null,
           arabic_translation: null,
         };
       }
@@ -392,6 +391,83 @@ export const getHadithEntry = createServerFn({ method: "GET" })
 
     return null;
   });
+
+async function findHadithInProvider(
+  p: import("@/lib/hadith-providers.server").HadithProvider,
+  collection: string,
+  num: number,
+): Promise<import("@/lib/hadith-providers.server").ProviderEntry | null> {
+  let books: import("@/lib/hadith-providers.server").ProviderBook[] = [];
+  try {
+    books = await p.listBooks(collection);
+  } catch {
+    books = [];
+  }
+
+  if (books.length === 0) {
+    for (let page = 0; page < 5; page += 1) {
+      const res = await p.listBookEntries({ collection, book: 1, page, pageSize: 50 });
+      const found = res.items.find((i) => i.global_id === num || i.id_in_book === num);
+      if (found) return found;
+      if (res.items.length < 50) break;
+    }
+    return null;
+  }
+
+  const targetBooks: import("@/lib/hadith-providers.server").ProviderBook[] = [];
+  let cumulative = 0;
+
+  for (const b of books) {
+    if (b.book_id === num) {
+      targetBooks.push(b);
+    }
+    if (num > cumulative && num <= cumulative + (b.hadith_count || 100)) {
+      if (!targetBooks.includes(b)) targetBooks.push(b);
+    }
+    cumulative += b.hadith_count || 100;
+  }
+
+  if (targetBooks.length === 0) {
+    targetBooks.push(books[0]);
+  }
+
+  for (const tb of targetBooks) {
+    const approxPage = Math.max(0, Math.floor((num - 1) / 50));
+    const pagesToTry = Array.from(new Set([approxPage, 0, 1, 2, 3]));
+    for (const page of pagesToTry) {
+      try {
+        const res = await p.listBookEntries({
+          collection,
+          book: tb.book_id,
+          page,
+          pageSize: 50,
+        });
+        const found = res.items.find((i) => i.global_id === num || i.id_in_book === num);
+        if (found) return found;
+      } catch {
+        continue;
+      }
+    }
+  }
+
+  for (const b of books.slice(0, 10)) {
+    if (targetBooks.includes(b)) continue;
+    try {
+      const res = await p.listBookEntries({
+        collection,
+        book: b.book_id,
+        page: 0,
+        pageSize: 50,
+      });
+      const found = res.items.find((i) => i.global_id === num || i.id_in_book === num);
+      if (found) return found;
+    } catch {
+      continue;
+    }
+  }
+
+  return null;
+}
 
 export const getHadithKnowledgeBundle = createServerFn({ method: "GET" })
   .inputValidator((input: unknown) =>
@@ -423,8 +499,7 @@ export const getHadithKnowledgeBundle = createServerFn({ method: "GET" })
         // Fallback to provider entry if not in DB
         try {
           const { value } = await runWithProviderFallback(async (p) => {
-            const res = await p.listBookEntries({ collection, book: 1, page: 0, pageSize: 50 });
-            return res.items.find((i) => i.global_id === data.num || i.id_in_book === data.num) ?? null;
+            return findHadithInProvider(p, collection, data.num);
           });
           if (!value) return null;
           entry = {
@@ -436,7 +511,7 @@ export const getHadithKnowledgeBundle = createServerFn({ method: "GET" })
             narrator: value.narrator,
             arabic_text: value.arabic_text,
             english_text: value.english_text,
-            hebrew_text: null,
+            hebrew_text: value.hebrew_text || null,
             arabic_translation: null,
           };
         } catch {
