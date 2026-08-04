@@ -30,6 +30,7 @@ export type ProviderEntry = {
   narrator: string | null;
   arabic_text: string;
   english_text: string | null;
+  hebrew_text?: string | null;
   grade: string | null;
   grade_source: string | null;
   chain_text: string | null;
