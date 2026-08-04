@@ -1,9 +1,9 @@
 {
   "site": {
-    "name": "Noor Al-Huda",
-    "tagline": "Quran & Sunnah Knowledge Hub",
-    "longTagline": "Explore • Learn • Discover Islamic Knowledge",
-    "description": "Noor Al-Huda is an international Islamic knowledge platform for Quran, Sahih Hadith, authenticated Tafsir, and interactive learning."
+    "name": "Bayan AI",
+    "tagline": "Islamic Knowledge & Research Platform",
+    "longTagline": "Clarity in Sacred Knowledge • Interconnected Research",
+    "description": "Bayan AI is the primary global Islamic knowledge platform unifying Quran, Sahih Hadith, authentic Tafsir, and interconnected research."
   },
   "nav": {
     "surahs": "Surahs",
@@ -14,7 +14,7 @@
     "plans": "Reading plans",
     "search": "Search",
     "favorites": "Favorites",
-    "ask": "Ask Noor Al-Huda AI",
+    "ask": "Ask Bayan AI",
     "glossary": "Glossary",
     "learn": "Learn",
     "research": "Research",
