@@ -31,7 +31,7 @@ import {
   type TafsirSourceKey,
   type TafsirSourceMeta,
 } from "@/lib/tafsir-sources";
-import { useTafsirUserStore } from "@/lib/tafsir-user-store";
+import { addReadingHistory, useTafsirUserStore } from "@/lib/tafsir-user-store";
 import { TafsirCompareView } from "@/components/tafsir/TafsirCompareView";
 import { TafsirAiAssistant } from "@/components/tafsir/TafsirAiAssistant";
 import { TafsirScholarBioModal } from "@/components/tafsir/TafsirScholarBioModal";
@@ -81,13 +81,15 @@ function VerseTafsirPage() {
   const [shareOpen, setShareOpen] = useState(false);
 
   // User store & note state
-  const { isBookmarked, saveBookmark, notes, saveNote, compareSources, setCompareSources, addReadingHistory } =
-    useTafsirUserStore();
+  const { isBookmarked, saveBookmark, notes, saveNote, compareSources, setCompareSources } = useTafsirUserStore();
   const [noteText, setNoteText] = useState("");
   const [noteEditing, setNoteEditing] = useState(false);
 
   useEffect(() => {
     addReadingHistory(surah, ayah);
+  }, [surah, ayah]);
+
+  useEffect(() => {
     const existingNote = notes[`${surah}:${ayah}`];
     setNoteText(existingNote ? existingNote.text : "");
   }, [surah, ayah, notes]);
