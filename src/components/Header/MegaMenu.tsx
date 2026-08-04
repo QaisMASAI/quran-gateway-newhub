@@ -168,15 +168,10 @@ export function MegaMenu() {
         {
           label: isAr ? "الباحث الإسلامي الذكي" : isHe ? "חוקר בינה מלאכותית" : "AI Research Engine",
           desc: isAr ? "بحث بالدليل والتوثيق" : isHe ? "מחקר מעמיק ומאומת" : "Deep Cited Research Assistant",
-          to: "/research",
+          to: "/ask",
           icon: <Sparkles className="h-4 w-4" />,
         },
-        {
-          label: isAr ? "اسأل نور الهداية" : isHe ? "שאל את נור AI" : "Ask Noor AI",
-          desc: isAr ? "إجابات فورية موثقة" : isHe ? "תשובות מיידיות" : "Instant Grounded Answers",
-          to: "/ask",
-          icon: <HelpCircle className="h-4 w-4" />,
-        },
+
         {
           label: isAr ? "ركن الأطفال" : isHe ? "פינת הילדים" : "Kids Islamic Hub",
           desc: isAr ? "تعلّم تفاعلي ممتع" : isHe ? "למידה חווייתית" : "Interactive Fun Learning",
