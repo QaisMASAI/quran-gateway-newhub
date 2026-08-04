@@ -33,6 +33,14 @@ export interface RankingFactors {
   userIntent: number;
 }
 
+export type SerializableValue =
+  | string
+  | number
+  | boolean
+  | null
+  | SerializableValue[]
+  | { [key: string]: SerializableValue };
+
 export interface UnifiedSearchResultItem {
   id: string;
   category: KnowledgeCategory;
@@ -48,7 +56,7 @@ export interface UnifiedSearchResultItem {
   relevanceScore: number;
   rankingFactors?: RankingFactors;
   rankingExplanation?: string;
-  metadata?: Record<string, unknown>;
+  metadata?: Record<string, SerializableValue>;
 }
 
 export interface UnifiedSearchResponse {
@@ -443,7 +451,7 @@ export async function performUnifiedSearch(
             url: `/prophets/${p.slug}`,
             badge: "Prophet",
             relevanceScore: Math.max(score, 70),
-            metadata: richMetadata as unknown as Record<string, unknown>,
+            metadata: richMetadata as unknown as Record<string, SerializableValue>,
           };
         });
       } catch (err) {
@@ -486,7 +494,7 @@ export async function performUnifiedSearch(
             url: `/topics/${t.slug}`,
             badge: "Topic",
             relevanceScore: Math.max(score, 65),
-            metadata: richMetadata as unknown as Record<string, unknown>,
+            metadata: richMetadata as unknown as Record<string, SerializableValue>,
           };
         });
       } catch (err) {
@@ -525,7 +533,7 @@ export async function performUnifiedSearch(
             url: `/stories/${s.slug}`,
             badge: "Story",
             relevanceScore: Math.max(score, 65),
-            metadata: richMetadata as unknown as Record<string, unknown>,
+            metadata: richMetadata as unknown as Record<string, SerializableValue>,
           };
         });
       } catch (err) {
@@ -568,7 +576,7 @@ export async function performUnifiedSearch(
             url: `/hadith?narrator=${n.slug}`,
             badge: "Narrator",
             relevanceScore: Math.max(score, 70),
-            metadata: richMetadata as unknown as Record<string, unknown>,
+            metadata: richMetadata as unknown as Record<string, SerializableValue>,
           };
         });
       } catch (err) {
@@ -623,7 +631,7 @@ export async function performUnifiedSearch(
   const scoredItems = allRawItems.map((item) => {
     if (item.rankingFactors && item.rankingExplanation) return item;
 
-    const dummyMeta: EntityRichMetadata = (item.metadata as EntityRichMetadata) ?? {
+    const dummyMeta: EntityRichMetadata = ((item.metadata as unknown as EntityRichMetadata | undefined) ?? {
       entitySlug: item.id,
       entityTitle: item.title,
       entityKind: item.badge || "concept",
@@ -646,7 +654,7 @@ export async function performUnifiedSearch(
       places: item.category === "places" ? [item.title] : [],
       people: item.category === "prophets" || item.category === "narrators" ? [item.title] : [],
       events: item.category === "stories" ? [item.title] : [],
-    };
+    });
 
     const { relevanceScore, factors, explanation } = computeMultiFactorRanking(
       item.title,
