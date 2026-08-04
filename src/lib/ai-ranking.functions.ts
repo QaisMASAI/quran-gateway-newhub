@@ -138,10 +138,7 @@ Respond ONLY with valid JSON in this exact structure:
 
       const parsed = JSON.parse(cleanJson);
 
-      const rankedMap = new Map<
-        string,
-        { score: number; explanation: string; factors: RankingFactors }
-      >();
+      const rankedMap = new Map<string, { score: number; explanation: string; factors: RankingFactors }>();
       if (Array.isArray(parsed.rankedItems)) {
         for (const item of parsed.rankedItems) {
           if (item.id) {
@@ -179,8 +176,7 @@ Respond ONLY with valid JSON in this exact structure:
 
       return {
         overallRankingRationale:
-          parsed.overallRankingRationale ||
-          "AI-optimized ranking based on multi-dimensional relevance.",
+          parsed.overallRankingRationale || "AI-optimized ranking based on multi-dimensional relevance.",
         rerankedItems,
         isAiRanked: true,
       };
