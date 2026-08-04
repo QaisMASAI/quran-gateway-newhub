@@ -13,23 +13,23 @@ export type EntityKind =
   | "theme"
   | "scholar"
   | "companion"
+  | "narrator"
   | "book"
   | "dua"
   | "mosque";
 
-const DB_ENTITY_KINDS = new Set<
-  "concept" | "event" | "nation" | "place" | "prophet" | "story" | "theme" | "topic"
->(["concept", "event", "nation", "place", "prophet", "story", "theme", "topic"]);
+const DB_ENTITY_KINDS = new Set<"concept" | "event" | "nation" | "place" | "prophet" | "story" | "theme" | "topic">([
+  "concept",
+  "event",
+  "nation",
+  "place",
+  "prophet",
+  "story",
+  "theme",
+  "topic",
+]);
 
-type DbEntityKind =
-  | "concept"
-  | "event"
-  | "nation"
-  | "place"
-  | "prophet"
-  | "story"
-  | "theme"
-  | "topic";
+type DbEntityKind = "concept" | "event" | "nation" | "place" | "prophet" | "story" | "theme" | "topic";
 
 function isDbEntityKind(kind: EntityKind): kind is DbEntityKind {
   return DB_ENTITY_KINDS.has(kind as DbEntityKind);
@@ -253,8 +253,7 @@ export async function getRelatedEntities(entityId: string, limit = 16): Promise<
   // Fill up with same kind entities
   if (currentEntity && results.length < limit) {
     const sameKind = seedEntities.filter(
-      (e) =>
-        e.kind === currentEntity.kind && e.slug !== currentEntity.slug && !matchedSlugs.has(e.slug),
+      (e) => e.kind === currentEntity.kind && e.slug !== currentEntity.slug && !matchedSlugs.has(e.slug),
     );
     for (const ent of sameKind) {
       matchedSlugs.add(ent.slug);
@@ -290,20 +289,13 @@ export async function searchEntities(query: string, limit = 12): Promise<Knowled
     `summary_i18n->>ar.ilike.*${safe}*`,
     `summary_i18n->>en.ilike.*${safe}*`,
   ].join(",");
-  const { data } = await supabase
-    .from("knowledge_entities")
-    .select("*")
-    .eq("published", true)
-    .or(filter)
-    .limit(limit);
+  const { data } = await supabase.from("knowledge_entities").select("*").eq("published", true).or(filter).limit(limit);
   const db = (data as KnowledgeEntity[] | null) ?? [];
   if (db.length >= limit) return db;
   const ql = safe.toLowerCase();
   const fallback = seedEntities.filter((e) => {
-    const title =
-      `${e.title_i18n.he ?? ""} ${e.title_i18n.ar ?? ""} ${e.title_i18n.en ?? ""}`.toLowerCase();
-    const summary =
-      `${e.summary_i18n.he ?? ""} ${e.summary_i18n.ar ?? ""} ${e.summary_i18n.en ?? ""}`.toLowerCase();
+    const title = `${e.title_i18n.he ?? ""} ${e.title_i18n.ar ?? ""} ${e.title_i18n.en ?? ""}`.toLowerCase();
+    const summary = `${e.summary_i18n.he ?? ""} ${e.summary_i18n.ar ?? ""} ${e.summary_i18n.en ?? ""}`.toLowerCase();
     return e.slug.includes(ql) || title.includes(ql) || summary.includes(ql);
   });
   return mergeEntities(db, fallback).slice(0, limit);
@@ -532,9 +524,7 @@ export async function listJourneys(): Promise<Journey[]> {
   return buildSeedJourneys();
 }
 
-export async function getJourneyBySlug(
-  slug: string,
-): Promise<{ journey: Journey; steps: JourneyStep[] } | null> {
+export async function getJourneyBySlug(slug: string): Promise<{ journey: Journey; steps: JourneyStep[] } | null> {
   const { data: j } = await supabase
     .from("knowledge_journeys")
     .select("*")
@@ -572,16 +562,9 @@ export async function toggleJourneyStep(
   if (done) {
     await supabase
       .from("knowledge_journey_progress")
-      .upsert(
-        { user_id: userId, journey_id: journeyId, step_id: stepId },
-        { onConflict: "user_id,step_id" },
-      );
+      .upsert({ user_id: userId, journey_id: journeyId, step_id: stepId }, { onConflict: "user_id,step_id" });
   } else {
-    await supabase
-      .from("knowledge_journey_progress")
-      .delete()
-      .eq("user_id", userId)
-      .eq("step_id", stepId);
+    await supabase.from("knowledge_journey_progress").delete().eq("user_id", userId).eq("step_id", stepId);
   }
 }
 
@@ -595,9 +578,7 @@ export interface GraphRelation {
 }
 
 export async function listRelations(): Promise<GraphRelation[]> {
-  const { data } = await supabase
-    .from("knowledge_relations")
-    .select("from_id,to_id,relation,weight");
+  const { data } = await supabase.from("knowledge_relations").select("from_id,to_id,relation,weight");
   const db = (data as GraphRelation[] | null) ?? [];
   if (db.length > 0) return db;
   return seedRelations
