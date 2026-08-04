@@ -43,8 +43,8 @@ export const rerankSearchResultsWithAiServerFn = createServerFn({ method: "POST"
       };
     }
 
-    const provider = createLovableAiGatewayProvider();
-    if (!provider) {
+    const apiKey = process.env.LOVABLE_API_KEY;
+    if (!apiKey) {
       // Return baseline sorted items with default explanation rationale
       const fallbackRationale =
         locale === "ar"
@@ -60,6 +60,7 @@ export const rerankSearchResultsWithAiServerFn = createServerFn({ method: "POST"
       };
     }
 
+    const provider = createLovableAiGatewayProvider(apiKey);
     const model = provider("google/gemini-2.5-flash");
 
     const systemPrompt = `You are an elite Islamic Knowledge Search Ranking AI.
