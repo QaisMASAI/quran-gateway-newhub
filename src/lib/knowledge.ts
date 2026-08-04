@@ -2,6 +2,8 @@ import { supabase } from "@/integrations/supabase/client";
 import type { LocaleCode } from "./translations-db";
 import seed from "@/lib/seeds/knowledge-seed.json";
 
+export type { LocaleCode } from "./translations-db";
+
 export type EntityKind =
   | "topic"
   | "prophet"
