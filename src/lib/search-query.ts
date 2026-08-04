@@ -1,275 +1,185 @@
-import { normalizeArabic, normalizeEnglish, normalizeHebrew } from "@/utils/normalize";
-import { ConceptualQueryProfile } from "@/types/entity-metadata";
+import React, { useState } from "react";
+import {
+  Sparkles,
+  ChevronDown,
+  ChevronUp,
+  Brain,
+  Network,
+  History,
+  Star,
+  BookCopy,
+  Link as LinkIcon,
+  Target,
+  Info,
+} from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import type { RankingFactors } from "@/lib/search-unified";
 
-export type SearchLang = "he" | "ar" | "en" | "mixed";
-
-// Multi-lingual rich concept dictionary
-const CONCEPT_DICTIONARY: Record<
-  string,
-  {
-    roots: string[];
-    synonyms: { ar: string[]; he: string[]; en: string[] };
-    categories: string[];
-    virtues?: string[];
-    sins?: string[];
-  }
-> = {
-  patience: {
-    roots: ["ص-ب-ر", "ס-ב-ر"],
-    synonyms: {
-      ar: ["صبر", "الصبر", "الصابرين", "اصطبار", "مصابرة"],
-      he: ["סבלנות", "אורך רוח", "עמידות", "התמדה"],
-      en: ["patience", "perseverance", "steadfastness", "endurance", "sabr"],
-    },
-    categories: ["Ethics", "Spiritual Purification"],
-    virtues: ["Sabr", "Perseverance"],
-  },
-  prayer: {
-    roots: ["ص-ل-و", "ص-ل-ى"],
-    synonyms: {
-      ar: ["صلاة", "الصلاة", "المصلين", "اقام الصلاة", "سجود"],
-      he: ["תפילה", "עבודה שבלב", "סלאת"],
-      en: ["prayer", "salat", "salah", "supplication", "prostration"],
-    },
-    categories: ["Ibadat", "Pillars of Islam"],
-    virtues: ["Devotion", "Humility in Worship"],
-  },
-  monotheism: {
-    roots: ["و-ح-د", "ו-ח-ד"],
-    synonyms: {
-      ar: ["توحيد", "التوحيد", "لا إله إلا الله", "إخلاص", "وحدانية"],
-      he: ["ייחוד האל", "אמונה באל אחד", "אחדות הבורא"],
-      en: ["tawhid", "monotheism", "oneness of god", "unitarianism"],
-    },
-    categories: ["Aqeeda", "Theology"],
-    virtues: ["Sincerity", "Pure Monotheism"],
-    sins: ["Shirk"],
-  },
-  justice: {
-    roots: ["ع-د-ل", "ق-س-ط"],
-    synonyms: {
-      ar: ["عدل", "العدل", "قسط", "إنصاف", "ميزان"],
-      he: ["צדק", "יושר", "הגינות", "משפט צדק"],
-      en: ["justice", "equity", "fairness", "impartiality", "adl"],
-    },
-    categories: ["Governance", "Ethics", "Social Order"],
-    virtues: ["Impartiality", "Fairness"],
-    sins: ["Injustice (Zulm)"],
-  },
-  mercy: {
-    roots: ["ر-ح-م", "ר-ח-מ"],
-    synonyms: {
-      ar: ["رحمة", "الرحمن", "الرحيم", "رأفة", "شفقة"],
-      he: ["רחמים", "חמלה", "חסד", "טוב לב"],
-      en: ["mercy", "compassion", "loving-kindness", "grace", "rahmah"],
-    },
-    categories: ["Divine Attributes", "Ethics"],
-    virtues: ["Compassion", "Forgiveness"],
-    sins: ["Cruelty"],
-  },
-  repentance: {
-    roots: ["ت-و-ب", "ת-ו-ב"],
-    synonyms: {
-      ar: ["توبة", "التواب", "استغفار", "إنابة", "ندم"],
-      he: ["תשובה", "חרטה", "סליחה", "מחילה"],
-      en: ["repentance", "tawbah", "seeking forgiveness", "contrition"],
-    },
-    categories: ["Aqeeda", "Ethics"],
-    virtues: ["Immediate Repentance", "Humility"],
-  },
-  charity: {
-    roots: ["ز-ك-و", "ص-د-ق"],
-    synonyms: {
-      ar: ["زكاة", "صدقة", "إنفاق", "إحسان", "إطعام"],
-      he: ["צדקה", "זכאת", "נתינה", "תרומה"],
-      en: ["charity", "zakat", "sadaqah", "almsgiving", "spending in god's cause"],
-    },
-    categories: ["Ibadat", "Social Welfare"],
-    virtues: ["Generosity", "Altruism"],
-    sins: ["Miserliness", "Stinginess"],
-  },
-};
-
-const AR_SYNONYMS: Record<string, string[]> = {
-  صلاه: ["صلاة", "الصلاة", "المصلين"],
-  ايمان: ["إيمان", "مؤمن", "المؤمنين"],
-  رحمه: ["رحمة", "الرحيم", "الرحمن"],
-  جنه: ["جنة", "جنات", "الفردوس"],
-  نار: ["جهنم", "السعير"],
-};
-
-const HE_SYNONYMS: Record<string, string[]> = {
-  תפלה: ["תפילה", "תפלת"],
-  אמונה: ["מאמין", "מאמינים"],
-  רחמים: ["רחום", "חסד"],
-  גן: ["גןעדן", "עדן"],
-  גיהנום: ["אש", "שאول"],
-};
-
-const EN_SYNONYMS: Record<string, string[]> = {
-  prayer: ["pray", "salat", "salah"],
-  faith: ["belief", "iman"],
-  mercy: ["compassion", "rahma"],
-  paradise: ["heaven", "jannah"],
-  hell: ["fire", "jahannam"],
-};
-
-export function detectSearchLang(input: string): SearchLang {
-  const hasAr = /[\u0600-\u06FF]/.test(input);
-  const hasHe = /[\u0590-\u05FF]/.test(input);
-  const hasEn = /[a-zA-Z]/.test(input);
-  const count = Number(hasAr) + Number(hasHe) + Number(hasEn);
-  if (count !== 1) return "mixed";
-  if (hasAr) return "ar";
-  if (hasHe) return "he";
-  return "en";
+interface SearchResultRankingDetailsProps {
+  relevanceScore: number;
+  rankingExplanation?: string;
+  rankingFactors?: RankingFactors;
+  locale: "ar" | "en" | "he";
+  compact?: boolean;
 }
 
-function stemEnglishToken(token: string): string[] {
-  const out = new Set<string>([token]);
-  if (token.length > 4 && token.endsWith("ing")) out.add(token.slice(0, -3));
-  if (token.length > 3 && token.endsWith("ed")) out.add(token.slice(0, -2));
-  if (token.length > 3 && token.endsWith("es")) out.add(token.slice(0, -2));
-  if (token.length > 2 && token.endsWith("s")) out.add(token.slice(0, -1));
-  if (token.length > 4 && token.endsWith("tion")) out.add(token.slice(0, -4));
-  return [...out].filter((t) => t.length >= 2);
-}
+export const SearchResultRankingDetails: React.FC<SearchResultRankingDetailsProps> = ({
+  relevanceScore,
+  rankingExplanation,
+  rankingFactors,
+  locale,
+  compact = false,
+}) => {
+  const [expanded, setExpanded] = useState(false);
 
-function stemHebrewToken(token: string): string[] {
-  const out = new Set<string>([token]);
-  const prefixes = ["ו", "ה", "ב", "ל", "כ", "מ", "ש"];
-  for (const p of prefixes) {
-    if (token.length > 3 && token.startsWith(p)) out.add(token.slice(1));
-  }
-  if (token.length > 3 && token.endsWith("ים")) out.add(token.slice(0, -2));
-  if (token.length > 3 && token.endsWith("ות")) out.add(token.slice(0, -2));
-  return [...out].filter((t) => t.length >= 2);
-}
+  const isAr = locale === "ar";
+  const isHe = locale === "he";
 
-function stemArabicToken(token: string): string[] {
-  const out = new Set<string>([token]);
-  const prefixes = ["ال", "و", "ف", "ب", "ك", "ل"];
-  for (const p of prefixes) {
-    if (token.length > 4 && token.startsWith(p)) out.add(token.slice(p.length));
-  }
-  const suffixes = ["ات", "ون", "ين", "ان", "ة", "ه"];
-  for (const s of suffixes) {
-    if (token.length > 4 && token.endsWith(s)) out.add(token.slice(0, -s.length));
-  }
-  return [...out].filter((t) => t.length >= 2);
-}
-
-export function buildConceptualQueryProfile(input: string): ConceptualQueryProfile {
-  const language = detectSearchLang(input);
-  const normalized =
-    language === "ar" ? normalizeArabic(input) : language === "he" ? normalizeHebrew(input) : normalizeEnglish(input);
-
-  const tokens = normalized
-    .toLowerCase()
-    .split(/\s+/)
-    .map((t) => t.trim())
-    .filter((t) => t.length >= 2);
-
-  const profile: ConceptualQueryProfile = {
-    rawQuery: input,
-    normalizedQuery: normalized,
-    language,
-    primaryConcepts: [],
-    rootWords: [],
-    synonyms: { ar: [], he: [], en: [] },
-    transliterations: [],
-    semanticTags: [],
-    topicCategories: [],
-    theologicalCategories: [],
-    ethicsCategories: [],
-    jurisprudenceCategories: [],
-    virtues: [],
-    sins: [],
-    people: [],
-    places: [],
-    events: [],
+  const getScoreColor = (score: number) => {
+    if (score >= 88)
+      return "bg-emerald-100 text-emerald-900 dark:bg-emerald-950/70 dark:text-emerald-200 border-emerald-300 dark:border-emerald-800";
+    if (score >= 75)
+      return "bg-amber-100 text-amber-900 dark:bg-amber-950/70 dark:text-amber-200 border-amber-300 dark:border-amber-800";
+    return "bg-slate-100 text-slate-800 dark:bg-slate-800 dark:text-slate-300 border-slate-300 dark:border-slate-700";
   };
 
-  for (const token of tokens) {
-    for (const [conceptKey, conceptData] of Object.entries(CONCEPT_DICTIONARY)) {
-      const matchInAr = conceptData.synonyms.ar.some((s) => s.includes(token));
-      const matchInHe = conceptData.synonyms.he.some((s) => s.includes(token));
-      const matchInEn = conceptData.synonyms.en.some((s) => s.includes(token));
+  const factorIcons: Array<{
+    key: keyof RankingFactors;
+    labelAr: string;
+    labelHe: string;
+    labelEn: string;
+    icon: React.ReactNode;
+  }> = [
+    {
+      key: "semanticSimilarity",
+      labelAr: "التطابق الدلالي",
+      labelHe: "דמיון סמנטי",
+      labelEn: "Semantic Similarity",
+      icon: <Brain className="w-3 h-3 text-purple-600 dark:text-purple-400" />,
+    },
+    {
+      key: "knowledgeGraph",
+      labelAr: "رسم البياني المعرفي",
+      labelHe: "גרף ידע",
+      labelEn: "Knowledge Graph",
+      icon: <Network className="w-3 h-3 text-blue-600 dark:text-blue-400" />,
+    },
+    {
+      key: "historicalRelevance",
+      labelAr: "الأهمية التاريخية",
+      labelHe: "זיקה היסטורית",
+      labelEn: "Historical Context",
+      icon: <History className="w-3 h-3 text-amber-600 dark:text-amber-400" />,
+    },
+    {
+      key: "topicImportance",
+      labelAr: "أهمية الموضوع",
+      labelHe: "חשיבות נושאית",
+      labelEn: "Topic Importance",
+      icon: <Star className="w-3 h-3 text-yellow-600 dark:text-yellow-400" />,
+    },
+    {
+      key: "sourceFrequency",
+      labelAr: "التكرار بالمصادر",
+      labelHe: "תדירות במקורות",
+      labelEn: "Source Frequency",
+      icon: <BookCopy className="w-3 h-3 text-emerald-600 dark:text-emerald-400" />,
+    },
+    {
+      key: "crossReferences",
+      labelAr: "الإحالات المتقاطعة",
+      labelHe: "הפניות צולבות",
+      labelEn: "Cross-References",
+      icon: <LinkIcon className="w-3 h-3 text-indigo-600 dark:text-indigo-400" />,
+    },
+    {
+      key: "userIntent",
+      labelAr: "تطابق هدف المستخدم",
+      labelHe: "כוונת המשתמש",
+      labelEn: "User Intent Match",
+      icon: <Target className="w-3 h-3 text-rose-600 dark:text-rose-400" />,
+    },
+  ];
 
-      if (matchInAr || matchInHe || matchInEn || conceptKey.includes(token)) {
-        profile.primaryConcepts.push(conceptKey);
-        profile.rootWords.push(...conceptData.roots);
-        profile.synonyms.ar.push(...conceptData.synonyms.ar);
-        profile.synonyms.he.push(...conceptData.synonyms.he);
-        profile.synonyms.en.push(...conceptData.synonyms.en);
-        profile.semanticTags.push(...conceptData.categories);
-        if (conceptData.virtues) profile.virtues.push(...conceptData.virtues);
-        if (conceptData.sins) profile.sins.push(...conceptData.sins);
-      }
-    }
-  }
+  return (
+    <div className="mt-2.5 pt-2 border-t border-border/40 text-xs space-y-2">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <div className="flex items-center gap-1.5">
+          <Badge
+            variant="outline"
+            className={`font-semibold px-2 py-0.5 text-[11px] flex items-center gap-1 border ${getScoreColor(
+              relevanceScore,
+            )}`}
+          >
+            <Sparkles className="w-3 h-3 text-amber-500 inline-block" />
+            <span>
+              {relevanceScore}% {isAr ? "ملاءمة" : isHe ? "ציון רלוונטיות" : "Relevance Score"}
+            </span>
+          </Badge>
 
-  // Deduplicate entries
-  profile.primaryConcepts = Array.from(new Set(profile.primaryConcepts));
-  profile.rootWords = Array.from(new Set(profile.rootWords));
-  profile.synonyms.ar = Array.from(new Set(profile.synonyms.ar));
-  profile.synonyms.he = Array.from(new Set(profile.synonyms.he));
-  profile.synonyms.en = Array.from(new Set(profile.synonyms.en));
-  profile.semanticTags = Array.from(new Set(profile.semanticTags));
-  profile.virtues = Array.from(new Set(profile.virtues));
-  profile.sins = Array.from(new Set(profile.sins));
+          {rankingExplanation && !compact && (
+            <span className="text-[11px] text-muted-foreground line-clamp-1 italic">{rankingExplanation}</span>
+          )}
+        </div>
 
-  return profile;
-}
+        {rankingFactors && (
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              setExpanded(!expanded);
+            }}
+            className="h-6 px-1.5 text-[10px] text-muted-foreground hover:text-foreground flex items-center gap-1"
+          >
+            <Info className="w-3 h-3 text-primary" />
+            <span>
+              {isAr ? "سبب الترتيب (7 عوامل)" : isHe ? "סיבת הדירוג (7 מדדים)" : "Ranking Rationale (7 Factors)"}
+            </span>
+            {expanded ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
+          </Button>
+        )}
+      </div>
 
-export function expandSearchQuery(input: string): {
-  language: SearchLang;
-  normalized: string;
-  tokens: string[];
-  expandedTokens: string[];
-  expandedQuery: string;
-} {
-  const language = detectSearchLang(input);
-  const normalized =
-    language === "ar" ? normalizeArabic(input) : language === "he" ? normalizeHebrew(input) : normalizeEnglish(input);
+      {/* EXPANDABLE 7-FACTOR BREAKDOWN */}
+      {expanded && rankingFactors && (
+        <div className="p-3 rounded-lg bg-muted/40 border border-border/60 space-y-2 text-xs animate-in fade-in-50 duration-150">
+          {rankingExplanation && (
+            <p className="text-xs font-medium text-foreground/90 bg-background/80 p-2 rounded border border-border/40 leading-relaxed">
+              💡 <strong>{isAr ? "سبب التصنيف:" : isHe ? "סיבת הדירוג:" : "Ranking Rationale:"}</strong>{" "}
+              {rankingExplanation}
+            </p>
+          )}
 
-  const tokens = normalized
-    .split(/\s+/)
-    .map((t) => t.trim())
-    .filter((t) => t.length >= 2)
-    .slice(0, 12);
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 pt-1">
+            {factorIcons.map((factor) => {
+              const scoreVal = rankingFactors[factor.key] ?? 70;
+              const label = isAr ? factor.labelAr : isHe ? factor.labelHe : factor.labelEn;
 
-  const expanded = new Set<string>(tokens);
-
-  // Apply concept profile expansion
-  const profile = buildConceptualQueryProfile(input);
-  for (const arSyn of profile.synonyms.ar) expanded.add(arSyn);
-  for (const heSyn of profile.synonyms.he) expanded.add(heSyn);
-  for (const enSyn of profile.synonyms.en) expanded.add(enSyn);
-
-  for (const token of tokens) {
-    if (language === "en") {
-      for (const t of stemEnglishToken(token)) expanded.add(t);
-      for (const t of EN_SYNONYMS[token] ?? []) expanded.add(normalizeEnglish(t));
-    } else if (language === "he") {
-      for (const t of stemHebrewToken(token)) expanded.add(t);
-      for (const t of HE_SYNONYMS[token] ?? []) expanded.add(normalizeHebrew(t));
-    } else if (language === "ar") {
-      for (const t of stemArabicToken(token)) expanded.add(t);
-      for (const t of AR_SYNONYMS[token] ?? []) expanded.add(normalizeArabic(t));
-    } else {
-      for (const t of stemEnglishToken(token)) expanded.add(t);
-      for (const t of stemHebrewToken(token)) expanded.add(t);
-      for (const t of stemArabicToken(token)) expanded.add(t);
-    }
-  }
-
-  const expandedTokens = [...expanded].filter(Boolean).slice(0, 50);
-  return {
-    language,
-    normalized,
-    tokens,
-    expandedTokens,
-    expandedQuery: expandedTokens.join(" "),
-  };
-}
+              return (
+                <div key={factor.key} className="p-1.5 rounded bg-card border border-border/40 flex flex-col gap-1">
+                  <div className="flex items-center justify-between text-[10px] font-medium text-muted-foreground">
+                    <span className="flex items-center gap-1 truncate">
+                      {factor.icon}
+                      <span className="truncate">{label}</span>
+                    </span>
+                    <span className="font-bold text-foreground">{scoreVal}%</span>
+                  </div>
+                  <div className="w-full bg-muted rounded-full h-1 overflow-hidden">
+                    <div
+                      className="bg-primary h-1 rounded-full transition-all duration-300"
+                      style={{ width: `${scoreVal}%` }}
+                    />
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
