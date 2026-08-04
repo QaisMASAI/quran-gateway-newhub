@@ -63,7 +63,6 @@ export const Route = createFileRoute("/")({
   component: Home,
 });
 
-import { PrayerTimesModal } from "@/components/PrayerTimesModal";
 import { Headphones } from "lucide-react";
 
 export function Home() {
@@ -78,7 +77,6 @@ export function Home() {
   const [assistantPrompt, setAssistantPrompt] = useState("");
   const [recentPrompts, setRecentPrompts] = useState<string[]>([]);
   const [recentPlanSlug, setRecentPlanSlug] = useState<string | null>(null);
-  const [prayerModalOpen, setPrayerModalOpen] = useState(false);
   const inputRef = useRef<HTMLInputElement | null>(null);
 
   useEffect(() => {
@@ -393,17 +391,19 @@ export function Home() {
             {/* QUICK LINK BUTTONS */}
             <div className="mt-8 flex flex-wrap justify-center gap-3">
               <Button
+                asChild
                 type="button"
                 variant="outline"
-                onClick={() => setPrayerModalOpen(true)}
                 className="rounded-full border-gold/40 bg-gold/10 px-5 font-semibold text-gold hover:bg-gold/20 hover:border-gold"
               >
-                <Clock className="h-4 w-4 text-gold" />
-                {locale === "ar"
-                  ? "أوقات الصلاة والقبلة"
-                  : locale === "he"
-                    ? "זמני תפילה וקיבלה"
-                    : "Prayer Times & Qibla"}
+                <Link to="/prayer-times">
+                  <Clock className="h-4 w-4 text-gold" />
+                  {locale === "ar"
+                    ? "أوقات الصلاة والقبلة"
+                    : locale === "he"
+                      ? "זמני תפילה וקיבלה"
+                      : "Prayer Times & Qibla"}
+                </Link>
               </Button>
 
               <Button
@@ -444,8 +444,6 @@ export function Home() {
             </div>
           </div>
         </section>
-
-        <PrayerTimesModal open={prayerModalOpen} onOpenChange={setPrayerModalOpen} />
 
         {/* FEATURE 5: DAILY ISLAMIC ASSISTANT ECOSYS WIDGET */}
         <div className="mt-8">

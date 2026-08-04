@@ -13,6 +13,7 @@ import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as SearchRouteImport } from './routes/search'
 import { Route as ResearchRouteImport } from './routes/research'
 import { Route as ProfileRouteImport } from './routes/profile'
+import { Route as PrayerTimesRouteImport } from './routes/prayer-times'
 import { Route as OnboardingRouteImport } from './routes/onboarding'
 import { Route as LibraryRouteImport } from './routes/library'
 import { Route as KidsRouteImport } from './routes/kids'
@@ -101,6 +102,11 @@ const ProfileRoute = ProfileRouteImport.update({
   path: '/profile',
   getParentRoute: () => rootRouteImport,
 } as any).lazy(() => import('./routes/profile.lazy').then((d) => d.Route))
+const PrayerTimesRoute = PrayerTimesRouteImport.update({
+  id: '/prayer-times',
+  path: '/prayer-times',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const OnboardingRoute = OnboardingRouteImport.update({
   id: '/onboarding',
   path: '/onboarding',
@@ -456,6 +462,7 @@ export interface FileRoutesByFullPath {
   '/kids': typeof KidsRoute
   '/library': typeof LibraryRoute
   '/onboarding': typeof OnboardingRoute
+  '/prayer-times': typeof PrayerTimesRoute
   '/profile': typeof ProfileRoute
   '/research': typeof ResearchRoute
   '/search': typeof SearchRoute
@@ -527,6 +534,7 @@ export interface FileRoutesByTo {
   '/kids': typeof KidsRoute
   '/library': typeof LibraryRoute
   '/onboarding': typeof OnboardingRoute
+  '/prayer-times': typeof PrayerTimesRoute
   '/profile': typeof ProfileRoute
   '/research': typeof ResearchRoute
   '/search': typeof SearchRoute
@@ -601,6 +609,7 @@ export interface FileRoutesById {
   '/kids': typeof KidsRoute
   '/library': typeof LibraryRoute
   '/onboarding': typeof OnboardingRoute
+  '/prayer-times': typeof PrayerTimesRoute
   '/profile': typeof ProfileRoute
   '/research': typeof ResearchRoute
   '/search': typeof SearchRoute
@@ -675,6 +684,7 @@ export interface FileRouteTypes {
     | '/kids'
     | '/library'
     | '/onboarding'
+    | '/prayer-times'
     | '/profile'
     | '/research'
     | '/search'
@@ -746,6 +756,7 @@ export interface FileRouteTypes {
     | '/kids'
     | '/library'
     | '/onboarding'
+    | '/prayer-times'
     | '/profile'
     | '/research'
     | '/search'
@@ -819,6 +830,7 @@ export interface FileRouteTypes {
     | '/kids'
     | '/library'
     | '/onboarding'
+    | '/prayer-times'
     | '/profile'
     | '/research'
     | '/search'
@@ -893,6 +905,7 @@ export interface RootRouteChildren {
   KidsRoute: typeof KidsRoute
   LibraryRoute: typeof LibraryRoute
   OnboardingRoute: typeof OnboardingRoute
+  PrayerTimesRoute: typeof PrayerTimesRoute
   ProfileRoute: typeof ProfileRoute
   ResearchRoute: typeof ResearchRoute
   SearchRoute: typeof SearchRoute
@@ -974,6 +987,13 @@ declare module '@tanstack/react-router' {
       path: '/profile'
       fullPath: '/profile'
       preLoaderRoute: typeof ProfileRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/prayer-times': {
+      id: '/prayer-times'
+      path: '/prayer-times'
+      fullPath: '/prayer-times'
+      preLoaderRoute: typeof PrayerTimesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/onboarding': {
@@ -1507,6 +1527,7 @@ const rootRouteChildren: RootRouteChildren = {
   KidsRoute: KidsRoute,
   LibraryRoute: LibraryRoute,
   OnboardingRoute: OnboardingRoute,
+  PrayerTimesRoute: PrayerTimesRoute,
   ProfileRoute: ProfileRoute,
   ResearchRoute: ResearchRoute,
   SearchRoute: SearchRoute,
@@ -1566,13 +1587,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

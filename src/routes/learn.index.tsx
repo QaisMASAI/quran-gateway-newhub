@@ -372,6 +372,13 @@ export function LearnIndexPage() {
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
+                aria-label={
+                  locale === "ar"
+                    ? "بحث في المعرفة القرآنية"
+                    : locale === "he"
+                      ? "חיפוש בידע הקוראני"
+                      : "Search Quran knowledge"
+                }
               placeholder={
                 locale === "ar"
                   ? "بحث شامل في المعرفة القرآنية (التوحيد، موسى، بدر...)"
