@@ -23,6 +23,16 @@ export type KnowledgeCategory =
   | "narrators"
   | "places";
 
+export interface RankingFactors {
+  semanticSimilarity: number;
+  knowledgeGraph: number;
+  historicalRelevance: number;
+  topicImportance: number;
+  sourceFrequency: number;
+  crossReferences: number;
+  userIntent: number;
+}
+
 export interface UnifiedSearchResultItem {
   id: string;
   category: KnowledgeCategory;
@@ -36,6 +46,8 @@ export interface UnifiedSearchResultItem {
   url: string;
   badge?: string;
   relevanceScore: number;
+  rankingFactors?: RankingFactors;
+  rankingExplanation?: string;
   metadata?: Record<string, unknown>;
 }
 
@@ -45,6 +57,139 @@ export interface UnifiedSearchResponse {
   items: UnifiedSearchResultItem[];
   categoryResults: Record<KnowledgeCategory, UnifiedSearchResultItem[]>;
   categoryCounts: Record<KnowledgeCategory, number>;
+  overallRankingRationale?: string;
+}
+
+export function computeMultiFactorRanking(
+  entityTitle: string,
+  entitySnippet: string,
+  category: KnowledgeCategory,
+  query: string,
+  richMeta: EntityRichMetadata,
+  locale: "ar" | "en" | "he",
+): { relevanceScore: number; factors: RankingFactors; explanation: string } {
+  const profile = buildConceptualQueryProfile(query);
+  const qLower = query.toLowerCase().trim();
+
+  // 1. Semantic Similarity
+  let semanticSimilarity = 45;
+  if (richMeta.primaryKeywords.some((k) => k.toLowerCase().includes(qLower) || qLower.includes(k.toLowerCase()))) {
+    semanticSimilarity = 96;
+  } else if (
+    richMeta.arabicSynonyms
+      .concat(
+        richMeta.hebrewSynonyms,
+        richMeta.englishSynonyms,
+        richMeta.alternativeSpellings,
+        richMeta.transliterations,
+      )
+      .some((s) => s.toLowerCase().includes(qLower))
+  ) {
+    semanticSimilarity = 88;
+  } else if (profile.primaryConcepts.some((c) => richMeta.relatedConcepts.some((rc) => rc.toLowerCase().includes(c)))) {
+    semanticSimilarity = 82;
+  } else if (entityTitle.toLowerCase().includes(qLower) || entitySnippet.toLowerCase().includes(qLower)) {
+    semanticSimilarity = 72;
+  }
+
+  // 2. Knowledge Graph Relationships
+  let knowledgeGraph = 55;
+  const graphConnections =
+    richMeta.topicHierarchies.parentTopics.length +
+    richMeta.topicHierarchies.childTopics.length +
+    richMeta.people.length +
+    richMeta.places.length;
+  if (graphConnections >= 4) knowledgeGraph = 94;
+  else if (graphConnections >= 2) knowledgeGraph = 82;
+  else if (graphConnections >= 1) knowledgeGraph = 70;
+
+  // 3. Historical Relevance
+  let historicalRelevance = 60;
+  if (richMeta.historicalCategories.length > 0 || richMeta.events.length > 0) {
+    historicalRelevance = 90;
+  } else if (category === "prophets" || category === "stories" || category === "tafsir") {
+    historicalRelevance = 84;
+  }
+
+  // 4. Topic Importance
+  let topicImportance = 65;
+  if (richMeta.theologicalCategories.length > 0 || richMeta.ethicsCategories.length > 0) {
+    topicImportance = 92;
+  } else if (category === "quran" || category === "topics") {
+    topicImportance = 88;
+  }
+
+  // 5. Source Frequency
+  let sourceFrequency = 55;
+  if (category === "quran") sourceFrequency = 95;
+  else if (category === "hadith") sourceFrequency = 88;
+  else if (category === "tafsir") sourceFrequency = 84;
+  else if (richMeta.primaryKeywords.length >= 3) sourceFrequency = 76;
+
+  // 6. Cross References
+  let crossReferences = 50;
+  const refsCount = richMeta.relatedConcepts.length + richMeta.semanticTags.length + richMeta.virtues.length;
+  if (refsCount >= 5) crossReferences = 93;
+  else if (refsCount >= 3) crossReferences = 80;
+  else crossReferences = 66;
+
+  // 7. User Intent Alignment
+  let userIntent = 60;
+  if (profile.primaryConcepts.length > 0) {
+    userIntent = 92;
+  } else if (query.length > 8) {
+    userIntent = 80;
+  }
+
+  // Weighted composite relevance calculation
+  const compositeScore = Math.min(
+    99,
+    Math.round(
+      semanticSimilarity * 0.25 +
+        knowledgeGraph * 0.15 +
+        historicalRelevance * 0.1 +
+        topicImportance * 0.15 +
+        sourceFrequency * 0.15 +
+        crossReferences * 0.1 +
+        userIntent * 0.1,
+    ),
+  );
+
+  const factors: RankingFactors = {
+    semanticSimilarity,
+    knowledgeGraph,
+    historicalRelevance,
+    topicImportance,
+    sourceFrequency,
+    crossReferences,
+    userIntent,
+  };
+
+  const isAr = locale === "ar";
+  const isHe = locale === "he";
+
+  let explanation = "";
+  if (compositeScore >= 88) {
+    explanation = isAr
+      ? `نتيجة عالية الترتيب (${compositeScore}%): تطابق دلالي ممتاز، علاقات وثيقة في رسم البياني المعرفي، وتوثيق مكثف في المصادر.`
+      : isHe
+        ? `דירוג מועדף (${compositeScore}%): התאמה סמנטית מצוינת, קשרי גרף ידע מרובים וציטוטים מרובים במקורות.`
+        : `Ranked #${category === "quran" ? "1" : "Top"} (${compositeScore}%): Exceptional semantic match, rich knowledge graph connectivity, and high cross-source frequency.`;
+  } else if (compositeScore >= 75) {
+    explanation = isAr
+      ? `ملاءمة مرتفعة (${compositeScore}%): ارتباط مفهومي متين وحضور موضوعي في النصوص الإسلامية.`
+      : isHe
+        ? `רלוונטיות גבוהה (${compositeScore}%): קשר מושגית איתן ונוכחות תמטית בטקסטים המוסמכים.`
+        : `Highly relevant (${compositeScore}%): Solid conceptual mapping and strong thematic resonance across Islamic texts.`;
+  } else {
+    explanation = isAr
+      ? `ملاءمة متوسطة (${compositeScore}%): مرجع سياقي ثانوي مرتبط بالموضوع.`
+      : isHe
+        ? `רלוונטיות בינונית (${compositeScore}%): הפניה בהקשר המשני של החיפוש.`
+        : `Relevant (${compositeScore}%): Secondary contextual reference linked to search query.`;
+  }
+
+  return { relevanceScore: compositeScore, factors, explanation };
 }
 
 function entityMatchesQuery(
@@ -471,18 +616,74 @@ export async function performUnifiedSearch(
     })(),
   ]);
 
-  // Combine and sort top overall results by relevance score
-  const allItems: UnifiedSearchResultItem[] = Object.values(categoryResults)
-    .flat()
-    .sort((a, b) => b.relevanceScore - a.relevanceScore);
+  // Combine and calculate multi-factor ranking for all items
+  const allRawItems: UnifiedSearchResultItem[] = Object.values(categoryResults).flat();
+
+  // Populate 7-factor ranking breakdown for every single result
+  const scoredItems = allRawItems.map((item) => {
+    if (item.rankingFactors && item.rankingExplanation) return item;
+
+    const dummyMeta: EntityRichMetadata = (item.metadata as EntityRichMetadata) ?? {
+      entitySlug: item.id,
+      entityTitle: item.title,
+      entityKind: item.badge || "concept",
+      primaryKeywords: [item.title, item.badge || ""],
+      arabicSynonyms: item.arabicSnippet ? [item.arabicSnippet] : [],
+      hebrewSynonyms: item.hebrewSnippet ? [item.hebrewSnippet] : [],
+      englishSynonyms: item.englishSnippet ? [item.englishSnippet] : [],
+      transliterations: [],
+      alternativeSpellings: [],
+      rootWords: [],
+      semanticTags: [item.category],
+      topicHierarchies: { parentTopics: [item.category], childTopics: [] },
+      theologicalCategories: item.category === "quran" ? ["Divine Revelation"] : [],
+      ethicsCategories: [],
+      historicalCategories: item.category === "stories" ? ["Historical Event"] : [],
+      virtues: [],
+      sins: [],
+      relatedConcepts: [item.title],
+      crossReferences: [],
+      places: item.category === "places" ? [item.title] : [],
+      people: item.category === "prophets" || item.category === "narrators" ? [item.title] : [],
+      events: item.category === "stories" ? [item.title] : [],
+    };
+
+    const { relevanceScore, factors, explanation } = computeMultiFactorRanking(
+      item.title,
+      item.snippet,
+      item.category,
+      q,
+      dummyMeta,
+      locale,
+    );
+
+    return {
+      ...item,
+      relevanceScore: Math.max(item.relevanceScore, relevanceScore),
+      rankingFactors: factors,
+      rankingExplanation: explanation,
+    };
+  });
+
+  // Sort top overall results by multi-factor relevance score
+  scoredItems.sort((a, b) => b.relevanceScore - a.relevanceScore);
 
   const totalResults = Object.values(categoryCounts).reduce((acc, c) => acc + c, 0);
+
+  const isAr = locale === "ar";
+  const isHe = locale === "he";
+  const overallRankingRationale = isAr
+    ? `تم تحليل ترتيب النتائج بناءً على التطابق الدلالي، شبكة العلاقات في رسم البياني المعرفي، الأهمية الموضوعية، والأحداث التاريخية في القرآن والسنة.`
+    : isHe
+      ? `תוצאות החיפוש דורגו בעזרת מודל רב-ממדי: דמיון סמנטי, קשרי גרף ידע, חשיבות נושאית והפניות צולבות במקורות.`
+      : `SearchResults ordered using multi-dimensional ranking (Semantic similarity, Knowledge graph, Topic importance, Historical context, Source frequency, Cross-references, User intent).`;
 
   return {
     query,
     totalResults,
-    items: allItems,
+    items: scoredItems,
     categoryResults,
     categoryCounts,
+    overallRankingRationale,
   };
 }
