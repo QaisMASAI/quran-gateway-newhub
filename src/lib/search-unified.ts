@@ -9,6 +9,9 @@ import {
   type EntityKind,
 } from "./knowledge";
 import { ALL_PROPHETS } from "./prophets";
+import { buildConceptualQueryProfile } from "./search-query";
+import { getRichMetadataForEntity } from "./knowledge-metadata-store";
+import type { EntityRichMetadata } from "@/types/entity-metadata";
 
 export type KnowledgeCategory =
   | "quran"
@@ -48,36 +51,63 @@ function entityMatchesQuery(
   entity: KnowledgeEntity,
   query: string,
   locale: "ar" | "en" | "he",
-): { matches: boolean; score: number } {
+): { matches: boolean; score: number; richMetadata: EntityRichMetadata } {
   const q = query.trim().toLowerCase();
-  if (!q) return { matches: false, score: 0 };
+  const profile = buildConceptualQueryProfile(q);
+  const richMetadata = getRichMetadataForEntity(entity.slug, pickLocale(entity.title_i18n, locale), entity.kind);
+
+  if (!q) return { matches: false, score: 0, richMetadata };
 
   const titleAr = (entity.title_i18n?.ar ?? "").toLowerCase();
   const titleHe = (entity.title_i18n?.he ?? "").toLowerCase();
   const titleEn = (entity.title_i18n?.en ?? "").toLowerCase();
-
-  const summaryAr = (entity.summary_i18n?.ar ?? "").toLowerCase();
-  const summaryHe = (entity.summary_i18n?.he ?? "").toLowerCase();
-  const summaryEn = (entity.summary_i18n?.en ?? "").toLowerCase();
-
   const slug = entity.slug.toLowerCase();
-  const keywords = (entity.keywords ?? []).map((k) => k.toLowerCase());
 
   let score = 0;
 
+  // 1. Exact Match Priority
   if (titleAr === q || titleHe === q || titleEn === q || slug === q) {
     score += 100;
   } else if (titleAr.startsWith(q) || titleHe.startsWith(q) || titleEn.startsWith(q)) {
-    score += 80;
-  } else if (titleAr.includes(q) || titleHe.includes(q) || titleEn.includes(q)) {
-    score += 60;
-  } else if (keywords.some((k) => k.includes(q))) {
-    score += 50;
-  } else if (summaryAr.includes(q) || summaryHe.includes(q) || summaryEn.includes(q)) {
-    score += 30;
+    score += 85;
   }
 
-  return { matches: score > 0, score };
+  // 2. Conceptual Match Priority (Metadata Layer)
+  const metaPrimary = richMetadata.primaryKeywords.map((k) => k.toLowerCase());
+  const metaSynonyms = [
+    ...richMetadata.arabicSynonyms,
+    ...richMetadata.hebrewSynonyms,
+    ...richMetadata.englishSynonyms,
+    ...richMetadata.alternativeSpellings,
+    ...richMetadata.transliterations,
+  ].map((k) => k.toLowerCase());
+
+  const metaConcepts = [
+    ...richMetadata.relatedConcepts,
+    ...richMetadata.semanticTags,
+    ...richMetadata.topicHierarchies.parentTopics,
+    ...richMetadata.topicHierarchies.childTopics,
+    ...richMetadata.theologicalCategories,
+    ...richMetadata.ethicsCategories,
+    ...richMetadata.virtues,
+    ...richMetadata.sins,
+  ].map((k) => k.toLowerCase());
+
+  const profileSyns = [...profile.synonyms.ar, ...profile.synonyms.he, ...profile.synonyms.en];
+
+  if (metaPrimary.some((k) => k.includes(q) || q.includes(k))) {
+    score += 80;
+  } else if (metaSynonyms.some((k) => k.includes(q) || profileSyns.some((ps) => k.includes(ps.toLowerCase())))) {
+    score += 75;
+  } else if (profile.primaryConcepts.some((pc) => metaConcepts.some((mc) => mc.includes(pc.toLowerCase())))) {
+    score += 70;
+  } else if (titleAr.includes(q) || titleHe.includes(q) || titleEn.includes(q)) {
+    score += 60;
+  } else if (metaConcepts.some((mc) => mc.includes(q))) {
+    score += 50;
+  }
+
+  return { matches: score > 0, score, richMetadata };
 }
 
 export async function performUnifiedSearch(
@@ -239,8 +269,8 @@ export async function performUnifiedSearch(
         const prophetsList = await listEntitiesByKind("prophet");
         const matched = prophetsList
           .map((p) => {
-            const { matches, score } = entityMatchesQuery(p, qLower, locale);
-            return { p, matches, score };
+            const { matches, score, richMetadata } = entityMatchesQuery(p, qLower, locale);
+            return { p, matches, score, richMetadata };
           })
           .filter(
             (m) =>
@@ -251,7 +281,7 @@ export async function performUnifiedSearch(
           );
 
         categoryCounts.prophets = matched.length;
-        categoryResults.prophets = matched.slice(0, 8).map(({ p, score }) => {
+        categoryResults.prophets = matched.slice(0, 8).map(({ p, score, richMetadata }) => {
           const title = pickLocale(p.title_i18n, locale);
           const snippet = pickLocale(p.summary_i18n, locale);
 
@@ -268,6 +298,7 @@ export async function performUnifiedSearch(
             url: `/prophets/${p.slug}`,
             badge: "Prophet",
             relevanceScore: Math.max(score, 70),
+            metadata: richMetadata as unknown as Record<string, unknown>,
           };
         });
       } catch (err) {
@@ -287,13 +318,13 @@ export async function performUnifiedSearch(
         const allTopics = [...topics, ...concepts, ...themes];
         const matched = allTopics
           .map((t) => {
-            const { matches, score } = entityMatchesQuery(t, qLower, locale);
-            return { t, matches, score };
+            const { matches, score, richMetadata } = entityMatchesQuery(t, qLower, locale);
+            return { t, matches, score, richMetadata };
           })
           .filter((m) => m.matches);
 
         categoryCounts.topics = matched.length;
-        categoryResults.topics = matched.slice(0, 10).map(({ t, score }) => {
+        categoryResults.topics = matched.slice(0, 10).map(({ t, score, richMetadata }) => {
           const title = pickLocale(t.title_i18n, locale);
           const snippet = pickLocale(t.summary_i18n, locale);
 
@@ -310,6 +341,7 @@ export async function performUnifiedSearch(
             url: `/topics/${t.slug}`,
             badge: "Topic",
             relevanceScore: Math.max(score, 65),
+            metadata: richMetadata as unknown as Record<string, unknown>,
           };
         });
       } catch (err) {
@@ -325,13 +357,13 @@ export async function performUnifiedSearch(
         const allStories = [...stories, ...events];
         const matched = allStories
           .map((s) => {
-            const { matches, score } = entityMatchesQuery(s, qLower, locale);
-            return { s, matches, score };
+            const { matches, score, richMetadata } = entityMatchesQuery(s, qLower, locale);
+            return { s, matches, score, richMetadata };
           })
           .filter((m) => m.matches);
 
         categoryCounts.stories = matched.length;
-        categoryResults.stories = matched.slice(0, 10).map(({ s, score }) => {
+        categoryResults.stories = matched.slice(0, 10).map(({ s, score, richMetadata }) => {
           const title = pickLocale(s.title_i18n, locale);
           const snippet = pickLocale(s.summary_i18n, locale);
 
@@ -348,6 +380,7 @@ export async function performUnifiedSearch(
             url: `/stories/${s.slug}`,
             badge: "Story",
             relevanceScore: Math.max(score, 65),
+            metadata: richMetadata as unknown as Record<string, unknown>,
           };
         });
       } catch (err) {
@@ -367,13 +400,13 @@ export async function performUnifiedSearch(
         const allNarrators = [...narrators, ...companions, ...scholars];
         const matched = allNarrators
           .map((n) => {
-            const { matches, score } = entityMatchesQuery(n, qLower, locale);
-            return { n, matches, score };
+            const { matches, score, richMetadata } = entityMatchesQuery(n, qLower, locale);
+            return { n, matches, score, richMetadata };
           })
           .filter((m) => m.matches);
 
         categoryCounts.narrators = matched.length;
-        categoryResults.narrators = matched.slice(0, 10).map(({ n, score }) => {
+        categoryResults.narrators = matched.slice(0, 10).map(({ n, score, richMetadata }) => {
           const title = pickLocale(n.title_i18n, locale);
           const snippet = pickLocale(n.summary_i18n, locale);
 
@@ -390,6 +423,7 @@ export async function performUnifiedSearch(
             url: `/hadith?narrator=${n.slug}`,
             badge: "Narrator",
             relevanceScore: Math.max(score, 70),
+            metadata: richMetadata as unknown as Record<string, unknown>,
           };
         });
       } catch (err) {
@@ -405,13 +439,13 @@ export async function performUnifiedSearch(
         const allPlaces = [...places, ...nations];
         const matched = allPlaces
           .map((p) => {
-            const { matches, score } = entityMatchesQuery(p, qLower, locale);
-            return { p, matches, score };
+            const { matches, score, richMetadata } = entityMatchesQuery(p, qLower, locale);
+            return { p, matches, score, richMetadata };
           })
           .filter((m) => m.matches);
 
         categoryCounts.places = matched.length;
-        categoryResults.places = matched.slice(0, 10).map(({ p, score }) => {
+        categoryResults.places = matched.slice(0, 10).map(({ p, score, richMetadata }) => {
           const title = pickLocale(p.title_i18n, locale);
           const snippet = pickLocale(p.summary_i18n, locale);
 
@@ -428,6 +462,7 @@ export async function performUnifiedSearch(
             url: `/topics/${p.slug}`,
             badge: "Place",
             relevanceScore: Math.max(score, 65),
+            metadata: richMetadata as unknown as Record<string, unknown>,
           };
         });
       } catch (err) {
