@@ -38,7 +38,7 @@ export const Route = createFileRoute("/concepts/")({
 });
 
 export function ConceptsIndexPage() {
-  const { i18n } = useTranslation("pages");
+  const { i18n, t } = useTranslation("common");
   const locale = (normalizeLocale(i18n.language) ?? "he") as Locale;
   const [searchQuery, setSearchQuery] = useState("");
   const [kindFilter, setKindFilter] = useState<"all" | "concept" | "theme" | "nation">("all");
@@ -87,27 +87,13 @@ export function ConceptsIndexPage() {
         <div className="mx-auto max-w-5xl px-4 pt-8 pb-6 sm:px-6">
           <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-purple-600 dark:text-purple-400 mb-2">
             <GraduationCap className="h-4 w-4" />
-            <span>
-              {locale === "ar"
-                ? "المفاهيم والمحاور"
-                : locale === "he"
-                  ? "מושגים ותמות"
-                  : "Concepts & Themes"}
-            </span>
+            <span>{t("concepts.headerBadge")}</span>
           </div>
           <h1 className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
-            {locale === "ar"
-              ? "المفاهيم العقائدية والأمم السابقة"
-              : locale === "he"
-                ? "מושגי אמונה ועמים בקוראן"
-                : "Quranic Concepts & Ancient Nations"}
+            {t("concepts.headerTitle")}
           </h1>
           <p className="mt-2 text-sm text-muted-foreground max-w-2xl">
-            {locale === "ar"
-              ? "فهرس شامل للمفاهيم العقائدية (التوحيد، الإيمان، الإحسان)، المحاور القرآنية، وقصص الأمم السابقة (عاد، وثمود، وقوم فرعون)."
-              : locale === "he"
-                ? "אינדקס מקיף של מושגי אמונה (ייחוד האל, מוסר), תמות קוראניות ועמים עתיקים (עאד, ת'מוד, עם פרעה)."
-                : "A comprehensive directory of theological concepts, Quranic themes, and ancient nations."}
+            {t("concepts.headerDesc")}
           </p>
 
           {/* Search Box */}
@@ -148,7 +134,7 @@ export function ConceptsIndexPage() {
                   : "bg-card border border-border text-muted-foreground hover:text-foreground"
               }`}
             >
-              {locale === "ar" ? "الكل" : locale === "he" ? "הכל" : "All"} ({conceptsList.length})
+              {t("concepts.all")} ({conceptsList.length})
             </button>
             <button
               type="button"
@@ -160,7 +146,7 @@ export function ConceptsIndexPage() {
               }`}
             >
               <GraduationCap className="h-3.5 w-3.5" />
-              <span>{locale === "ar" ? "المفاهيم" : locale === "he" ? "מושגים" : "Concepts"}</span>
+              <span>{t("concepts.concepts")}</span>
             </button>
             <button
               type="button"
@@ -172,7 +158,7 @@ export function ConceptsIndexPage() {
               }`}
             >
               <Layers className="h-3.5 w-3.5" />
-              <span>{locale === "ar" ? "المحاور" : locale === "he" ? "תמות" : "Themes"}</span>
+              <span>{t("concepts.themes")}</span>
             </button>
             <button
               type="button"
@@ -184,7 +170,7 @@ export function ConceptsIndexPage() {
               }`}
             >
               <Users className="h-3.5 w-3.5" />
-              <span>{locale === "ar" ? "الأمم والقوم" : locale === "he" ? "עמים" : "Nations"}</span>
+              <span>{t("concepts.nations")}</span>
             </button>
           </div>
         </div>
