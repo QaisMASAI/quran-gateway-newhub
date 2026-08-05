@@ -70,10 +70,8 @@ export const TAFSIR_SOURCES_META: TafsirSourceMeta[] = [
       keyWorks: ["Tafsir al-Qur'an al-Azim", "Al-Bidayah wa al-Nihayah", "Al-Ba'ith al-Hathith"],
       summary_en:
         "Imam Ibn Kathir was a master Muhaddith, historian, and Shafi'i jurist. A star student of Shaykh al-Islam Ibn Taymiyyah and Al-Mizzi.",
-      summary_ar:
-        "الإمام الحافظ عماد الدين أبو الفداء ابن كثير، محدث ومؤرخ وفقيه شافعي، تلميذ ابن تيمية والمزي.",
-      summary_he:
-        "אימאם אבן כת׳יר היה חוקר חדית׳, היסטוריון ומשפטן שאפעי בולט בדמשק, תלמידם של אבן תיימיה ואל-מזי.",
+      summary_ar: "الإمام الحافظ عماد الدين أبو الفداء ابن كثير، محدث ومؤرخ وفقيه شافعي، تلميذ ابن تيمية والمزي.",
+      summary_he: "אימאם אבן כת׳יר היה חוקר חדית׳, היסטוריון ומשפטן שאפעי בולט בדמשק, תלמידם של אבן תיימיה ואל-מזי.",
     },
   },
   {
@@ -92,12 +90,10 @@ export const TAFSIR_SOURCES_META: TafsirSourceMeta[] = [
     methodologyLabel_ar: "وجيز لغوي ومحكم",
     methodologyLabel_en: "Concise Classical Linguistic",
     methodologyLabel_he: "פירוש לשוני מרוכז ומדויק",
-    description_ar:
-      "تفسير موجز ودقيق يركز على استخراج المعنى اللغوي المباشر، إعراب الكلمات، والقراءات المتواترة.",
+    description_ar: "تفسير موجز ودقيق يركز على استخراج المعنى اللغوي المباشر، إعراب الكلمات، والقراءات المتواترة.",
     description_en:
       "Renowned classical commentary praised for extreme brevity and precision in linguistic meanings, grammar (i'rab), and variant readings.",
-    description_he:
-      "פירוש קלאסי מפורסם הידוע בתמציתיות רבה ובדיוק לשוני, דקדוק (אעראב) וקריאות שונות.",
+    description_he: "פירוש קלאסי מפורסם הידוע בתמציתיות רבה ובדיוק לשוני, דקדוק (אעראב) וקריאות שונות.",
     badgeColor: "bg-sky-500/15 text-sky-700 dark:text-sky-300 border-sky-500/30",
     scholarBio: {
       birthDeath: "Al-Mahalli (d. 864 AH) & Al-Suyuti (849 – 911 AH)",
@@ -126,12 +122,10 @@ export const TAFSIR_SOURCES_META: TafsirSourceMeta[] = [
     methodologyLabel_ar: "تربوي ودعوي معاصر",
     methodologyLabel_en: "Contemporary Practical & Spiritual",
     methodologyLabel_he: "פירוש יישומי ורוחני בן זמננו",
-    description_ar:
-      "تفسير معاصر يتميز بسهولة العبارة، والتركيز على المقاصد الإيمانية، التوجيهات الأخلاقية والتربوية.",
+    description_ar: "تفسير معاصر يتميز بسهولة العبارة، والتركيز على المقاصد الإيمانية، التوجيهات الأخلاقية والتربوية.",
     description_en:
       "Accessible modern commentary celebrated for clear prose, practical spiritual lessons, and focus on divine wisdom and moral guidance.",
-    description_he:
-      "פירוש מודרני נגיש המתאפיין בשפה ברורה, דגש על מוסר, חכמה אלוהית והדרכה מעשית לחיים.",
+    description_he: "פירוש מודרני נגיש המתאפיין בשפה ברורה, דגש על מוסר, חכמה אלוהית והדרכה מעשית לחיים.",
     badgeColor: "bg-purple-500/15 text-purple-700 dark:text-purple-300 border-purple-500/30",
     scholarBio: {
       birthDeath: "1307 – 1376 AH (1889 – 1956 CE)",
@@ -139,10 +133,8 @@ export const TAFSIR_SOURCES_META: TafsirSourceMeta[] = [
       keyWorks: ["Taysir al-Karim al-Rahman", "Manhaj al-Salikin", "Al-Qawa'id al-Fiqhiyyah"],
       summary_en:
         "Shaykh Al-Sa'di was a prominent contemporary scholar and teacher of Shaykh Ibn Uthaymeen, known for gentle demeanor and deep Quranic insight.",
-      summary_ar:
-        "العلامة الشيخ عبد الرحمن السعدي، شيخ ابن عثيمين، تميز بالسماحة والعمق التفسيري والأسلوب التربوي.",
-      summary_he:
-        "שייח׳ אס-סעדי היה חוקר מודרני דגול ומורו של שייח׳ אבן עות׳יימין, אשר נודע בגישתו החינוכית והרוחנית.",
+      summary_ar: "العلامة الشيخ عبد الرحمن السعدي، شيخ ابن عثيمين، تميز بالسماحة والعمق التفسيري والأسلوب التربوي.",
+      summary_he: "שייח׳ אס-סעדי היה חוקר מודרני דגול ומורו של שייח׳ אבן עות׳יימין, אשר נודע בגישתו החינוכית והרוחנית.",
     },
   },
   {
@@ -170,17 +162,11 @@ export const TAFSIR_SOURCES_META: TafsirSourceMeta[] = [
     scholarBio: {
       birthDeath: "600 – 671 AH (1204 – 1273 CE)",
       birthplace: "Cordoba (Al-Andalus) / Minya, Egypt",
-      keyWorks: [
-        "Al-Jami' li-Ahkam al-Qur'an",
-        "Al-Tadhkirah fi Ahwal al-Mawta",
-        "Al-Asna fi Sharh Asma' Allah",
-      ],
+      keyWorks: ["Al-Jami' li-Ahkam al-Qur'an", "Al-Tadhkirah fi Ahwal al-Mawta", "Al-Asna fi Sharh Asma' Allah"],
       summary_en:
         "Imam Abu 'Abd Allah Al-Qurtubi was an Andalusian Maliki scholar and ascetic who migrated to Egypt. Famous for objective scholarly integrity.",
-      summary_ar:
-        "الإمام القرطبي الأندلسي المالكي، عالم زاهد هاجر إلى مصر، اشتهر بالموضوعية والإنصاف والتحقيق الفقهي.",
-      summary_he:
-        "אימאם אל-קורטובי היה מלומד אנדלוסי מאסכולת מאלכי שעבר למצרים, ונודע ביושר מדעי עמוק ובאובייקטיביות.",
+      summary_ar: "الإمام القرطبي الأندلسي المالكي، عالم زاهد هاجر إلى مصر، اشتهر بالموضوعية والإنصاف والتحقيق الفقهي.",
+      summary_he: "אימאם אל-קורטובי היה מלומד אנדלוסי מאסכולת מאלכי שעבר למצרים, ונודע ביושר מדעי עמוק ובאובייקטיביות.",
     },
   },
   {
@@ -202,21 +188,15 @@ export const TAFSIR_SOURCES_META: TafsirSourceMeta[] = [
       "أم التفاسير وأعظمها، يورد الأسانيد الكاملة للصحابة والتابعين، ويوجه الأقوال بالترجيح اللغوي والفقهي المحكم.",
     description_en:
       "The greatest foundational encyclopedia of Tafsir. Preserves full Isnads from Companions and Successors with authoritative scholarly weightings.",
-    description_he:
-      "האנציקלופדיה המייסדת הגדולה ביותר של תפסיר הקוראן. משמרת שרשראות תמסורת מלאות מראשית האסלאם.",
+    description_he: "האנציקלופדיה המייסדת הגדולה ביותר של תפסיר הקוראן. משמרת שרשראות תמסורת מלאות מראשית האסלאם.",
     badgeColor: "bg-emerald-600/15 text-emerald-800 dark:text-emerald-200 border-emerald-600/30",
     scholarBio: {
       birthDeath: "224 – 310 AH (839 – 923 CE)",
       birthplace: "Amol, Tabaristan (Baghdad scholar)",
-      keyWorks: [
-        "Jami' al-Bayan 'an Ta'wil Ay al-Qur'an",
-        "Tarikh al-Rusul wa al-Muluk",
-        "Tahdhib al-Athar",
-      ],
+      keyWorks: ["Jami' al-Bayan 'an Ta'wil Ay al-Qur'an", "Tarikh al-Rusul wa al-Muluk", "Tahdhib al-Athar"],
       summary_en:
         "Imam Al-Tabari was a Mujtahid Mutlaq (independent legal authority), master of Hadith, Arabic linguistics, and father of Islamic history.",
-      summary_ar:
-        "إمام المفسرين والمؤرخين، مجتهد مطلق، جمع بين علوم الحديث والفقه واللغة والتاريخ بشكل غير مسبوق.",
+      summary_ar: "إمام المفسرين والمؤرخين، مجتهد مطلق، جمع بين علوم الحديث والفقه واللغة والتاريخ بشكل غير مسبوق.",
       summary_he:
         "אבי ההיستוריונים והפרשנים באסלאם, פוסק עצמאי (מוג׳תהד מולאק) שאיחד ידע עצום בחדית׳, דקדוק והיסטוריה.",
     },
@@ -240,8 +220,7 @@ export const TAFSIR_SOURCES_META: TafsirSourceMeta[] = [
       "تفسير متوسط بالمأثور يُعنى بالحديث الصحيح، واجتناب الإسرائيليات الضعيفة، مع بيان أحكام الفقه واللغة.",
     description_en:
       "A refined narration-based Tafsir praised for summarizing Al-Tabari while filtering weak reports, focusing on authentic Sunnah and Fiqh.",
-    description_he:
-      "תפסיר מבוסס מסורת המורעף בשבחים על זיקוק המסורות והתמקדות בסונה מאומתת ללא מסורות חלשות.",
+    description_he: "תפסיר מבוסס מסורת המורעף בשבחים על זיקוק המסורות והתמקדות בסונה מאומתת ללא מסורות חלשות.",
     badgeColor: "bg-teal-500/15 text-teal-700 dark:text-teal-300 border-teal-500/30",
     scholarBio: {
       birthDeath: "433 – 516 AH (1041 – 1122 CE)",
@@ -251,8 +230,7 @@ export const TAFSIR_SOURCES_META: TafsirSourceMeta[] = [
         "Known as 'Rukn al-Din' (Pillar of Religion) and 'Muhyi al-Sunnah' (Reviver of the Sunnah). Highly commended by Imam Ibn Taymiyyah.",
       summary_ar:
         "محيي السنة، ركن الدين البغوي، الإمام المحدث الفقيه الشافعي الذي حظي تفسيره بثناء كبير من أئمة الإسلام.",
-      summary_he:
-        "אימאם אל-בגהווי נודע כ׳מחיה הסונה׳. תפסיר זה זכה לשבחים כבירים מגדולי חכמי האסלאם.",
+      summary_he: "אימאם אל-בגהווי נודע כ׳מחיה הסונה׳. תפסיר זה זכה לשבחים כבירים מגדולי חכמי האסלאם.",
     },
   },
   {
@@ -275,8 +253,7 @@ export const TAFSIR_SOURCES_META: TafsirSourceMeta[] = [
       "تفسير حديث موسع وميسر يربط هداية القرآن بقضايا العصر، مع استيعاب كلام المتقدمين بطريقة علمية وسلسة.",
     description_en:
       "Comprehensive 8-volume modern commentary bridging classical consensus with modern legal, social, and personal life applications.",
-    description_he:
-      "פירוש מקיף ומודרני בן 8 כרכים המחבר בין הפרשנות הקלאסית לבין אתגרי החיים, החוק והחברה בימינו.",
+    description_he: "פירוש מקיף ומודרני בן 8 כרכים המחבר בין הפרשנות הקלאסית לבין אתגרי החיים, החוק והחברה בימינו.",
     badgeColor: "bg-indigo-500/15 text-indigo-700 dark:text-indigo-300 border-indigo-500/30",
     scholarBio: {
       birthDeath: "1314 – 1396 AH (1897 – 1976 CE)",
@@ -284,8 +261,7 @@ export const TAFSIR_SOURCES_META: TafsirSourceMeta[] = [
       keyWorks: ["Ma'ariful Qur'an", "Ahkam al-Qur'an", "Jawahir al-Fiqh"],
       summary_en:
         "Grand Mufti of Pakistan, founder of Jamia Darul Uloom Karachi, leading Hanafi jurist and student of Anwar Shah Kashmiri.",
-      summary_ar:
-        "مفتي ديار باكستان الأكبر، مؤسس دار العلوم كراتشي، من كبار فقهاء الحنفية والمفسرين المعاصرين.",
+      summary_ar: "مفتي ديار باكستان الأكبر، مؤسس دار العلوم كراتشي، من كبار فقهاء الحنفية والمفسرين المعاصرين.",
       summary_he: "המופטי הגדול של פקיסטן ומייסד מוסד דאר אל-עולום קראצ׳י, חוקר חנפי ומשפטן דגול.",
     },
   },
@@ -304,12 +280,10 @@ export const TAFSIR_SOURCES_META: TafsirSourceMeta[] = [
     methodologyLabel_ar: "تراث الصحابة الأوائل",
     methodologyLabel_en: "Early Companion Tradition",
     methodologyLabel_he: "מסורת צחאבה מוקדמת",
-    description_ar:
-      "تفسير تنوير المقباس المنسوب لترجمان القرآن الصحابي الجليل عبد الله بن عباس رضي الله عنهما.",
+    description_ar: "تفسير تنوير المقباس المنسوب لترجمان القرآن الصحابي الجليل عبد الله بن عباس رضي الله عنهما.",
     description_en:
       "Early attribution to Abdullah ibn 'Abbas, the 'Interpreter of the Quran' blessed by the Prophet (PBUH) with deep Quranic understanding.",
-    description_he:
-      "פירוש מוקדם המיוחס לעבדאללה אבן עבאס, ׳פרשן הקוראן׳ אשר בורך על ידי הנביא בהבנה עמוקה של הספר.",
+    description_he: "פירוש מוקדם המיוחס לעבדאללה אבן עבאס, ׳פרשן הקוראן׳ אשר בורך על ידי הנביא בהבנה עמוקה של הספר.",
     badgeColor: "bg-rose-500/15 text-rose-700 dark:text-rose-300 border-rose-500/30",
     scholarBio: {
       birthDeath: "3 BH – 68 AH (619 – 687 CE)",
@@ -317,8 +291,7 @@ export const TAFSIR_SOURCES_META: TafsirSourceMeta[] = [
       keyWorks: ["Attributed traditions in Tafsir", "Fatawa Ibn Abbas"],
       summary_en:
         "Cousin of Prophet Muhammad (PBUH), known as 'Turjuman al-Qur'an' (Interpreter of the Quran) and 'Al-Habr' (The Scholar of the Ummah).",
-      summary_ar:
-        "حبر الأمة وترجمان القرآن، ابن عم رسول الله ﷺ، دعا له النبي بالفقه في الدين وتأويل الكتاب.",
+      summary_ar: "حبر الأمة وترجمان القرآن، ابن عم رسول الله ﷺ، دعا له النبي بالفقه في الدين وتأويل الكتاب.",
       summary_he: "בן דודו של הנביא מוחמד, נודע כ׳פרשן הקוראן׳ וכימאם הראשון של חכمي הקוראן.",
     },
   },

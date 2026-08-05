@@ -7,7 +7,6 @@ const NavKeySchema = z.enum([
   "stories",
   "research",
   "learn",
-  "hadith",
   "tafsir",
   "search",
   "kids",
@@ -15,8 +14,6 @@ const NavKeySchema = z.enum([
   "admin_kids",
   "admin_setup",
   "admin_backfill",
-  "admin_hadith_api",
-  "admin_hadith_ingest",
 ]);
 
 const UiVisibilitySchema = z.object({
