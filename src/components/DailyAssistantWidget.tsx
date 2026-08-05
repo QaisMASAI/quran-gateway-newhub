@@ -3,18 +3,14 @@ import { Link } from "@tanstack/react-router";
 import {
   Sparkles,
   BookOpen,
-  Library,
   Heart,
   Flame,
   Award,
   ArrowRight,
-  Play,
   Share2,
-  Compass,
   CheckCircle2,
-  RefreshCw,
+  BookMarked,
 } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { getGamificationStats, calculateLevel, awardXP } from "@/lib/gamification";
 import { ShareCardModal } from "@/components/ShareCardModal";
 import { toast } from "sonner";
@@ -38,7 +34,8 @@ export function DailyAssistantWidget({ locale = "en" }: { locale?: "he" | "ar" |
   const todayVerse = {
     surah: 2,
     ayah: 286,
-    surahName: locale === "ar" ? "سورة البقرة" : locale === "he" ? "סורת אל-בקרה" : "Surah Al-Baqarah",
+    surahName:
+      locale === "ar" ? "سورة البقرة" : locale === "he" ? "סורת אל-בקרה" : "Surah Al-Baqarah",
     arabic: "لَا يُكَلِّفُ اللَّهُ نَفْسًا إِلَّا وُسْعَهَا",
     translation:
       locale === "ar"
@@ -49,15 +46,15 @@ export function DailyAssistantWidget({ locale = "en" }: { locale?: "he" | "ar" |
     ref: "Al-Baqarah 2:286",
   };
 
-  const todayHadith = {
-    arabic: "إِنَّمَا الأَعْمَالُ بِالنِّيَّاتِ، وَإِنَّمَا لِكُلِّ امْرِئٍ مَا نَوَى",
+  const todayTafsir = {
+    arabic: "التيسير ورفع الحرج في الشريعة الإسلامية",
     translation:
       locale === "ar"
-        ? "إنما صحة الأعمال وقبولها بالنيات الخالصة لله تعالى."
+        ? "تأكيد على رحمة الله بعباده وعدم تكليفهم بما لا يطيقون."
         : locale === "he"
-          ? "מעשים נמדדים לפי הכוונות, ולכל אדם מה שביקש לכוון."
-          : "Actions are judged by intentions, and every person will get what they intended.",
-    collection: "Sahih al-Bukhari #1",
+          ? "הדגשה על רחמי ה' שאינו מעמיס עול מעבר ליכולת."
+          : "Emphasis on Allah's mercy and wisdom, ensuring religious obligations remain within human capacity.",
+    ref: "Tafsir Ibn Kathir",
   };
 
   const todayDua = {
@@ -102,7 +99,7 @@ export function DailyAssistantWidget({ locale = "en" }: { locale?: "he" | "ar" |
               </span>
             </div>
             <p className="text-xs text-muted-foreground">
-              Personalized verse, authentic Hadith, dua & reading streak tracker
+              Personalized verse, Tafsir reflection, dua & reading streak tracker
             </p>
           </div>
         </div>
@@ -112,7 +109,8 @@ export function DailyAssistantWidget({ locale = "en" }: { locale?: "he" | "ar" |
           <div className="flex items-center gap-1.5 rounded-2xl border border-amber-500/30 bg-amber-500/10 px-3.5 py-1.5 text-xs font-bold text-amber-600 dark:text-amber-400">
             <Flame className="h-4 w-4 text-amber-500 fill-amber-500 animate-bounce" />
             <span>
-              {stats.streak} {locale === "ar" ? "أيام متتالية" : locale === "he" ? "ימים ברצף" : "Day Streak"}
+              {stats.streak}{" "}
+              {locale === "ar" ? "أيام متتالية" : locale === "he" ? "ימים ברצף" : "Day Streak"}
             </span>
           </div>
 
@@ -125,7 +123,7 @@ export function DailyAssistantWidget({ locale = "en" }: { locale?: "he" | "ar" |
         </div>
       </div>
 
-      {/* Grid Content Cards: Verse, Hadith, Dua */}
+      {/* Grid Content Cards: Verse, Tafsir, Dua */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
         {/* Today's Verse Card */}
         <div className="group relative flex flex-col justify-between rounded-2xl border border-border/80 bg-background/80 p-5 shadow-sm transition-all hover:border-primary/40 hover:shadow-lg">
@@ -159,7 +157,9 @@ export function DailyAssistantWidget({ locale = "en" }: { locale?: "he" | "ar" |
               {todayVerse.arabic}
             </p>
 
-            <p className="text-xs text-muted-foreground leading-relaxed italic">"{todayVerse.translation}"</p>
+            <p className="text-xs text-muted-foreground leading-relaxed italic">
+              "{todayVerse.translation}"
+            </p>
           </div>
 
           <div className="mt-4 pt-3 border-t border-border/50 flex items-center justify-between text-[11px]">
@@ -175,26 +175,26 @@ export function DailyAssistantWidget({ locale = "en" }: { locale?: "he" | "ar" |
           </div>
         </div>
 
-        {/* Today's Hadith Card */}
+        {/* Today's Tafsir Card */}
         <div className="group relative flex flex-col justify-between rounded-2xl border border-border/80 bg-background/80 p-5 shadow-sm transition-all hover:border-gold/40 hover:shadow-lg">
           <div className="space-y-3">
             <div className="flex items-center justify-between">
               <span className="flex items-center gap-1.5 text-xs font-bold text-gold">
-                <Library className="h-4 w-4" /> Sahih Hadith
+                <BookMarked className="h-4 w-4" /> Tafsir Insight
               </span>
               <button
                 type="button"
                 onClick={() =>
                   setShareItem({
                     open: true,
-                    title: "Share Today's Hadith",
-                    arabic: todayHadith.arabic,
-                    translation: todayHadith.translation,
-                    ref: todayHadith.collection,
+                    title: "Share Tafsir Insight",
+                    arabic: todayTafsir.arabic,
+                    translation: todayTafsir.translation,
+                    ref: todayTafsir.ref,
                   })
                 }
                 className="text-muted-foreground hover:text-gold transition-colors p-1"
-                title="Share Hadith"
+                title="Share Insight"
               >
                 <Share2 className="h-3.5 w-3.5" />
               </button>
@@ -204,16 +204,21 @@ export function DailyAssistantWidget({ locale = "en" }: { locale?: "he" | "ar" |
               className="text-base leading-relaxed font-arabic text-right text-amber-950 dark:text-amber-200"
               dir="rtl"
             >
-              {todayHadith.arabic}
+              {todayTafsir.arabic}
             </p>
 
-            <p className="text-xs text-muted-foreground leading-relaxed italic">"{todayHadith.translation}"</p>
+            <p className="text-xs text-muted-foreground leading-relaxed italic">
+              "{todayTafsir.translation}"
+            </p>
           </div>
 
           <div className="mt-4 pt-3 border-t border-border/50 flex items-center justify-between text-[11px]">
-            <span className="font-semibold text-foreground">{todayHadith.collection}</span>
-            <Link to="/hadith" className="inline-flex items-center gap-1 text-gold hover:underline font-semibold">
-              Hadith Library <ArrowRight className="h-3 w-3" />
+            <span className="font-semibold text-foreground">{todayTafsir.ref}</span>
+            <Link
+              to="/tafsir"
+              className="inline-flex items-center gap-1 text-gold hover:underline font-semibold"
+            >
+              Tafsir Studio <ArrowRight className="h-3 w-3" />
             </Link>
           </div>
         </div>
@@ -234,19 +239,27 @@ export function DailyAssistantWidget({ locale = "en" }: { locale?: "he" | "ar" |
               </button>
             </div>
 
-            <p className="text-xl leading-loose font-arabic text-right text-purple-950 dark:text-purple-200" dir="rtl">
+            <p
+              className="text-xl leading-loose font-arabic text-right text-purple-950 dark:text-purple-200"
+              dir="rtl"
+            >
               {todayDua.arabic}
             </p>
 
             <div className="space-y-1">
-              <p className="text-[11px] font-mono text-primary font-medium">{todayDua.transliteration}</p>
+              <p className="text-[11px] font-mono text-primary font-medium">
+                {todayDua.transliteration}
+              </p>
               <p className="text-xs text-muted-foreground italic">"{todayDua.translation}"</p>
             </div>
           </div>
 
           <div className="mt-4 pt-3 border-t border-border/50 flex items-center justify-between text-[11px]">
             <span className="font-semibold text-foreground">{todayDua.ref}</span>
-            <Link to="/ask" className="inline-flex items-center gap-1 text-primary hover:underline font-semibold">
+            <Link
+              to="/ask"
+              className="inline-flex items-center gap-1 text-primary hover:underline font-semibold"
+            >
               Ask AI Research <ArrowRight className="h-3 w-3" />
             </Link>
           </div>
