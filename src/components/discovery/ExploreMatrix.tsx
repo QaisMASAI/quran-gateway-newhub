@@ -37,19 +37,79 @@ export const ExploreMatrix: React.FC<ExploreMatrixProps> = ({ locale }) => {
   const tafsirSchools = getTafsirSchools(locale);
 
   const prophetsList = [
-    { slug: "adam", nameEn: "Adam (AS)", nameAr: "آدم عليه السلام", nameHe: "אדם עליו השלום", role: "First Prophet & Father of Humanity" },
-    { slug: "nuh", nameEn: "Noah (Nuh AS)", nameAr: "نوح عليه السلام", nameHe: "נח עליו השלום", role: "Prophet of the Great Ark" },
-    { slug: "ibrahim", nameEn: "Abraham (Ibrahim AS)", nameAr: "إبراهيم خليل الله", nameHe: "אברהם אבינו", role: "Patriarch of Pure Monotheism" },
-    { slug: "musa", nameEn: "Moses (Musa AS)", nameAr: "موسى كليم الله", nameHe: "משה רבנו", role: "Lawgiver & Deliverer from Pharaoh" },
-    { slug: "isa", nameEn: "Jesus (Isa AS)", nameAr: "عيسى روح الله", nameHe: "ישוע בן מרים", role: "Messiah & Spirit from God" },
-    { slug: "muhammad", nameEn: "Muhammad ﷺ", nameAr: "محمد خاتم الأنبياء ﷺ", nameHe: "מוחמד חתם הנביאים ﷺ", role: "Seal of the Prophets & Universal Mercy" },
+    {
+      slug: "adam",
+      nameEn: "Adam (AS)",
+      nameAr: "آدم عليه السلام",
+      nameHe: "אדם עליו השלום",
+      role: "First Prophet & Father of Humanity",
+    },
+    {
+      slug: "nuh",
+      nameEn: "Noah (Nuh AS)",
+      nameAr: "نوح عليه السلام",
+      nameHe: "נח עליו השלום",
+      role: "Prophet of the Great Ark",
+    },
+    {
+      slug: "ibrahim",
+      nameEn: "Abraham (Ibrahim AS)",
+      nameAr: "إبراهيم خليل الله",
+      nameHe: "אברהם אבינו",
+      role: "Patriarch of Pure Monotheism",
+    },
+    {
+      slug: "musa",
+      nameEn: "Moses (Musa AS)",
+      nameAr: "موسى كليم الله",
+      nameHe: "משה רבנו",
+      role: "Lawgiver & Deliverer from Pharaoh",
+    },
+    {
+      slug: "isa",
+      nameEn: "Jesus (Isa AS)",
+      nameAr: "عيسى روح الله",
+      nameHe: "ישוע בן מרים",
+      role: "Messiah & Spirit from God",
+    },
+    {
+      slug: "muhammad",
+      nameEn: "Muhammad ﷺ",
+      nameAr: "محمد خاتم الأنبياء ﷺ",
+      nameHe: "מוחמד חתם הנביאים ﷺ",
+      role: "Seal of the Prophets & Universal Mercy",
+    },
   ];
 
   const placesList = [
-    { slug: "makkah", nameEn: "Makkah al-Mukarramah", nameAr: "مكة المكرمة", nameHe: "מאכה אל-מוכרמה", desc: "The Sacred Sanctuary & Kaaba" },
-    { slug: "madinah", nameEn: "Madinah al-Munawwarah", nameAr: "المدينة المنورة", nameHe: "מדינה אל-מונוורה", desc: "City of the Prophet & First State" },
-    { slug: "jerusalem-al-aqsa", nameEn: "Jerusalem (Al-Aqsa)", nameAr: "القدس الشريف والمسجد الأقصى", nameHe: "ירושלים (אל-אקצא)", desc: "First Qibla & Site of Night Journey" },
-    { slug: "mount-sinai", nameEn: "Mount Sinai (Jabal al-Tur)", nameAr: "جبل الطور ببيناء", nameHe: "הר סיני", desc: "Blessed Valley of Tuwa" },
+    {
+      slug: "makkah",
+      nameEn: "Makkah al-Mukarramah",
+      nameAr: "مكة المكرمة",
+      nameHe: "מאכה אל-מוכרמה",
+      desc: "The Sacred Sanctuary & Kaaba",
+    },
+    {
+      slug: "madinah",
+      nameEn: "Madinah al-Munawwarah",
+      nameAr: "المدينة المنورة",
+      nameHe: "מדינה אל-מונוורה",
+      desc: "City of the Prophet & First State",
+    },
+    {
+      slug: "jerusalem-al-aqsa",
+      nameEn: "Jerusalem (Al-Aqsa)",
+      nameAr: "القدس الشريف والمسجد الأقصى",
+      nameHe: "ירושלים (אל-אקצא)",
+      desc: "First Qibla & Site of Night Journey",
+    },
+    {
+      slug: "mount-sinai",
+      nameEn: "Mount Sinai (Jabal al-Tur)",
+      nameAr: "جبل الطور ببيناء",
+      nameHe: "הר סיני",
+      desc: "Blessed Valley of Tuwa",
+    },
   ];
 
   return (
@@ -61,7 +121,11 @@ export const ExploreMatrix: React.FC<ExploreMatrixProps> = ({ locale }) => {
           </span>
           <div>
             <h3 className="text-2xl font-extrabold text-white dir-auto">
-              {isAr ? "مصفوفة الاستكشاف والتقسيمات المعرفية" : isHe ? "מטריצת החקירה והנושאים" : "Multidimensional Exploration Matrix"}
+              {isAr
+                ? "مصفوفة الاستكشاف والتقسيمات المعرفية"
+                : isHe
+                  ? "מטריצת החקירה והנושאים"
+                  : "Multidimensional Exploration Matrix"}
             </h3>
             <p className="text-xs text-zinc-400 dir-auto">
               {isAr
@@ -86,7 +150,7 @@ export const ExploreMatrix: React.FC<ExploreMatrixProps> = ({ locale }) => {
           ].map((tab) => (
             <button
               key={tab.id}
-              onClick={() => setActiveTab(tab.id as any)}
+              onClick={() => setActiveTab(tab.id as never)}
               className={`px-3 py-1.5 text-xs font-extrabold rounded-xl transition-all whitespace-nowrap ${
                 activeTab === tab.id
                   ? "bg-cyan-500 text-zinc-950 shadow-md shadow-cyan-500/20"
@@ -109,18 +173,17 @@ export const ExploreMatrix: React.FC<ExploreMatrixProps> = ({ locale }) => {
             >
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
-                  <Badge variant="outline" className="border-cyan-500/30 text-cyan-400 bg-cyan-500/10 font-bold text-[10px]">
+                  <Badge
+                    variant="outline"
+                    className="border-cyan-500/30 text-cyan-400 bg-cyan-500/10 font-bold text-[10px]"
+                  >
                     {emo.refs.length} {isAr ? "آيات قرآنية" : isHe ? "פסוקים" : "Verses"}
                   </Badge>
                   <Heart className="w-4 h-4 text-zinc-500 group-hover:text-rose-400 transition-colors" />
                 </div>
-                <h4 className="text-lg font-extrabold text-white dir-auto">
-                  {emo.title}
-                </h4>
+                <h4 className="text-lg font-extrabold text-white dir-auto">{emo.title}</h4>
                 {emo.subtitle && (
-                  <p className="text-xs text-cyan-300 font-medium dir-auto">
-                    {emo.subtitle}
-                  </p>
+                  <p className="text-xs text-cyan-300 font-medium dir-auto">{emo.subtitle}</p>
                 )}
                 <p className="text-xs text-zinc-300 leading-relaxed dir-auto line-clamp-2">
                   {emo.description}
@@ -133,7 +196,13 @@ export const ExploreMatrix: React.FC<ExploreMatrixProps> = ({ locale }) => {
                 className="pt-2 border-t border-zinc-800"
               >
                 <Button className="w-full bg-zinc-800 hover:bg-cyan-600 text-zinc-200 hover:text-white text-xs font-bold py-1.5 rounded-xl flex items-center justify-between">
-                  <span>{isAr ? "تصفح الآيات والتفاسير" : isHe ? "חקור פסוקים" : "Explore Verses & Tafsir"}</span>
+                  <span>
+                    {isAr
+                      ? "تصفح الآيات والتفاسير"
+                      : isHe
+                        ? "חקור פסוקים"
+                        : "Explore Verses & Tafsir"}
+                  </span>
                   <ChevronRight className="w-4 h-4" />
                 </Button>
               </Link>
@@ -152,7 +221,10 @@ export const ExploreMatrix: React.FC<ExploreMatrixProps> = ({ locale }) => {
             >
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
-                  <Badge variant="outline" className="border-emerald-500/30 text-emerald-400 bg-emerald-500/10 font-bold text-[10px]">
+                  <Badge
+                    variant="outline"
+                    className="border-emerald-500/30 text-emerald-400 bg-emerald-500/10 font-bold text-[10px]"
+                  >
                     {isAr ? "خُلق إسلامي" : isHe ? "מידה טובה" : "Islamic Virtue"}
                   </Badge>
                   <Sparkles className="w-4 h-4 text-zinc-500 group-hover:text-emerald-400 transition-colors" />
@@ -174,7 +246,9 @@ export const ExploreMatrix: React.FC<ExploreMatrixProps> = ({ locale }) => {
                 className="pt-2 border-t border-zinc-800"
               >
                 <Button className="w-full bg-zinc-800 hover:bg-emerald-600 text-zinc-200 hover:text-white text-xs font-bold py-1.5 rounded-xl flex items-center justify-between">
-                  <span>{isAr ? "استعرض الشواهد الكاملة" : isHe ? "צפה במקורות" : "View Full Evidence"}</span>
+                  <span>
+                    {isAr ? "استعرض الشواهد الكاملة" : isHe ? "צפה במקורות" : "View Full Evidence"}
+                  </span>
                   <ChevronRight className="w-4 h-4" />
                 </Button>
               </Link>
@@ -193,18 +267,17 @@ export const ExploreMatrix: React.FC<ExploreMatrixProps> = ({ locale }) => {
             >
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
-                  <Badge variant="outline" className="border-amber-500/30 text-amber-400 bg-amber-500/10 font-bold text-[10px]">
+                  <Badge
+                    variant="outline"
+                    className="border-amber-500/30 text-amber-400 bg-amber-500/10 font-bold text-[10px]"
+                  >
                     {top.refs.length} {isAr ? "مواقع قرأنية" : isHe ? "מקורות" : "Passages"}
                   </Badge>
                   <Layers className="w-4 h-4 text-zinc-500 group-hover:text-amber-400 transition-colors" />
                 </div>
-                <h4 className="text-lg font-extrabold text-white dir-auto">
-                  {top.title}
-                </h4>
+                <h4 className="text-lg font-extrabold text-white dir-auto">{top.title}</h4>
                 {top.subtitle && (
-                  <p className="text-xs text-amber-300 font-medium dir-auto">
-                    {top.subtitle}
-                  </p>
+                  <p className="text-xs text-amber-300 font-medium dir-auto">{top.subtitle}</p>
                 )}
                 <p className="text-xs text-zinc-300 leading-relaxed dir-auto line-clamp-2">
                   {top.description}
@@ -244,9 +317,7 @@ export const ExploreMatrix: React.FC<ExploreMatrixProps> = ({ locale }) => {
                 <h4 className="text-lg font-extrabold text-white dir-auto">
                   {isAr ? p.nameAr : isHe ? p.nameHe : p.nameEn}
                 </h4>
-                <p className="text-xs text-zinc-300 leading-relaxed dir-auto">
-                  {p.role}
-                </p>
+                <p className="text-xs text-zinc-300 leading-relaxed dir-auto">{p.role}</p>
               </div>
 
               <Link
@@ -255,7 +326,13 @@ export const ExploreMatrix: React.FC<ExploreMatrixProps> = ({ locale }) => {
                 className="pt-2 border-t border-zinc-800"
               >
                 <Button className="w-full bg-zinc-800 hover:bg-emerald-600 text-zinc-200 hover:text-white text-xs font-bold py-1.5 rounded-xl flex items-center justify-between">
-                  <span>{isAr ? "اقرأ السيرة المباركة" : isHe ? "קרא את הסיפור" : "Read Prophetic Seerah"}</span>
+                  <span>
+                    {isAr
+                      ? "اقرأ السيرة المباركة"
+                      : isHe
+                        ? "קרא את הסיפור"
+                        : "Read Prophetic Seerah"}
+                  </span>
                   <ChevronRight className="w-4 h-4" />
                 </Button>
               </Link>
@@ -282,9 +359,7 @@ export const ExploreMatrix: React.FC<ExploreMatrixProps> = ({ locale }) => {
                 <h4 className="text-lg font-extrabold text-white dir-auto">
                   {isAr ? p.nameAr : isHe ? p.nameHe : p.nameEn}
                 </h4>
-                <p className="text-xs text-zinc-300 leading-relaxed dir-auto">
-                  {p.desc}
-                </p>
+                <p className="text-xs text-zinc-300 leading-relaxed dir-auto">{p.desc}</p>
               </div>
 
               <Link
@@ -293,7 +368,13 @@ export const ExploreMatrix: React.FC<ExploreMatrixProps> = ({ locale }) => {
                 className="pt-2 border-t border-zinc-800"
               >
                 <Button className="w-full bg-zinc-800 hover:bg-rose-600 text-zinc-200 hover:text-white text-xs font-bold py-1.5 rounded-xl flex items-center justify-between">
-                  <span>{isAr ? "استكشف الخريطة والمعلومات" : isHe ? "חקור במפה" : "Explore Sacred Geography"}</span>
+                  <span>
+                    {isAr
+                      ? "استكشف الخريطة والمعلومات"
+                      : isHe
+                        ? "חקור במפה"
+                        : "Explore Sacred Geography"}
+                  </span>
                   <ChevronRight className="w-4 h-4" />
                 </Button>
               </Link>
@@ -313,7 +394,11 @@ export const ExploreMatrix: React.FC<ExploreMatrixProps> = ({ locale }) => {
               <Clock className="w-5 h-5 text-amber-400" />
             </div>
             <h4 className="text-xl font-extrabold text-white dir-auto">
-              {isAr ? "العهد المكي والبعثة الأولى (13 سنة)" : isHe ? "התקופה המאכית (13 שנים)" : "Makkan Era (13 Years in Makkah)"}
+              {isAr
+                ? "العهد المكي والبعثة الأولى (13 سنة)"
+                : isHe
+                  ? "התקופה המאכית (13 שנים)"
+                  : "Makkan Era (13 Years in Makkah)"}
             </h4>
             <p className="text-xs text-zinc-300 leading-relaxed dir-auto">
               {isAr
@@ -324,7 +409,13 @@ export const ExploreMatrix: React.FC<ExploreMatrixProps> = ({ locale }) => {
             </p>
             <Link to="/surahs">
               <Button className="w-full bg-amber-600 hover:bg-amber-500 text-white font-bold text-xs py-2 rounded-xl mt-2">
-                <span>{isAr ? "استعرض السور المكية" : isHe ? "צפה בסורות המאכיות" : "Browse Makkan Surahs"}</span>
+                <span>
+                  {isAr
+                    ? "استعرض السور المكية"
+                    : isHe
+                      ? "צפה בסורות המאכיות"
+                      : "Browse Makkan Surahs"}
+                </span>
               </Button>
             </Link>
           </div>
@@ -337,7 +428,11 @@ export const ExploreMatrix: React.FC<ExploreMatrixProps> = ({ locale }) => {
               <Clock className="w-5 h-5 text-emerald-400" />
             </div>
             <h4 className="text-xl font-extrabold text-white dir-auto">
-              {isAr ? "العهد المدني وتأسيس الدولة (10 سنوات)" : isHe ? "התקופה המדינית (10 שנים)" : "Madinan Era (10 Years in Madinah)"}
+              {isAr
+                ? "العهد المدني وتأسيس الدولة (10 سنوات)"
+                : isHe
+                  ? "התקופה המדינית (10 שנים)"
+                  : "Madinan Era (10 Years in Madinah)"}
             </h4>
             <p className="text-xs text-zinc-300 leading-relaxed dir-auto">
               {isAr
@@ -348,7 +443,13 @@ export const ExploreMatrix: React.FC<ExploreMatrixProps> = ({ locale }) => {
             </p>
             <Link to="/surahs">
               <Button className="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs py-2 rounded-xl mt-2">
-                <span>{isAr ? "استعرض السور المدنية" : isHe ? "צפה בסורות המדיניות" : "Browse Madinan Surahs"}</span>
+                <span>
+                  {isAr
+                    ? "استعرض السور المدنية"
+                    : isHe
+                      ? "צפה בסורות המדיניות"
+                      : "Browse Madinan Surahs"}
+                </span>
               </Button>
             </Link>
           </div>
@@ -387,7 +488,13 @@ export const ExploreMatrix: React.FC<ExploreMatrixProps> = ({ locale }) => {
                 className="pt-2 border-t border-zinc-800"
               >
                 <Button className="w-full bg-purple-700 hover:bg-purple-600 text-white text-xs font-bold py-1.5 rounded-xl flex items-center justify-between">
-                  <span>{isAr ? "تصفح نموذج التفسير" : isHe ? "צפה בדוגמת תפסיר" : "Explore Tafsir Sample"}</span>
+                  <span>
+                    {isAr
+                      ? "تصفح نموذج التفسير"
+                      : isHe
+                        ? "צפה בדוגמת תפסיר"
+                        : "Explore Tafsir Sample"}
+                  </span>
                   <ArrowUpRight className="w-4 h-4" />
                 </Button>
               </Link>
