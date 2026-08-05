@@ -92,9 +92,7 @@ export function ConceptsIndexPage() {
           <h1 className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
             {t("concepts.headerTitle")}
           </h1>
-          <p className="mt-2 text-sm text-muted-foreground max-w-2xl">
-            {t("concepts.headerDesc")}
-          </p>
+          <p className="mt-2 text-sm text-muted-foreground max-w-2xl">{t("concepts.headerDesc")}</p>
 
           {/* Search Box */}
           <div className="mt-6 relative max-w-xl">
