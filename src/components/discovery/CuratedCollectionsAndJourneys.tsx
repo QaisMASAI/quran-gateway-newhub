@@ -1,5 +1,8 @@
 import React, { useState } from "react";
 import { Link } from "@tanstack/react-router";
+import topicsWebp from "@/assets/discovery-topics.webp";
+import surahsWebp from "@/assets/discovery-surahs.webp";
+import hadithWebp from "@/assets/discovery-hadith.webp";
 import {
   TrendingUp,
   Shuffle,
@@ -275,45 +278,75 @@ export const CuratedCollectionsAndJourneys: React.FC<CuratedCollectionsAndJourne
           </div>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-          {collections.map((col) => (
-            <div
-              key={col.id}
-              className={`p-6 rounded-3xl bg-gradient-to-br ${col.colorGrad} border border-white/10 shadow-xl space-y-4 text-white flex flex-col justify-between`}
-            >
-              <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <Badge className="bg-black/30 backdrop-blur-md text-white border-white/20 text-[10px] font-bold">
-                    {isAr ? col.badgeAr : isHe ? col.badgeHe : col.badgeEn}
-                  </Badge>
-                  <span className="text-xs font-mono font-extrabold bg-black/40 px-2.5 py-1 rounded-full">
-                    {col.itemsCount} {isAr ? "عناصر" : isHe ? "פריטים" : "Items"}
-                  </span>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {collections.map((col, idx) => {
+            const imgAsset = idx === 0 ? topicsWebp : idx === 1 ? surahsWebp : hadithWebp;
+            const imgAlt = isAr
+              ? idx === 0
+                ? "خريطة المفاهيم القرآنية العقدية والأخلاقية بطباعة شبكية حديثة"
+                : idx === 1
+                  ? "صورة توضيحية لترتيب وفهرس سور القرآن الكريم الهيكلي"
+                  : "رسم بياني لسلسلة أسانيد الحديث النبوي الشريف والتصنيف المعرفي"
+              : isHe
+                ? idx === 0
+                  ? "מפת מושגי יסוד קוראניים ואתיקה איסלאמית"
+                  : idx === 1
+                    ? "תמונת תצוגה מובנית של סורות הקוראן והתגלויותיהן"
+                    : "גרף מפה של ספרות החדית' ושלשלות המסירה"
+                : idx === 0
+                  ? "WebP diagram of Quranic concept networks and thematic connections"
+                  : idx === 1
+                    ? "WebP visual summary of Surah structure and revelation sequence"
+                    : "WebP diagram showing authentic Prophetic Hadith chains and collections";
+
+            return (
+              <div
+                key={col.id}
+                className={`p-6 rounded-3xl bg-gradient-to-br ${col.colorGrad} border border-white/10 shadow-xl space-y-4 text-white flex flex-col justify-between`}
+              >
+                <div className="space-y-3">
+                  <div className="relative h-32 w-full rounded-2xl overflow-hidden border border-white/20 shadow-md">
+                    <img
+                      src={imgAsset}
+                      alt={imgAlt}
+                      className="object-cover w-full h-full hover:scale-105 transition-transform duration-500"
+                      loading="lazy"
+                    />
+                  </div>
+
+                  <div className="flex items-center justify-between">
+                    <Badge className="bg-black/30 backdrop-blur-md text-white border-white/20 text-[10px] font-bold">
+                      {isAr ? col.badgeAr : isHe ? col.badgeHe : col.badgeEn}
+                    </Badge>
+                    <span className="text-xs font-mono font-extrabold bg-black/40 px-2.5 py-1 rounded-full">
+                      {col.itemsCount} {isAr ? "عناصر" : isHe ? "פריטים" : "Items"}
+                    </span>
+                  </div>
+
+                  <h4 className="text-xl font-extrabold dir-auto">
+                    {isAr ? col.titleAr : isHe ? col.titleHe : col.titleEn}
+                  </h4>
+
+                  <p className="text-xs text-zinc-100 leading-relaxed dir-auto opacity-90">
+                    {isAr ? col.descAr : isHe ? col.descHe : col.descEn}
+                  </p>
                 </div>
 
-                <h4 className="text-xl font-extrabold dir-auto">
-                  {isAr ? col.titleAr : isHe ? col.titleHe : col.titleEn}
-                </h4>
-
-                <p className="text-xs text-zinc-100 leading-relaxed dir-auto opacity-90">
-                  {isAr ? col.descAr : isHe ? col.descHe : col.descEn}
-                </p>
+                <Link to="/topics">
+                  <Button className="w-full bg-white text-zinc-950 hover:bg-zinc-100 font-extrabold text-xs py-2 rounded-xl flex items-center justify-between shadow-lg">
+                    <span>
+                      {isAr
+                        ? "استعرض المجموعة بالكامل"
+                        : isHe
+                          ? "צפה באוסף המלא"
+                          : "Explore Collection"}
+                    </span>
+                    <ChevronRight className="w-4 h-4" />
+                  </Button>
+                </Link>
               </div>
-
-              <Link to="/topics">
-                <Button className="w-full bg-white text-zinc-950 hover:bg-zinc-100 font-extrabold text-xs py-2 rounded-xl flex items-center justify-between shadow-lg">
-                  <span>
-                    {isAr
-                      ? "استعرض المجموعة بالكامل"
-                      : isHe
-                        ? "צפה באוסף המלא"
-                        : "Explore Collection"}
-                  </span>
-                  <ChevronRight className="w-4 h-4" />
-                </Button>
-              </Link>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </section>
 
