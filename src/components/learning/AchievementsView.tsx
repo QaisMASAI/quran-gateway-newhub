@@ -35,10 +35,7 @@ export const AchievementsView: React.FC<AchievementsViewProps> = ({ stats, local
   }, [selectedCategory, searchQuery, locale]);
 
   const categoryOptions = useMemo(() => {
-    return Object.entries(CATEGORY_LABELS) as [
-      AchievementCategory,
-      { ar: string; en: string; he: string },
-    ][];
+    return Object.entries(CATEGORY_LABELS) as [AchievementCategory, { ar: string; en: string; he: string }][];
   }, []);
 
   const totalUnlocked = unlockedSet.size;
@@ -58,18 +55,14 @@ export const AchievementsView: React.FC<AchievementsViewProps> = ({ stats, local
           </span>
           <h2 className="text-2xl sm:text-3xl font-black dir-auto">
             {totalUnlocked} / {ALL_300_ACHIEVEMENTS.length}{" "}
-            {locale === "ar"
-              ? "أوسمة مكتملة"
-              : locale === "he"
-                ? "תגים שהושלמו"
-                : "Achievements Unlocked"}
+            {locale === "ar" ? "أوسمة مكتملة" : locale === "he" ? "תגים שהושלמו" : "Achievements Unlocked"}
           </h2>
           <p className="text-xs sm:text-sm text-indigo-100 dir-auto max-w-xl">
             {locale === "ar"
-              ? "سجل إنجازاتك في التلاوة والتفسير وحديث المصطفى والتفكر والاستمرارية. افتح أوسمة المعرفة الرفيعة."
+              ? "سجل إنجازاتك في التلاوة والتفسير والتفكر والاستمرارية. افتح أوسمة المعرفة الرفيعة."
               : locale === "he"
-                ? "תיעוד ההישגים שלך בקריאה, תפסיר, חדית' והתבוננות."
-                : "Track your milestones in Quran recitation, Tafsir, Hadith, AI research, and daily devotion."}
+                ? "תיעוד ההישגים שלך בקריאה, תפסיר והתבוננות."
+                : "Track your milestones in Quran recitation, Tafsir, AI research, and daily devotion."}
           </p>
         </div>
         <div className="relative z-10 flex flex-col items-center justify-center p-4 rounded-2xl bg-white/10 backdrop-blur-md border border-white/20 min-w-[120px]">
@@ -90,11 +83,7 @@ export const AchievementsView: React.FC<AchievementsViewProps> = ({ stats, local
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder={
-                locale === "ar"
-                  ? "ابحث عن وسام..."
-                  : locale === "he"
-                    ? "חפש תג..."
-                    : "Search achievement..."
+                locale === "ar" ? "ابحث عن وسام..." : locale === "he" ? "חפש תג..." : "Search achievement..."
               }
               className="w-full pl-9 pr-4 py-2 text-xs rounded-xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-purple-500"
             />
@@ -109,8 +98,7 @@ export const AchievementsView: React.FC<AchievementsViewProps> = ({ stats, local
                   : "bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 hover:bg-zinc-200"
               }`}
             >
-              {locale === "ar" ? "الكل" : locale === "he" ? "הכל" : "All Categories"} (
-              {ALL_300_ACHIEVEMENTS.length})
+              {locale === "ar" ? "الكل" : locale === "he" ? "הכל" : "All Categories"} ({ALL_300_ACHIEVEMENTS.length})
             </button>
             {categoryOptions.map(([catKey, labels]) => (
               <button
@@ -165,17 +153,13 @@ export const AchievementsView: React.FC<AchievementsViewProps> = ({ stats, local
                   {isUnlocked ? ach.icon : <Lock className="w-5 h-5 text-zinc-400" />}
                 </div>
 
-                <span
-                  className={`text-[9px] font-mono uppercase px-2 py-0.5 rounded-full border ${rarityColor}`}
-                >
+                <span className={`text-[9px] font-mono uppercase px-2 py-0.5 rounded-full border ${rarityColor}`}>
                   {ach.rarity.replace("_", " ")}
                 </span>
               </div>
 
               <div>
-                <h4 className="font-bold text-xs text-zinc-900 dark:text-zinc-100 dir-auto line-clamp-1">
-                  {name}
-                </h4>
+                <h4 className="font-bold text-xs text-zinc-900 dark:text-zinc-100 dir-auto line-clamp-1">{name}</h4>
                 <p className="text-[11px] text-zinc-500 dark:text-zinc-400 dir-auto mt-1 leading-snug line-clamp-2">
                   {desc}
                 </p>

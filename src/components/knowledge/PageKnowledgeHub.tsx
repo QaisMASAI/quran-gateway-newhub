@@ -67,8 +67,8 @@ export const PageKnowledgeHub: React.FC<PageKnowledgeHubProps> = ({
           {locale === "ar"
             ? "جاري بناء شبكة المعرفة المتقاطعة ذات 10 أبعاد..."
             : locale === "he"
-            ? "בונה את רשת הידע ה-10 ממדית..."
-            : "Generating 10-Dimensional Dynamic Knowledge Graph..."}
+              ? "בונה את רשת הידע ה-10 ממדית..."
+              : "Generating 10-Dimensional Dynamic Knowledge Graph..."}
         </p>
       </div>
     );
@@ -87,8 +87,7 @@ export const PageKnowledgeHub: React.FC<PageKnowledgeHubProps> = ({
     "vocabulary",
   ];
 
-  const currentTabNodes: GraphNode[] =
-    activeTab === "graph" ? hubData.graph.nodes : hubData[activeTab] || [];
+  const currentTabNodes: GraphNode[] = activeTab === "graph" ? hubData.graph.nodes : hubData[activeTab] || [];
 
   return (
     <div
@@ -105,8 +104,8 @@ export const PageKnowledgeHub: React.FC<PageKnowledgeHubProps> = ({
               {locale === "ar"
                 ? "مركز المعرفة المتقاطعة (10 أبعاد)"
                 : locale === "he"
-                ? "מרכז ידע מולטי-ממדי"
-                : "Dynamic 10-Dimensional Knowledge Hub"}
+                  ? "מרכז ידע מולטי-ממדי"
+                  : "Dynamic 10-Dimensional Knowledge Hub"}
             </span>
           </div>
           <h2 className="text-xl font-extrabold dir-auto">
@@ -114,16 +113,16 @@ export const PageKnowledgeHub: React.FC<PageKnowledgeHubProps> = ({
               (locale === "ar"
                 ? "الربط التلقائي بالمصادر والأبعاد الإيمانية"
                 : locale === "he"
-                ? "חיבור אוטומטי לכל מקורות הידע"
-                : "Automatic Multi-Source Knowledge Integration")}
+                  ? "חיבור אוטומטי לכל מקורות הידע"
+                  : "Automatic Multi-Source Knowledge Integration")}
           </h2>
           <p className="text-xs text-zinc-400 dir-auto">
             {subtitle ||
               (locale === "ar"
-                ? "يربط هذا العنصر تلقائياً بالقرآن، الحديث، التفسير، الأنبياء، العلماء، الموضوعات، القصص، الأماكن، الأحداث والمفردات."
+                ? "يربط هذا العنصر تلقائياً بالقرآن، التفسير، الأنبياء، العلماء، الموضوعات، القصص، الأماكن، الأحداث والمفردات."
                 : locale === "he"
-                ? "חיבור אוטומטי לקוראן, חדית', תפסיר, נביאים, חכמים, נושאים, סיפורים, מקומות, אירועים ואוצר מילים."
-                : "Automatically interconnected across Quran, Hadith, Tafsir, Prophets, Scholars, Topics, Stories, Places, Events & Vocabulary.")}
+                  ? "חיבור אוטומטי לקוראן, תפסיר, נביאים, חכמים, נושאים, סיפורים, מקומות, אירועים ואוצר מילים."
+                  : "Automatically interconnected across Quran, Tafsir, Prophets, Scholars, Topics, Stories, Places, Events & Vocabulary.")}
           </p>
         </div>
 
@@ -131,10 +130,15 @@ export const PageKnowledgeHub: React.FC<PageKnowledgeHubProps> = ({
           <ShieldCheck className="w-5 h-5 text-amber-400" />
           <div className="text-left">
             <span className="text-sm font-black text-amber-300 block">
-              {hubData.totalConnections} {locale === "ar" ? "ارتباط معتمد" : locale === "he" ? "קישורים מוסמכים" : "Verified Links"}
+              {hubData.totalConnections}{" "}
+              {locale === "ar" ? "ارتباط معتمد" : locale === "he" ? "קישורים מוסמכים" : "Verified Links"}
             </span>
             <span className="text-[10px] text-zinc-400 block dir-auto">
-              {locale === "ar" ? "محدث تلقائياً من قواعد البيانات" : locale === "he" ? "מתעדכן אוטומטית" : "Auto-Generated Graph"}
+              {locale === "ar"
+                ? "محدث تلقائياً من قواعد البيانات"
+                : locale === "he"
+                  ? "מתעדכן אוטומטית"
+                  : "Auto-Generated Graph"}
             </span>
           </div>
         </div>
@@ -151,19 +155,20 @@ export const PageKnowledgeHub: React.FC<PageKnowledgeHubProps> = ({
           }`}
         >
           <Compass className="w-4 h-4" />
-          <span>{locale === "ar" ? "الرسم البياني التفاعلي" : locale === "he" ? "תרשים אינטראקטיבי" : "Interactive Graph Map"}</span>
+          <span>
+            {locale === "ar"
+              ? "الرسم البياني التفاعلي"
+              : locale === "he"
+                ? "תרשים אינטראקטיבי"
+                : "Interactive Graph Map"}
+          </span>
         </button>
 
         {dimensions.map((dim) => {
           const cfg = DIMENSION_CONFIG[dim];
           const count = hubData.graph.dimensionCounts[dim] || 0;
           const isActive = activeTab === dim;
-          const label =
-            locale === "ar"
-              ? cfg.labelAr
-              : locale === "he"
-              ? cfg.labelHe
-              : cfg.labelEn;
+          const label = locale === "ar" ? cfg.labelAr : locale === "he" ? cfg.labelHe : cfg.labelEn;
 
           return (
             <button
@@ -177,9 +182,7 @@ export const PageKnowledgeHub: React.FC<PageKnowledgeHubProps> = ({
             >
               <span>{cfg.icon}</span>
               <span>{label}</span>
-              <span className="px-1.5 py-0.5 rounded-full text-[10px] bg-zinc-800 text-zinc-300">
-                {count}
-              </span>
+              <span className="px-1.5 py-0.5 rounded-full text-[10px] bg-zinc-800 text-zinc-300">{count}</span>
             </button>
           );
         })}
@@ -187,26 +190,14 @@ export const PageKnowledgeHub: React.FC<PageKnowledgeHubProps> = ({
 
       {/* Main Tab Content Display */}
       {activeTab === "graph" ? (
-        <KnowledgeGraphVisualizer
-          graphData={hubData.graph}
-          locale={locale}
-          focusNodeId={slug}
-        />
+        <KnowledgeGraphVisualizer graphData={hubData.graph} locale={locale} focusNodeId={slug} />
       ) : (
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <h3 className="text-base font-bold text-zinc-200 flex items-center gap-2 dir-auto">
               <span>{DIMENSION_CONFIG[activeTab].icon}</span>
               <span>
-                {
-                  DIMENSION_CONFIG[activeTab][
-                    locale === "ar"
-                      ? "labelAr"
-                      : locale === "he"
-                      ? "labelHe"
-                      : "labelEn"
-                  ]
-                }
+                {DIMENSION_CONFIG[activeTab][locale === "ar" ? "labelAr" : locale === "he" ? "labelHe" : "labelEn"]}
               </span>
             </h3>
             <span className="text-xs text-zinc-400 font-medium dir-auto">
@@ -219,8 +210,8 @@ export const PageKnowledgeHub: React.FC<PageKnowledgeHubProps> = ({
               {locale === "ar"
                 ? "لا توجد عناصر متصلة في هذا البعد حالياً."
                 : locale === "he"
-                ? "אין רכיבים מקושרים בממד זה כעת."
-                : "No linked items in this dimension for the current entity."}
+                  ? "אין רכיבים מקושרים בממד זה כעת."
+                  : "No linked items in this dimension for the current entity."}
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -241,12 +232,8 @@ export const PageKnowledgeHub: React.FC<PageKnowledgeHubProps> = ({
                         </span>
                         <ArrowUpRight className="w-4 h-4 text-zinc-500" />
                       </div>
-                      <h4 className="font-extrabold text-sm text-white dir-auto">
-                        {titleText}
-                      </h4>
-                      <p className="text-xs text-zinc-400 dir-auto line-clamp-3 leading-relaxed">
-                        {summaryText}
-                      </p>
+                      <h4 className="font-extrabold text-sm text-white dir-auto">{titleText}</h4>
+                      <p className="text-xs text-zinc-400 dir-auto line-clamp-3 leading-relaxed">{summaryText}</p>
                     </div>
 
                     <Link

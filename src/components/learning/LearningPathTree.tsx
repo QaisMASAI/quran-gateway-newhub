@@ -33,15 +33,6 @@ export const PATH_STAGES = [
     descriptionEn: "Stories of Prophet Adam, Noah, Abraham, Moses, and Jesus (pbut)",
     descriptionHe: "סיפורי הנביאים אדם, נח, אברהם, משה וישוע",
   },
-  {
-    stageId: 3,
-    nameAr: "المرحلة الثالثة: رياض الصالحين وأحكام الحديث",
-    nameEn: "Stage 3: Gardens of Hadith & Prophetic Sunnah",
-    nameHe: "שלב 3: חדית'ים מאומתים וסונה",
-    descriptionAr: "دراسة جوامع الأحاديث الصحيحة والأخلاق النبوية الشريفة",
-    descriptionEn: "Exploring authentic Hadith collections and noble character",
-    descriptionHe: "חקר חדית'ים מאומתים ומידות מוסריות",
-  },
 ];
 
 interface LearningPathTreeProps {
@@ -50,23 +41,14 @@ interface LearningPathTreeProps {
   onSelectNode: (node: PathNode) => void;
 }
 
-export const LearningPathTree: React.FC<LearningPathTreeProps> = ({
-  nodes,
-  locale,
-  onSelectNode,
-}) => {
+export const LearningPathTree: React.FC<LearningPathTreeProps> = ({ nodes, locale, onSelectNode }) => {
   return (
     <div className="w-full max-w-3xl mx-auto space-y-12 py-6">
       {PATH_STAGES.map((stage) => {
         const stageNodes = nodes.filter((n) => n.stageId === stage.stageId);
-        const stageName =
-          locale === "ar" ? stage.nameAr : locale === "he" ? stage.nameHe : stage.nameEn;
+        const stageName = locale === "ar" ? stage.nameAr : locale === "he" ? stage.nameHe : stage.nameEn;
         const stageDesc =
-          locale === "ar"
-            ? stage.descriptionAr
-            : locale === "he"
-              ? stage.descriptionHe
-              : stage.descriptionEn;
+          locale === "ar" ? stage.descriptionAr : locale === "he" ? stage.descriptionHe : stage.descriptionEn;
 
         return (
           <div key={stage.stageId} className="space-y-6">
@@ -92,16 +74,11 @@ export const LearningPathTree: React.FC<LearningPathTreeProps> = ({
               <div className="absolute top-4 bottom-4 w-1.5 bg-zinc-200 dark:bg-zinc-800 rounded-full z-0" />
 
               {stageNodes.map((node, index) => {
-                const nodeTitle =
-                  locale === "ar" ? node.titleAr : locale === "he" ? node.titleHe : node.titleEn;
+                const nodeTitle = locale === "ar" ? node.titleAr : locale === "he" ? node.titleHe : node.titleEn;
 
                 // Alternate horizontal offset for Duolingo curve feel
                 const offsetClass =
-                  index % 3 === 0
-                    ? "translate-x-0"
-                    : index % 3 === 1
-                      ? "-translate-x-12"
-                      : "translate-x-12";
+                  index % 3 === 0 ? "translate-x-0" : index % 3 === 1 ? "-translate-x-12" : "translate-x-12";
 
                 return (
                   <div
