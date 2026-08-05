@@ -43,16 +43,76 @@ export const PerplexityResearchHub: React.FC<PerplexityResearchHubProps> = ({
   const isHe = brief.locale === "he";
 
   const sectionNavItems = [
-    { id: "ai-research-brief", labelEn: "1. AI Brief", labelAr: "1. الملخص", labelHe: "1. תקציר AI", icon: <Sparkles className="w-3.5 h-3.5" /> },
-    { id: "knowledge-overview", labelEn: "2. Overview", labelAr: "2. البطاقات", labelHe: "2. כרטיסים", icon: <Compass className="w-3.5 h-3.5" /> },
-    { id: "timeline", labelEn: "3. Timeline", labelAr: "3. التسلسل", labelHe: "3. ציר זמן", icon: <History className="w-3.5 h-3.5" /> },
-    { id: "knowledge-graph", labelEn: "4. Knowledge Graph", labelAr: "4. الرسم البياني", labelHe: "4. תרשים", icon: <Network className="w-3.5 h-3.5" /> },
-    { id: "categorized-results", labelEn: "5. Results", labelAr: "5. النتائج", labelHe: "5. תוצאות", icon: <Search className="w-3.5 h-3.5" /> },
-    { id: "related-topics", labelEn: "6. Topics", labelAr: "6. الموضوعات", labelHe: "6. נושאים", icon: <Layers className="w-3.5 h-3.5" /> },
-    { id: "suggested-research", labelEn: "7. Research", labelAr: "7. المسارات", labelHe: "7. מחקר", icon: <GraduationCap className="w-3.5 h-3.5" /> },
-    { id: "related-questions", labelEn: "8. Questions", labelAr: "8. الأسئلة", labelHe: "8. שאלות", icon: <HelpCircle className="w-3.5 h-3.5" /> },
-    { id: "learning-recommendations", labelEn: "9. Learning", labelAr: "9. التوصيات", labelHe: "9. למידה", icon: <Brain className="w-3.5 h-3.5" /> },
-    { id: "recently-updated-sources", labelEn: "10. Sources", labelAr: "10. المصادر", labelHe: "10. מקורות", icon: <ShieldCheck className="w-3.5 h-3.5" /> },
+    {
+      id: "ai-research-brief",
+      labelEn: "1. AI Brief",
+      labelAr: "1. الملخص",
+      labelHe: "1. תקציר AI",
+      icon: <Sparkles className="w-3.5 h-3.5" />,
+    },
+    {
+      id: "knowledge-overview",
+      labelEn: "2. Overview",
+      labelAr: "2. البطاقات",
+      labelHe: "2. כרטיסים",
+      icon: <Compass className="w-3.5 h-3.5" />,
+    },
+    {
+      id: "timeline",
+      labelEn: "3. Timeline",
+      labelAr: "3. التسلسل",
+      labelHe: "3. ציר זמן",
+      icon: <History className="w-3.5 h-3.5" />,
+    },
+    {
+      id: "knowledge-graph",
+      labelEn: "4. Knowledge Graph",
+      labelAr: "4. الرسم البياني",
+      labelHe: "4. תרשים",
+      icon: <Network className="w-3.5 h-3.5" />,
+    },
+    {
+      id: "categorized-results",
+      labelEn: "5. Results",
+      labelAr: "5. النتائج",
+      labelHe: "5. תוצאות",
+      icon: <Search className="w-3.5 h-3.5" />,
+    },
+    {
+      id: "related-topics",
+      labelEn: "6. Topics",
+      labelAr: "6. الموضوعات",
+      labelHe: "6. נושאים",
+      icon: <Layers className="w-3.5 h-3.5" />,
+    },
+    {
+      id: "suggested-research",
+      labelEn: "7. Research",
+      labelAr: "7. المسارات",
+      labelHe: "7. מחקר",
+      icon: <GraduationCap className="w-3.5 h-3.5" />,
+    },
+    {
+      id: "related-questions",
+      labelEn: "8. Questions",
+      labelAr: "8. الأسئلة",
+      labelHe: "8. שאלות",
+      icon: <HelpCircle className="w-3.5 h-3.5" />,
+    },
+    {
+      id: "learning-recommendations",
+      labelEn: "9. Learning",
+      labelAr: "9. التوصيات",
+      labelHe: "9. למידה",
+      icon: <Brain className="w-3.5 h-3.5" />,
+    },
+    {
+      id: "recently-updated-sources",
+      labelEn: "10. Sources",
+      labelAr: "10. المصادر",
+      labelHe: "10. מקורות",
+      icon: <ShieldCheck className="w-3.5 h-3.5" />,
+    },
   ];
 
   useEffect(() => {
@@ -118,13 +178,17 @@ export const PerplexityResearchHub: React.FC<PerplexityResearchHubProps> = ({
           </span>
           <div>
             <h3 className="text-xl font-extrabold text-white dir-auto">
-              {isAr ? "نتائج البحث المصنفة والمؤكدة" : isHe ? "תוצאות חיפוש ממוינות ומאומתות" : "Categorized & Verified Database Records"}
+              {isAr
+                ? "نتائج البحث المصنفة والمؤكدة"
+                : isHe
+                  ? "תוצאות חיפוש ממוינות ומאומתות"
+                  : "Categorized & Verified Database Records"}
             </h3>
             <p className="text-xs text-zinc-400 dir-auto">
               {isAr
-                ? "سجلات معتمدة مقسمة حسب القرآن، الحديث، التفسير، الأنبياء والموضوعات"
+                ? "سجلات معتمدة مقسمة حسب القرآن، التفسير، الأنبياء والموضوعات"
                 : isHe
-                  ? "תוצאות מאומתות לפי קוראן, חדית', תפסיר ונביאים"
+                  ? "תוצאות מאומתות לפי קוראן, תפסיר ונביאים"
                   : "Ranked evidence items across Quranic Verses, Sahih Traditions, Classical Exegesis & Topics"}
             </p>
           </div>
