@@ -1,6 +1,11 @@
 import { useState } from "react";
 import ReactMarkdown from "react-markdown";
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 import {
   BadgeCheck,
   BookOpen,
@@ -20,7 +25,7 @@ type Props = {
   locale: "he" | "ar" | "en";
   versesCount: number;
   tafsirCount: number;
-  hadithCount: number;
+  hadithCount?: number;
   confidence?: number;
   suggestedQuestions?: string[];
   onSuggestedQuestion?: (question: string) => void;
@@ -37,7 +42,11 @@ function quickSummary(answer: string) {
   const plain = stripMarkdown(answer);
   if (plain.length <= 220) return plain;
   const clipped = plain.slice(0, 220);
-  const lastDot = Math.max(clipped.lastIndexOf("."), clipped.lastIndexOf("؟"), clipped.lastIndexOf("!"));
+  const lastDot = Math.max(
+    clipped.lastIndexOf("."),
+    clipped.lastIndexOf("؟"),
+    clipped.lastIndexOf("!"),
+  );
   return (lastDot > 80 ? clipped.slice(0, lastDot + 1) : clipped).trim();
 }
 
@@ -47,7 +56,7 @@ const COPY = {
     summary: "Quick summary",
     deep: "Deep explanation",
     evidence: "Evidence",
-    references: "Quran / Tafsir / Hadith references",
+    references: "Quran / Tafsir references",
     context: "Historical context",
     reflection: "Modern reflection",
     cross: "Cross references",
@@ -58,7 +67,7 @@ const COPY = {
     summary: "סיכום מהיר",
     deep: "הסבר מעמיק",
     evidence: "ראיות",
-    references: "הפניות קוראן / תפסיר / חדית׳",
+    references: "הפניות קוראן / תפסיר",
     context: "הקשר היסטורי",
     reflection: "השתקפות מודרנית",
     cross: "הצלבות",
@@ -69,7 +78,7 @@ const COPY = {
     summary: "ملخص سريع",
     deep: "شرح معمّق",
     evidence: "الأدلّة",
-    references: "مراجع القرآن / التفسير / الحديث",
+    references: "مراجع القرآن / التفسير",
     context: "السياق التاريخي",
     reflection: "انعكاس معاصر",
     cross: "إحالات متقاطعة",
@@ -101,7 +110,9 @@ export function StructuredAnswer({
           </div>
           <div>
             <h3>{copy.heading}</h3>
-            <span className="text-xs text-muted-foreground font-normal">Noor Al-Huda Multi-Agent Verification</span>
+            <span className="text-xs text-muted-foreground font-normal">
+              Noor Al-Huda Multi-Agent Verification
+            </span>
           </div>
         </div>
 
@@ -162,27 +173,19 @@ export function StructuredAnswer({
             </div>
           </AccordionTrigger>
           <AccordionContent>
-            <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
               <div className="rounded-2xl border border-emerald-500/30 bg-emerald-50/50 dark:bg-emerald-950/20 p-3 text-xs">
                 <div className="mb-1.5 flex items-center justify-between text-emerald-800 dark:text-emerald-300 font-bold">
                   <span className="flex items-center gap-1">
                     <BookOpen className="h-4 w-4" /> Quran Verses
                   </span>
-                  <span className="rounded-full bg-emerald-600 px-2 py-0.5 text-[10px] text-white">{versesCount}</span>
+                  <span className="rounded-full bg-emerald-600 px-2 py-0.5 text-[10px] text-white">
+                    {versesCount}
+                  </span>
                 </div>
                 <div className="text-[11px] text-muted-foreground">
                   Direct Quranic evidence with Arabic text & translations
                 </div>
-              </div>
-
-              <div className="rounded-2xl border border-amber-500/30 bg-amber-50/50 dark:bg-amber-950/20 p-3 text-xs">
-                <div className="mb-1.5 flex items-center justify-between text-amber-900 dark:text-amber-300 font-bold">
-                  <span className="flex items-center gap-1">
-                    <Library className="h-4 w-4" /> Authentic Hadiths
-                  </span>
-                  <span className="rounded-full bg-amber-600 px-2 py-0.5 text-[10px] text-white">{hadithCount}</span>
-                </div>
-                <div className="text-[11px] text-muted-foreground">Sahih Bukhari, Muslim & authenticated Sunnah</div>
               </div>
 
               <div className="rounded-2xl border border-sky-500/30 bg-sky-50/50 dark:bg-sky-950/20 p-3 text-xs">
@@ -190,7 +193,9 @@ export function StructuredAnswer({
                   <span className="flex items-center gap-1">
                     <ScrollText className="h-4 w-4" /> Tafsir & Scholars
                   </span>
-                  <span className="rounded-full bg-sky-600 px-2 py-0.5 text-[10px] text-white">{tafsirCount}</span>
+                  <span className="rounded-full bg-sky-600 px-2 py-0.5 text-[10px] text-white">
+                    {tafsirCount}
+                  </span>
                 </div>
                 <div className="text-[11px] text-muted-foreground">
                   Tafsir Ibn Kathir, Asbab Nuzul & Scholarly Consensus
