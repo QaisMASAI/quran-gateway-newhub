@@ -76,14 +76,18 @@ export const SavedCollectionsManager: React.FC<SavedCollectionsManagerProps> = (
           </div>
           <div>
             <h3 className="text-base font-extrabold text-white">
-              {isAr ? "المجموعات والحافظات المحفوظة" : isHe ? "אוספים ושמירות אישיות" : "Saved Collections & Vaults"}
+              {isAr
+                ? "المجموعات والحافظات المحفوظة"
+                : isHe
+                  ? "אוספים ושמירות אישיות"
+                  : "Saved Collections & Vaults"}
             </h3>
             <p className="text-xs text-zinc-400">
               {isAr
-                ? "تنظيم الآيات والأحاديث والتأملات في مجموعات موضوعية خاصة"
+                ? "تنظيم الآيات والتفاسير والتأملات في مجموعات موضوعية خاصة"
                 : isHe
-                  ? "ארגן פסוקים, חדית'ים והרהורים באוספים נושאיים"
-                  : "Organize verses, Hadiths & reflections into custom curated collections"}
+                  ? "ארגן פסוקים, תפסיר והרהורים באוספים נושאיים"
+                  : "Organize verses, Tafsir & reflections into custom curated collections"}
             </p>
           </div>
         </div>
@@ -104,7 +108,13 @@ export const SavedCollectionsManager: React.FC<SavedCollectionsManagerProps> = (
           </h4>
           <input
             type="text"
-            placeholder={isAr ? "عنوان المجموعة (مثال: أذكار الصباح)" : isHe ? "שם האוסף" : "Collection Title (e.g., Morning Adhkar)"}
+            placeholder={
+              isAr
+                ? "عنوان المجموعة (مثال: أذكار الصباح)"
+                : isHe
+                  ? "שם האוסף"
+                  : "Collection Title (e.g., Morning Adhkar)"
+            }
             value={newTitle}
             onChange={(e) => setNewTitle(e.target.value)}
             className="w-full px-3 py-2 rounded-xl bg-zinc-900 border border-zinc-700 text-white text-xs focus:outline-none focus:border-amber-500"
@@ -112,11 +122,7 @@ export const SavedCollectionsManager: React.FC<SavedCollectionsManagerProps> = (
           <textarea
             rows={2}
             placeholder={
-              isAr
-                ? "وصف قصير للمجموعة..."
-                : isHe
-                  ? "תיאור קצר..."
-                  : "Short description..."
+              isAr ? "وصف قصير للمجموعة..." : isHe ? "תיאור קצר..." : "Short description..."
             }
             value={newDesc}
             onChange={(e) => setNewDesc(e.target.value)}
@@ -199,7 +205,11 @@ export const SavedCollectionsManager: React.FC<SavedCollectionsManagerProps> = (
 
           {filteredItems.length === 0 ? (
             <div className="p-8 text-center rounded-2xl bg-zinc-950 border border-dashed border-zinc-800 text-zinc-500 text-xs">
-              {isAr ? "لا توجد عناصر محفوظة في هذه المجموعة حتى الآن" : isHe ? "אין פריטים שמורים באוסף זה" : "No saved items in this collection yet."}
+              {isAr
+                ? "لا توجد عناصر محفوظة في هذه المجموعة حتى الآن"
+                : isHe
+                  ? "אין פריטים שמורים באוסף זה"
+                  : "No saved items in this collection yet."}
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
