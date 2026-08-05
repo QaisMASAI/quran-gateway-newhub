@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Trophy, Award, Lock, CheckCircle2, Sparkles, Flame, ShieldCheck } from "lucide-react";
-import { ALL_BADGES, getGamificationStats, calculateLevel, type Badge as BadgeType } from "@/lib/gamification";
+import { ALL_BADGES, getGamificationStats, calculateLevel } from "@/lib/gamification";
 import { Badge } from "@/components/ui/badge";
 
 interface AchievementSystemViewProps {
@@ -11,7 +11,7 @@ export const AchievementSystemView: React.FC<AchievementSystemViewProps> = ({ lo
   const isAr = locale === "ar";
   const isHe = locale === "he";
 
-  const [gameStats, setGameStats] = useState(getGamificationStats());
+  const [gameStats] = useState(getGamificationStats());
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
 
   const levelInfo = calculateLevel(gameStats.xp);
@@ -49,7 +49,7 @@ export const AchievementSystemView: React.FC<AchievementSystemViewProps> = ({ lo
           </div>
 
           <div className="px-3.5 py-1.5 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 font-extrabold text-xs">
-            {gameStats.badges.length} / {ALL_BADGES.length} {isAr ? "مفتوح" : isHe ? "פתוחים" : "Unlocked"}
+            {gameStats.unlockedAchievements.length} / {ALL_BADGES.length} {isAr ? "مفتوح" : isHe ? "פתוחים" : "Unlocked"}
           </div>
         </div>
       </div>
@@ -80,7 +80,7 @@ export const AchievementSystemView: React.FC<AchievementSystemViewProps> = ({ lo
       {/* BADGES GRID */}
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
         {filteredBadges.map((b) => {
-          const isUnlocked = gameStats.badges.includes(b.id);
+          const isUnlocked = gameStats.unlockedAchievements.includes(b.id);
           const name = isAr ? b.nameAr : isHe ? b.nameHe : b.nameEn;
           const desc = isAr ? b.descAr : isHe ? b.descHe : b.descEn;
 

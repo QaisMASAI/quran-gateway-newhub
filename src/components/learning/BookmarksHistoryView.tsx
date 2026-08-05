@@ -5,9 +5,6 @@ import {
   Sparkles,
   CheckCircle2,
   XCircle,
-  Award,
-  Compass,
-  Brain,
 } from "lucide-react";
 import type { UserStats } from "@/lib/gamification";
 import { getLearningRecommendations } from "@/lib/gamification";

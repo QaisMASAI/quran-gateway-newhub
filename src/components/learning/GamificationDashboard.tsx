@@ -464,7 +464,7 @@ export const GamificationDashboard: React.FC<GamificationDashboardProps> = ({ lo
             </p>
           </div>
 
-          <SpacedRepetitionView stats={stats} locale={locale} />
+          <SpacedRepetitionView stats={stats} locale={locale} onStartRevision={() => {}} />
         </div>
       )}
 

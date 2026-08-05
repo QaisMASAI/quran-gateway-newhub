@@ -117,7 +117,7 @@ export function DailyAssistantWidget({ locale = "en" }: { locale?: "he" | "ar" |
           <div className="flex items-center gap-1.5 rounded-2xl border border-emerald-500/30 bg-emerald-500/10 px-3.5 py-1.5 text-xs font-bold text-emerald-600 dark:text-emerald-400">
             <Award className="h-4 w-4 text-emerald-500" />
             <span>
-              {stats.xp} XP • {levelInfo.titleEn}
+              {stats.xp} XP • {locale === "ar" ? levelInfo.titleAr : locale === "he" ? levelInfo.titleHe : levelInfo.title}
             </span>
           </div>
         </div>

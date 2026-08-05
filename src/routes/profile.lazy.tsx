@@ -203,7 +203,7 @@ function ProfilePage() {
                           ? lvl.titleAr
                           : locale === "he"
                             ? lvl.titleHe
-                            : lvl.titleEn}
+                              : lvl.title}
                       </h2>
                     </div>
                     <p className="text-xs text-muted-foreground">
@@ -242,7 +242,7 @@ function ProfilePage() {
                 </h3>
                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-2.5">
                   {ALL_BADGES.map((b) => {
-                    const isUnlocked = gameStats.badges.includes(b.id);
+                    const isUnlocked = gameStats.unlockedAchievements.includes(b.id);
                     return (
                       <div
                         key={b.id}
