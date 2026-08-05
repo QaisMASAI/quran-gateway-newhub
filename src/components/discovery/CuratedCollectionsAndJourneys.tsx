@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import { Link } from "@tanstack/react-router";
 import topicsWebp from "@/assets/discovery-topics.webp";
 import surahsWebp from "@/assets/discovery-surahs.webp";
-import hadithWebp from "@/assets/discovery-hadith.webp";
 import {
   TrendingUp,
   Shuffle,
@@ -280,7 +279,7 @@ export const CuratedCollectionsAndJourneys: React.FC<CuratedCollectionsAndJourne
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {collections.map((col, idx) => {
-            const imgAsset = idx === 0 ? topicsWebp : idx === 1 ? surahsWebp : hadithWebp;
+            const imgAsset = idx % 2 === 0 ? topicsWebp : surahsWebp;
             const imgAlt = isAr
               ? idx === 0
                 ? "خريطة المفاهيم القرآنية العقدية والأخلاقية بطباعة شبكية حديثة"
