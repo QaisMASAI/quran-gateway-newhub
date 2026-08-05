@@ -62,8 +62,8 @@ export const InteractiveQuestionCard: React.FC<InteractiveQuestionCardProps> = (
   }, [question]);
 
   const handleBookmarkToggle = () => {
-    const res = toggleBookmark(question);
-    setIsBookmarked(res.bookmarked);
+    const updatedStats = toggleBookmark(question.id);
+    setIsBookmarked(updatedStats.bookmarks.some((bookmark) => bookmark.questionId === question.id));
   };
 
   const options =

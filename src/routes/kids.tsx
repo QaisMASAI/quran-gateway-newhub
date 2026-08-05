@@ -151,18 +151,7 @@ function IslamicLearningPlatformPage() {
 
   const handleAnswerSubmit = (isCorrect: boolean, xpEarned: number) => {
     if (!activeQuestion) return;
-    const updated = updateAdaptiveDifficulty(
-      activeQuestion.category,
-      isCorrect,
-      xpEarned,
-      activeQuestion.id,
-      platformLocale === "ar"
-        ? activeQuestion.titleAr
-        : platformLocale === "he"
-          ? activeQuestion.titleHe
-          : activeQuestion.titleEn,
-      activeQuestion.mode,
-    );
+    const updated = updateAdaptiveDifficulty(stats, isCorrect);
     setStats(updated);
   };
 
@@ -192,7 +181,7 @@ function IslamicLearningPlatformPage() {
                     : "Noor Islamic Learning Platform"}
               </h1>
               <span className="text-xs text-emerald-600 dark:text-emerald-400 font-bold dir-auto">
-                {levelInfo.titleEn} • Level {levelInfo.level}
+                {platformLocale === "ar" ? levelInfo.titleAr : platformLocale === "he" ? levelInfo.titleHe : levelInfo.title} • Level {levelInfo.level}
               </span>
             </div>
           </div>
