@@ -3,7 +3,7 @@
     "name": "Bayan AI",
     "tagline": "Islamic Knowledge & Research Platform",
     "longTagline": "Clarity in Sacred Knowledge • Interconnected Research",
-    "description": "Bayan AI is the primary global Islamic knowledge platform unifying Quran, Sahih Hadith, authentic Tafsir, and interconnected research."
+    "description": "Bayan AI is the primary global Islamic knowledge platform unifying Quran, authentic Tafsir, and interconnected research."
   },
   "nav": {
     "surahs": "Surahs",
@@ -19,7 +19,6 @@
     "learn": "Learn",
     "research": "Research",
     "collections": "Collections",
-    "hadith": "Hadith",
     "tafsir": "Tafsir",
     "account": "Account",
     "signIn": "Sign in",
@@ -117,7 +116,7 @@
       "markUnread": "Mark as unread"
     },
     "auth": {
-      "metaTitle": "Sign in | Noor Quran & Hadith",
+      "metaTitle": "Sign in | Noor Quran & Tafsir",
       "metaDescription": "Sign in or create an account to save verses, personal notes, and track your reading progress.",
       "welcomeBack": "Welcome back",
       "createAccount": "Create account",
@@ -137,29 +136,6 @@
       "alreadyRegistered": "This email is already registered.",
       "emailNotConfirmed": "Please confirm your email address.",
       "weakPassword": "Password must be at least 6 characters."
-    },
-    "hadith": {
-      "backToHub": "Back to Hadith Hub",
-      "booksIndex": "Books Index",
-      "filterBooksPlaceholder": "Filter books by title…",
-      "sahihAuthentic": "Sahih (Authentic)",
-      "sahihIsnad": "Sahih Isnad",
-      "hadithHub": "Hadith Hub",
-      "prev": "Prev",
-      "next": "Next",
-      "hebrewTranslation": "Hebrew Translation",
-      "hebrewLanguage": "Hebrew",
-      "hebrewDefaultText": "Authentic Hadith narration from Prophetic tradition translated into Hebrew.",
-      "isnadText": "Isnad & Text",
-      "aiAnalysis": "AI Scholarly Engine",
-      "crossRef": "Cross-References",
-      "knowledgeGraph": "Knowledge Graph",
-      "similarHadiths": "Similar & Parallel Hadiths",
-      "directVerses": "Directly Cross-Referenced Quran Verses",
-      "relatedTafsir": "Related Tafsir Passages",
-      "linkedTopics": "Linked Topics & Prophets",
-      "prophet": "Prophet",
-      "topic": "Topic"
     },
     "prayerTimes": {
       "fajr": "Fajr",
