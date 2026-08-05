@@ -41,12 +41,16 @@
 
   --font-hebrew: "Heebo", "Arial Hebrew", system-ui, sans-serif;
   --font-ui-he: "Heebo", "Arial Hebrew", system-ui, sans-serif;
-  --font-ui-en: "Plus Jakarta Sans", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-ui-en:
+    "Plus Jakarta Sans", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    sans-serif;
   --font-ui-ar: "Cairo", "IBM Plex Sans Arabic", "Noto Sans Arabic", system-ui, sans-serif;
   --font-reading-en: "Plus Jakarta Sans", Georgia, "Times New Roman", serif;
   --font-reading-he: "Heebo", "Arial Hebrew", sans-serif;
   --font-reading-ar: "Amiri", "Scheherazade New", "Noto Naskh Arabic", serif;
-  --font-quran: "KFGQPC Uthmanic Script HAFS", "UthmanicHafs", "KFGQPC Hafs", "Amiri Quran", "Scheherazade New", serif;
+  --font-quran:
+    "KFGQPC Uthmanic Script HAFS", "UthmanicHafs", "KFGQPC Hafs", "Amiri Quran", "Scheherazade New",
+    serif;
   --font-tafsir-hadith-ar: var(--font-reading-ar);
   --font-tafsir-hadith-he: var(--font-reading-he);
   --font-tafsir-hadith-en: var(--font-reading-en);
@@ -58,7 +62,11 @@
     oklch(0.42 0.09 162) 60%,
     oklch(0.48 0.09 165) 100%
   );
-  --gradient-hero-soft: linear-gradient(160deg, oklch(0.97 0.025 110) 0%, oklch(0.95 0.04 150) 100%);
+  --gradient-hero-soft: linear-gradient(
+    160deg,
+    oklch(0.97 0.025 110) 0%,
+    oklch(0.95 0.04 150) 100%
+  );
   --gradient-primary: linear-gradient(135deg, oklch(0.32 0.07 160), oklch(0.48 0.09 165));
   --gradient-olive: linear-gradient(135deg, oklch(0.48 0.09 165), oklch(0.55 0.08 160));
   --gradient-gold: linear-gradient(135deg, oklch(0.78 0.13 80), oklch(0.7 0.14 60));
@@ -161,9 +169,15 @@
     border-color: var(--color-border);
   }
 
-  /* Default: let the HTML dir attribute control layout. Use :dir selectors for direction-specific tweaks. */
-  html {
+  /* Direction settings: dynamically driven by HTML & Body dir attributes */
+  html[dir="rtl"] {
+    direction: rtl;
+    text-align: right;
+  }
+
+  html[dir="ltr"] {
     direction: ltr;
+    text-align: left;
   }
 
   body {
@@ -175,11 +189,42 @@
     position: relative;
   }
 
+  html[dir="rtl"] body {
+    direction: rtl;
+    text-align: right;
+  }
+
   html[lang="he"] body {
     font-family: var(--font-ui-he);
   }
   html[lang="ar"] body {
     font-family: var(--font-ui-ar);
+  }
+
+  /* Right-to-Left (RTL) Layout Mirroring Rules */
+  [dir="rtl"] .ml-auto {
+    margin-left: 0;
+    margin-right: auto;
+  }
+  [dir="rtl"] .mr-auto {
+    margin-right: 0;
+    margin-left: auto;
+  }
+  [dir="rtl"] .pl-2 {
+    padding-left: 0;
+    padding-right: 0.5rem;
+  }
+  [dir="rtl"] .pr-2 {
+    padding-right: 0;
+    padding-left: 0.5rem;
+  }
+  [dir="rtl"] .pl-4 {
+    padding-left: 0;
+    padding-right: 1rem;
+  }
+  [dir="rtl"] .pr-4 {
+    padding-right: 0;
+    padding-left: 1rem;
   }
 
   /* Islamic Khatam watermark — 8-pointed star (two overlapping squares)
@@ -409,7 +454,8 @@
   font-family: "Scheherazade New";
   src:
     local("Scheherazade New"),
-    url("https://fonts.gstatic.com/s/scheherazadenew/v13/6xK4sS1n23c4aInXv9g6pQW7_K2j0X8.woff2") format("woff2");
+    url("https://fonts.gstatic.com/s/scheherazadenew/v13/6xK4sS1n23c4aInXv9g6pQW7_K2j0X8.woff2")
+      format("woff2");
   font-weight: 400;
   font-style: normal;
   font-display: swap;
