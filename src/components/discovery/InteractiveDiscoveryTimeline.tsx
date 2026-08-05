@@ -27,7 +27,9 @@ interface InteractiveDiscoveryTimelineProps {
   locale: LocaleCode;
 }
 
-export const InteractiveDiscoveryTimeline: React.FC<InteractiveDiscoveryTimelineProps> = ({ locale }) => {
+export const InteractiveDiscoveryTimeline: React.FC<InteractiveDiscoveryTimelineProps> = ({
+  locale,
+}) => {
   const isAr = locale === "ar";
   const isHe = locale === "he";
 
@@ -43,8 +45,10 @@ export const InteractiveDiscoveryTimeline: React.FC<InteractiveDiscoveryTimeline
       titleEn: "First Divine Revelation in Cave Hira",
       titleAr: "بداية نزول الوحي في غار حراء (اقرأ باسم ربك)",
       titleHe: "התגלות ראשונה במערת חיראא",
-      descEn: "Archangel Gabriel (Jibril) delivered the first five verses of Surah Al-Alaq, initiating the final Prophetic call.",
-      descAr: "نزل جبريل عليه السلام بآيات سورة العلق الأولى على النبي ﷺ لتنطلق رسالة الإسلام والتنزيل العزيز.",
+      descEn:
+        "Archangel Gabriel (Jibril) delivered the first five verses of Surah Al-Alaq, initiating the final Prophetic call.",
+      descAr:
+        "نزل جبريل عليه السلام بآيات سورة العلق الأولى على النبي ﷺ لتنطلق رسالة الإسلام والتنزيل العزيز.",
       descHe: "המלאך גבריאל מסר את חמשת הפסוקים הראשונים של סורת אל-עלק, ותחילת שליחות הנבואה.",
       surahLink: "/surah/96#v-1",
       impactEn: "Foundation of Monotheism & Knowledge",
@@ -59,8 +63,10 @@ export const InteractiveDiscoveryTimeline: React.FC<InteractiveDiscoveryTimeline
       titleEn: "The Night Journey & Ascension (Isra and Mi'raj)",
       titleAr: "رحلة الإسراء والمعراج وفرض الصلوات الخمس",
       titleHe: "מסע הלילה והעלייה לשמיים (אל-איסראא ואל-מעראג')",
-      descEn: "Miraculous journey from Makkah to Al-Aqsa Mosque in Jerusalem, followed by ascension to the heavens and ordination of 5 daily prayers.",
-      descAr: "الإسراء بالنبي ﷺ من المسجد الحرام إلى المسجد الأقصى والعروج إلى السماوات العلى وفرض الصلاة الإلهية.",
+      descEn:
+        "Miraculous journey from Makkah to Al-Aqsa Mosque in Jerusalem, followed by ascension to the heavens and ordination of 5 daily prayers.",
+      descAr:
+        "الإسراء بالنبي ﷺ من المسجد الحرام إلى المسجد الأقصى والعروج إلى السماوات العلى وفرض الصلاة الإلهية.",
       descHe: "מסע פלאי ממאכה למסגד אל-אקצא בירושלים, עלייה לשמיים ופסיקת חמש התפילות היומיות.",
       surahLink: "/surah/17#v-1",
       impactEn: "Sanctity of Jerusalem & Pillar of Prayer",
@@ -75,8 +81,10 @@ export const InteractiveDiscoveryTimeline: React.FC<InteractiveDiscoveryTimeline
       titleEn: "The Prophetic Hijrah & Constitution of Madinah",
       titleAr: "الهجرة النبوية المباركة وميثاق صحيفة المدينة",
       titleHe: "ההגירה (היג'רה) ומيثاق מדינה",
-      descEn: "Migration to Yathrib (Madinah), building the Prophet's Mosque, establishing brotherhood (Mu'akhah), and signing the Constitution.",
-      descAr: "تأسيس المجتمع الإسلامي الأول بالمدينة، المؤاخاة بين المهاجرين والأنصار، ووضع أول وثيقة حقوقية تاريخية.",
+      descEn:
+        "Migration to Yathrib (Madinah), building the Prophet's Mosque, establishing brotherhood (Mu'akhah), and signing the Constitution.",
+      descAr:
+        "تأسيس المجتمع الإسلامي الأول بالمدينة، المؤاخاة بين المهاجرين والأنصار، ووضع أول وثيقة حقوقية تاريخية.",
       descHe: "הקמת הקהילה הראשונה במדינה, אחוות המהגרים והתושבים וחתימת החוקה.",
       surahLink: "/surah/9#v-40",
       impactEn: "Pluralistic Statehood & Social Solidarity",
@@ -91,7 +99,8 @@ export const InteractiveDiscoveryTimeline: React.FC<InteractiveDiscoveryTimeline
       titleEn: "Treaty of Hudaybiyyah & Manifest Victory",
       titleAr: "صلح الحديبية والفتح المبين",
       titleHe: "הסכם חודייביה והניצחון הגלוי",
-      descEn: "Diplomatic peace treaty that allowed peaceful propagation of Islam across Arabia and foreign empires.",
+      descEn:
+        "Diplomatic peace treaty that allowed peaceful propagation of Islam across Arabia and foreign empires.",
       descAr: "معاهدة السلام التاريخية التي فتحت آفاق انتشار الإسلام بالشرق والغرب وحقنت الدماء.",
       descHe: "הסכם שלום דיפלומטי שאפשר את הפיזור השקט של האמונה.",
       surahLink: "/surah/48#v-1",
@@ -106,9 +115,11 @@ export const InteractiveDiscoveryTimeline: React.FC<InteractiveDiscoveryTimeline
       yearCE: "632-634 CE",
       titleEn: "Compilation of the Holy Quran under Abu Bakr (RA)",
       titleAr: "جمع القرآن الكريم في المصحف الإمام الأول",
-      titleHe: "איסוף הקוראן בימי אבו בכר (רע\"א)",
-      descEn: "Under Caliph Abu Bakr and Zayd ibn Thabit, scattered manuscripts were meticulously compiled into a single master volume.",
-      descAr: "جمع الآيات والصحف الشريفة في مصحف موحد بحفظ الصحابة المتقنين وإشراف زيد بن ثابت رضي الله عنه.",
+      titleHe: 'איסוף הקוראן בימי אבו בכר (רע"א)',
+      descEn:
+        "Under Caliph Abu Bakr and Zayd ibn Thabit, scattered manuscripts were meticulously compiled into a single master volume.",
+      descAr:
+        "جمع الآيات والصحف الشريفة في مصحف موحد بحفظ الصحابة المتقنين وإشراف زيد بن ثابت رضي الله عنه.",
       descHe: "איסוף הכתבים לכרך אחד מאוחד תחת הדרכת אבו בכר וזייד בן ת'אבת.",
       impactEn: "Preservation of Textual Integrity",
       impactAr: "حفظ نص القرآن الشريف بحرفيته",
@@ -138,7 +149,11 @@ export const InteractiveDiscoveryTimeline: React.FC<InteractiveDiscoveryTimeline
           </span>
           <div>
             <h3 className="text-2xl font-extrabold text-white dir-auto">
-              {isAr ? "التسلسل الزمني التاريخي والمحطات" : isHe ? "ציר זמן היסטורי אינטראקטיבי" : "Interactive Historical Timeline"}
+              {isAr
+                ? "التسلسل الزمني التاريخي والمحطات"
+                : isHe
+                  ? "ציר זמן היסטורי אינטראקטיבי"
+                  : "Interactive Historical Timeline"}
             </h3>
             <p className="text-xs text-zinc-400 dir-auto">
               {isAr
@@ -158,7 +173,9 @@ export const InteractiveDiscoveryTimeline: React.FC<InteractiveDiscoveryTimeline
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder={isAr ? "تصفية بالأحداث..." : isHe ? "סינון אירועים..." : "Filter events..."}
+              placeholder={
+                isAr ? "تصفية بالأحداث..." : isHe ? "סינון אירועים..." : "Filter events..."
+              }
               className="pl-8 pr-3 py-1.5 bg-zinc-900 border border-zinc-700 text-xs text-zinc-100 rounded-xl focus:border-purple-500 focus:outline-none"
             />
           </div>
@@ -200,12 +217,13 @@ export const InteractiveDiscoveryTimeline: React.FC<InteractiveDiscoveryTimeline
             <div className="p-6 rounded-3xl bg-zinc-900 border border-zinc-800 hover:border-purple-500/50 shadow-xl transition-all space-y-3">
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <div className="flex items-center gap-2">
-                  <Badge variant="outline" className="border-purple-500/30 text-purple-400 bg-purple-500/10 font-bold text-xs">
+                  <Badge
+                    variant="outline"
+                    className="border-purple-500/30 text-purple-400 bg-purple-500/10 font-bold text-xs"
+                  >
                     {evt.yearAH} ({evt.yearCE})
                   </Badge>
-                  <span className="text-[10px] text-zinc-400 font-mono uppercase">
-                    {evt.era}
-                  </span>
+                  <span className="text-[10px] text-zinc-400 font-mono uppercase">{evt.era}</span>
                 </div>
 
                 <Badge className="bg-emerald-500/10 text-emerald-400 border-emerald-500/20 text-[10px]">
@@ -224,11 +242,17 @@ export const InteractiveDiscoveryTimeline: React.FC<InteractiveDiscoveryTimeline
               {evt.surahLink && (
                 <div className="pt-2 border-t border-zinc-800 flex items-center justify-between">
                   <Link
-                    to={evt.surahLink as any}
+                    to={evt.surahLink as never}
                     className="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-400 hover:text-emerald-300"
                   >
                     <BookOpen className="w-3.5 h-3.5" />
-                    <span>{isAr ? "اقرأ النص القرآني المرتبط" : isHe ? "קרא את המקור בקוראן" : "Read Connected Quranic Passage"}</span>
+                    <span>
+                      {isAr
+                        ? "اقرأ النص القرآني المرتبط"
+                        : isHe
+                          ? "קרא את המקור בקוראן"
+                          : "Read Connected Quranic Passage"}
+                    </span>
                     <ChevronRight className="w-4 h-4" />
                   </Link>
                 </div>
