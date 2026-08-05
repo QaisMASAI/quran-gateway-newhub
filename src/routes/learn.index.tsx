@@ -25,6 +25,7 @@ import {
 } from "lucide-react";
 import { listAllEntities, pickLocale, type KnowledgeEntity } from "@/lib/knowledge";
 import { PremiumDiscoveryHub } from "@/components/discovery/PremiumDiscoveryHub";
+import { GamificationDashboard } from "@/components/learning/GamificationDashboard";
 
 export const Route = createFileRoute("/learn/")({
   head: () => {
@@ -372,13 +373,13 @@ export function LearnIndexPage() {
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-                aria-label={
-                  locale === "ar"
-                    ? "بحث في المعرفة القرآنية"
-                    : locale === "he"
-                      ? "חיפוש בידע הקוראני"
-                      : "Search Quran knowledge"
-                }
+              aria-label={
+                locale === "ar"
+                  ? "بحث في المعرفة القرآنية"
+                  : locale === "he"
+                    ? "חיפוש בידע הקוראני"
+                    : "Search Quran knowledge"
+              }
               placeholder={
                 locale === "ar"
                   ? "بحث شامل في المعرفة القرآنية (التوحيد، موسى، بدر...)"
@@ -402,6 +403,11 @@ export function LearnIndexPage() {
       </div>
 
       <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 space-y-12">
+        {/* GAMIFICATION & LEARNING HUB */}
+        <section>
+          <GamificationDashboard locale={locale} />
+        </section>
+
         {/* PREMIUM DISCOVERY HUB */}
         <PremiumDiscoveryHub locale={locale} />
         {/* Search Results Drawer if user is typing */}
