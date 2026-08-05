@@ -1099,16 +1099,24 @@ export const ALL_BADGES = ALL_300_ACHIEVEMENTS.map((a) => ({
 
 export function toggleBookmark(questionId: string): UserStats {
   const stats = getGamificationStats();
-  if (stats.bookmarks.includes(questionId)) {
-    stats.bookmarks = stats.bookmarks.filter((id) => id !== questionId);
+  const existingIndex = stats.bookmarks.findIndex((bookmark) => bookmark.questionId === questionId);
+
+  if (existingIndex >= 0) {
+    stats.bookmarks = stats.bookmarks.filter((bookmark) => bookmark.questionId !== questionId);
   } else {
-    stats.bookmarks.push(questionId);
+    const question = QUESTION_DATABASE.find((item) => item.id === questionId);
+    stats.bookmarks.push({
+      id: `bookmark_${questionId}_${Date.now()}`,
+      questionId,
+      title: question?.titleEn ?? questionId,
+      citation: question?.citation ?? "",
+      savedAt: new Date().toISOString(),
+    });
   }
   saveStats(stats);
   return stats;
 }
 
 export function getLearningRecommendations(stats: UserStats) {
-  const rec = getAiMentorRecommendations(stats);
-  return [rec.recommendedTopic];
+  return getAiMentorRecommendations(stats);
 }
