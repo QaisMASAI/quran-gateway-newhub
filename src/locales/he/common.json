@@ -3,7 +3,7 @@
     "name": "ביאן (Bayan AI)",
     "tagline": "מנוע המחקר והידע האסלאמי",
     "longTagline": "בהירות בידע האסלאמי • מחקר מקושר",
-    "description": "ביאן (Bayan AI) היא פלטפורמה לדעת ולמחקר אסלאמי המאחדת קוראן, חדית' סחיח, תפסיר מאומת ומפה מדעית מקושרת."
+    "description": "ביאן (Bayan AI) היא פלטפורמה לדעת ולמחקר אסלאמי המאחדת קוראן, תפסיר מאומת ומפה מדעית מקושרת."
   },
   "nav": {
     "surahs": "סורות",
@@ -19,7 +19,6 @@
     "learn": "ללמוד",
     "research": "מחקר",
     "collections": "אוספים",
-    "hadith": "חדית'",
     "tafsir": "תפסיר",
     "account": "חשבון",
     "signIn": "התחברות",
@@ -86,20 +85,20 @@
       "formats": {
         "square": "מרובע · אינסטגרם / כללי",
         "story": "סטורי · 9:16",
-        "landscape": "אופקי · פייסבוק / X",
-        "portrait": "פורטרט · אינסטגרם 4:5"
+        "landscape": "אופקי",
+        "portrait": "אנכי · אינסטגרם 4:5"
       }
     },
     "note": {
-      "placeholder": "כתבי כאן את ההערה האישית שלך לפסוק...",
+      "placeholder": "כתוב את ההערה האישית שלך לפסוק זה…",
       "lastUpdated": "עודכן: {{when}}",
-      "notSaved": "לא נשמר עדיין"
+      "notSaved": "טרם נשמר"
     },
     "reading": {
       "settings": "הגדרות קריאה",
       "close": "סגור",
-      "arabicSize": "גודל גופן ערבי",
-      "stripTashkil": "הסתר ניקוד ערבי"
+      "arabicSize": "גודל גופן בערבית",
+      "stripTashkil": "הסתר ניקוד"
     },
     "theme": {
       "light": "מצב יום",
@@ -107,17 +106,17 @@
     },
     "surah": {
       "makkah": "מכה",
-      "madinah": "מדינה",
-      "stopReciter": "עצור תלאוה",
-      "playReciter": "האזן — יאסר א-דוסרי"
+      "madinah": "אל-מדינה",
+      "stopReciter": "עצור הקראה",
+      "playReciter": "האזן — יאסר אל-דוסרי"
     },
     "plans": {
-      "confirmReset": "לאפס את ההתקדמות?",
+      "confirmReset": "לאפס התקדמות?",
       "markRead": "סמן כנקרא",
       "markUnread": "סמן כלא נקרא"
     },
     "auth": {
-      "metaTitle": "התחברות | נור קוראן וחדית'",
+      "metaTitle": "התחברות | נור קוראן ותפסיר",
       "metaDescription": "התחברי או הירשמי כדי לשמור פסוקים, הערות אישיות ולעקוב אחרי התקדמות הקריאה.",
       "welcomeBack": "ברוכים השבים",
       "createAccount": "יצירת חשבון",
@@ -137,29 +136,6 @@
       "alreadyRegistered": "כתובת הדוא״ל כבר רשומה.",
       "emailNotConfirmed": "יש לאשר את כתובת הדוא״ל שלך.",
       "weakPassword": "סיסמה חייבת לכלול לפחות 6 תווים."
-    },
-    "hadith": {
-      "backToHub": "חזרה לספרייה",
-      "booksIndex": "אינדקס ספרים",
-      "filterBooksPlaceholder": "חיפוש לפי שם ספר…",
-      "sahihAuthentic": "צחיח (מוסמך)",
-      "sahihIsnad": "צחיח (מוסמך)",
-      "hadithHub": "אינדקס חדית'",
-      "prev": "הקודם",
-      "next": "הבא",
-      "hebrewTranslation": "תרגום לעברית (Hebrew)",
-      "hebrewLanguage": "עברית",
-      "hebrewDefaultText": "חדית' מוסמך מתוך מסורת נביא אסלאם. תוכן הוראות המוסר וההלכה מפורט בשפה העברית.",
-      "isnadText": "חדית' ומסורת",
-      "aiAnalysis": "ניתוח חכם AI",
-      "crossRef": "הצלבה עם הקוראן",
-      "knowledgeGraph": "רשת ידע",
-      "similarHadiths": "חדית'ים מקבילים ודומים",
-      "directVerses": "פסוקי קוראן מקושרים ישירות",
-      "relatedTafsir": "קטעי תפסיר מלווים",
-      "linkedTopics": "נושאים ונביאים מקושרים",
-      "prophet": "נביא",
-      "topic": "נושא"
     },
     "prayerTimes": {
       "fajr": "פג'ר",
