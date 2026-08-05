@@ -11,7 +11,7 @@ export interface ShareCardProps {
   arabicText?: string;
   translationText?: string;
   reference?: string;
-  type?: "verse" | "hadith" | "dua" | "topic";
+  type?: "verse" | "dua" | "topic";
 }
 
 type CardTheme = "emerald" | "parchment" | "midnight" | "ivory";
@@ -166,8 +166,12 @@ export function ShareCardModal({
             className={`relative p-6 sm:p-8 rounded-3xl border ${currentTheme.border} ${currentTheme.bg} shadow-2xl space-y-5 text-center overflow-hidden transition-all duration-300`}
           >
             {/* Geometric Accent Corners */}
-            <div className={`absolute top-3 left-3 w-4 h-4 border-t-2 border-l-2 ${currentTheme.border} opacity-60`} />
-            <div className={`absolute top-3 right-3 w-4 h-4 border-t-2 border-r-2 ${currentTheme.border} opacity-60`} />
+            <div
+              className={`absolute top-3 left-3 w-4 h-4 border-t-2 border-l-2 ${currentTheme.border} opacity-60`}
+            />
+            <div
+              className={`absolute top-3 right-3 w-4 h-4 border-t-2 border-r-2 ${currentTheme.border} opacity-60`}
+            />
             <div
               className={`absolute bottom-3 left-3 w-4 h-4 border-b-2 border-l-2 ${currentTheme.border} opacity-60`}
             />
@@ -186,7 +190,10 @@ export function ShareCardModal({
 
             {/* Arabic Text */}
             {showArabic && arabicText && (
-              <p className={`text-xl sm:text-2xl leading-loose font-arabic ${currentTheme.arabic}`} dir="rtl">
+              <p
+                className={`text-xl sm:text-2xl leading-loose font-arabic ${currentTheme.arabic}`}
+                dir="rtl"
+              >
                 {arabicText}
               </p>
             )}
