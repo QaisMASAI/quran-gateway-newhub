@@ -1,6 +1,11 @@
 import React, { useState } from "react";
 import { Bell, Clock, Calendar, Check, Volume2, Sparkles } from "lucide-react";
-import { getHabitData, toggleReminder, type ReadingReminder, type HabitUserData } from "@/lib/habit-engine";
+import {
+  getHabitData,
+  toggleReminder,
+  type ReadingReminder,
+  type HabitUserData,
+} from "@/lib/habit-engine";
 import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 
@@ -25,27 +30,43 @@ export const ReadingRemindersCard: React.FC<ReadingRemindersCardProps> = ({ loca
       if (Notification.permission === "granted") {
         new Notification("Noor Al Quran | 📖 Reading Reminder", {
           body: "It's time for your daily Quranic reflection and study session.",
-          icon: "/pwa-192x192.png",
+          icon: "/favicon.ico",
         });
         setNotificationStatus(
-          isAr ? "تم إرسال تذكير تجريبي 🎉" : isHe ? "נשלחה תזכורת בדיקה 🎉" : "Test reminder sent! 🎉",
+          isAr
+            ? "تم إرسال تذكير تجريبي 🎉"
+            : isHe
+              ? "נשלחה תזכורת בדיקה 🎉"
+              : "Test reminder sent! 🎉",
         );
       } else {
         Notification.requestPermission().then((perm) => {
           if (perm === "granted") {
             setNotificationStatus(
-              isAr ? "تم تفعيل الإشعارات بنجاح" : isHe ? "התראות הופעלו בהצלחה" : "Notifications enabled!",
+              isAr
+                ? "تم تفعيل الإشعارات بنجاح"
+                : isHe
+                  ? "התראות הופעלו בהצלחה"
+                  : "Notifications enabled!",
             );
           } else {
             setNotificationStatus(
-              isAr ? "تذكير: الإشعارات محظورة في متصفحك" : isHe ? "התראות חסומות בדפדפן" : "Notifications blocked in browser settings.",
+              isAr
+                ? "تذكير: الإشعارات محظورة في متصفحك"
+                : isHe
+                  ? "התראות חסומות בדפדפן"
+                  : "Notifications blocked in browser settings.",
             );
           }
         });
       }
     } else {
       setNotificationStatus(
-        isAr ? "التذكيرات النشطة تعمل داخل المنصة" : isHe ? "תזכורות פועלות בתוך הפלטפורמה" : "In-app reminders active",
+        isAr
+          ? "التذكيرات النشطة تعمل داخل المنصة"
+          : isHe
+            ? "תזכורות פועלות בתוך הפלטפורמה"
+            : "In-app reminders active",
       );
     }
   };
@@ -59,7 +80,11 @@ export const ReadingRemindersCard: React.FC<ReadingRemindersCardProps> = ({ loca
           </div>
           <div>
             <h3 className="text-base font-extrabold text-white">
-              {isAr ? "منبه المدارسة والتلاوة" : isHe ? "תזכורות קריאה ולימוד" : "Study & Reading Reminders"}
+              {isAr
+                ? "منبه المدارسة والتلاوة"
+                : isHe
+                  ? "תזכורות קריאה ולימוד"
+                  : "Study & Reading Reminders"}
             </h3>
             <p className="text-xs text-zinc-400">
               {isAr
