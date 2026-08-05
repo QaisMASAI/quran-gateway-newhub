@@ -29,7 +29,9 @@ interface CuratedCollectionsAndJourneysProps {
   locale: LocaleCode;
 }
 
-export const CuratedCollectionsAndJourneys: React.FC<CuratedCollectionsAndJourneysProps> = ({ locale }) => {
+export const CuratedCollectionsAndJourneys: React.FC<CuratedCollectionsAndJourneysProps> = ({
+  locale,
+}) => {
   const isAr = locale === "ar";
   const isHe = locale === "he";
 
@@ -56,27 +58,59 @@ export const CuratedCollectionsAndJourneys: React.FC<CuratedCollectionsAndJourne
   const handleRollRandom = () => {
     const surprises = [
       {
-        title: isAr ? "سورة الكهف (آية 10)" : isHe ? "סורת אל-כהף (פסוק 10)" : "Surah Al-Kahf (Verse 10)",
+        title: isAr
+          ? "سورة الكهف (آية 10)"
+          : isHe
+            ? "סורת אל-כהף (פסוק 10)"
+            : "Surah Al-Kahf (Verse 10)",
         type: isAr ? "دعاء قرآني" : isHe ? "תפילה בקוראן" : "Quranic Supplication",
-        desc: isAr ? "(رَبَّنَا آتِنَا مِن لَّدُنكَ رَحْمَةً وَهَيِّئْ لَنَا مِنْ أَمْرِنَا رَشَدًا)" : isHe ? "\"אדוננו, הענק לנו רחמים מאתך והכן לנו מישרין\"" : "'Our Lord, grant us from Yourself mercy and prepare for us from our affair right guidance.'",
+        desc: isAr
+          ? "(رَبَّنَا آتِنَا مِن لَّدُنكَ رَحْمَةً وَهَيِّئْ لَنَا مِنْ أَمْرِنَا رَشَدًا)"
+          : isHe
+            ? '"אדוננו, הענק לנו רחמים מאתך והכן לנו מישרין"'
+            : "'Our Lord, grant us from Yourself mercy and prepare for us from our affair right guidance.'",
         link: "/surah/18#v-10",
       },
       {
-        title: isAr ? "قصة ذي القرنين ورحلته الشرقية والغربية" : isHe ? "סיפור דול-קרניין והמסע" : "Story of Dhul-Qarnayn & the Two Barriers",
+        title: isAr
+          ? "قصة ذي القرنين ورحلته الشرقية والغربية"
+          : isHe
+            ? "סיפור דול-קרניין והמסע"
+            : "Story of Dhul-Qarnayn & the Two Barriers",
         type: isAr ? "قصة قرآنية" : isHe ? "סיפור קוראני" : "Quranic Narrative",
-        desc: isAr ? "سفر الحاكم العادل مجهزاً بأسباب التمكين والإيمان لبناء السد الحصين." : isHe ? "מסע המנהיג הכל יכול לבניית הסכר המגן מפני עריצות." : "The journey of the righteous king empowered with wisdom and engineering faith.",
+        desc: isAr
+          ? "سفر الحاكم العادل مجهزاً بأسباب التمكين والإيمان لبناء السد الحصين."
+          : isHe
+            ? "מסע המנהיג הכל יכול לבניית הסכר המגן מפני עריצות."
+            : "The journey of the righteous king empowered with wisdom and engineering faith.",
         link: "/stories/dhul-qarnayn",
       },
       {
-        title: isAr ? "رياض الصالحين - باب الصدق" : isHe ? "ריאד א-צאליחין - אמת" : "Riyad as-Salihin - Chapter on Truthfulness",
+        title: isAr
+          ? "رياض الصالحين - باب الصدق"
+          : isHe
+            ? "ריאד א-צאליחין - אמת"
+            : "Riyad as-Salihin - Chapter on Truthfulness",
         type: isAr ? "حديث نبوي" : isHe ? "חדיت' מוסמך" : "Hadith Collection",
-        desc: isAr ? "(عليكم بالصدق فإن الصدق يهدي إلى البر وإن البر يهدي إلى الجنة)" : isHe ? "\"הקפידו על האמת כי האמת מוליכה אל הנדיבות וגן עדן\"" : "'Adhere to truthfulness, for truthfulness leads to righteousness.'",
+        desc: isAr
+          ? "(عليكم بالصدق فإن الصدق يهدي إلى البر وإن البر يهدي إلى الجنة)"
+          : isHe
+            ? '"הקפידו על האמת כי האמת מוליכה אל הנדיבות וגן עדן"'
+            : "'Adhere to truthfulness, for truthfulness leads to righteousness.'",
         link: "/hadith/nawawi40/entry/1",
       },
       {
-        title: isAr ? "الوادي المقدس طوى في سيناء" : isHe ? "העמק הקדוש טוונה בסיני" : "Sacred Valley of Tuwa in Sinai",
+        title: isAr
+          ? "الوادي المقدس طوى في سيناء"
+          : isHe
+            ? "העמק הקדוש טוונה בסיני"
+            : "Sacred Valley of Tuwa in Sinai",
         type: isAr ? "معلم مقدس" : isHe ? "מקום קדוש" : "Sacred Geography",
-        desc: isAr ? "الموقع الذي خاطب الله فيه نبي الله موسى تكليماً." : isHe ? "המקום שבו דיבר הבורא עם משה רבנו." : "The valley where God spoke directly to Prophet Moses.",
+        desc: isAr
+          ? "الموقع الذي خاطب الله فيه نبي الله موسى تكليماً."
+          : isHe
+            ? "המקום שבו דיבר הבורא עם משה רבנו."
+            : "The valley where God spoke directly to Prophet Moses.",
         link: "/places/mount-sinai",
       },
     ];
@@ -98,10 +132,18 @@ export const CuratedCollectionsAndJourneys: React.FC<CuratedCollectionsAndJourne
               </span>
               <div>
                 <Badge className="bg-orange-500/10 text-orange-400 border-orange-500/30 text-[10px] font-black uppercase">
-                  {isAr ? "الأكثر استكشافاً اليوم" : isHe ? "הפופולרי ביותר" : "Trending Topics Today"}
+                  {isAr
+                    ? "الأكثر استكشافاً اليوم"
+                    : isHe
+                      ? "הפופולרי ביותר"
+                      : "Trending Topics Today"}
                 </Badge>
                 <h4 className="text-base font-extrabold text-white mt-0.5 dir-auto">
-                  {isAr ? "مواضيع إسلامية متصدرة الاهتمام" : isHe ? "נושאי אמונה לוהטים" : "Trending Islamic Search Topics"}
+                  {isAr
+                    ? "مواضيع إسلامية متصدرة الاهتمام"
+                    : isHe
+                      ? "נושאי אמונה לוהטים"
+                      : "Trending Islamic Search Topics"}
                 </h4>
               </div>
             </div>
@@ -117,7 +159,10 @@ export const CuratedCollectionsAndJourneys: React.FC<CuratedCollectionsAndJourne
               >
                 <div className="space-y-1">
                   <div className="flex items-center gap-2">
-                    <Badge variant="outline" className="border-orange-500/30 text-orange-400 text-[10px] font-bold">
+                    <Badge
+                      variant="outline"
+                      className="border-orange-500/30 text-orange-400 text-[10px] font-bold"
+                    >
                       {isAr ? item.categoryAr : isHe ? item.categoryHe : item.categoryEn}
                     </Badge>
                     <span className="text-[10px] text-emerald-400 font-mono font-bold">
@@ -128,7 +173,8 @@ export const CuratedCollectionsAndJourneys: React.FC<CuratedCollectionsAndJourne
                     {isAr ? item.titleAr : isHe ? item.titleHe : item.titleEn}
                   </h5>
                   <span className="text-[11px] text-zinc-400 block dir-auto">
-                    {(item.views).toLocaleString()} {isAr ? "قراءة واستكشاف" : isHe ? "קריאות" : "reads"}
+                    {item.views.toLocaleString()}{" "}
+                    {isAr ? "قراءة واستكشاف" : isHe ? "קריאות" : "reads"}
                   </span>
                 </div>
                 <ChevronRight className="w-5 h-5 text-zinc-600 group-hover:text-orange-400 group-hover:translate-x-1 transition-all" />
@@ -152,7 +198,11 @@ export const CuratedCollectionsAndJourneys: React.FC<CuratedCollectionsAndJourne
 
               <div className="space-y-2">
                 <h4 className="text-base font-extrabold text-white dir-auto">
-                  {isAr ? "افتح باباً جديداً للمعرفة الإيمانية" : isHe ? "גלה פנינה אמונית אקראית" : "Unlock a Random Pearl of Knowledge"}
+                  {isAr
+                    ? "افتح باباً جديداً للمعرفة الإيمانية"
+                    : isHe
+                      ? "גלה פנינה אמונית אקראית"
+                      : "Unlock a Random Pearl of Knowledge"}
                 </h4>
                 <p className="text-xs text-zinc-400 leading-relaxed dir-auto">
                   {isAr
@@ -168,15 +218,13 @@ export const CuratedCollectionsAndJourneys: React.FC<CuratedCollectionsAndJourne
                   <Badge className="bg-indigo-500/20 text-indigo-300 text-[10px]">
                     {randomItem.type}
                   </Badge>
-                  <h5 className="text-sm font-extrabold text-white dir-auto">
-                    {randomItem.title}
-                  </h5>
-                  <p className="text-xs text-zinc-300 italic dir-auto">
-                    {randomItem.desc}
-                  </p>
-                  <Link to={randomItem.link as any} className="inline-block pt-1">
+                  <h5 className="text-sm font-extrabold text-white dir-auto">{randomItem.title}</h5>
+                  <p className="text-xs text-zinc-300 italic dir-auto">{randomItem.desc}</p>
+                  <Link to={randomItem.link as never} className="inline-block pt-1">
                     <span className="text-xs font-bold text-indigo-400 hover:underline flex items-center gap-1">
-                      <span>{isAr ? "افتح العنصر بالكامل" : isHe ? "פתח דף מלא" : "Open Full Content"}</span>
+                      <span>
+                        {isAr ? "افتح العنصر بالكامل" : isHe ? "פתח דף מלא" : "Open Full Content"}
+                      </span>
                       <ArrowRight className="w-3.5 h-3.5" />
                     </span>
                   </Link>
@@ -189,7 +237,13 @@ export const CuratedCollectionsAndJourneys: React.FC<CuratedCollectionsAndJourne
               className="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs py-2.5 rounded-xl shadow-lg gap-2"
             >
               <Shuffle className="w-4 h-4" />
-              <span>{isAr ? "توليد عنصر عشوائي جديد" : isHe ? "חולל גילוי אקראי" : "Roll Random Discovery"}</span>
+              <span>
+                {isAr
+                  ? "توليد عنصر عشوائي جديد"
+                  : isHe
+                    ? "חולל גילוי אקראי"
+                    : "Roll Random Discovery"}
+              </span>
             </Button>
           </div>
         </section>
@@ -204,10 +258,18 @@ export const CuratedCollectionsAndJourneys: React.FC<CuratedCollectionsAndJourne
             </span>
             <div>
               <Badge className="bg-teal-500/10 text-teal-400 border-teal-500/30 text-[10px] font-black uppercase">
-                {isAr ? "مجموعات معرفية منتقاة" : isHe ? "אוספים מומלצים" : "AI Curated Collections"}
+                {isAr
+                  ? "مجموعات معرفية منتقاة"
+                  : isHe
+                    ? "אוספים מומלצים"
+                    : "AI Curated Collections"}
               </Badge>
               <h3 className="text-2xl font-extrabold text-white mt-0.5 dir-auto">
-                {isAr ? "المجموعات الموضوعية المنسقة" : isHe ? "אוספי ידע מנוהלים" : "Curated Quranic Knowledge Collections"}
+                {isAr
+                  ? "المجموعات الموضوعية المنسقة"
+                  : isHe
+                    ? "אוספי ידע מנוהלים"
+                    : "Curated Quranic Knowledge Collections"}
               </h3>
             </div>
           </div>
@@ -240,7 +302,13 @@ export const CuratedCollectionsAndJourneys: React.FC<CuratedCollectionsAndJourne
 
               <Link to="/topics">
                 <Button className="w-full bg-white text-zinc-950 hover:bg-zinc-100 font-extrabold text-xs py-2 rounded-xl flex items-center justify-between shadow-lg">
-                  <span>{isAr ? "استعرض المجموعة بالكامل" : isHe ? "צפה באוסף המלא" : "Explore Collection"}</span>
+                  <span>
+                    {isAr
+                      ? "استعرض المجموعة بالكامل"
+                      : isHe
+                        ? "צפה באוסף המלא"
+                        : "Explore Collection"}
+                  </span>
                   <ChevronRight className="w-4 h-4" />
                 </Button>
               </Link>
@@ -259,20 +327,30 @@ export const CuratedCollectionsAndJourneys: React.FC<CuratedCollectionsAndJourne
               </span>
               <div>
                 <Badge className="bg-amber-500/10 text-amber-400 border-amber-500/30 text-[10px] font-black uppercase">
-                  {isAr ? "مسار التعلم اليومي التفاعلي" : isHe ? "מסלול למידה יומי" : "Daily Guided Learning Journey"}
+                  {isAr
+                    ? "مسار التعلم اليومي التفاعلي"
+                    : isHe
+                      ? "מסלול למידה יומי"
+                      : "Daily Guided Learning Journey"}
                 </Badge>
                 <h3 className="text-xl font-extrabold text-white mt-0.5 dir-auto">
-                  {isAr ? "رحلة الهداية والتعلم اليومية (5 محطات)" : isHe ? "מסע למידה יומי מודרך" : "5-Step Daily Guided Learning Path"}
+                  {isAr
+                    ? "رحلة الهداية والتعلم اليومية (5 محطات)"
+                    : isHe
+                      ? "מסע למידה יומי מודרך"
+                      : "5-Step Daily Guided Learning Path"}
                 </h3>
               </div>
             </div>
 
             <div className="flex items-center gap-3">
               <span className="text-xs font-mono font-bold text-amber-400 bg-amber-500/10 px-3 py-1.5 rounded-xl border border-amber-500/20">
-                XP: {completedSteps.reduce((acc, stepNum) => {
+                XP:{" "}
+                {completedSteps.reduce((acc, stepNum) => {
                   const st = journeySteps.find((s) => s.step === stepNum);
                   return acc + (st ? st.xp : 0);
-                }, 0)} / 170
+                }, 0)}{" "}
+                / 170
               </span>
             </div>
           </div>
@@ -306,7 +384,10 @@ export const CuratedCollectionsAndJourneys: React.FC<CuratedCollectionsAndJourne
                         <span className="text-[11px] font-extrabold text-amber-400 uppercase">
                           {isAr ? step.titleAr : isHe ? step.titleHe : step.titleEn}
                         </span>
-                        <Badge variant="outline" className="text-[9px] border-zinc-700 text-zinc-400">
+                        <Badge
+                          variant="outline"
+                          className="text-[9px] border-zinc-700 text-zinc-400"
+                        >
                           +{step.xp} XP
                         </Badge>
                       </div>
@@ -316,8 +397,12 @@ export const CuratedCollectionsAndJourneys: React.FC<CuratedCollectionsAndJourne
                     </div>
                   </div>
 
-                  <Link to={step.targetLink as any} className="shrink-0">
-                    <Button variant="outline" size="sm" className="bg-zinc-800 hover:bg-amber-600 text-zinc-200 hover:text-white border-zinc-700 text-xs font-bold rounded-xl gap-1">
+                  <Link to={step.targetLink as never} className="shrink-0">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="bg-zinc-800 hover:bg-amber-600 text-zinc-200 hover:text-white border-zinc-700 text-xs font-bold rounded-xl gap-1"
+                    >
                       <span>{isAr ? "انتقل للمحطة" : isHe ? "עבור לשלב" : "Go to Step"}</span>
                       <ArrowRight className="w-3.5 h-3.5" />
                     </Button>
