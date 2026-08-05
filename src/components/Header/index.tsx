@@ -1,13 +1,14 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Link } from "@tanstack/react-router";
 import { useAuth } from "@/hooks/useAuth";
 import { useTranslation } from "react-i18next";
-import { Search, Sparkles, Clock, MessageSquare } from "lucide-react";
+import { Search, Sparkles, Clock, MessageSquare, Calendar } from "lucide-react";
 import { Logo } from "@/components/Logo";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { LocaleSwitcher } from "@/components/LocaleSwitcher";
 import { PrayerTimesModal } from "@/components/PrayerTimesModal";
 import { FeedbackModal } from "@/components/FeedbackModal";
+import { getHijriDate } from "@/lib/hijri-date";
 import { HeaderNav } from "./HeaderNav";
 import { HeaderUser } from "./HeaderUser";
 
@@ -18,6 +19,9 @@ export function Header() {
   const [feedbackModalOpen, setFeedbackModalOpen] = useState(false);
   const isAr = i18n.language === "ar";
   const isHe = i18n.language === "he";
+
+  const hijri = useMemo(() => getHijriDate(new Date()), []);
+  const hijriText = isAr ? hijri.formattedAr : hijri.formattedEn;
 
   return (
     <>
@@ -32,8 +36,10 @@ export function Header() {
               <div className="text-[15px] font-bold tracking-tight text-foreground flex items-center gap-1.5">
                 <span>{t("site.name")}</span>
               </div>
-              <div className="text-[10.5px] font-medium text-muted-foreground/90">
-                {t("site.tagline")}
+              <div className="text-[10.5px] font-medium text-muted-foreground/90 flex items-center gap-1">
+                <span>{t("site.tagline")}</span>
+                <span className="hidden xl:inline text-border">•</span>
+                <span className="hidden xl:inline font-semibold text-gold">{hijriText}</span>
               </div>
             </div>
           </Link>
@@ -48,13 +54,11 @@ export function Header() {
               aria-label={
                 isAr ? "أوقات الصلاة والقبلة" : isHe ? "זמני תפילה וקיבלה" : "Prayer Times & Qibla"
               }
-              title={
-                isAr ? "أوقات الصلاة والقبلة" : isHe ? "זמני תפילה וקיבלה" : "Prayer Times & Qibla"
-              }
+              title={`${isAr ? "أوقات الصلاة والقبلة" : isHe ? "זמני תפילה וקיבלה" : "Prayer Times & Qibla"} (${hijriText})`}
             >
               <Clock className="h-3.5 w-3.5 text-gold" />
-              <span className="hidden md:inline">
-                {isAr ? "الصلاة والقبلة" : isHe ? "תפילה וקיבלה" : "Prayer & Qibla"}
+              <span className="hidden md:inline font-semibold text-amber-600 dark:text-amber-400">
+                {hijriText}
               </span>
             </button>
 
