@@ -6,7 +6,6 @@ import { ALL_TOPICS } from "@/lib/topics";
 
 export type KnowledgeKind =
   | "verse"
-  | "hadith"
   | "tafsir"
   | "prophet"
   | "topic"
@@ -54,7 +53,6 @@ export interface InterconnectedKnowledgeBundle {
   subtitle?: string;
   summary?: string;
   verses: ConnectedVerse[];
-  hadiths: ConnectedHadith[];
   tafsirPassages: Array<{ source: string; body: string; surah: number; ayah: number }>;
   prophets: ConnectedEntity[];
   topics: ConnectedEntity[];
@@ -66,7 +64,6 @@ export interface InterconnectedKnowledgeBundle {
 const QueryInputSchema = z.object({
   kind: z.enum([
     "verse",
-    "hadith",
     "tafsir",
     "prophet",
     "topic",
@@ -107,8 +104,6 @@ export const getInterconnectedKnowledge = createServerFn({ method: "POST" })
       return source.name_he ?? source.name_ar ?? source.name_en ?? "Tafsir";
     };
 
-    type HadithEntityLinkRow = Database["public"]["Tables"]["hadith_entity_links"]["Row"];
-    type HadithEntryRow = Database["public"]["Tables"]["hadith_entries"]["Row"];
     type TafsirPassageRow = Database["public"]["Tables"]["tafsir_passages"]["Row"];
 
     const bundle: InterconnectedKnowledgeBundle = {
@@ -116,7 +111,6 @@ export const getInterconnectedKnowledge = createServerFn({ method: "POST" })
       entityId: id,
       title: "",
       verses: [],
-      hadiths: [],
       tafsirPassages: [],
       prophets: [],
       topics: [],
@@ -132,44 +126,7 @@ export const getInterconnectedKnowledge = createServerFn({ method: "POST" })
 
       bundle.title = `Verse ${surah}:${ayah}`;
 
-      // Fetch Hadiths linked to this verse
-      const { data: hadithLinks } = await supabaseAdmin
-        .from("hadith_entity_links")
-        .select("hadith_id, weight")
-        .eq("surah", surah)
-        .eq("ayah", ayah)
-        .not("hadith_id", "is", null)
-        .order("weight", { ascending: false })
-        .limit(6);
 
-      const hadithIds = ((hadithLinks ?? []) as HadithEntityLinkRow[])
-        .map((l) => l.hadith_id)
-        .filter((value): value is number => typeof value === "number");
-
-      if (hadithIds.length > 0) {
-        const { data: hadiths } = await supabaseAdmin
-          .from("hadith_entries")
-          .select("id, collection_slug, book_id, id_in_book, narrator, arabic_text, english_text, hebrew_text")
-          .in("id", hadithIds);
-
-        bundle.hadiths = ((hadiths ?? []) as HadithEntryRow[]).map((h) => ({
-          id: h.id,
-          collectionSlug: h.collection_slug,
-          collectionTitle:
-            h.collection_slug === "bukhari"
-              ? "Sahih al-Bukhari"
-              : h.collection_slug === "muslim"
-                ? "Sahih Muslim"
-                : h.collection_slug,
-          bookId: h.book_id,
-          idInBook: h.id_in_book,
-          narrator: h.narrator,
-          arabicText: h.arabic_text,
-          translationText:
-            (fallbackLocale === "he" ? h.hebrew_text : fallbackLocale === "en" ? h.english_text : h.arabic_text) ||
-            h.arabic_text,
-          grade: h.grade ?? undefined,
-        }));
       }
 
       // Fetch Tafsirs linked to this verse
