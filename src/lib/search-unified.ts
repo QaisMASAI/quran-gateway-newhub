@@ -1,6 +1,5 @@
 import { buildQuranIndex, type SearchOutput } from "./quran-api";
 import { searchWithFallback } from "./quran-search";
-import { searchHadith } from "./hadith.functions";
 import {
   listEntitiesByKind,
   searchKnowledgeTexts,
@@ -14,14 +13,7 @@ import { getRichMetadataForEntity } from "./knowledge-metadata-store";
 import type { EntityRichMetadata } from "@/types/entity-metadata";
 
 export type KnowledgeCategory =
-  | "quran"
-  | "hadith"
-  | "tafsir"
-  | "topics"
-  | "prophets"
-  | "stories"
-  | "narrators"
-  | "places";
+  "quran" | "hadith" | "tafsir" | "topics" | "prophets" | "stories" | "narrators" | "places";
 
 export interface RankingFactors {
   semanticSimilarity: number;
@@ -34,12 +26,7 @@ export interface RankingFactors {
 }
 
 export type SerializableValue =
-  | string
-  | number
-  | boolean
-  | null
-  | SerializableValue[]
-  | { [key: string]: SerializableValue };
+  string | number | boolean | null | SerializableValue[] | { [key: string]: SerializableValue };
 
 export interface UnifiedSearchResultItem {
   id: string;
@@ -81,7 +68,11 @@ export function computeMultiFactorRanking(
 
   // 1. Semantic Similarity
   let semanticSimilarity = 45;
-  if (richMeta.primaryKeywords.some((k) => k.toLowerCase().includes(qLower) || qLower.includes(k.toLowerCase()))) {
+  if (
+    richMeta.primaryKeywords.some(
+      (k) => k.toLowerCase().includes(qLower) || qLower.includes(k.toLowerCase()),
+    )
+  ) {
     semanticSimilarity = 96;
   } else if (
     richMeta.arabicSynonyms
@@ -94,9 +85,16 @@ export function computeMultiFactorRanking(
       .some((s) => s.toLowerCase().includes(qLower))
   ) {
     semanticSimilarity = 88;
-  } else if (profile.primaryConcepts.some((c) => richMeta.relatedConcepts.some((rc) => rc.toLowerCase().includes(c)))) {
+  } else if (
+    profile.primaryConcepts.some((c) =>
+      richMeta.relatedConcepts.some((rc) => rc.toLowerCase().includes(c)),
+    )
+  ) {
     semanticSimilarity = 82;
-  } else if (entityTitle.toLowerCase().includes(qLower) || entitySnippet.toLowerCase().includes(qLower)) {
+  } else if (
+    entityTitle.toLowerCase().includes(qLower) ||
+    entitySnippet.toLowerCase().includes(qLower)
+  ) {
     semanticSimilarity = 72;
   }
 
@@ -136,7 +134,8 @@ export function computeMultiFactorRanking(
 
   // 6. Cross References
   let crossReferences = 50;
-  const refsCount = richMeta.relatedConcepts.length + richMeta.semanticTags.length + richMeta.virtues.length;
+  const refsCount =
+    richMeta.relatedConcepts.length + richMeta.semanticTags.length + richMeta.virtues.length;
   if (refsCount >= 5) crossReferences = 93;
   else if (refsCount >= 3) crossReferences = 80;
   else crossReferences = 66;
@@ -207,7 +206,11 @@ function entityMatchesQuery(
 ): { matches: boolean; score: number; richMetadata: EntityRichMetadata } {
   const q = query.trim().toLowerCase();
   const profile = buildConceptualQueryProfile(q);
-  const richMetadata = getRichMetadataForEntity(entity.slug, pickLocale(entity.title_i18n, locale), entity.kind);
+  const richMetadata = getRichMetadataForEntity(
+    entity.slug,
+    pickLocale(entity.title_i18n, locale),
+    entity.kind,
+  );
 
   if (!q) return { matches: false, score: 0, richMetadata };
 
@@ -250,9 +253,15 @@ function entityMatchesQuery(
 
   if (metaPrimary.some((k) => k.includes(q) || q.includes(k))) {
     score += 80;
-  } else if (metaSynonyms.some((k) => k.includes(q) || profileSyns.some((ps) => k.includes(ps.toLowerCase())))) {
+  } else if (
+    metaSynonyms.some(
+      (k) => k.includes(q) || profileSyns.some((ps) => k.includes(ps.toLowerCase())),
+    )
+  ) {
     score += 75;
-  } else if (profile.primaryConcepts.some((pc) => metaConcepts.some((mc) => mc.includes(pc.toLowerCase())))) {
+  } else if (
+    profile.primaryConcepts.some((pc) => metaConcepts.some((mc) => mc.includes(pc.toLowerCase())))
+  ) {
     score += 70;
   } else if (titleAr.includes(q) || titleHe.includes(q) || titleEn.includes(q)) {
     score += 60;
@@ -347,47 +356,9 @@ export async function performUnifiedSearch(
       }
     })(),
 
-    // 2. HADITH
+    // 2. HADITH (disabled)
     (async () => {
-      if (categoryFilter !== "all" && categoryFilter !== "hadith") return;
-      try {
-        const hadithRes = await searchHadith({ data: { q: qLower, page: 0, pageSize: 15 } });
-        if (hadithRes?.items) {
-          categoryCounts.hadith = hadithRes.total ?? hadithRes.items.length;
-          categoryResults.hadith = hadithRes.items.map((h) => {
-            const snippet =
-              locale === "ar"
-                ? h.arabic_text || h.english_text || h.hebrew_text || ""
-                : locale === "he"
-                  ? h.hebrew_text || h.english_text || h.arabic_text || ""
-                  : h.english_text || h.arabic_text || h.hebrew_text || "";
-
-            const collection = h.collection_slug || "hadith";
-            const entryNum = h.id_in_book || h.id;
-
-            return {
-              id: `hadith-${collection}-${entryNum}`,
-              category: "hadith" as const,
-              domain: "hadith" as const,
-              title: `${collection === "bukhari" ? "Sahih al-Bukhari" : collection === "muslim" ? "Sahih Muslim" : collection} #${entryNum}`,
-              subtitle: h.narrator ?? undefined,
-              snippet,
-              arabicSnippet: h.arabic_text,
-              hebrewSnippet: h.hebrew_text || undefined,
-              englishSnippet: h.english_text || undefined,
-              url: `/hadith/${collection}/entry/${entryNum}`,
-              badge: "Hadith",
-              relevanceScore: 60,
-              metadata: {
-                collection,
-                id_in_book: h.id_in_book,
-              },
-            };
-          });
-        }
-      } catch (err) {
-        console.error("Error searching Hadith in unified search:", err);
-      }
+      // Hadith module removed
     })(),
 
     // 3. TAFSIR
@@ -397,7 +368,8 @@ export async function performUnifiedSearch(
         const hits = await searchKnowledgeTexts(qLower, 10);
         categoryCounts.tafsir = hits.length;
         categoryResults.tafsir = hits.map((hit) => {
-          const url = hit.surah && hit.ayah_start ? `/tafsir/${hit.surah}/${hit.ayah_start}` : "/tafsir";
+          const url =
+            hit.surah && hit.ayah_start ? `/tafsir/${hit.surah}/${hit.ayah_start}` : "/tafsir";
 
           return {
             id: `tafsir-${hit.id}`,
@@ -429,7 +401,9 @@ export async function performUnifiedSearch(
             (m) =>
               m.matches ||
               ALL_PROPHETS.some(
-                (ap) => ap.slug === m.p.slug && (ap.nameAr.includes(qLower) || ap.nameHe.includes(qLower)),
+                (ap) =>
+                  ap.slug === m.p.slug &&
+                  (ap.nameAr.includes(qLower) || ap.nameHe.includes(qLower)),
               ),
           );
 
@@ -506,7 +480,10 @@ export async function performUnifiedSearch(
     (async () => {
       if (categoryFilter !== "all" && categoryFilter !== "stories") return;
       try {
-        const [stories, events] = await Promise.all([listEntitiesByKind("story"), listEntitiesByKind("event")]);
+        const [stories, events] = await Promise.all([
+          listEntitiesByKind("story"),
+          listEntitiesByKind("event"),
+        ]);
         const allStories = [...stories, ...events];
         const matched = allStories
           .map((s) => {
@@ -573,7 +550,7 @@ export async function performUnifiedSearch(
             arabicSnippet: n.summary_i18n?.ar,
             hebrewSnippet: n.summary_i18n?.he,
             englishSnippet: n.summary_i18n?.en,
-            url: `/hadith?narrator=${n.slug}`,
+            url: `/learn/narrators/${n.slug}`,
             badge: "Narrator",
             relevanceScore: Math.max(score, 70),
             metadata: richMetadata as unknown as Record<string, SerializableValue>,
@@ -588,7 +565,10 @@ export async function performUnifiedSearch(
     (async () => {
       if (categoryFilter !== "all" && categoryFilter !== "places") return;
       try {
-        const [places, nations] = await Promise.all([listEntitiesByKind("place"), listEntitiesByKind("nation")]);
+        const [places, nations] = await Promise.all([
+          listEntitiesByKind("place"),
+          listEntitiesByKind("nation"),
+        ]);
         const allPlaces = [...places, ...nations];
         const matched = allPlaces
           .map((p) => {
@@ -631,7 +611,8 @@ export async function performUnifiedSearch(
   const scoredItems = allRawItems.map((item) => {
     if (item.rankingFactors && item.rankingExplanation) return item;
 
-    const dummyMeta: EntityRichMetadata = ((item.metadata as unknown as EntityRichMetadata | undefined) ?? {
+    const dummyMeta: EntityRichMetadata = (item.metadata as unknown as
+      EntityRichMetadata | undefined) ?? {
       primaryKeywords: [item.title, item.badge || ""],
       secondaryKeywords: [],
       arabicSynonyms: item.arabicSnippet ? [item.arabicSnippet] : [],
@@ -657,7 +638,7 @@ export async function performUnifiedSearch(
       places: item.category === "places" ? [item.title] : [],
       people: item.category === "prophets" || item.category === "narrators" ? [item.title] : [],
       events: item.category === "stories" ? [item.title] : [],
-    });
+    };
 
     const { relevanceScore, factors, explanation } = computeMultiFactorRanking(
       item.title,
