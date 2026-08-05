@@ -1,5 +1,15 @@
 import React, { useState } from "react";
-import { Sparkles, Send, Brain, Bot, HelpCircle, Check, BookOpen, RotateCcw, Award } from "lucide-react";
+import {
+  Sparkles,
+  Send,
+  Brain,
+  Bot,
+  HelpCircle,
+  Check,
+  BookOpen,
+  RotateCcw,
+  Award,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { awardXP } from "@/lib/gamification";
 import { logResearchQuery } from "@/lib/habit-engine";
@@ -9,7 +19,10 @@ interface AIStudyAssistantModalProps {
   onClose: () => void;
 }
 
-export const AIStudyAssistantModal: React.FC<AIStudyAssistantModalProps> = ({ locale, onClose }) => {
+export const AIStudyAssistantModal: React.FC<AIStudyAssistantModalProps> = ({
+  locale,
+  onClose,
+}) => {
   const isAr = locale === "ar";
   const isHe = locale === "he";
 
@@ -20,10 +33,10 @@ export const AIStudyAssistantModal: React.FC<AIStudyAssistantModalProps> = ({ lo
     {
       role: "assistant",
       text: isAr
-        ? "أهلاً بك! أنا مساعد المدارسة الذكي نور AI. كيف يمكنني مساعدتك في تدبر القرآن، فهم الأحاديث، أو مراجعة مساراتك المعرفية اليوم؟"
+        ? "أهلاً بك! أنا مساعد المدارسة الذكي نور AI. كيف يمكنني مساعدتك في تدبر القرآن، فهم التفاسير، أو مراجعة مساراتك المعرفية اليوم؟"
         : isHe
-          ? "שלום! אני עוזר הלימוד החכם נור AI. כיצד אוכל לעזור לך בהבנת הקוראן, חקר החדית' או חזרה על נושאי הלימוד היום?"
-          : "Welcome! I am Noor AI Study Assistant. How can I assist your Quranic reflection, Hadith research, or study plan today?",
+          ? "שלום! אני עוזר הלימוד החכם נור AI. כיצד אוכל לעזור לך בהבנת הקוראן, חקר התפסיר או חזרה על נושאי הלימוד היום?"
+          : "Welcome! I am Noor AI Study Assistant. How can I assist your Quranic reflection, Tafsir research, or study plan today?",
     },
   ]);
   const [loading, setLoading] = useState(false);
@@ -33,7 +46,8 @@ export const AIStudyAssistantModal: React.FC<AIStudyAssistantModalProps> = ({ lo
       labelEn: "Generate Daily Reflection Prompt",
       labelAr: "سؤال تدبر يومي",
       labelHe: "שאלה להרהור יומי",
-      promptEn: "Give me a deep reflection question based on Surah Al-Baqarah 2:255 (Ayat al-Kursi).",
+      promptEn:
+        "Give me a deep reflection question based on Surah Al-Baqarah 2:255 (Ayat al-Kursi).",
       promptAr: "قدم لي سؤال تدبر عميق حول آية الكرسي (سورة البقرة 2:255)",
       promptHe: "תן לי שאלת הרהור עמוקה על פסוק הכסא (2:255)",
     },
@@ -73,14 +87,22 @@ export const AIStudyAssistantModal: React.FC<AIStudyAssistantModalProps> = ({ lo
       let replyText = "";
       let citation = "";
 
-      if (textToSend.toLowerCase().includes("quiz") || textToSend.includes("اختبار") || textToSend.includes("בוחן")) {
+      if (
+        textToSend.toLowerCase().includes("quiz") ||
+        textToSend.includes("اختبار") ||
+        textToSend.includes("בוחן")
+      ) {
         replyText = isAr
           ? "اختبار المراجعة السريع:\nما هو الحديث الأول في الأربعين النووية، وما هي القاعدة الإيمانية الكبرى التي يؤسس لها؟\n\n💡 تلميح: يتعلق بأصل كل الأعمال القلبيّة والظاهرة."
           : isHe
             ? "בוחן פתע קצר:\nמהו החדית' הראשון ב-40 החדית'ים של א-נוואווי, ומהו היסוד האמוני המרכזי שהוא קובע?\n\n💡 רמז: מדובר ביסוד כל המעשים."
             : "Quick Recall Quiz:\nWhat is the 1st Hadith in An-Nawawi's 40 collection, and what fundamental principle does it establish?\n\n💡 Hint: It governs the inner intention behind all deeds.";
         citation = "Sahih al-Bukhari 1 / Sahih Muslim 1907";
-      } else if (textToSend.toLowerCase().includes("reflection") || textToSend.includes("تدبر") || textToSend.includes("הרהור")) {
+      } else if (
+        textToSend.toLowerCase().includes("reflection") ||
+        textToSend.includes("تدبر") ||
+        textToSend.includes("הרהור")
+      ) {
         replyText = isAr
           ? "تأمل في قوله تعالى: ﴿اللَّهُ لَا إِلَٰهَ إِلَّا هُوَ الْحَيُّ الْقَيُّومُ﴾ [البقرة: 255].\nكيف يؤثر إيمانك بأن الله هو 'القيوم' على طمأنينة قلبك في مواجهة تحديات الحياة اليومية؟"
           : isHe
@@ -112,10 +134,18 @@ export const AIStudyAssistantModal: React.FC<AIStudyAssistantModalProps> = ({ lo
             </div>
             <div>
               <h3 className="text-sm font-black text-white">
-                {isAr ? "مساعد المدارسة والبحث الذكي - نور AI" : isHe ? "עוזר הלימוד והמחקר נור AI" : "Noor AI Study & Research Companion"}
+                {isAr
+                  ? "مساعد المدارسة والبحث الذكي - نور AI"
+                  : isHe
+                    ? "עוזר הלימוד והמחקר נור AI"
+                    : "Noor AI Study & Research Companion"}
               </h3>
               <span className="text-[10px] text-purple-400 font-mono">
-                {isAr ? "موثق بالمصادر والأسانيد" : isHe ? "מאומת עם מקורות" : "CITED & AUTHENTIC SOURCES"}
+                {isAr
+                  ? "موثق بالمصادر والأسانيد"
+                  : isHe
+                    ? "מאומת עם מקורות"
+                    : "CITED & AUTHENTIC SOURCES"}
               </span>
             </div>
           </div>
@@ -184,7 +214,11 @@ export const AIStudyAssistantModal: React.FC<AIStudyAssistantModalProps> = ({ lo
                 <Bot className="w-4 h-4" />
               </div>
               <div className="p-3 rounded-2xl bg-zinc-900 border border-zinc-800 text-xs text-zinc-400 italic">
-                {isAr ? "جاري البحث في مصادر التفسير والحديث..." : isHe ? "מחפש במקורות התפסיר והחדית'..." : "Analyzing authentic references & generating response..."}
+                {isAr
+                  ? "جاري البحث في مصادر التفسير والدراسات القرآنية..."
+                  : isHe
+                    ? "מחפש במקורות התפסיר והקוראן..."
+                    : "Analyzing authentic references & generating response..."}
               </div>
             </div>
           )}
