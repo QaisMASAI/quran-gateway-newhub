@@ -50,7 +50,7 @@ export const Route = createFileRoute("/hadith/$collection")({
 
 function HadithCollectionPage() {
   const { collection } = Route.useParams();
-  const { i18n } = useTranslation();
+  const { i18n, t } = useTranslation("common");
   const isRtl = i18n.dir() === "rtl";
   const locale = normalizeLocale(i18n.language) ?? "he";
   const Chev = isRtl ? ChevronLeft : ChevronRight;
@@ -99,9 +99,7 @@ function HadithCollectionPage() {
             className="text-xs font-semibold text-muted-foreground hover:text-primary transition-colors flex items-center gap-1.5"
           >
             <BookOpen className="h-4 w-4 text-primary" />
-            <span>
-              {locale === "ar" ? "العودة إلى المكتبة" : locale === "he" ? "חזרה לספרייה" : "Back to Hadith Hub"}
-            </span>
+            <span>{t("hadith.backToHub")}</span>
           </Link>
 
           <Badge
@@ -115,7 +113,10 @@ function HadithCollectionPage() {
 
         {/* Collection Hero Box */}
         <div className="rounded-3xl border border-border/80 bg-card p-6 md:p-8 shadow-sm space-y-3">
-          <div className="font-quran text-2xl md:text-3xl text-right text-primary font-bold" dir="rtl">
+          <div
+            className="font-quran text-2xl md:text-3xl text-right text-primary font-bold"
+            dir="rtl"
+          >
             {meta?.title_ar || collection.toUpperCase()}
           </div>
           <h1 className="text-xl md:text-2xl font-extrabold text-foreground">
@@ -138,22 +139,14 @@ function HadithCollectionPage() {
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-border/60 pb-3">
           <h2 className="font-bold text-base text-foreground flex items-center gap-2">
             <Layers className="h-4 w-4 text-primary" />
-            <span>
-              {locale === "ar" ? "فهرس الكُتُب والموضوعات" : locale === "he" ? "אינדקס ספרים" : "Books Index"}
-            </span>
+            <span>{t("hadith.booksIndex")}</span>
           </h2>
 
           <div className="relative w-full sm:w-72">
             <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
             <Input
               type="search"
-              placeholder={
-                locale === "ar"
-                  ? "البحث في أسماء الكتب…"
-                  : locale === "he"
-                    ? "חיפוש לפי שם ספר…"
-                    : "Filter books by title…"
-              }
+              placeholder={t("hadith.filterBooksPlaceholder")}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="pl-9 rounded-xl border-border/80 text-xs"
@@ -173,7 +166,11 @@ function HadithCollectionPage() {
           {booksError && (
             <div className="col-span-full rounded-2xl border border-destructive/30 bg-destructive/5 p-4 text-sm text-destructive flex items-center justify-between">
               <span>Failed to load books.</span>
-              <button type="button" onClick={() => void refetchBooks()} className="underline font-semibold">
+              <button
+                type="button"
+                onClick={() => void refetchBooks()}
+                className="underline font-semibold"
+              >
                 Retry
               </button>
             </div>
@@ -204,7 +201,9 @@ function HadithCollectionPage() {
                 >
                   {b.name_ar}
                 </div>
-                <div className="truncate text-xs text-muted-foreground font-medium">{b.name_en}</div>
+                <div className="truncate text-xs text-muted-foreground font-medium">
+                  {b.name_en}
+                </div>
               </div>
 
               <div className="flex items-center gap-2 text-xs font-semibold text-muted-foreground">
