@@ -7,7 +7,6 @@ import {
   Sparkles,
   Folder,
   Gamepad2,
-  Library,
   ScrollText,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -72,9 +71,6 @@ export function HeaderNav({ isAuthenticated }: HeaderNavProps) {
       {!hidden.has("learn") && (
         <NavLink to="/learn" label={t("nav.learn")} icon={<BookMarked className="h-4 w-4" />} />
       )}
-      {!hidden.has("hadith") && (
-        <NavLink to="/hadith" label={t("nav.hadith")} icon={<Library className="h-4 w-4" />} />
-      )}
       {!hidden.has("tafsir") && (
         <NavLink to="/tafsir" label={t("nav.tafsir")} icon={<BookOpen className="h-4 w-4" />} />
       )}
@@ -102,13 +98,6 @@ export function HeaderNav({ isAuthenticated }: HeaderNavProps) {
       )}
       {isAuthenticated && !hidden.has("admin_kids") && (
         <NavLink to="/admin/kids" label="Kids Admin" icon={<BookMarked className="h-4 w-4" />} />
-      )}
-      {isAuthenticated && !hidden.has("admin_hadith_ingest") && (
-        <NavLink
-          to="/admin/hadith-ingest"
-          label="Hadith Import"
-          icon={<Compass className="h-4 w-4" />}
-        />
       )}
     </nav>
   );
