@@ -1,6 +1,5 @@
 import { buildQuranIndex } from "./quran-api";
 import { searchWithFallback } from "./quran-search";
-import { searchHadith } from "./hadith.functions";
 import { listEntitiesByKind, pickLocale, type KnowledgeEntity } from "./knowledge";
 
 export interface RagContextChunk {
@@ -16,12 +15,18 @@ export interface RagContextResult {
   systemContextPrompt: string;
 }
 
-function topicMatchesQuery(topic: KnowledgeEntity, query: string, locale: "ar" | "en" | "he"): boolean {
+function topicMatchesQuery(
+  topic: KnowledgeEntity,
+  query: string,
+  locale: "ar" | "en" | "he",
+): boolean {
   const q = query.toLowerCase();
   const localizedTitle = pickLocale(topic.title_i18n, locale).toLowerCase();
   const localizedSummary = pickLocale(topic.summary_i18n, locale).toLowerCase();
-  const allTitles = `${topic.title_i18n.en ?? ""} ${topic.title_i18n.ar ?? ""} ${topic.title_i18n.he ?? ""}`.toLowerCase();
-  const allSummaries = `${topic.summary_i18n.en ?? ""} ${topic.summary_i18n.ar ?? ""} ${topic.summary_i18n.he ?? ""}`.toLowerCase();
+  const allTitles =
+    `${topic.title_i18n.en ?? ""} ${topic.title_i18n.ar ?? ""} ${topic.title_i18n.he ?? ""}`.toLowerCase();
+  const allSummaries =
+    `${topic.summary_i18n.en ?? ""} ${topic.summary_i18n.ar ?? ""} ${topic.summary_i18n.he ?? ""}`.toLowerCase();
 
   return (
     localizedTitle.includes(q) ||
@@ -31,7 +36,10 @@ function topicMatchesQuery(topic: KnowledgeEntity, query: string, locale: "ar" |
   );
 }
 
-export async function buildRagContext(query: string, locale: "ar" | "en" | "he" = "en"): Promise<RagContextResult> {
+export async function buildRagContext(
+  query: string,
+  locale: "ar" | "en" | "he" = "en",
+): Promise<RagContextResult> {
   const chunks: RagContextChunk[] = [];
   const q = query.trim();
 
@@ -68,29 +76,6 @@ export async function buildRagContext(query: string, locale: "ar" | "en" | "he" 
     // Silent catch
   }
 
-  // 2. Fetch relevant Hadith entries
-  try {
-    const hadithHits = await searchHadith({ data: { q, page: 0, pageSize: 3 } });
-    if (hadithHits?.items) {
-      hadithHits.items.slice(0, 3).forEach((h) => {
-        const text =
-          locale === "ar"
-            ? h.arabic_text || h.english_text || h.hebrew_text || ""
-            : locale === "he"
-              ? h.hebrew_text || h.english_text || h.arabic_text || ""
-              : h.english_text || h.arabic_text || h.hebrew_text || "";
-
-        chunks.push({
-          source: "hadith",
-          reference: `${h.collection_slug || "Hadith"} #${h.id_in_book || h.id}`,
-          text,
-        });
-      });
-    }
-  } catch {
-    // Silent catch
-  }
-
   // 3. Fetch matching topics
   try {
     const topics = await listEntitiesByKind("topic");
@@ -108,7 +93,9 @@ export async function buildRagContext(query: string, locale: "ar" | "en" | "he" 
   }
 
   const contextFormatted = chunks
-    .map((c, i) => `[Context Item ${i + 1} - ${c.source.toUpperCase()} - ${c.reference}]\n${c.text}`)
+    .map(
+      (c, i) => `[Context Item ${i + 1} - ${c.source.toUpperCase()} - ${c.reference}]\n${c.text}`,
+    )
     .join("\n\n");
 
   const systemContextPrompt = `The following authenticated Islamic knowledge chunks were retrieved for query "${q}":\n\n${contextFormatted}`;
