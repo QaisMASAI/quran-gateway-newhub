@@ -170,55 +170,6 @@ export const getInterconnectedKnowledge = createServerFn({ method: "POST" })
         summary: t.description,
       }));
 
-    } else if (kind === "hadith") {
-      // id format: hadith entry ID or global ID
-      const hadithId = Number(id);
-      if (!isNaN(hadithId)) {
-        const { data: entry } = await supabaseAdmin
-          .from("hadith_entries")
-          .select("id, collection_slug, book_id, id_in_book, narrator, arabic_text, english_text, hebrew_text")
-          .eq("id", hadithId)
-          .maybeSingle();
-
-        if (entry) {
-          bundle.title = `${entry.collection_slug.toUpperCase()} Hadith #${entry.id_in_book}`;
-          bundle.summary = entry.narrator ? `Narrated by ${entry.narrator}` : undefined;
-
-          // Fetch related verses
-          const { data: vLinks } = await supabaseAdmin
-            .from("hadith_entity_links")
-            .select("surah, ayah, weight")
-            .eq("hadith_id", entry.id)
-            .not("surah", "is", null)
-            .not("ayah", "is", null)
-            .limit(5);
-
-          const verseLinks = ((vLinks ?? []) as HadithEntityLinkRow[]).filter(
-            (vl): vl is HadithEntityLinkRow & { surah: number; ayah: number } =>
-              typeof vl.surah === "number" && typeof vl.ayah === "number",
-          );
-
-          if (verseLinks.length > 0) {
-            for (const vl of verseLinks) {
-              const { data: verseTrans } = await supabaseAdmin
-                .from("ayah_translations")
-                .select("text, source_id")
-                .eq("surah", vl.surah)
-                .eq("ayah", vl.ayah)
-                .limit(2);
-
-              bundle.verses.push({
-                surah: vl.surah,
-                ayah: vl.ayah,
-                reference: `${vl.surah}:${vl.ayah}`,
-                arabic: verseTrans?.find((t) => t.source_id.includes("arabic"))?.text || "",
-                translation: verseTrans?.[0]?.text || "",
-              });
-            }
-          }
-        }
-      }
-
     } else if (kind === "prophet" || kind === "topic" || kind === "story") {
       const prophet = ALL_PROPHETS.find((p) => p.slug === id);
       const topic = ALL_TOPICS.find((t) => t.slug === id);
