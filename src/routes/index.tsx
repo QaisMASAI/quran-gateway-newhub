@@ -597,24 +597,35 @@ export function Home() {
                   : "Recently Opened"}
             </h3>
             <div className="flex flex-wrap gap-2">
-              {recentViews.slice(0, 8).map((view, idx) => (
-                <Link
-                  key={`home-recent-${idx}`}
-                  to={
-                    view.kind === "surah"
-                      ? "/surah/$id"
-                      : "/learn/$kind/$slug"
-                  }
-                  params={
-                    view.kind === "surah"
-                      ? { id: String(view.surah) }
-                      : { kind: view.entityKind, slug: view.slug }
-                  }
-                  className="rounded-full border border-border/80 bg-card/80 px-3.5 py-1.5 text-xs font-semibold text-foreground transition-all hover:border-primary/40 hover:bg-primary-soft/40 hover:text-primary shadow-2xs"
-                >
-                  {view.label}
-                </Link>
-              ))}
+              {recentViews.slice(0, 8).map((view, idx) => {
+                if (view.kind === "surah") {
+                  return (
+                    <Link
+                      key={`home-recent-${idx}`}
+                      to="/surah/$id"
+                      params={{ id: String(view.surah) }}
+                      className="rounded-full border border-border/80 bg-card/80 px-3.5 py-1.5 text-xs font-semibold text-foreground transition-all hover:border-primary/40 hover:bg-primary-soft/40 hover:text-primary shadow-2xs"
+                    >
+                      {view.label}
+                    </Link>
+                  );
+                }
+
+                if (view.kind === "entity") {
+                  return (
+                    <Link
+                      key={`home-recent-${idx}`}
+                      to="/learn/$kind/$slug"
+                      params={{ kind: view.entityKind, slug: view.slug }}
+                      className="rounded-full border border-border/80 bg-card/80 px-3.5 py-1.5 text-xs font-semibold text-foreground transition-all hover:border-primary/40 hover:bg-primary-soft/40 hover:text-primary shadow-2xs"
+                    >
+                      {view.label}
+                    </Link>
+                  );
+                }
+
+                return null;
+              })}
             </div>
           </section>
         )}
