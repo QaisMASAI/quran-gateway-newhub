@@ -394,57 +394,14 @@ function AskPage() {
           </div>
         )}
 
-        {result && result.hadith && result.hadith.length > 0 && (
-          <div className="mt-6 rounded-xl border border-border bg-card p-4">
-            <h3 className="mb-2 text-sm font-semibold text-foreground">
-              {t("research.hadithCitations", "Hadith citations")}
-            </h3>
-            <div className="space-y-2">
-              {result.hadith.map((h, i) => (
-                <Link
-                  key={`${h.collection}-${h.global_id}-${i}`}
-                  to="/hadith/$collection/entry/$num"
-                  params={{ collection: h.collection, num: String(h.global_id) }}
-                  className="block rounded-lg border border-border bg-background px-3 py-2 hover:border-primary/40"
-                >
-                  <div className="text-xs text-primary">
-                    {h.collection_label} · #{h.id_in_book}
-                  </div>
-                  {h.narrator && (
-                    <div className="text-[11px] italic text-muted-foreground">{h.narrator}</div>
-                  )}
-                  {h.english && (
-                    <p className="font-reading-en mt-1 text-xs text-muted-foreground">
-                      {h.english}
-                    </p>
-                  )}
-                  <p
-                    className="font-reading-ar mt-1 text-right text-xs text-foreground"
-                    dir="rtl"
-                    lang="ar"
-                  >
-                    {h.arabic}
-                  </p>
-                </Link>
-              ))}
-            </div>
-          </div>
-        )}
-
         {result &&
-          (result.verses.length > 0 || result.hadith.length > 0 || recentViews.length > 0) && (
+          (result.verses.length > 0 || recentViews.length > 0) && (
             <DiscoveryRail
               locale={locale}
               relatedVerses={result.verses.slice(0, 6).map((v) => ({
                 surah: v.surah,
                 ayah: v.ayah,
                 label: `${surahDisplayName(v.surah, locale)} ${v.surah}:${v.ayah}`,
-              }))}
-              relatedHadith={result.hadith.slice(0, 4).map((h) => ({
-                collection: h.collection,
-                num: h.global_id,
-                label: `${h.collection_label} #${h.id_in_book}`,
-                subtitle: h.narrator ?? undefined,
               }))}
               recentViews={recentViews}
               suggestedQuestions={suggestedQuestions}
