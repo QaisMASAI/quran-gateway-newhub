@@ -254,7 +254,6 @@ function AskPage() {
                 locale={locale}
                 versesCount={result.verses.length}
                 tafsirCount={result.tafsir.length}
-                hadithCount={result.hadith.length}
                 suggestedQuestions={suggestedQuestions}
                 onSuggestedQuestion={submitSuggestedQuestion}
               />
