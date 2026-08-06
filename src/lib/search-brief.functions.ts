@@ -356,7 +356,7 @@ export const getSearchResearchBrief = createServerFn({ method: "POST" })
       const searchResults = await performUnifiedSearch(query, locale, "all");
 
       const quranItems = searchResults.categoryResults.quran || [];
-      const hadithItems = searchResults.categoryResults.hadith || [];
+      const hadithItems: UnifiedSearchResultItem[] = [];
       const tafsirItems = searchResults.categoryResults.tafsir || [];
 
       // Also gather entity hits
