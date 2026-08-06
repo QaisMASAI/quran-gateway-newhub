@@ -5,14 +5,12 @@ import type { RecentView } from "@/lib/recently-viewed";
 
 type EntityLink = { kind: EntityKind; slug: string; label: string; subtitle?: string };
 type VerseLink = { surah: number; ayah: number; label: string; subtitle?: string };
-type HadithLink = { collection: string; num: number; label: string; subtitle?: string };
 type JourneyLink = { slug: string; label: string; subtitle?: string };
 
 type Props = {
   locale: "he" | "ar" | "en";
   relatedEntities?: EntityLink[];
   relatedVerses?: VerseLink[];
-  relatedHadith?: HadithLink[];
   recentViews?: RecentView[];
   journeys?: JourneyLink[];
   suggestedQuestions?: string[];
@@ -62,7 +60,6 @@ export function DiscoveryRail({
   locale,
   relatedEntities = [],
   relatedVerses = [],
-  relatedHadith = [],
   recentViews = [],
   journeys = [],
   suggestedQuestions = [],
@@ -93,7 +90,7 @@ export function DiscoveryRail({
               to="/surah/$id"
               params={{ id: String(verse.surah) }}
               hash={`v-${verse.ayah}`}
-              search={{ q: undefined }}
+              search={{ q: "" }}
               className="rounded-lg border border-border bg-background px-3 py-2 text-sm hover:border-primary/40"
             >
               <div className="font-medium text-foreground">{verse.label}</div>
@@ -105,28 +102,8 @@ export function DiscoveryRail({
         </div>
       </Section>
 
-      {(relatedHadith.length > 0 || journeys.length > 0) && (
+      {journeys.length > 0 && (
         <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-          {relatedHadith.length > 0 && (
-            <Section title={copy.peopleAlso}>
-              <div className="space-y-2">
-                {relatedHadith.slice(0, 4).map((hadith) => (
-                  <Link
-                    key={`${hadith.collection}-${hadith.num}`}
-                    to="/hadith/$collection/entry/$num"
-                    params={{ collection: hadith.collection, num: String(hadith.num) }}
-                    className="block rounded-lg border border-border bg-background px-3 py-2 text-sm hover:border-primary/40"
-                  >
-                    <div className="font-medium text-foreground">{hadith.label}</div>
-                    {hadith.subtitle && (
-                      <div className="text-xs text-muted-foreground">{hadith.subtitle}</div>
-                    )}
-                  </Link>
-                ))}
-              </div>
-            </Section>
-          )}
-
           {journeys.length > 0 && (
             <Section title={copy.journeys}>
               <div className="space-y-2">
@@ -161,7 +138,7 @@ export function DiscoveryRail({
                     to="/surah/$id"
                     params={{ id: String(view.surah) }}
                     hash={view.ayah ? `v-${view.ayah}` : undefined}
-                    search={{ q: undefined }}
+                    search={{ q: "" }}
                     className="rounded-full border border-border bg-background px-3 py-1 text-xs hover:border-primary/40"
                   >
                     {view.label}
@@ -180,16 +157,7 @@ export function DiscoveryRail({
                   </Link>
                 );
               }
-              return (
-                <Link
-                  key={key}
-                  to="/hadith/$collection/entry/$num"
-                  params={{ collection: view.collection, num: String(view.num) }}
-                  className="rounded-full border border-border bg-background px-3 py-1 text-xs hover:border-primary/40"
-                >
-                  {view.label}
-                </Link>
-              );
+              return null;
             })}
           </div>
         </Section>

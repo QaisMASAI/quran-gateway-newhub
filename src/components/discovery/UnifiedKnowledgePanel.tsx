@@ -2,15 +2,10 @@ import { useState } from "react";
 import { Link } from "@tanstack/react-router";
 import {
   BookOpen,
-  ScrollText,
   User,
-  Sparkles,
   Layers,
   ChevronRight,
-  ExternalLink,
   ShieldCheck,
-  Bookmark,
-  Share2,
 } from "lucide-react";
 import type { InterconnectedKnowledgeBundle } from "@/lib/knowledge-engine";
 import { Badge } from "@/components/ui/badge";
@@ -22,11 +17,9 @@ interface Props {
 }
 
 export function UnifiedKnowledgePanel({ bundle, locale = "he", className = "" }: Props) {
-  const [activeTab, setActiveTab] = useState<"verses" | "hadiths" | "tafsir" | "entities" | "ai">(
+  const [activeTab, setActiveTab] = useState<"verses" | "tafsir" | "entities">(
     bundle.verses.length > 0
       ? "verses"
-      : bundle.hadiths.length > 0
-      ? "hadiths"
       : bundle.tafsirPassages.length > 0
       ? "tafsir"
       : "entities"
@@ -36,7 +29,6 @@ export function UnifiedKnowledgePanel({ bundle, locale = "he", className = "" }:
 
   const totalConnected =
     bundle.verses.length +
-    bundle.hadiths.length +
     bundle.tafsirPassages.length +
     bundle.prophets.length +
     bundle.topics.length;
@@ -97,24 +89,6 @@ export function UnifiedKnowledgePanel({ bundle, locale = "he", className = "" }:
             {locale === "ar" ? "آيات قرأنية" : locale === "he" ? "פסוקים" : "Verses"}
             <span className="rounded-full bg-primary-soft/40 px-1.5 py-0.2 text-[10px]">
               {bundle.verses.length}
-            </span>
-          </button>
-        )}
-
-        {bundle.hadiths.length > 0 && (
-          <button
-            type="button"
-            onClick={() => setActiveTab("hadiths")}
-            className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 font-semibold transition-colors ${
-              activeTab === "hadiths"
-                ? "bg-primary text-primary-foreground shadow-2xs"
-                : "text-muted-foreground hover:bg-muted hover:text-foreground"
-            }`}
-          >
-            <ScrollText className="h-3.5 w-3.5" />
-            {locale === "ar" ? "أحاديث صحيحة" : locale === "he" ? "חדית'ים" : "Hadith"}
-            <span className="rounded-full bg-primary-soft/40 px-1.5 py-0.2 text-[10px]">
-              {bundle.hadiths.length}
             </span>
           </button>
         )}
@@ -189,55 +163,6 @@ export function UnifiedKnowledgePanel({ bundle, locale = "he", className = "" }:
                 {v.translation && (
                   <p className="text-xs text-muted-foreground leading-relaxed">
                     {v.translation}
-                  </p>
-                )}
-              </div>
-            ))}
-          </div>
-        )}
-
-        {/* Connected Hadiths */}
-        {activeTab === "hadiths" && (
-          <div className="space-y-3">
-            {bundle.hadiths.map((h) => (
-              <div
-                key={h.id}
-                className="rounded-xl border border-border/70 bg-card p-3.5 shadow-2xs hover:border-primary/40 transition-colors space-y-2"
-              >
-                <div className="flex items-center justify-between text-xs">
-                  <div className="flex items-center gap-2">
-                    <Badge variant="secondary" className="text-[10px] bg-primary-soft/50 text-primary font-semibold">
-                      {h.collectionTitle} #{h.idInBook}
-                    </Badge>
-                    {h.grade && (
-                      <Badge variant="outline" className="text-[10px] border-emerald-600/30 text-emerald-700 dark:text-emerald-400">
-                        {h.grade}
-                      </Badge>
-                    )}
-                  </div>
-                  <Link
-                    to="/hadith/$collection/entry/$num"
-                    params={{ collection: h.collectionSlug, num: String(h.idInBook) }}
-                    className="inline-flex items-center gap-1 text-[11px] text-muted-foreground hover:text-primary transition-colors"
-                  >
-                    {locale === "ar" ? "عرض الحديث" : locale === "he" ? "הצג חדית'" : "View Hadith"}
-                    <ExternalLink className="h-3 w-3" />
-                  </Link>
-                </div>
-
-                {h.narrator && (
-                  <p className="text-[11px] italic text-muted-foreground">
-                    Narrated: {h.narrator}
-                  </p>
-                )}
-
-                <p className="font-quran text-right text-base text-foreground leading-relaxed" dir="rtl">
-                  {h.arabicText}
-                </p>
-
-                {h.translationText && (
-                  <p className="text-xs text-muted-foreground leading-relaxed">
-                    {h.translationText}
                   </p>
                 )}
               </div>

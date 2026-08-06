@@ -2,6 +2,7 @@ export type QueryPrefillState = "missing" | "empty" | "invalid" | "ok";
 
 export type QueryPrefillSource =
   | "hero_input"
+  | "search_input"
   | "popular_questions"
   | "home_continue_ai"
   | "recent_ai"
@@ -62,6 +63,7 @@ function parseQueryPrefillRaw(raw: unknown): Omit<QueryPrefillResult, "src"> {
 function parsePrefillSource(raw: unknown): QueryPrefillSource {
   if (
     raw === "hero_input" ||
+    raw === "search_input" ||
     raw === "popular_questions" ||
     raw === "home_continue_ai" ||
     raw === "recent_ai"

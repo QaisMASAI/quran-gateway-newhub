@@ -167,6 +167,7 @@ export function DailyAssistantWidget({ locale = "en" }: { locale?: "he" | "ar" |
             <Link
               to="/surah/$id"
               params={{ id: "2" }}
+              search={{ q: undefined }}
               hash="286"
               className="inline-flex items-center gap-1 text-primary hover:underline font-semibold"
             >
@@ -258,6 +259,7 @@ export function DailyAssistantWidget({ locale = "en" }: { locale?: "he" | "ar" |
             <span className="font-semibold text-foreground">{todayDua.ref}</span>
             <Link
               to="/ask"
+              search={{ q: "", qState: "missing", src: "unknown" }}
               className="inline-flex items-center gap-1 text-primary hover:underline font-semibold"
             >
               Ask AI Research <ArrowRight className="h-3 w-3" />

@@ -221,7 +221,7 @@ function AdminBackfillPage() {
         </p>
         <div className="mt-3">
           <Link
-            to="/admin/hadith-ingest"
+            to="/admin/backfill"
             className="inline-flex min-h-11 items-center rounded-lg border border-border px-4 py-2 text-sm hover:bg-secondary"
           >
             Open ingest reports

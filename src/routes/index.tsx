@@ -11,7 +11,6 @@ import {
   Compass,
   Gamepad2,
   GraduationCap,
-  LibraryBig,
   MessageCircle,
   Mic,
   ScrollText,
@@ -190,11 +189,6 @@ export function Home() {
         label: locale === "ar" ? "الرحلات" : locale === "he" ? "מסלולים" : "Journeys",
         to: "/learn/journeys" as const,
         icon: GraduationCap,
-      },
-      {
-        label: locale === "ar" ? "الحديث" : locale === "he" ? "חדית׳" : "Hadith",
-        to: "/hadith" as const,
-        icon: LibraryBig,
       },
       {
         label: locale === "ar" ? "الأطفال" : locale === "he" ? "ילדים" : "Kids",
@@ -410,10 +404,10 @@ export function Home() {
                 <span className="flex items-center gap-1">
                   <BookOpen className="h-3.5 w-3.5 text-primary" />
                   {locale === "ar"
-                    ? "تفسير الجلالين • أحاديث صحيحة"
+                    ? "تفسير الجلالين • شرح معرفي موثّق"
                     : locale === "he"
-                      ? "תפסיר אל-ג'לאלין • חדית'ים מוסמכים"
-                      : "Jalalayn Tafsir • Verified Sahih Hadith"}
+                      ? "תפסיר אל-ג'לאלין • הסבר מבוסס מקורות"
+                      : "Jalalayn Tafsir • Verified grounded explanations"}
                 </span>
                 <TrustBadge size="sm" className="border-border/60 bg-background/50" />
               </div>
@@ -454,24 +448,9 @@ export function Home() {
 
               <Button
                 asChild
-                variant="outline"
-                className="rounded-full border-border/80 px-5 font-semibold hover:border-primary/40"
-              >
-                <Link to="/hadith">
-                  <LibraryBig className="h-4 w-4 text-olive" />
-                  {locale === "ar"
-                    ? "مكتبة الحديث"
-                    : locale === "he"
-                      ? "ספריית החדית'"
-                      : "Hadith Library"}
-                </Link>
-              </Button>
-
-              <Button
-                asChild
                 className="rounded-full bg-gradient-to-r from-primary to-olive px-5 font-semibold text-primary-foreground shadow-md hover:opacity-95"
               >
-                <Link to="/ask" search={{ q: undefined, qState: "missing", src: "unknown" }}>
+                <Link to="/ask" search={{ q: "", qState: "missing", src: "unknown" }}>
                   <Sparkles className="h-4 w-4 text-gold" />
                   {locale === "ar"
                     ? "مساعد AI"
@@ -509,7 +488,7 @@ export function Home() {
                 <Link
                   to="/surah/$id"
                   params={{ id: String(progress.surah) }}
-                  search={{ q: undefined }}
+                  search={{ q: "" }}
                   hash={progress.ayah ? `v-${progress.ayah}` : undefined}
                   className="surface-card group flex items-center justify-between p-4 hover:border-primary/50 hover:shadow-md transition-all"
                 >
@@ -618,28 +597,35 @@ export function Home() {
                   : "Recently Opened"}
             </h3>
             <div className="flex flex-wrap gap-2">
-              {recentViews.slice(0, 8).map((view, idx) => (
-                <Link
-                  key={`home-recent-${idx}`}
-                  to={
-                    view.kind === "surah"
-                      ? "/surah/$id"
-                      : view.kind === "entity"
-                        ? "/learn/$kind/$slug"
-                        : "/hadith/$collection/entry/$num"
-                  }
-                  params={
-                    view.kind === "surah"
-                      ? { id: String(view.surah) }
-                      : view.kind === "entity"
-                        ? { kind: view.entityKind, slug: view.slug }
-                        : { collection: view.collection, num: String(view.num) }
-                  }
-                  className="rounded-full border border-border/80 bg-card/80 px-3.5 py-1.5 text-xs font-semibold text-foreground transition-all hover:border-primary/40 hover:bg-primary-soft/40 hover:text-primary shadow-2xs"
-                >
-                  {view.label}
-                </Link>
-              ))}
+              {recentViews.slice(0, 8).map((view, idx) => {
+                if (view.kind === "surah") {
+                  return (
+                    <Link
+                      key={`home-recent-${idx}`}
+                      to="/surah/$id"
+                      params={{ id: String(view.surah) }}
+                      className="rounded-full border border-border/80 bg-card/80 px-3.5 py-1.5 text-xs font-semibold text-foreground transition-all hover:border-primary/40 hover:bg-primary-soft/40 hover:text-primary shadow-2xs"
+                    >
+                      {view.label}
+                    </Link>
+                  );
+                }
+
+                if (view.kind === "entity") {
+                  return (
+                    <Link
+                      key={`home-recent-${idx}`}
+                      to="/learn/$kind/$slug"
+                      params={{ kind: view.entityKind, slug: view.slug }}
+                      className="rounded-full border border-border/80 bg-card/80 px-3.5 py-1.5 text-xs font-semibold text-foreground transition-all hover:border-primary/40 hover:bg-primary-soft/40 hover:text-primary shadow-2xs"
+                    >
+                      {view.label}
+                    </Link>
+                  );
+                }
+
+                return null;
+              })}
             </div>
           </section>
         )}
@@ -681,10 +667,10 @@ export function Home() {
             </h2>
             <p className="text-xs text-muted-foreground mt-0.5">
               {locale === "ar"
-                ? "تصفح السور والحديث والمواضيع والأنبياء عبر خرائط تفاعلية"
+                ? "تصفح السور والمواضيع والأنبياء عبر خرائط تفاعلية"
                 : locale === "he"
-                  ? "עיינו בסורות, חדית', נושאים ונביאים במפות אינטראקטיביות"
-                  : "Browse Surahs, Hadith, Topics, Prophets, and interactive maps"}
+                  ? "עיינו בסורות, נושאים ונביאים במפות אינטראקטיביות"
+                  : "Browse Surahs, Topics, Prophets, and interactive maps"}
             </p>
           </div>
 
@@ -725,13 +711,7 @@ export function Home() {
                             : locale === "he"
                               ? "עץ קונספטים אינטראקטיבי"
                               : "Interactive concept graph & cross-references"
-                          : card.to === "/hadith"
-                            ? locale === "ar"
-                              ? "كتب الحديث الصحيحة مع دراسة الإسناد"
-                              : locale === "he"
-                                ? "ספרי חדית' מוסמכים עם חקר סנד"
-                                : "Authentic Hadith collections & narrators"
-                            : card.to === "/kids"
+                          : card.to === "/kids"
                               ? locale === "ar"
                                 ? "أسئلة تفاعلية وممتعة للأطفال"
                                 : locale === "he"

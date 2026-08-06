@@ -189,8 +189,8 @@ export const DailySpotlight: React.FC<DailySpotlightProps> = ({
             </div>
 
             <Link
-              to="/hadith/$collection/entry/$num"
-              params={{ collection: todayHadith.collection, num: String(todayHadith.hadithNum) }}
+              to="/ask"
+              search={{ q: `${todayHadith.bookEn} ${todayHadith.hadithNum}`, qState: "ok", src: "unknown" }}
               className="w-full"
             >
               <Button variant="outline" className="w-full bg-zinc-800 hover:bg-sky-600 text-zinc-200 hover:text-white border-zinc-700 text-xs font-bold py-2 rounded-xl flex items-center justify-between">
