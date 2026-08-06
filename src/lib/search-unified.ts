@@ -13,7 +13,7 @@ import { getRichMetadataForEntity } from "./knowledge-metadata-store";
 import type { EntityRichMetadata } from "@/types/entity-metadata";
 
 export type KnowledgeCategory =
-  "quran" | "hadith" | "tafsir" | "topics" | "prophets" | "stories" | "narrators" | "places";
+  "quran" | "tafsir" | "topics" | "prophets" | "stories" | "narrators" | "places";
 
 export interface RankingFactors {
   semanticSimilarity: number;
@@ -128,7 +128,6 @@ export function computeMultiFactorRanking(
   // 5. Source Frequency
   let sourceFrequency = 55;
   if (category === "quran") sourceFrequency = 95;
-  else if (category === "hadith") sourceFrequency = 88;
   else if (category === "tafsir") sourceFrequency = 84;
   else if (richMeta.primaryKeywords.length >= 3) sourceFrequency = 76;
 
@@ -280,7 +279,6 @@ export async function performUnifiedSearch(
   const q = query.trim();
   const categoryResults: Record<KnowledgeCategory, UnifiedSearchResultItem[]> = {
     quran: [],
-    hadith: [],
     tafsir: [],
     topics: [],
     prophets: [],
@@ -291,7 +289,6 @@ export async function performUnifiedSearch(
 
   const categoryCounts: Record<KnowledgeCategory, number> = {
     quran: 0,
-    hadith: 0,
     tafsir: 0,
     topics: 0,
     prophets: 0,
@@ -356,12 +353,7 @@ export async function performUnifiedSearch(
       }
     })(),
 
-    // 2. HADITH (disabled)
-    (async () => {
-      // Hadith module removed
-    })(),
-
-    // 3. TAFSIR
+    // 2. TAFSIR
     (async () => {
       if (categoryFilter !== "all" && categoryFilter !== "tafsir") return;
       try {
@@ -387,7 +379,7 @@ export async function performUnifiedSearch(
       }
     })(),
 
-    // 4. PROPHETS
+    // 3. PROPHETS
     (async () => {
       if (categoryFilter !== "all" && categoryFilter !== "prophets") return;
       try {
@@ -433,7 +425,7 @@ export async function performUnifiedSearch(
       }
     })(),
 
-    // 5. TOPICS
+    // 4. TOPICS
     (async () => {
       if (categoryFilter !== "all" && categoryFilter !== "topics") return;
       try {
@@ -476,7 +468,7 @@ export async function performUnifiedSearch(
       }
     })(),
 
-    // 6. STORIES
+    // 5. STORIES
     (async () => {
       if (categoryFilter !== "all" && categoryFilter !== "stories") return;
       try {
@@ -518,7 +510,7 @@ export async function performUnifiedSearch(
       }
     })(),
 
-    // 7. NARRATORS
+    // 6. NARRATORS
     (async () => {
       if (categoryFilter !== "all" && categoryFilter !== "narrators") return;
       try {
@@ -561,7 +553,7 @@ export async function performUnifiedSearch(
       }
     })(),
 
-    // 8. PLACES
+    // 7. PLACES
     (async () => {
       if (categoryFilter !== "all" && categoryFilter !== "places") return;
       try {
@@ -665,7 +657,7 @@ export async function performUnifiedSearch(
   const isAr = locale === "ar";
   const isHe = locale === "he";
   const overallRankingRationale = isAr
-    ? `تم تحليل ترتيب النتائج بناءً على التطابق الدلالي، شبكة العلاقات في رسم البياني المعرفي، الأهمية الموضوعية، والأحداث التاريخية في القرآن والسنة.`
+    ? `تم تحليل ترتيب النتائج بناءً على التطابق الدلالي، شبكة العلاقات في الرسم البياني المعرفي، والأهمية الموضوعية في المصادر المعرفية.`
     : isHe
       ? `תוצאות החיפוש דורגו בעזרת מודל רב-ממדי: דמיון סמנטי, קשרי גרף ידע, חשיבות נושאית והפניות צולבות במקורות.`
       : `SearchResults ordered using multi-dimensional ranking (Semantic similarity, Knowledge graph, Topic importance, Historical context, Source frequency, Cross-references, User intent).`;

@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import { Link } from "@tanstack/react-router";
 import {
   BookOpen,
-  BookCheck,
   Quote,
   Layers,
   User,
@@ -56,13 +55,6 @@ export const CategorizedSearchResults: React.FC<CategorizedSearchResultsProps> =
       icon: <BookOpen className="h-4 w-4 text-emerald-600" />,
       count: categoryCounts.quran || 0,
       color: "border-emerald-500/30 text-emerald-700 dark:text-emerald-300",
-    },
-    {
-      id: "hadith",
-      label: isAr ? "الأحاديث الصحيحة" : isHe ? "חדית' מוסמך" : "Sahih Hadith",
-      icon: <BookCheck className="h-4 w-4 text-amber-600" />,
-      count: categoryCounts.hadith || 0,
-      color: "border-amber-500/30 text-amber-700 dark:text-amber-300",
     },
     {
       id: "tafsir",
