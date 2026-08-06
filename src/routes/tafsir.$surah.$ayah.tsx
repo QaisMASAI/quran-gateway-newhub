@@ -239,6 +239,7 @@ function VerseTafsirPage() {
               <Link
                 to="/surah/$id"
                 params={{ id: String(surah) }}
+                search={{ q: "" }}
                 className="text-xs text-muted-foreground hover:text-primary transition-colors font-medium flex items-center gap-1"
               >
                 <span>{locale === "ar" ? "قراءة السورة كاملة" : "Read Full Surah"}</span>
