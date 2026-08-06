@@ -90,7 +90,7 @@ export function DiscoveryRail({
               to="/surah/$id"
               params={{ id: String(verse.surah) }}
               hash={`v-${verse.ayah}`}
-              search={{ q: undefined }}
+              search={{ q: "" }}
               className="rounded-lg border border-border bg-background px-3 py-2 text-sm hover:border-primary/40"
             >
               <div className="font-medium text-foreground">{verse.label}</div>
