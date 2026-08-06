@@ -75,7 +75,7 @@ function SearchPage() {
   const handleClear = () => {
     setSearchQuery("");
     navigate({
-      search: { q: undefined, qState: "missing", src: "unknown" },
+      search: { q: "", qState: "missing", src: "unknown" },
     });
   };
 
