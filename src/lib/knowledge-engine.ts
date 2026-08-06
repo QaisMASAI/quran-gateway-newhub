@@ -126,9 +126,6 @@ export const getInterconnectedKnowledge = createServerFn({ method: "POST" })
 
       bundle.title = `Verse ${surah}:${ayah}`;
 
-
-      }
-
       // Fetch Tafsirs linked to this verse
       const { data: tafsirs } = await supabaseAdmin
         .from("tafsir_passages")
