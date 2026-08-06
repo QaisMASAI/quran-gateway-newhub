@@ -241,7 +241,9 @@ export const SavedCollectionsManager: React.FC<SavedCollectionsManagerProps> = (
                   <div className="pt-2 flex justify-end">
                     {item.type === "verse" && (
                       <Link
-                        to={`/surah/${item.reference.split(":")[0]}`}
+                        to="/surah/$id"
+                        params={{ id: item.reference.split(":")[0] ?? "1" }}
+                        search={{ q: "" }}
                         hash={`v-${item.reference.split(":")[1]}`}
                         className="text-[11px] font-bold text-amber-400 hover:underline flex items-center gap-1"
                       >
