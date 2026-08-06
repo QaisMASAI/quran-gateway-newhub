@@ -488,7 +488,7 @@ export function Home() {
                 <Link
                   to="/surah/$id"
                   params={{ id: String(progress.surah) }}
-                  search={{ q: undefined }}
+                  search={{ q: "" }}
                   hash={progress.ayah ? `v-${progress.ayah}` : undefined}
                   className="surface-card group flex items-center justify-between p-4 hover:border-primary/50 hover:shadow-md transition-all"
                 >
