@@ -5,6 +5,7 @@ import {
   executePrestigeReset,
   INITIAL_USER_GAMEIFICATION,
   restoreStreak,
+  buildUserGamificationFromDb,
   type UserGameification,
 } from "./gamification-engine-v2";
 
@@ -86,5 +87,40 @@ describe("Gamification Engine 2.0 Tests", () => {
     const prestigeRes = executePrestigeReset(userState);
     expect(prestigeRes.success).toBe(false);
     expect(userState.prestige).toBe(0);
+  });
+
+  it("builds UserGameification state correctly from DB records", () => {
+    const userId = "test_user_uuid_123";
+    const dbGamification = {
+      user_id: userId,
+      total_xp: 4500,
+      level: 5,
+      prestige: 1,
+      current_streak_days: 12,
+      longest_streak_days: 20,
+      learning_style: "kinesthetic",
+      difficulty_preference: "hard",
+    };
+    const dbAchievements = [
+      {
+        id: "ach_1",
+        achievement_id: "ach_streak_7",
+        name: "Steadfast Week",
+        progress: 100,
+        badge: "🔥",
+        rarity: "epic",
+        type: "habit",
+      },
+    ];
+
+    const state = buildUserGamificationFromDb(userId, dbGamification, dbAchievements);
+    expect(state.userId).toBe(userId);
+    expect(state.totalXp).toBe(4500);
+    expect(state.level).toBe(5);
+    expect(state.prestige).toBe(1);
+    expect(state.streaks.current).toBe(12);
+    expect(state.personalization.detectedStyle).toBe("kinesthetic");
+    expect(state.personalization.difficultyPreference).toBe(8);
+    expect(state.earnedBadges).toContain("🔥");
   });
 });
