@@ -1029,3 +1029,89 @@ export function getLeaderboardData(
 
   return mockUsers.sort((a, b) => b.totalXp - a.totalXp);
 }
+
+/**
+ * Builds UserGameification state object from Supabase relational DB records.
+ */
+export function buildUserGamificationFromDb(
+  userId: string,
+  dbGamification?: any,
+  dbAchievements?: any[],
+  dbEvents?: any[],
+  dbChallenges?: any[],
+  dbWorlds?: any[]
+): UserGameification {
+  const base: UserGameification = JSON.parse(JSON.stringify(INITIAL_USER_GAMEIFICATION));
+  base.userId = userId;
+
+  if (dbGamification) {
+    base.totalXp = dbGamification.total_xp ?? base.totalXp;
+    base.level = dbGamification.level ?? base.level;
+    base.prestige = dbGamification.prestige ?? base.prestige;
+    base.streaks.current = dbGamification.current_streak_days ?? base.streaks.current;
+    base.streaks.longest = dbGamification.longest_streak_days ?? base.streaks.longest;
+    base.streaks.lastCompletedDate = dbGamification.last_activity_date ?? base.streaks.lastCompletedDate;
+    if (dbGamification.learning_style) {
+      base.personalization.detectedStyle = dbGamification.learning_style as LearningStyle;
+    }
+    if (dbGamification.difficulty_preference) {
+      base.personalization.difficultyPreference =
+        dbGamification.difficulty_preference === "easy" ? 3 :
+        dbGamification.difficulty_preference === "hard" ? 8 : 5;
+    }
+  }
+
+  if (dbAchievements && dbAchievements.length > 0) {
+    base.achievements = dbAchievements.map((a) => ({
+      id: a.achievement_id || a.id,
+      name: a.name || "Achievement",
+      description: a.description || "",
+      badge: a.badge || "🏆",
+      rarity: (a.rarity as AchievementRarity) || "common",
+      type: (a.type as AchievementType) || "skill",
+      progress: a.progress ?? 100,
+      unlockedAt: a.unlocked_at,
+      rewardXp: a.xp_reward || 50,
+    }));
+    base.earnedBadges = base.achievements
+      .filter((a) => a.progress >= 100)
+      .map((a) => a.badge);
+  }
+
+  if (dbChallenges && dbChallenges.length > 0) {
+    base.dailyChallenges = dbChallenges.map((c) => ({
+      id: c.challenge_id || c.id,
+      title: c.title,
+      description: c.description || "",
+      difficulty: c.difficulty || "medium",
+      durationMinutes: c.duration_minutes || 15,
+      xpReward: c.xp_reward || 100,
+      completed: !!c.completed,
+      claimed: !!c.claimed,
+      claimedAt: c.claimed_at,
+      expiresAt: c.expires_at || new Date(Date.now() + 30 * 86400000).toISOString(),
+      progress: c.progress ?? 0,
+    }));
+  }
+
+  if (dbWorlds && dbWorlds.length > 0) {
+    dbWorlds.forEach((w) => {
+      if (w.world_id && base.worldProgress[w.world_id as WorldId] !== undefined) {
+        base.worldProgress[w.world_id as WorldId] = Number(w.progress_percentage || 0);
+      }
+    });
+  }
+
+  if (dbEvents && dbEvents.length > 0) {
+    dbEvents.forEach((evt) => {
+      if (evt.event_type === "quiz_completed") {
+        base.engagementStats.totalQuizzesTaken += 1;
+        if (evt.accuracy && Number(evt.accuracy) >= 70) {
+          base.engagementStats.correctAnswersCount += 1;
+        }
+      }
+    });
+  }
+
+  return base;
+}
