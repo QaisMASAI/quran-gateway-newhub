@@ -20,6 +20,7 @@ import { surahDisplayName } from "@/lib/surah-names-he";
 import { getGamificationStats, calculateLevel, ALL_BADGES } from "@/lib/gamification";
 import { Flame, Award, Trophy, ShieldCheck, Sparkles as SparklesIcon } from "lucide-react";
 import { HabitPersonalDashboard } from "@/components/dashboard/HabitPersonalDashboard";
+import { GamificationDashboard } from "@/components/learning/GamificationDashboard";
 
 export const Route = createLazyFileRoute("/profile")({
   component: ProfilePage,
@@ -129,6 +130,7 @@ function ProfilePage() {
   const { t, i18n } = useTranslation("pages");
   const locale = (normalizeLocale(i18n.language) ?? "he") as Locale;
   const { user, isAuthenticated, loading: authLoading } = useAuth();
+  const routeData = (Route.useLoaderData() || {}) as any;
 
   const { data, isLoading } = useQuery({
     queryKey: ["profile-summary", user?.id],
@@ -182,91 +184,14 @@ function ProfilePage() {
       <main id="main" className="mx-auto max-w-7xl px-4 py-8 sm:px-6 space-y-10">
         {/* HABIT PERSONAL DASHBOARD */}
         <HabitPersonalDashboard locale={locale} />
-        {/* Gamification & Achievements Banner */}
-        {(() => {
-          const gameStats = getGamificationStats();
-          const lvl = calculateLevel(gameStats.xp);
-          return (
-            <div className="rounded-3xl border border-gold/30 bg-gradient-to-r from-gold/10 via-card to-primary/10 p-6 shadow-xl space-y-4">
-              <div className="flex flex-wrap items-center justify-between gap-4">
-                <div className="flex items-center gap-3">
-                  <div className="rounded-2xl border border-gold/40 bg-gold/20 p-3 text-gold">
-                    <Trophy className="h-6 w-6" />
-                  </div>
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <span className="text-xs font-bold uppercase tracking-wider text-gold">
-                        Level {lvl.level}
-                      </span>
-                      <h2 className="text-xl font-bold text-foreground">
-                        {locale === "ar"
-                          ? lvl.titleAr
-                          : locale === "he"
-                            ? lvl.titleHe
-                              : lvl.title}
-                      </h2>
-                    </div>
-                    <p className="text-xs text-muted-foreground">
-                      {gameStats.xp} Total XP • {lvl.nextLevelXP - gameStats.xp} XP to next
-                      milestone
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-3">
-                  <div className="flex items-center gap-1.5 rounded-full border border-amber-500/30 bg-amber-500/10 px-3.5 py-1.5 text-xs font-bold text-amber-600 dark:text-amber-400">
-                    <Flame className="h-4 w-4 text-amber-500 fill-amber-500" />
-                    <span>{gameStats.streak} Day Streak</span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Progress Bar */}
-              <div className="space-y-1">
-                <div className="flex justify-between text-[11px] font-semibold text-muted-foreground">
-                  <span>Level Progress</span>
-                  <span>{lvl.progressPercent}%</span>
-                </div>
-                <div className="h-2.5 rounded-full bg-secondary overflow-hidden">
-                  <div
-                    className="h-full bg-gradient-to-r from-gold via-emerald-500 to-primary transition-all duration-500"
-                    style={{ width: `${lvl.progressPercent}%` }}
-                  />
-                </div>
-              </div>
-
-              {/* Badges Grid */}
-              <div className="pt-2 border-t border-border/50">
-                <h3 className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-3">
-                  Unlocked Achievements
-                </h3>
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-2.5">
-                  {ALL_BADGES.map((b) => {
-                    const isUnlocked = gameStats.unlockedAchievements.includes(b.id);
-                    return (
-                      <div
-                        key={b.id}
-                        className={`p-3 rounded-2xl border text-center transition-all ${
-                          isUnlocked
-                            ? "border-gold/40 bg-gold/10 text-foreground shadow-sm"
-                            : "border-border/40 bg-secondary/30 opacity-50 grayscale"
-                        }`}
-                      >
-                        <div className="text-2xl mb-1">{b.icon}</div>
-                        <div className="text-[11px] font-bold truncate">
-                          {locale === "ar" ? b.nameAr : locale === "he" ? b.nameHe : b.nameEn}
-                        </div>
-                        <div className="text-[9px] text-muted-foreground truncate">
-                          {isUnlocked ? "Unlocked" : "Locked"}
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-            </div>
-          );
-        })()}
+        {/* Gamification Engine 2.0 & Analytics Hub */}
+        <GamificationDashboard
+          locale={locale}
+          userId={user?.id}
+          data={routeData?.userGamificationState}
+          achievements={routeData?.achievements}
+          learningEvents={routeData?.learningEvents}
+        />
 
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
           <StatCard
