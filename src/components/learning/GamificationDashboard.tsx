@@ -31,6 +31,8 @@ import { SocialLeaderboardView } from "@/components/gamification/SocialLeaderboa
 import { PersonalizationWidget } from "@/components/gamification/PersonalizationWidget";
 import { GamificationAdminDashboard } from "@/components/admin/GamificationAdminDashboard";
 import { LearningAnalyticsDashboard } from "@/components/analytics/LearningAnalyticsDashboard";
+import { ClassroomHub } from "@/components/classroom/ClassroomHub";
+import { GraduationCap } from "lucide-react";
 
 interface GamificationDashboardProps {
   locale?: "en" | "ar" | "he";
@@ -39,6 +41,7 @@ interface GamificationDashboardProps {
 export const GamificationDashboard: React.FC<GamificationDashboardProps> = ({ locale = "en" }) => {
   const [data, setData] = useState<UserGameification>(loadUserGamification);
   const [activeTab, setActiveTab] = useState<
+    | "classroom"
     | "analytics"
     | "xp_summary"
     | "streak"
@@ -64,6 +67,12 @@ export const GamificationDashboard: React.FC<GamificationDashboardProps> = ({ lo
       {/* Engine 2.0 Top Navigation Tabs */}
       <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none border-b border-zinc-200 dark:border-zinc-800">
         {[
+          {
+            id: "classroom",
+            labelAr: "الفصول و المعلمين",
+            labelEn: "Classroom & Teacher Portal",
+            icon: GraduationCap,
+          },
           {
             id: "analytics",
             labelAr: "التحليلات المتقدمة",
@@ -115,6 +124,8 @@ export const GamificationDashboard: React.FC<GamificationDashboardProps> = ({ lo
       </div>
 
       {/* TAB CONTENT */}
+      {activeTab === "classroom" && <ClassroomHub locale={locale} />}
+
       {activeTab === "analytics" && <LearningAnalyticsDashboard locale={locale} />}
 
       {activeTab === "xp_summary" && (
