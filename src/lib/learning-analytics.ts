@@ -296,6 +296,113 @@ export function generateMockAnalyticsSummary(userId: string = "usr_guest"): Anal
   };
 }
 
+export interface GenerateAnalyticsParams {
+  userId: string;
+  learningEvents?: any[];
+  quizHistory?: any[];
+  topicProgress?: any[];
+  userLevel?: number;
+  userXp?: number;
+  streakDays?: number;
+}
+
+export function generateAnalyticsSummary(params: GenerateAnalyticsParams): AnalyticsSummary {
+  const base = generateMockAnalyticsSummary(params.userId);
+
+  const events = params.learningEvents || [];
+  const quizzes = params.quizHistory || [];
+  const topics = params.topicProgress || [];
+
+  if (events.length > 0 || quizzes.length > 0 || topics.length > 0) {
+    let totalSecs = 0;
+    let versesRead = 0;
+    let quizCount = quizzes.length;
+
+    const dailyActivityMap = new Map<string, { minutes: number; count: number; quizzes: number }>();
+
+    events.forEach((evt) => {
+      const duration = evt.duration_seconds || evt.durationSeconds || 0;
+      totalSecs += duration;
+
+      const evtType = evt.event_type || evt.eventType;
+      if (evtType === "verse_read") versesRead += 1;
+      if (evtType === "quiz_completed") quizCount += 1;
+
+      const dateStr = (evt.timestamp || evt.created_at || new Date().toISOString()).split("T")[0];
+      const current = dailyActivityMap.get(dateStr) || { minutes: 0, count: 0, quizzes: 0 };
+      current.minutes += Math.round(duration / 60);
+      current.count += 1;
+      if (evtType === "quiz_completed") current.quizzes += 1;
+      dailyActivityMap.set(dateStr, current);
+    });
+
+    quizzes.forEach((q) => {
+      totalSecs += q.time_spent_seconds || 0;
+    });
+
+    const hours = Math.round((totalSecs / 3600) * 10) / 10;
+    if (hours > 0) base.totalLearningHours = hours;
+    if (versesRead > 0) base.totalVersesRead = versesRead;
+    if (quizCount > 0) base.totalQuizzesCompleted = quizCount;
+
+    if (dailyActivityMap.size > 0) {
+      base.heatmapData = base.heatmapData.map((item) => {
+        const real = dailyActivityMap.get(item.date);
+        if (real) {
+          let intensity: DayHeatmapItem["intensity"] = 0;
+          if (real.minutes > 45) intensity = 4;
+          else if (real.minutes > 30) intensity = 3;
+          else if (real.minutes > 15) intensity = 2;
+          else if (real.minutes > 0) intensity = 1;
+
+          return {
+            date: item.date,
+            count: real.count,
+            minutes: real.minutes,
+            quizzes: real.quizzes,
+            intensity,
+          };
+        }
+        return item;
+      });
+    }
+
+    if (topics.length > 0) {
+      let totalMasteryPct = 0;
+      const updatedTopicMastery = base.topicMasteryData.map((tm) => {
+        const found = topics.find((t) => t.topic_id === tm.topicId || t.topicId === tm.topicId);
+        if (found) {
+          const mastery = Number(found.mastery_percentage || found.masteryPercentage || tm.userMasteryPct);
+          totalMasteryPct += mastery;
+          return {
+            ...tm,
+            userMasteryPct: mastery,
+            quizzesTaken: found.quizzes_taken ?? tm.quizzesTaken,
+            timeSpentHours: Number(found.time_spent_hours || tm.timeSpentHours),
+            status: (mastery >= 80 ? "mastered" : mastery >= 50 ? "proficient" : "weak") as any,
+          };
+        }
+        totalMasteryPct += tm.userMasteryPct;
+        return tm;
+      });
+      base.topicMasteryData = updatedTopicMastery;
+      base.topicsMasteredPct = Math.round(totalMasteryPct / updatedTopicMastery.length);
+    }
+  }
+
+  if (params.userLevel !== undefined && params.userLevel > 0) {
+    base.currentLevel = params.userLevel;
+  }
+  if (params.userXp !== undefined && params.userXp > 0) {
+    base.xpInLevel = params.userXp % 1000;
+  }
+  if (params.streakDays !== undefined) {
+    base.currentStreakDays = params.streakDays;
+  }
+
+  return base;
+}
+
 /**
  * Export CSV Utility
  */
