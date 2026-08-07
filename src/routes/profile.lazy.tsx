@@ -191,6 +191,7 @@ function ProfilePage() {
           data={routeData?.userGamificationState}
           achievements={routeData?.achievements}
           learningEvents={routeData?.learningEvents}
+          analyticsData={routeData?.analyticsData}
         />
 
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
