@@ -19,11 +19,17 @@ import {
   MessageSquare,
   HelpCircle,
   RefreshCw,
+  Clock,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { fetchTafsirBySourceFn, fetchTafsirMultiSourceFn, fetchAsbabFromApi } from "@/lib/tafsir-api.functions";
+import {
+  fetchTafsirBySourceFn,
+  fetchTafsirMultiSourceFn,
+  fetchAsbabFromApi,
+} from "@/lib/tafsir-api.functions";
 import {
   TAFSIR_SOURCES_META,
   getTafsirMetaByKey,
@@ -40,8 +46,78 @@ import { ShareCardModal } from "@/components/ShareCardModal";
 import { PageKnowledgeHub } from "@/components/knowledge/PageKnowledgeHub";
 import { fetchSurahBilingual } from "@/lib/translations-db";
 import { SURAH_NAMES_AR, SURAH_NAMES_EN } from "@/lib/surah-names-he";
+import { generateGroundedAnswer, contentModerationFlag } from "@/lib/ai/ai-safety-rag";
+import { supabase } from "@/integrations/supabase/client";
+import { trackLearningEvent } from "@/lib/analytics-tracker";
+import { useAuth } from "@/hooks/useAuth";
+import { trackLearningEvent } from "@/lib/analytics-tracker";
+import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
 import ReactMarkdown from "react-markdown";
+
+export interface TafsirResponse {
+  content: string;
+  sources: unknown[];
+  aiGenerated: boolean;
+  moderationStatus: "approved" | "pending" | "flagged";
+  scholarReviewRequired: boolean;
+}
+
+export const generateTafsir = async (surah: number, ayah: number, useAiEnhancement = false) => {
+  // Get the verse
+  const { data: verse } = await supabase
+    .from("quran_ayat")
+    .select("*")
+    .eq("surah", surah)
+    .eq("number", ayah)
+    .maybeSingle();
+
+  // Get relevant tafsir sources from database (not AI-generated)
+  const { data: sourcesData } = await supabase
+    .from("tafsir_sources")
+    .select("*")
+    .or(`surah.eq.${surah},ayah.eq.${ayah}`);
+
+  const sources = sourcesData || [];
+  let aiExplanation: Awaited<ReturnType<typeof generateGroundedAnswer>> | null = null;
+
+  // If AI enhancement enabled:
+  if (useAiEnhancement) {
+    aiExplanation = await generateGroundedAnswer(
+      `Explain this verse: ${verse?.text || `Surah ${surah}:${ayah}`}`,
+      sources, // ONLY use verified sources
+    );
+
+    // Flag for review if confidence is low
+    if (aiExplanation.confidence === "low") {
+      await contentModerationFlag({
+        contentId: `tafsir_${surah}_${ayah}`,
+        type: "low_confidence_ai",
+        content: aiExplanation.content,
+        sources: sources,
+        requiresReview: true,
+      });
+    }
+  }
+
+  const moderationStatus: "approved" | "pending" | "flagged" =
+    aiExplanation && aiExplanation.confidence === "low" ? "pending" : "approved";
+
+  const response: TafsirResponse = {
+    content: aiExplanation?.content || (verse?.text ? `Tafsir for verse ${surah}:${ayah}` : ""),
+    sources: sources,
+    aiGenerated: useAiEnhancement,
+    moderationStatus,
+    scholarReviewRequired: moderationStatus === "pending",
+  };
+
+  return {
+    verse: verse,
+    sources: sources,
+    aiEnhancement: useAiEnhancement ? aiExplanation : null,
+    response,
+  };
+};
 
 export const Route = createFileRoute("/tafsir/$surah/$ayah")({
   head: ({ params }) => {
@@ -81,7 +157,8 @@ function VerseTafsirPage() {
   const [shareOpen, setShareOpen] = useState(false);
 
   // User store & note state
-  const { isBookmarked, saveBookmark, notes, saveNote, compareSources, setCompareSources } = useTafsirUserStore();
+  const { isBookmarked, saveBookmark, notes, saveNote, compareSources, setCompareSources } =
+    useTafsirUserStore();
   const [noteText, setNoteText] = useState("");
   const [noteEditing, setNoteEditing] = useState(false);
 
@@ -139,6 +216,29 @@ function VerseTafsirPage() {
     enabled: activeTab === "asbab",
     staleTime: 10 * 60_000,
   });
+
+  const { data: groundedTafsirData } = useQuery({
+    queryKey: ["grounded-tafsir", surah, ayah],
+    queryFn: () => generateTafsir(surah, ayah, true),
+    staleTime: 10 * 60_000,
+  });
+
+  const { user } = useAuth();
+
+  useEffect(() => {
+    const startTime = Date.now();
+    return () => {
+      if (!user?.id) return;
+      const durationSeconds = Math.max(1, Math.round((Date.now() - startTime) / 1000));
+      trackLearningEvent("tafsir_studied", {
+        userId: user.id,
+        topicId: `tafsir_${surah}_${ayah}`,
+        durationSeconds,
+        difficulty: 5,
+        xpEarned: 25,
+      });
+    };
+  }, [surah, ayah, user?.id]);
 
   const activeMeta = getTafsirMetaByKey(activeSourceKey) ?? TAFSIR_SOURCES_META[0];
   const bookmarked = isBookmarked(surah, ayah, activeSourceKey);
@@ -232,9 +332,17 @@ function VerseTafsirPage() {
         {/* Primary Verse Card */}
         <div className="rounded-3xl border border-border/80 bg-card/90 p-6 md:p-8 shadow-md space-y-4">
           <div className="flex items-center justify-between border-b border-border/50 pb-3">
-            <span className="text-xs font-bold text-primary tracking-wider uppercase">
-              {surahName} • Verse {surah}:{ayah}
-            </span>
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-bold text-primary tracking-wider uppercase">
+                {surahName} • Verse {surah}:{ayah}
+              </span>
+              {groundedTafsirData?.response?.moderationStatus === "pending" && (
+                <Badge variant="outline" className="bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/30 gap-1 text-[10px] py-0.5">
+                  <Clock className="h-3 w-3" />
+                  <span>Pending Scholar Review</span>
+                </Badge>
+              )}
+            </div>
             <div className="flex items-center gap-2">
               <Link
                 to="/surah/$id"
@@ -255,7 +363,8 @@ function VerseTafsirPage() {
 
           {/* Translation */}
           <p className="text-sm md:text-base text-muted-foreground leading-relaxed italic border-t border-border/40 pt-3">
-            {translationText || "In the name of Allah, the Entirely Merciful, the Especially Merciful."}
+            {translationText ||
+              "In the name of Allah, the Entirely Merciful, the Especially Merciful."}
           </p>
         </div>
 
@@ -343,7 +452,9 @@ function VerseTafsirPage() {
             <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-border/80 bg-card p-4 shadow-xs">
               <div className="space-y-1">
                 <div className="flex items-center gap-2">
-                  <span className={`px-2 py-0.5 rounded-md text-[10px] font-bold border ${activeMeta.badgeColor}`}>
+                  <span
+                    className={`px-2 py-0.5 rounded-md text-[10px] font-bold border ${activeMeta.badgeColor}`}
+                  >
                     {locale === "ar"
                       ? activeMeta.methodologyLabel_ar
                       : locale === "he"
@@ -352,7 +463,9 @@ function VerseTafsirPage() {
                   </span>
                   <span className="text-xs text-muted-foreground font-mono">{activeMeta.era}</span>
                 </div>
-                <h3 className="font-bold text-lg text-foreground">{tafsirSourceName(activeMeta, locale)}</h3>
+                <h3 className="font-bold text-lg text-foreground">
+                  {tafsirSourceName(activeMeta, locale)}
+                </h3>
                 <p className="text-xs text-muted-foreground">
                   {locale === "ar"
                     ? activeMeta.author_ar
@@ -399,7 +512,13 @@ function VerseTafsirPage() {
                 >
                   <Bookmark className={`h-3.5 w-3.5 ${bookmarked ? "fill-current" : ""}`} />
                   <span>
-                    {bookmarked ? (locale === "ar" ? "محفوظ" : "Bookmarked") : locale === "ar" ? "حفظ" : "Bookmark"}
+                    {bookmarked
+                      ? locale === "ar"
+                        ? "محفوظ"
+                        : "Bookmarked"
+                      : locale === "ar"
+                        ? "حفظ"
+                        : "Bookmark"}
                   </span>
                 </Button>
 
@@ -450,7 +569,9 @@ function VerseTafsirPage() {
               <div className="flex items-center justify-between">
                 <h4 className="font-bold text-sm text-foreground flex items-center gap-2">
                   <FileText className="h-4 w-4 text-primary" />
-                  <span>{locale === "ar" ? "ملاحظاتك الشخصية على هذه الآية" : "Personal Notes on Verse"}</span>
+                  <span>
+                    {locale === "ar" ? "ملاحظاتك الشخصية على هذه الآية" : "Personal Notes on Verse"}
+                  </span>
                 </h4>
 
                 {!noteEditing && noteText && (
@@ -492,7 +613,9 @@ function VerseTafsirPage() {
                 </div>
               ) : (
                 <div className="rounded-2xl bg-secondary/30 p-4 border border-border/50">
-                  <p className="text-sm text-foreground/90 font-serif whitespace-pre-wrap">{noteText}</p>
+                  <p className="text-sm text-foreground/90 font-serif whitespace-pre-wrap">
+                    {noteText}
+                  </p>
                 </div>
               )}
             </div>
