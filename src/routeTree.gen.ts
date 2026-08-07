@@ -61,12 +61,21 @@ import { Route as AuthenticatedCollectionsIndexRouteImport } from './routes/_aut
 import { Route as TafsirSurahAyahRouteImport } from './routes/tafsir.$surah.$ayah'
 import { Route as LearnJourneysSlugRouteImport } from './routes/learn.journeys.$slug'
 import { Route as LearnKindSlugRouteImport } from './routes/learn.$kind.$slug'
+import { Route as ApiV1SearchRouteImport } from './routes/api/v1/search'
+import { Route as ApiV1DocsRouteImport } from './routes/api/v1/docs'
 import { Route as ApiPublicSurahNamesRouteImport } from './routes/api/public/surah-names'
 import { Route as ApiPublicSeedKnowledgeRouteImport } from './routes/api/public/seed-knowledge'
 import { Route as ApiPublicFeedbackRouteImport } from './routes/api/public/feedback'
 import { Route as AuthenticatedAdminSetupRouteImport } from './routes/_authenticated/admin.setup'
 import { Route as AuthenticatedAdminKidsRouteImport } from './routes/_authenticated/admin.kids'
+import { Route as AuthenticatedAdminContentModerationRouteImport } from './routes/_authenticated/admin.content-moderation'
 import { Route as AuthenticatedAdminBackfillRouteImport } from './routes/_authenticated/admin.backfill'
+import { Route as ApiV1UserProgressRouteImport } from './routes/api/v1/user/progress'
+import { Route as ApiV1GamificationXpRouteImport } from './routes/api/v1/gamification/xp'
+import { Route as ApiV1GamificationProfileRouteImport } from './routes/api/v1/gamification/profile'
+import { Route as ApiV1GamificationPrestigeRouteImport } from './routes/api/v1/gamification/prestige'
+import { Route as ApiV1GamificationLeaderboardRouteImport } from './routes/api/v1/gamification/leaderboard'
+import { Route as ApiV1GamificationChallengesRouteImport } from './routes/api/v1/gamification/challenges'
 import { Route as ApiPublicAdminValidateQuranCertificationRouteImport } from './routes/api/public/admin/validate-quran-certification'
 import { Route as ApiPublicAdminRebuildGroundedIndexRouteImport } from './routes/api/public/admin/rebuild-grounded-index'
 import { Route as ApiPublicAdminIngestQuranJsonRouteImport } from './routes/api/public/admin/ingest-quran-json'
@@ -74,6 +83,8 @@ import { Route as ApiPublicAdminBackfillVerseTranslationsRouteImport } from './r
 import { Route as ApiPublicAdminBackfillQuranChaptersRouteImport } from './routes/api/public/admin/backfill-quran-chapters'
 import { Route as ApiPublicAdminBackfillAsbabNuzulRouteImport } from './routes/api/public/admin/backfill-asbab-nuzul'
 import { Route as ApiPublicAdminBackfillArabicAyatRouteImport } from './routes/api/public/admin/backfill-arabic-ayat'
+import { Route as ApiV1QuranVersesSurahRouteImport } from './routes/api/v1/quran/verses/$surah'
+import { Route as ApiV1GamificationStreaksRestoreRouteImport } from './routes/api/v1/gamification/streaks/restore'
 
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   id: '/sitemap.xml',
@@ -335,6 +346,16 @@ const LearnKindSlugRoute = LearnKindSlugRouteImport.update({
   path: '/learn/$kind/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiV1SearchRoute = ApiV1SearchRouteImport.update({
+  id: '/api/v1/search',
+  path: '/api/v1/search',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiV1DocsRoute = ApiV1DocsRouteImport.update({
+  id: '/api/v1/docs',
+  path: '/api/v1/docs',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicSurahNamesRoute = ApiPublicSurahNamesRouteImport.update({
   id: '/api/public/surah-names',
   path: '/api/public/surah-names',
@@ -360,11 +381,51 @@ const AuthenticatedAdminKidsRoute = AuthenticatedAdminKidsRouteImport.update({
   path: '/admin/kids',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedAdminContentModerationRoute =
+  AuthenticatedAdminContentModerationRouteImport.update({
+    id: '/admin/content-moderation',
+    path: '/admin/content-moderation',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedAdminBackfillRoute =
   AuthenticatedAdminBackfillRouteImport.update({
     id: '/admin/backfill',
     path: '/admin/backfill',
     getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const ApiV1UserProgressRoute = ApiV1UserProgressRouteImport.update({
+  id: '/api/v1/user/progress',
+  path: '/api/v1/user/progress',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiV1GamificationXpRoute = ApiV1GamificationXpRouteImport.update({
+  id: '/api/v1/gamification/xp',
+  path: '/api/v1/gamification/xp',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiV1GamificationProfileRoute =
+  ApiV1GamificationProfileRouteImport.update({
+    id: '/api/v1/gamification/profile',
+    path: '/api/v1/gamification/profile',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiV1GamificationPrestigeRoute =
+  ApiV1GamificationPrestigeRouteImport.update({
+    id: '/api/v1/gamification/prestige',
+    path: '/api/v1/gamification/prestige',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiV1GamificationLeaderboardRoute =
+  ApiV1GamificationLeaderboardRouteImport.update({
+    id: '/api/v1/gamification/leaderboard',
+    path: '/api/v1/gamification/leaderboard',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiV1GamificationChallengesRoute =
+  ApiV1GamificationChallengesRouteImport.update({
+    id: '/api/v1/gamification/challenges',
+    path: '/api/v1/gamification/challenges',
+    getParentRoute: () => rootRouteImport,
   } as any)
 const ApiPublicAdminValidateQuranCertificationRoute =
   ApiPublicAdminValidateQuranCertificationRouteImport.update({
@@ -406,6 +467,17 @@ const ApiPublicAdminBackfillArabicAyatRoute =
   ApiPublicAdminBackfillArabicAyatRouteImport.update({
     id: '/api/public/admin/backfill-arabic-ayat',
     path: '/api/public/admin/backfill-arabic-ayat',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiV1QuranVersesSurahRoute = ApiV1QuranVersesSurahRouteImport.update({
+  id: '/api/v1/quran/verses/$surah',
+  path: '/api/v1/quran/verses/$surah',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiV1GamificationStreaksRestoreRoute =
+  ApiV1GamificationStreaksRestoreRouteImport.update({
+    id: '/api/v1/gamification/streaks/restore',
+    path: '/api/v1/gamification/streaks/restore',
     getParentRoute: () => rootRouteImport,
   } as any)
 
@@ -457,11 +529,14 @@ export interface FileRoutesByFullPath {
   '/tafsir/': typeof TafsirIndexRoute
   '/topics/': typeof TopicsIndexRoute
   '/admin/backfill': typeof AuthenticatedAdminBackfillRoute
+  '/admin/content-moderation': typeof AuthenticatedAdminContentModerationRoute
   '/admin/kids': typeof AuthenticatedAdminKidsRoute
   '/admin/setup': typeof AuthenticatedAdminSetupRoute
   '/api/public/feedback': typeof ApiPublicFeedbackRoute
   '/api/public/seed-knowledge': typeof ApiPublicSeedKnowledgeRoute
   '/api/public/surah-names': typeof ApiPublicSurahNamesRoute
+  '/api/v1/docs': typeof ApiV1DocsRoute
+  '/api/v1/search': typeof ApiV1SearchRoute
   '/learn/$kind/$slug': typeof LearnKindSlugRoute
   '/learn/journeys/$slug': typeof LearnJourneysSlugRoute
   '/tafsir/$surah/$ayah': typeof TafsirSurahAyahRoute
@@ -474,6 +549,14 @@ export interface FileRoutesByFullPath {
   '/api/public/admin/ingest-quran-json': typeof ApiPublicAdminIngestQuranJsonRoute
   '/api/public/admin/rebuild-grounded-index': typeof ApiPublicAdminRebuildGroundedIndexRoute
   '/api/public/admin/validate-quran-certification': typeof ApiPublicAdminValidateQuranCertificationRoute
+  '/api/v1/gamification/challenges': typeof ApiV1GamificationChallengesRoute
+  '/api/v1/gamification/leaderboard': typeof ApiV1GamificationLeaderboardRoute
+  '/api/v1/gamification/prestige': typeof ApiV1GamificationPrestigeRoute
+  '/api/v1/gamification/profile': typeof ApiV1GamificationProfileRoute
+  '/api/v1/gamification/xp': typeof ApiV1GamificationXpRoute
+  '/api/v1/user/progress': typeof ApiV1UserProgressRoute
+  '/api/v1/gamification/streaks/restore': typeof ApiV1GamificationStreaksRestoreRoute
+  '/api/v1/quran/verses/$surah': typeof ApiV1QuranVersesSurahRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -523,11 +606,14 @@ export interface FileRoutesByTo {
   '/tafsir': typeof TafsirIndexRoute
   '/topics': typeof TopicsIndexRoute
   '/admin/backfill': typeof AuthenticatedAdminBackfillRoute
+  '/admin/content-moderation': typeof AuthenticatedAdminContentModerationRoute
   '/admin/kids': typeof AuthenticatedAdminKidsRoute
   '/admin/setup': typeof AuthenticatedAdminSetupRoute
   '/api/public/feedback': typeof ApiPublicFeedbackRoute
   '/api/public/seed-knowledge': typeof ApiPublicSeedKnowledgeRoute
   '/api/public/surah-names': typeof ApiPublicSurahNamesRoute
+  '/api/v1/docs': typeof ApiV1DocsRoute
+  '/api/v1/search': typeof ApiV1SearchRoute
   '/learn/$kind/$slug': typeof LearnKindSlugRoute
   '/learn/journeys/$slug': typeof LearnJourneysSlugRoute
   '/tafsir/$surah/$ayah': typeof TafsirSurahAyahRoute
@@ -540,6 +626,14 @@ export interface FileRoutesByTo {
   '/api/public/admin/ingest-quran-json': typeof ApiPublicAdminIngestQuranJsonRoute
   '/api/public/admin/rebuild-grounded-index': typeof ApiPublicAdminRebuildGroundedIndexRoute
   '/api/public/admin/validate-quran-certification': typeof ApiPublicAdminValidateQuranCertificationRoute
+  '/api/v1/gamification/challenges': typeof ApiV1GamificationChallengesRoute
+  '/api/v1/gamification/leaderboard': typeof ApiV1GamificationLeaderboardRoute
+  '/api/v1/gamification/prestige': typeof ApiV1GamificationPrestigeRoute
+  '/api/v1/gamification/profile': typeof ApiV1GamificationProfileRoute
+  '/api/v1/gamification/xp': typeof ApiV1GamificationXpRoute
+  '/api/v1/user/progress': typeof ApiV1UserProgressRoute
+  '/api/v1/gamification/streaks/restore': typeof ApiV1GamificationStreaksRestoreRoute
+  '/api/v1/quran/verses/$surah': typeof ApiV1QuranVersesSurahRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -591,11 +685,14 @@ export interface FileRoutesById {
   '/tafsir/': typeof TafsirIndexRoute
   '/topics/': typeof TopicsIndexRoute
   '/_authenticated/admin/backfill': typeof AuthenticatedAdminBackfillRoute
+  '/_authenticated/admin/content-moderation': typeof AuthenticatedAdminContentModerationRoute
   '/_authenticated/admin/kids': typeof AuthenticatedAdminKidsRoute
   '/_authenticated/admin/setup': typeof AuthenticatedAdminSetupRoute
   '/api/public/feedback': typeof ApiPublicFeedbackRoute
   '/api/public/seed-knowledge': typeof ApiPublicSeedKnowledgeRoute
   '/api/public/surah-names': typeof ApiPublicSurahNamesRoute
+  '/api/v1/docs': typeof ApiV1DocsRoute
+  '/api/v1/search': typeof ApiV1SearchRoute
   '/learn/$kind/$slug': typeof LearnKindSlugRoute
   '/learn/journeys/$slug': typeof LearnJourneysSlugRoute
   '/tafsir/$surah/$ayah': typeof TafsirSurahAyahRoute
@@ -608,6 +705,14 @@ export interface FileRoutesById {
   '/api/public/admin/ingest-quran-json': typeof ApiPublicAdminIngestQuranJsonRoute
   '/api/public/admin/rebuild-grounded-index': typeof ApiPublicAdminRebuildGroundedIndexRoute
   '/api/public/admin/validate-quran-certification': typeof ApiPublicAdminValidateQuranCertificationRoute
+  '/api/v1/gamification/challenges': typeof ApiV1GamificationChallengesRoute
+  '/api/v1/gamification/leaderboard': typeof ApiV1GamificationLeaderboardRoute
+  '/api/v1/gamification/prestige': typeof ApiV1GamificationPrestigeRoute
+  '/api/v1/gamification/profile': typeof ApiV1GamificationProfileRoute
+  '/api/v1/gamification/xp': typeof ApiV1GamificationXpRoute
+  '/api/v1/user/progress': typeof ApiV1UserProgressRoute
+  '/api/v1/gamification/streaks/restore': typeof ApiV1GamificationStreaksRestoreRoute
+  '/api/v1/quran/verses/$surah': typeof ApiV1QuranVersesSurahRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -659,11 +764,14 @@ export interface FileRouteTypes {
     | '/tafsir/'
     | '/topics/'
     | '/admin/backfill'
+    | '/admin/content-moderation'
     | '/admin/kids'
     | '/admin/setup'
     | '/api/public/feedback'
     | '/api/public/seed-knowledge'
     | '/api/public/surah-names'
+    | '/api/v1/docs'
+    | '/api/v1/search'
     | '/learn/$kind/$slug'
     | '/learn/journeys/$slug'
     | '/tafsir/$surah/$ayah'
@@ -676,6 +784,14 @@ export interface FileRouteTypes {
     | '/api/public/admin/ingest-quran-json'
     | '/api/public/admin/rebuild-grounded-index'
     | '/api/public/admin/validate-quran-certification'
+    | '/api/v1/gamification/challenges'
+    | '/api/v1/gamification/leaderboard'
+    | '/api/v1/gamification/prestige'
+    | '/api/v1/gamification/profile'
+    | '/api/v1/gamification/xp'
+    | '/api/v1/user/progress'
+    | '/api/v1/gamification/streaks/restore'
+    | '/api/v1/quran/verses/$surah'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -725,11 +841,14 @@ export interface FileRouteTypes {
     | '/tafsir'
     | '/topics'
     | '/admin/backfill'
+    | '/admin/content-moderation'
     | '/admin/kids'
     | '/admin/setup'
     | '/api/public/feedback'
     | '/api/public/seed-knowledge'
     | '/api/public/surah-names'
+    | '/api/v1/docs'
+    | '/api/v1/search'
     | '/learn/$kind/$slug'
     | '/learn/journeys/$slug'
     | '/tafsir/$surah/$ayah'
@@ -742,6 +861,14 @@ export interface FileRouteTypes {
     | '/api/public/admin/ingest-quran-json'
     | '/api/public/admin/rebuild-grounded-index'
     | '/api/public/admin/validate-quran-certification'
+    | '/api/v1/gamification/challenges'
+    | '/api/v1/gamification/leaderboard'
+    | '/api/v1/gamification/prestige'
+    | '/api/v1/gamification/profile'
+    | '/api/v1/gamification/xp'
+    | '/api/v1/user/progress'
+    | '/api/v1/gamification/streaks/restore'
+    | '/api/v1/quran/verses/$surah'
   id:
     | '__root__'
     | '/'
@@ -792,11 +919,14 @@ export interface FileRouteTypes {
     | '/tafsir/'
     | '/topics/'
     | '/_authenticated/admin/backfill'
+    | '/_authenticated/admin/content-moderation'
     | '/_authenticated/admin/kids'
     | '/_authenticated/admin/setup'
     | '/api/public/feedback'
     | '/api/public/seed-knowledge'
     | '/api/public/surah-names'
+    | '/api/v1/docs'
+    | '/api/v1/search'
     | '/learn/$kind/$slug'
     | '/learn/journeys/$slug'
     | '/tafsir/$surah/$ayah'
@@ -809,6 +939,14 @@ export interface FileRouteTypes {
     | '/api/public/admin/ingest-quran-json'
     | '/api/public/admin/rebuild-grounded-index'
     | '/api/public/admin/validate-quran-certification'
+    | '/api/v1/gamification/challenges'
+    | '/api/v1/gamification/leaderboard'
+    | '/api/v1/gamification/prestige'
+    | '/api/v1/gamification/profile'
+    | '/api/v1/gamification/xp'
+    | '/api/v1/user/progress'
+    | '/api/v1/gamification/streaks/restore'
+    | '/api/v1/quran/verses/$surah'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -862,6 +1000,8 @@ export interface RootRouteChildren {
   ApiPublicFeedbackRoute: typeof ApiPublicFeedbackRoute
   ApiPublicSeedKnowledgeRoute: typeof ApiPublicSeedKnowledgeRoute
   ApiPublicSurahNamesRoute: typeof ApiPublicSurahNamesRoute
+  ApiV1DocsRoute: typeof ApiV1DocsRoute
+  ApiV1SearchRoute: typeof ApiV1SearchRoute
   LearnKindSlugRoute: typeof LearnKindSlugRoute
   LearnJourneysSlugRoute: typeof LearnJourneysSlugRoute
   TafsirSurahAyahRoute: typeof TafsirSurahAyahRoute
@@ -873,6 +1013,14 @@ export interface RootRouteChildren {
   ApiPublicAdminIngestQuranJsonRoute: typeof ApiPublicAdminIngestQuranJsonRoute
   ApiPublicAdminRebuildGroundedIndexRoute: typeof ApiPublicAdminRebuildGroundedIndexRoute
   ApiPublicAdminValidateQuranCertificationRoute: typeof ApiPublicAdminValidateQuranCertificationRoute
+  ApiV1GamificationChallengesRoute: typeof ApiV1GamificationChallengesRoute
+  ApiV1GamificationLeaderboardRoute: typeof ApiV1GamificationLeaderboardRoute
+  ApiV1GamificationPrestigeRoute: typeof ApiV1GamificationPrestigeRoute
+  ApiV1GamificationProfileRoute: typeof ApiV1GamificationProfileRoute
+  ApiV1GamificationXpRoute: typeof ApiV1GamificationXpRoute
+  ApiV1UserProgressRoute: typeof ApiV1UserProgressRoute
+  ApiV1GamificationStreaksRestoreRoute: typeof ApiV1GamificationStreaksRestoreRoute
+  ApiV1QuranVersesSurahRoute: typeof ApiV1QuranVersesSurahRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -1241,6 +1389,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LearnKindSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/v1/search': {
+      id: '/api/v1/search'
+      path: '/api/v1/search'
+      fullPath: '/api/v1/search'
+      preLoaderRoute: typeof ApiV1SearchRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/v1/docs': {
+      id: '/api/v1/docs'
+      path: '/api/v1/docs'
+      fullPath: '/api/v1/docs'
+      preLoaderRoute: typeof ApiV1DocsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/surah-names': {
       id: '/api/public/surah-names'
       path: '/api/public/surah-names'
@@ -1276,12 +1438,61 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminKidsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/admin/content-moderation': {
+      id: '/_authenticated/admin/content-moderation'
+      path: '/admin/content-moderation'
+      fullPath: '/admin/content-moderation'
+      preLoaderRoute: typeof AuthenticatedAdminContentModerationRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/admin/backfill': {
       id: '/_authenticated/admin/backfill'
       path: '/admin/backfill'
       fullPath: '/admin/backfill'
       preLoaderRoute: typeof AuthenticatedAdminBackfillRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/api/v1/user/progress': {
+      id: '/api/v1/user/progress'
+      path: '/api/v1/user/progress'
+      fullPath: '/api/v1/user/progress'
+      preLoaderRoute: typeof ApiV1UserProgressRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/v1/gamification/xp': {
+      id: '/api/v1/gamification/xp'
+      path: '/api/v1/gamification/xp'
+      fullPath: '/api/v1/gamification/xp'
+      preLoaderRoute: typeof ApiV1GamificationXpRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/v1/gamification/profile': {
+      id: '/api/v1/gamification/profile'
+      path: '/api/v1/gamification/profile'
+      fullPath: '/api/v1/gamification/profile'
+      preLoaderRoute: typeof ApiV1GamificationProfileRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/v1/gamification/prestige': {
+      id: '/api/v1/gamification/prestige'
+      path: '/api/v1/gamification/prestige'
+      fullPath: '/api/v1/gamification/prestige'
+      preLoaderRoute: typeof ApiV1GamificationPrestigeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/v1/gamification/leaderboard': {
+      id: '/api/v1/gamification/leaderboard'
+      path: '/api/v1/gamification/leaderboard'
+      fullPath: '/api/v1/gamification/leaderboard'
+      preLoaderRoute: typeof ApiV1GamificationLeaderboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/v1/gamification/challenges': {
+      id: '/api/v1/gamification/challenges'
+      path: '/api/v1/gamification/challenges'
+      fullPath: '/api/v1/gamification/challenges'
+      preLoaderRoute: typeof ApiV1GamificationChallengesRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/api/public/admin/validate-quran-certification': {
       id: '/api/public/admin/validate-quran-certification'
@@ -1332,11 +1543,26 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicAdminBackfillArabicAyatRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/v1/quran/verses/$surah': {
+      id: '/api/v1/quran/verses/$surah'
+      path: '/api/v1/quran/verses/$surah'
+      fullPath: '/api/v1/quran/verses/$surah'
+      preLoaderRoute: typeof ApiV1QuranVersesSurahRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/v1/gamification/streaks/restore': {
+      id: '/api/v1/gamification/streaks/restore'
+      path: '/api/v1/gamification/streaks/restore'
+      fullPath: '/api/v1/gamification/streaks/restore'
+      preLoaderRoute: typeof ApiV1GamificationStreaksRestoreRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedAdminBackfillRoute: typeof AuthenticatedAdminBackfillRoute
+  AuthenticatedAdminContentModerationRoute: typeof AuthenticatedAdminContentModerationRoute
   AuthenticatedAdminKidsRoute: typeof AuthenticatedAdminKidsRoute
   AuthenticatedAdminSetupRoute: typeof AuthenticatedAdminSetupRoute
   AuthenticatedCollectionsIndexRoute: typeof AuthenticatedCollectionsIndexRoute
@@ -1344,6 +1570,8 @@ interface AuthenticatedRouteRouteChildren {
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAdminBackfillRoute: AuthenticatedAdminBackfillRoute,
+  AuthenticatedAdminContentModerationRoute:
+    AuthenticatedAdminContentModerationRoute,
   AuthenticatedAdminKidsRoute: AuthenticatedAdminKidsRoute,
   AuthenticatedAdminSetupRoute: AuthenticatedAdminSetupRoute,
   AuthenticatedCollectionsIndexRoute: AuthenticatedCollectionsIndexRoute,
@@ -1403,6 +1631,8 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicFeedbackRoute: ApiPublicFeedbackRoute,
   ApiPublicSeedKnowledgeRoute: ApiPublicSeedKnowledgeRoute,
   ApiPublicSurahNamesRoute: ApiPublicSurahNamesRoute,
+  ApiV1DocsRoute: ApiV1DocsRoute,
+  ApiV1SearchRoute: ApiV1SearchRoute,
   LearnKindSlugRoute: LearnKindSlugRoute,
   LearnJourneysSlugRoute: LearnJourneysSlugRoute,
   TafsirSurahAyahRoute: TafsirSurahAyahRoute,
@@ -1418,7 +1648,25 @@ const rootRouteChildren: RootRouteChildren = {
     ApiPublicAdminRebuildGroundedIndexRoute,
   ApiPublicAdminValidateQuranCertificationRoute:
     ApiPublicAdminValidateQuranCertificationRoute,
+  ApiV1GamificationChallengesRoute: ApiV1GamificationChallengesRoute,
+  ApiV1GamificationLeaderboardRoute: ApiV1GamificationLeaderboardRoute,
+  ApiV1GamificationPrestigeRoute: ApiV1GamificationPrestigeRoute,
+  ApiV1GamificationProfileRoute: ApiV1GamificationProfileRoute,
+  ApiV1GamificationXpRoute: ApiV1GamificationXpRoute,
+  ApiV1UserProgressRoute: ApiV1UserProgressRoute,
+  ApiV1GamificationStreaksRestoreRoute: ApiV1GamificationStreaksRestoreRoute,
+  ApiV1QuranVersesSurahRoute: ApiV1QuranVersesSurahRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
