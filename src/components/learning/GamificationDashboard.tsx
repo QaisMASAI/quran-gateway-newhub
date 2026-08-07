@@ -31,6 +31,7 @@ import { SocialLeaderboardView } from "@/components/gamification/SocialLeaderboa
 import { PersonalizationWidget } from "@/components/gamification/PersonalizationWidget";
 import { GamificationAdminDashboard } from "@/components/admin/GamificationAdminDashboard";
 import { LearningAnalyticsDashboard } from "@/components/analytics/LearningAnalyticsDashboard";
+import { AnalyticsSummary } from "@/lib/learning-analytics";
 import { ClassroomHub } from "@/components/classroom/ClassroomHub";
 import { GlobalExpansionDashboard } from "@/components/expansion/GlobalExpansionDashboard";
 import { GraduationCap, Globe2 } from "lucide-react";
@@ -41,12 +42,14 @@ interface GamificationDashboardProps {
   data?: UserGameification;
   achievements?: any[];
   learningEvents?: any[];
+  analyticsData?: AnalyticsSummary;
 }
 
 export const GamificationDashboard: React.FC<GamificationDashboardProps> = ({
   locale = "en",
   data: initialData,
   userId,
+  analyticsData,
 }) => {
   const [data, setData] = useState<UserGameification>(() => {
     if (initialData) return initialData;
@@ -149,7 +152,9 @@ export const GamificationDashboard: React.FC<GamificationDashboardProps> = ({
 
       {activeTab === "classroom" && <ClassroomHub locale={locale} />}
 
-      {activeTab === "analytics" && <LearningAnalyticsDashboard locale={locale} />}
+      {activeTab === "analytics" && (
+        <LearningAnalyticsDashboard locale={locale} userId={userId} data={analyticsData} />
+      )}
 
       {activeTab === "xp_summary" && (
         <XpTracker data={data} onUpdate={handleUpdateData} locale={locale} />
