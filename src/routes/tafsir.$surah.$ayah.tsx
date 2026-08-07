@@ -50,8 +50,6 @@ import { generateGroundedAnswer, contentModerationFlag } from "@/lib/ai/ai-safet
 import { supabase } from "@/integrations/supabase/client";
 import { trackLearningEvent } from "@/lib/analytics-tracker";
 import { useAuth } from "@/hooks/useAuth";
-import { trackLearningEvent } from "@/lib/analytics-tracker";
-import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
 import ReactMarkdown from "react-markdown";
 
