@@ -32,6 +32,8 @@ export function generateBase32Secret(length = 32): string {
   return secret;
 }
 
+export const generateTotpSecret = generateBase32Secret;
+
 /**
  * Generate cryptographically random 8-character backup codes
  */
