@@ -4,11 +4,109 @@ import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable/index";
 import { Logo } from "@/components/Logo";
-import { Loader2, Mail, Lock, AlertCircle, ChevronLeft } from "lucide-react";
+import { Loader2, Mail, Lock, AlertCircle, ChevronLeft, ShieldCheck, KeyRound, QrCode } from "lucide-react";
+import { generateTotpSecret, verifyTotpToken, provisionUser2FA } from "@/lib/security/totp";
+import { validatePiiHandling, encryptSensitiveData, maskEmail } from "@/lib/security/rbac-pii";
+import { checkRateLimit, recordFailedAttempt, resetFailedAttempts } from "@/lib/security/rate-limiting";
 
 export const Route = createLazyFileRoute("/auth")({
   component: AuthPage,
 });
+
+export function TwoFactorAuthPrompt({
+  userId,
+  secret,
+  onSuccess,
+  onCancel,
+}: {
+  userId: string;
+  secret: string;
+  onSuccess: () => void;
+  onCancel: () => void;
+}) {
+  const [code, setCode] = useState("");
+  const [error, setError] = useState<string | null>(null);
+  const [verifying, setVerifying] = useState(false);
+
+  const handleVerify = () => {
+    setError(null);
+    if (code.length !== 6) {
+      setError("Please enter a valid 6-digit verification code.");
+      return;
+    }
+    setVerifying(true);
+    try {
+      const isValid = verifyTotpToken(code, secret);
+      if (isValid) {
+        onSuccess();
+      } else {
+        setError("Invalid 2FA verification code. Please try again.");
+      }
+    } catch (err: any) {
+      setError(err.message || "Invalid 2FA token format.");
+    } finally {
+      setVerifying(false);
+    }
+  };
+
+  return (
+    <div className="space-y-4 rounded-xl border border-border/80 bg-card p-6 shadow-lg">
+      <div className="flex items-center gap-3 border-b border-border/50 pb-3">
+        <div className="rounded-lg bg-primary/10 p-2 text-primary">
+          <ShieldCheck className="h-6 w-6" />
+        </div>
+        <div>
+          <h2 className="text-base font-bold text-foreground">Two-Factor Authentication</h2>
+          <p className="text-xs text-muted-foreground">
+            Verify your account with your authenticator app
+          </p>
+        </div>
+      </div>
+
+      <p className="text-xs text-muted-foreground">
+        Enter the 6-digit numeric code from your authenticator app (e.g. Google Authenticator, Authy).
+      </p>
+
+      <div className="space-y-2">
+        <input
+          type="text"
+          maxLength={6}
+          value={code}
+          onChange={(e) => setCode(e.target.value.replace(/\D/g, ""))}
+          placeholder="000000"
+          className="w-full rounded-lg border border-border bg-background px-4 py-3 text-center text-xl font-mono tracking-[0.5em] text-foreground outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
+          dir="ltr"
+          autoFocus
+        />
+      </div>
+
+      {error && (
+        <div className="flex items-center gap-2 rounded-lg border border-destructive/30 bg-destructive/5 px-3 py-2 text-xs text-destructive">
+          <AlertCircle className="h-3.5 w-3.5 shrink-0" />
+          <span>{error}</span>
+        </div>
+      )}
+
+      <div className="flex gap-2 pt-2">
+        <button
+          type="button"
+          onClick={onCancel}
+          className="flex-1 rounded-lg border border-border px-3 py-2 text-xs font-medium text-muted-foreground hover:bg-secondary"
+        >
+          Cancel
+        </button>
+        <button
+          type="button"
+          onClick={handleVerify}
+          disabled={verifying || code.length !== 6}
+          className="flex-1 rounded-lg bg-primary px-3 py-2 text-xs font-semibold text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
+        >
+          {verifying ? "Verifying…" : "Verify Code"}
+        </button>
+      </div>
+    </div>
+  );
+}
 
 function AuthPage() {
   const navigate = useNavigate();
@@ -25,18 +123,31 @@ function AuthPage() {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // 2FA state
+  const [pending2FA, setPending2FA] = useState<{ userId: string; secret: string } | null>(null);
+
+  // 2FA setup mode state
+  const [show2FASetup, setShow2FASetup] = useState(false);
+  const [setupData, setSetupData] = useState<{
+    secret: string;
+    qrCodeUrl: string;
+    backupCodes: string[];
+  } | null>(null);
+  const [setupConfirmCode, setSetupConfirmCode] = useState("");
+  const [setupStatus, setSetupStatus] = useState<string | null>(null);
+
   useEffect(() => {
     let mounted = true;
     supabase.auth.getSession().then(({ data }) => {
       if (!mounted) return;
-      if (data.session) {
+      if (data.session && !pending2FA) {
         navigate({ to: safeRedirect, replace: true });
       }
     });
     return () => {
       mounted = false;
     };
-  }, [navigate, safeRedirect]);
+  }, [navigate, safeRedirect, pending2FA]);
 
   const translateAuthError = (msg: string): string => {
     if (/invalid login credentials/i.test(msg)) return t("ui.auth.invalidCreds");
@@ -49,16 +160,18 @@ function AuthPage() {
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!email.trim() || password.length < 6) {
+    const trimmedEmail = email.trim();
+    if (!trimmedEmail || password.length < 6) {
       setError(t("ui.auth.genericError"));
       return;
     }
     setError(null);
     setBusy(true);
+
     try {
       if (mode === "signup") {
         const { error: err } = await supabase.auth.signUp({
-          email: email.trim(),
+          email: trimmedEmail,
           password,
           options: {
             data: { full_name: name.trim() || undefined },
@@ -66,8 +179,9 @@ function AuthPage() {
           },
         });
         if (err) throw err;
+
         const { error: signErr } = await supabase.auth.signInWithPassword({
-          email: email.trim(),
+          email: trimmedEmail,
           password,
         });
         if (!signErr) {
@@ -76,14 +190,51 @@ function AuthPage() {
         }
         setError(t("ui.auth.confirmEmail"));
       } else {
-        const { error: err } = await supabase.auth.signInWithPassword({
-          email: email.trim(),
+        // Rate Limiting Check (5 attempts per 60 mins)
+        const isRateLimited = await checkRateLimit("login_attempt", trimmedEmail, {
+          maxAttempts: 5,
+          windowMinutes: 60,
+        });
+
+        if (isRateLimited) {
+          throw new Error("Too many failed login attempts. Please try again in 1 hour.");
+        }
+
+        const { data: authRes, error: err } = await supabase.auth.signInWithPassword({
+          email: trimmedEmail,
           password,
         });
-        if (err) throw err;
+
+        if (err) {
+          await recordFailedAttempt("login_attempt", trimmedEmail, 60);
+          console.log("Failed login attempt for user:", maskEmail(trimmedEmail));
+          throw err;
+        }
+
+        await resetFailedAttempts("login_attempt", trimmedEmail);
+        console.log("User authentication successful:", maskEmail(trimmedEmail));
+
+        // Check if 2FA is enabled for this user
+        if (authRes.user?.id) {
+          const { data: totpSettings } = await supabase
+            .from("user_2fa_settings")
+            .select("enabled, secret")
+            .eq("user_id", authRes.user.id)
+            .maybeSingle();
+
+          if (totpSettings?.enabled && totpSettings?.secret) {
+            setPending2FA({
+              userId: authRes.user.id,
+              secret: totpSettings.secret,
+            });
+            setBusy(false);
+            return;
+          }
+        }
+
         navigate({ to: safeRedirect, replace: true });
       }
-    } catch (e) {
+    } catch (e: any) {
       setError(e instanceof Error ? translateAuthError(e.message) : t("ui.auth.genericError"));
     } finally {
       setBusy(false);
@@ -103,6 +254,49 @@ function AuthPage() {
     }
     if (result.redirected) return;
     navigate({ to: safeRedirect, replace: true });
+  };
+
+  const handleStart2FASetup = () => {
+    const provisioning = provisionUser2FA(email || "user@quran.app");
+    setSetupData({
+      secret: provisioning.secret,
+      qrCodeUrl: provisioning.qrCodeUrl,
+      backupCodes: provisioning.backupCodes,
+    });
+    setShow2FASetup(true);
+  };
+
+  const handleConfirm2FASetup = async () => {
+    if (!setupData || setupConfirmCode.length !== 6) return;
+    try {
+      const isValid = verifyTotpToken(setupConfirmCode, setupData.secret);
+      if (!isValid) {
+        setSetupStatus("Invalid token. Please check code on your authenticator app.");
+        return;
+      }
+
+      const { data: userData } = await supabase.auth.getUser();
+      if (userData?.user?.id) {
+        const encryptedSecret = encryptSensitiveData(setupData.secret);
+        await supabase.from("user_2fa_settings").upsert({
+          user_id: userData.user.id,
+          enabled: true,
+          secret: encryptedSecret,
+          backup_codes: setupData.backupCodes,
+          updated_at: new Date().toISOString(),
+        });
+      }
+
+      setSetupStatus("2FA has been successfully configured and activated!");
+      setTimeout(() => {
+        setShow2FASetup(false);
+        setSetupData(null);
+        setSetupConfirmCode("");
+        setSetupStatus(null);
+      }, 2000);
+    } catch (err: any) {
+      setSetupStatus(err.message || "2FA verification failed.");
+    }
   };
 
   return (
@@ -131,85 +325,165 @@ function AuthPage() {
           </p>
         </div>
 
-        <div className="surface-card px-5 py-6 sm:px-7">
-          <button
-            type="button"
-            onClick={google}
-            disabled={busy}
-            className="flex min-h-11 w-full items-center justify-center gap-2 rounded-lg border border-border bg-background px-4 py-2.5 text-sm font-medium text-foreground transition-colors hover:bg-secondary disabled:opacity-60"
-          >
-            <GoogleIcon />
-            Google
-          </button>
+        {/* 2FA Verification Step */}
+        {pending2FA ? (
+          <TwoFactorAuthPrompt
+            userId={pending2FA.userId}
+            secret={pending2FA.secret}
+            onSuccess={() => {
+              setPending2FA(null);
+              navigate({ to: safeRedirect, replace: true });
+            }}
+            onCancel={() => setPending2FA(null)}
+          />
+        ) : (
+          <div className="surface-card px-5 py-6 sm:px-7 space-y-4">
+            <button
+              type="button"
+              onClick={google}
+              disabled={busy}
+              className="flex min-h-11 w-full items-center justify-center gap-2 rounded-lg border border-border bg-background px-4 py-2.5 text-sm font-medium text-foreground transition-colors hover:bg-secondary disabled:opacity-60"
+            >
+              <GoogleIcon />
+              Google
+            </button>
 
-          <div className="my-5 flex items-center gap-3 text-[11px] uppercase tracking-wider text-muted-foreground">
-            <span className="h-px flex-1 bg-border" />
-            {t("ui.auth.email")}
-            <span className="h-px flex-1 bg-border" />
-          </div>
+            <div className="my-5 flex items-center gap-3 text-[11px] uppercase tracking-wider text-muted-foreground">
+              <span className="h-px flex-1 bg-border" />
+              {t("ui.auth.email")}
+              <span className="h-px flex-1 bg-border" />
+            </div>
 
-          <form onSubmit={submit} className="space-y-3">
-            {mode === "signup" && (
-              <Field label={t("ui.auth.displayName")}>
+            <form onSubmit={submit} className="space-y-3">
+              {mode === "signup" && (
+                <Field label={t("ui.auth.displayName")}>
+                  <input
+                    type="text"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    className="input-base"
+                    placeholder={t("ui.auth.displayNamePlaceholder")}
+                  />
+                </Field>
+              )}
+              <Field label={t("ui.auth.email")} icon={<Mail className="h-3.5 w-3.5" />}>
                 <input
-                  type="text"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
+                  type="email"
+                  required
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                   className="input-base"
-                  placeholder={t("ui.auth.displayNamePlaceholder")}
+                  placeholder="you@example.com"
+                  dir="ltr"
                 />
               </Field>
-            )}
-            <Field label={t("ui.auth.email")} icon={<Mail className="h-3.5 w-3.5" />}>
-              <input
-                type="email"
-                required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="input-base"
-                placeholder="you@example.com"
-                dir="ltr"
-              />
-            </Field>
-            <Field label={t("ui.auth.password")} icon={<Lock className="h-3.5 w-3.5" />}>
-              <input
-                type="password"
-                required
-                minLength={6}
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="input-base"
-                placeholder={t("ui.auth.passwordPlaceholder")}
-                dir="ltr"
-              />
-            </Field>
+              <Field label={t("ui.auth.password")} icon={<Lock className="h-3.5 w-3.5" />}>
+                <input
+                  type="password"
+                  required
+                  minLength={6}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="input-base"
+                  placeholder={t("ui.auth.passwordPlaceholder")}
+                  dir="ltr"
+                />
+              </Field>
 
-            {error && (
-              <div className="flex items-start gap-2 rounded-lg border border-destructive/30 bg-destructive/5 px-3 py-2 text-xs text-destructive">
-                <AlertCircle className="mt-0.5 h-3.5 w-3.5 shrink-0" />
-                <span>{error}</span>
+              {error && (
+                <div className="flex items-start gap-2 rounded-lg border border-destructive/30 bg-destructive/5 px-3 py-2 text-xs text-destructive">
+                  <AlertCircle className="mt-0.5 h-3.5 w-3.5 shrink-0" />
+                  <span>{error}</span>
+                </div>
+              )}
+
+              <button
+                type="submit"
+                disabled={busy}
+                className="flex min-h-11 w-full items-center justify-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90 disabled:opacity-60"
+              >
+                {busy && <Loader2 className="h-4 w-4 animate-spin" />}
+                {mode === "signin" ? t("ui.auth.submitSignin") : t("ui.auth.submitSignup")}
+              </button>
+            </form>
+
+            <div className="mt-4 flex flex-col items-center gap-2 text-xs text-muted-foreground">
+              <button
+                type="button"
+                onClick={() => setMode(mode === "signin" ? "signup" : "signin")}
+                className="font-medium text-primary hover:underline"
+              >
+                {mode === "signin" ? t("ui.auth.createAccount") : t("ui.auth.submitSignin")}
+              </button>
+
+              <button
+                type="button"
+                onClick={handleStart2FASetup}
+                className="mt-2 inline-flex items-center gap-1.5 text-[11px] font-semibold text-muted-foreground/80 hover:text-foreground"
+              >
+                <KeyRound className="h-3.5 w-3.5" />
+                <span>Configure Two-Factor Auth (2FA)</span>
+              </button>
+            </div>
+
+            {/* 2FA Setup Flow Card */}
+            {show2FASetup && setupData && (
+              <div className="mt-4 space-y-3 rounded-xl border border-gold/40 bg-gold/5 p-4 text-xs">
+                <div className="flex items-center justify-between">
+                  <h3 className="font-bold text-foreground">Set Up Authenticator App</h3>
+                  <button
+                    type="button"
+                    onClick={() => setShow2FASetup(false)}
+                    className="text-muted-foreground hover:text-foreground"
+                  >
+                    ✕
+                  </button>
+                </div>
+
+                <p className="text-muted-foreground">
+                  Scan this QR code with Google Authenticator or Authy to configure 2FA:
+                </p>
+
+                <div className="flex justify-center p-2 bg-white rounded-lg inline-block mx-auto border">
+                  <img src={setupData.qrCodeUrl} alt="2FA QR Code" className="h-36 w-36" />
+                </div>
+
+                <div className="rounded border border-border bg-background p-2 font-mono text-[10px] break-all text-center">
+                  Secret: {setupData.secret}
+                </div>
+
+                <div className="space-y-1">
+                  <label className="block text-[11px] font-medium text-foreground">
+                    Confirm Code:
+                  </label>
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      maxLength={6}
+                      value={setupConfirmCode}
+                      onChange={(e) => setSetupConfirmCode(e.target.value.replace(/\D/g, ""))}
+                      placeholder="000000"
+                      className="input-base tracking-widest text-center font-mono"
+                    />
+                    <button
+                      type="button"
+                      onClick={handleConfirm2FASetup}
+                      className="rounded bg-primary px-3 py-1 font-bold text-primary-foreground"
+                    >
+                      Enable
+                    </button>
+                  </div>
+                </div>
+
+                {setupStatus && (
+                  <div className="text-[11px] font-medium text-emerald-600 dark:text-emerald-400">
+                    {setupStatus}
+                  </div>
+                )}
               </div>
             )}
-
-            <button
-              type="submit"
-              disabled={busy}
-              className="flex min-h-11 w-full items-center justify-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90 disabled:opacity-60"
-            >
-              {busy && <Loader2 className="h-4 w-4 animate-spin" />}
-              {mode === "signin" ? t("ui.auth.submitSignin") : t("ui.auth.submitSignup")}
-            </button>
-          </form>
-
-          <div className="mt-5 text-center text-xs text-muted-foreground">
-            <button
-              onClick={() => setMode(mode === "signin" ? "signup" : "signin")}
-              className="font-medium text-primary hover:underline"
-            >
-              {mode === "signin" ? t("ui.auth.createAccount") : t("ui.auth.submitSignin")}
-            </button>
           </div>
-        </div>
+        )}
       </div>
 
       <style>{`
