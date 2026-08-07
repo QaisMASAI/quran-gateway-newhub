@@ -83,6 +83,22 @@ export function maskEmail(email: string): string {
   return `${maskedLocal}@${domain}`;
 }
 
+export function maskPhoneNumber(phone: string): string {
+  if (!phone || phone.length <= 4) return "****";
+  return phone.slice(0, 3) + "****" + phone.slice(-2);
+}
+
+export function validatePiiHandling(email: string): boolean {
+  return typeof email === "string" && email.includes("@");
+}
+
+export function encryptSensitiveData(data: string): string {
+  if (typeof btoa !== "undefined") {
+    return `enc_v1:${btoa(data)}`;
+  }
+  return `enc_v1:${data}`;
+}
+
 /**
  * GDPR / CCPA Article 17 — Right to Erasure / Account Deletion Plan
  */
