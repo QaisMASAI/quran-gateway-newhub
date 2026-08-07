@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
 import { buildUserGamificationFromDb } from "@/lib/gamification-engine-v2";
+import { generateAnalyticsSummary } from "@/lib/learning-analytics";
 
 export const Route = createFileRoute("/profile")({
   beforeLoad: async () => {
@@ -18,17 +19,22 @@ export const Route = createFileRoute("/profile")({
           learningEvents: [],
           dailyChallenges: [],
           learningWorlds: [],
+          quizSubmissions: [],
+          userTopicProgress: [],
           userGamificationState: null,
+          analyticsData: generateAnalyticsSummary({ userId: "usr_guest" }),
         };
       }
 
-      // FETCH real data from Supabase tables
+      // FETCH real data from Supabase tables (90-day window for learning events)
       const [
         { data: gamificationData },
         { data: achievements },
         { data: learningEvents },
         { data: dailyChallenges },
         { data: learningWorlds },
+        { data: quizSubmissions },
+        { data: userTopicProgress },
       ] = await Promise.all([
         supabase.from("user_gamification").select("*").eq("user_id", userId).maybeSingle(),
         supabase.from("user_achievements").select("*").eq("user_id", userId),
@@ -36,9 +42,11 @@ export const Route = createFileRoute("/profile")({
           .from("learning_events")
           .select("*")
           .eq("user_id", userId)
-          .gte("timestamp", new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString()),
+          .gte("timestamp", new Date(Date.now() - 90 * 24 * 60 * 60 * 1000).toISOString()),
         supabase.from("daily_challenges").select("*").eq("user_id", userId),
         supabase.from("learning_worlds").select("*").eq("user_id", userId),
+        supabase.from("quiz_submissions").select("*").eq("user_id", userId),
+        supabase.from("user_topic_progress").select("*").eq("user_id", userId),
       ]);
 
       const userGamificationState = buildUserGamificationFromDb(
@@ -50,6 +58,16 @@ export const Route = createFileRoute("/profile")({
         learningWorlds || []
       );
 
+      const analyticsData = generateAnalyticsSummary({
+        userId,
+        learningEvents: learningEvents || [],
+        quizHistory: quizSubmissions || [],
+        topicProgress: userTopicProgress || [],
+        userLevel: gamificationData?.level,
+        userXp: gamificationData?.total_xp,
+        streakDays: gamificationData?.current_streak_days,
+      });
+
       return {
         userId,
         gamificationData,
@@ -57,10 +75,13 @@ export const Route = createFileRoute("/profile")({
         learningEvents: learningEvents || [],
         dailyChallenges: dailyChallenges || [],
         learningWorlds: learningWorlds || [],
+        quizSubmissions: quizSubmissions || [],
+        userTopicProgress: userTopicProgress || [],
         userGamificationState,
+        analyticsData,
       };
     } catch (err) {
-      console.error("Failed to load gamification data from Supabase:", err);
+      console.error("Failed to load gamification and analytics data from Supabase:", err);
       return {
         userId: null,
         gamificationData: null,
@@ -68,7 +89,10 @@ export const Route = createFileRoute("/profile")({
         learningEvents: [],
         dailyChallenges: [],
         learningWorlds: [],
+        quizSubmissions: [],
+        userTopicProgress: [],
         userGamificationState: null,
+        analyticsData: generateAnalyticsSummary({ userId: "usr_guest" }),
       };
     }
   },
