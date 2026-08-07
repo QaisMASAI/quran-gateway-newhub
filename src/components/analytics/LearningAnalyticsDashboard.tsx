@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Download, Sparkles, RefreshCw, Layers } from "lucide-react";
 import { generateMockAnalyticsSummary, AnalyticsSummary } from "@/lib/learning-analytics";
 import { ProgressOverviewCards } from "./ProgressOverviewCards";
@@ -14,24 +14,32 @@ import { AnalyticsExportModal } from "./AnalyticsExportModal";
 interface LearningAnalyticsDashboardProps {
   userId?: string;
   locale?: "en" | "ar" | "he";
+  data?: AnalyticsSummary;
 }
 
 export const LearningAnalyticsDashboard: React.FC<LearningAnalyticsDashboardProps> = ({
   userId = "usr_guest",
   locale = "en",
+  data: initialData,
 }) => {
-  const [summary, setSummary] = useState<AnalyticsSummary>(() =>
-    generateMockAnalyticsSummary(userId),
+  const [summary, setSummary] = useState<AnalyticsSummary>(
+    () => initialData || generateMockAnalyticsSummary(userId)
   );
   const [showExportModal, setShowExportModal] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
+
+  useEffect(() => {
+    if (initialData) {
+      setSummary(initialData);
+    }
+  }, [initialData]);
 
   const isAr = locale === "ar";
 
   const handleRefresh = () => {
     setIsRefreshing(true);
     setTimeout(() => {
-      setSummary(generateMockAnalyticsSummary(userId));
+      setSummary(initialData || generateMockAnalyticsSummary(userId));
       setIsRefreshing(false);
     }, 400);
   };
