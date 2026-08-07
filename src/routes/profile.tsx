@@ -55,7 +55,7 @@ export const Route = createFileRoute("/profile")({
         achievements || [],
         learningEvents || [],
         dailyChallenges || [],
-        learningWorlds || []
+        learningWorlds || [],
       );
 
       const analyticsData = generateAnalyticsSummary({
