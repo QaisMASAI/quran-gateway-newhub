@@ -37,10 +37,23 @@ import { GraduationCap, Globe2 } from "lucide-react";
 
 interface GamificationDashboardProps {
   locale?: "en" | "ar" | "he";
+  userId?: string;
+  data?: UserGameification;
+  achievements?: any[];
+  learningEvents?: any[];
 }
 
-export const GamificationDashboard: React.FC<GamificationDashboardProps> = ({ locale = "en" }) => {
-  const [data, setData] = useState<UserGameification>(loadUserGamification);
+export const GamificationDashboard: React.FC<GamificationDashboardProps> = ({
+  locale = "en",
+  data: initialData,
+  userId,
+}) => {
+  const [data, setData] = useState<UserGameification>(() => {
+    if (initialData) return initialData;
+    const loaded = loadUserGamification();
+    if (userId) loaded.userId = userId;
+    return loaded;
+  });
   const [activeTab, setActiveTab] = useState<
     | "global_expansion"
     | "classroom"
